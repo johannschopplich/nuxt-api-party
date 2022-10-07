@@ -66,15 +66,15 @@ Finally, fetch data from your API in your template:
 
 ```vue
 <script setup lang="ts">
-interface JsonPlaceholderPost {
+interface Post {
   userId: number
   id: number
   title: string
   body: string
 }
 
-// `data` will be typed as `Ref<JsonPlaceholderPost | null>`
-const { data, pending, refresh, error } = await useJsonPlaceholderData<JsonPlaceholderPost>('posts/1')
+// `data` will be typed as `Ref<Post | null>`
+const { data, pending, refresh, error } = await useJsonPlaceholderData<Post>('posts/1')
 </script>
 
 <template>
