@@ -97,7 +97,7 @@ Returns the API response data.
 
 ```ts
 function $party<T = any>(
-  uri: string,
+  path: string,
   opts: ApiFetchOptions = {},
 ): Promise<T>
 
@@ -152,7 +152,7 @@ By default, Nuxt waits until a `refresh` is finished before it can be executed a
 
 ```ts
 export function usePartyData<T = any>(
-  uri: MaybeComputedRef<string>,
+  path: MaybeComputedRef<string>,
   opts: UseApiDataOptions<T> = {},
 ): AsyncData<T, FetchError | null | true>
 

@@ -4,12 +4,12 @@ import { useRuntimeConfig } from '#imports'
 
 export default defineEventHandler(async (event): Promise<any> => {
   const body = await readBody(event)
-  const uri: string = body.uri || ''
+  const path: string = body.path || ''
   const headers: Record<string, string> = body.headers || {}
   const { apiParty } = useRuntimeConfig()
 
   try {
-    return await $fetch(uri, {
+    return await $fetch(path, {
       baseURL: apiParty.url,
       headers: {
         ...(apiParty.token && { Authorization: `Bearer ${apiParty.token}` }),

@@ -9,14 +9,14 @@ export type ApiFetchOptions = Pick<
 >
 
 export function $api<T = any>(
-  uri: string,
+  path: string,
   opts: ApiFetchOptions = {},
 ): Promise<T> {
   const nuxt = useNuxtApp()
   const { headers, ...fetchOptions } = opts
 
   const promiseMap: Map<string, Promise<T>> = nuxt._promiseMap = nuxt._promiseMap || new Map()
-  const key = `$party${hash(uri)}`
+  const key = `$party${hash(path)}`
 
   if (key in nuxt.payload.data!)
     return Promise.resolve(nuxt.payload.data![key])
@@ -28,7 +28,7 @@ export function $api<T = any>(
     ...fetchOptions,
     method: 'POST',
     body: {
-      uri,
+      path,
       headers: headersToObject(headers),
     },
   }).then((response) => {

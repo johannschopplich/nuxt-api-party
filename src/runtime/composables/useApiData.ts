@@ -26,10 +26,10 @@ export type UseApiDataOptions<T> = Pick<
 >
 
 export function useApiData<T = any>(
-  uri: MaybeComputedRef<string>,
+  path: MaybeComputedRef<string>,
   opts: UseApiDataOptions<T> = {},
 ) {
-  const _uri = computed(() => resolveUnref(uri))
+  const _path = computed(() => resolveUnref(path))
 
   const {
     lazy,
@@ -46,18 +46,18 @@ export function useApiData<T = any>(
     initialCache,
     immediate,
     watch: [
-      _uri,
+      _path,
     ],
   }
 
   return useAsyncData<T, FetchError>(
-    `$party${hash(_uri.value)}`,
+    `$party${hash(_path.value)}`,
     () => {
       return $fetch(apiServerRoute, {
         ...fetchOptions,
         method: 'POST',
         body: {
-          uri: _uri.value,
+          path: _path.value,
           headers: headersToObject(headers),
         },
       }) as Promise<T>
