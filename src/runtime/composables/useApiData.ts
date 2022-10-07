@@ -1,12 +1,10 @@
 import { computed } from 'vue'
 import { hash } from 'ohash'
-import type { ComputedRef, Ref } from 'vue'
 import type { FetchError } from 'ohmyfetch'
 import type { AsyncData, AsyncDataOptions, UseFetchOptions } from 'nuxt/app'
-import { apiServerRoute, headersToObject } from '../utils'
+import { apiServerRoute, headersToObject, resolveUnref } from '../utils'
+import type { MaybeComputedRef } from '../utils'
 import { useAsyncData } from '#imports'
-
-export type MaybeComputedRef<T> = (() => T) | ComputedRef<T> | Ref<T> | T
 
 export type UseApiDataOptions<T> = Pick<
   UseFetchOptions<T>,
@@ -64,10 +62,4 @@ export function useApiData<T = any>(
     },
     asyncDataOptions,
   ) as AsyncData<T, FetchError | null | true>
-}
-
-function resolveUnref<T>(r: MaybeComputedRef<T>): T {
-  return typeof r === 'function'
-    ? (r as any)()
-    : unref(r)
 }
