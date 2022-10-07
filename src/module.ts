@@ -89,12 +89,8 @@ export default defineNuxtModule<ModuleOptions>({
         return `
 import { $api } from '${resolve('runtime/composables/$api')}'
 import { useApiData } from '${resolve('runtime/composables/useApiData')}'
-export function ${rawComposableName}(uri, opts = {}) {
-  return $api(uri, opts)
-}
-export function ${dataComposableName}(uri, opts = {}) {
-  return useApiData(uri, opts)
-}
+export const ${rawComposableName} = (...args) => $api(...args)
+export const ${dataComposableName} = (...args) => useApiData(...args)
 `.trimStart()
       },
     })

@@ -6,7 +6,15 @@ interface JsonPlaceholderPost {
   body: string
 }
 
-const { data, refresh } = await useJsonPlaceholderData<JsonPlaceholderPost>('posts/1')
+const { data, refresh } = await useJsonPlaceholderData<JsonPlaceholderPost>(
+  'posts/1',
+  {
+    async onResponse({ response }) {
+      // eslint-disable-next-line no-console
+      console.table(response._data)
+    },
+  },
+)
 </script>
 
 <template>
