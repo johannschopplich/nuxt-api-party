@@ -8,7 +8,7 @@ You can customize the composable names! Given `json-placeholder` set as the modu
 
 ## Features
 
-- 🪅 Dynamic composable names
+- 🪅 [Dynamic composable names](#composables)
 - 🔒 Protect your API credentials in the client
 - 🪢 Token-based authentication built-in or bring your own headers
 - 🍱 Handle request similar to [`useFetch`](https://v3.nuxtjs.org/api/composables/use-fetch)
@@ -89,7 +89,7 @@ const { data, pending, refresh, error } = await useJsonPlaceholderData<Post>('po
 
 > ℹ️ The headings of the following sections aren't available as-is. As an example, the module option `name` is set to `party`.
 
-### `$party`
+### `$party` (Respectively Camel-Cased API Name)
 
 Returns the API response data.
 
@@ -137,7 +137,7 @@ const data = await $party(
 </template>
 ```
 
-### `usePartyData`
+### `usePartyData` (Respectively Pascal-Cased API Name)
 
 Return values:
 

@@ -1,13 +1,15 @@
 <script setup lang="ts">
-interface JsonPlaceholderPost {
+interface Post {
   userId: number
   id: number
   title: string
   body: string
 }
 
-const { data, refresh } = await useJsonPlaceholderData<JsonPlaceholderPost>(
-  'posts/1',
+const postId = ref(1)
+
+const { data, refresh } = await useJsonPlaceholderData<Post>(
+  computed(() => `posts/${postId.value}`),
   {
     async onResponse({ response }) {
       // eslint-disable-next-line no-console
@@ -24,6 +26,9 @@ const { data, refresh } = await useJsonPlaceholderData<JsonPlaceholderPost>(
     <hr>
     <h2>Response</h2>
     <pre>{{ JSON.stringify(data, undefined, 2) }}</pre>
+    <button @click="postId++">
+      Increment Post ID
+    </button>
     <button @click="refresh()">
       Refresh
     </button>
