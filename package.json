@@ -39,7 +39,6 @@
     "dev:prepare": "nuxt-module-build --stub && nuxi prepare playground",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "test": "vitest run",
     "test:types": "tsc --noEmit",
     "release": "bumpp --commit --push --tag",
     "prepare": "nuxi prepare playground"

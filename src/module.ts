@@ -13,14 +13,14 @@ export interface ModuleOptions {
 
   /**
    * API base URL
-   * @default 'process.env.API_PARTY_BASE_URL'
+   * @default process.env.API_PARTY_BASE_URL
    */
   url?: string
 
   /**
    * Optional API token for bearer authentication
    * You can set a custom header with the `headers` module option instead
-   * @default 'process.env.API_PARTY_TOKEN'
+   * @default process.env.API_PARTY_TOKEN
    */
   token?: string
 
@@ -54,7 +54,7 @@ export default defineNuxtModule<ModuleOptions>({
       logger.error('Missing `API_PARTY_BASE_URL` in `.env`')
 
     // Make sure authentication credentials are set
-    const authHeader = Object.keys(options.headers).find(key => key.toLowerCase() === 'authorization')
+    const authHeader = Object.keys(options.headers!).find(key => key.toLowerCase() === 'authorization')
     if (!options.token || !authHeader)
       logger.warn('Missing `API_PARTY_TOKEN` in `.env` for bearer authentication and `Authorization` header in the module options. Are you sure your API doesn\'t require authentication? If so, you may not need this module.')
 
