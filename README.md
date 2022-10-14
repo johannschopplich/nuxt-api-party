@@ -87,6 +87,8 @@ const { data, pending, refresh, error } = await useJsonPlaceholderData<Post>('po
 
 ## Composables
 
+Customize your API's composable names with the `name` in your Nuxt config module option. Given it is set to `json-placeholder`, the composables `$jsonPlaceholder` and `useJsonPlaceholderData` will be available globally.
+
 > ℹ️ The headings of the following sections aren't available as-is. As an example, the module option `name` is set to `party`.
 
 ### `$party` (Respectively Camel-Cased API Name)
