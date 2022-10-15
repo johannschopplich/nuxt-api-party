@@ -9,6 +9,7 @@ import { useAsyncData } from '#imports'
 export type UseApiDataOptions<T> = Pick<
   UseFetchOptions<T>,
   // Pick from `AsyncDataOptions`
+  | 'server'
   | 'lazy'
   | 'default'
   | 'watch'
