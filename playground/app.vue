@@ -13,7 +13,7 @@ const { data, refresh } = await useJsonPlaceholderData<Post>(
   {
     async onResponse({ response }) {
       // eslint-disable-next-line no-console
-      console.table(response._data)
+      console[process.server ? 'info' : 'table'](response._data)
     },
   },
 )
