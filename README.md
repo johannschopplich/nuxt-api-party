@@ -85,6 +85,49 @@ const { data, pending, refresh, error } = await useJsonPlaceholderData<Post>('po
 </template>
 ```
 
+## Module Options
+
+```ts
+interface ModuleOptions {
+  /**
+   * API name used for composables
+   *
+   * @remarks
+   * For example, if you set it to `foo`, the composables will be called `$foo` and `useFooData`
+   *
+   * @default 'party'
+   */
+  name?: string
+
+  /**
+   * API base URL
+   *
+   * @default process.env.API_PARTY_BASE_URL
+   */
+  url?: string
+
+  /**
+   * Optional API token for bearer authentication
+   *
+   * @remarks
+   * You can set a custom header with the `headers` module option instead
+   *
+   * @default process.env.API_PARTY_TOKEN
+   */
+  token?: string
+
+  /**
+   * Custom headers sent with every request to the API
+   *
+   * @remarks
+   * Add authorization headers if you want to use a custom authorization method
+   *
+   * @default {}
+   */
+  headers?: Record<string, string>
+}
+```
+
 ## Composables
 
 Customize your API's composable names with the `name` in your Nuxt config module option. Given it is set to `json-placeholder`, the composables `$jsonPlaceholder` and `useJsonPlaceholderData` will be available globally.
