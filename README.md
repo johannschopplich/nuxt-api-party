@@ -214,6 +214,7 @@ export function usePartyData<T = any>(
 type UseApiDataOptions<T> = Pick<
   UseFetchOptions<T>,
   // Pick from `AsyncDataOptions`
+  | 'server'
   | 'lazy'
   | 'default'
   | 'watch'
