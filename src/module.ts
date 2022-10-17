@@ -71,12 +71,11 @@ export default defineNuxtModule<ModuleOptions>({
 
     // Make sure API base URL is set
     if (!options.url)
-      logger.error('Missing `API_PARTY_BASE_URL` in `.env`')
+      logger.error('Missing `API_PARTY_BASE_URL` in `.env` file')
 
     // Make sure authentication credentials are set
-    const authHeader = Object.keys(options.headers!).find(key => key.toLowerCase() === 'authorization')
-    if (!options.token || !authHeader)
-      logger.warn('Missing `API_PARTY_TOKEN` in `.env` for bearer authentication and `Authorization` header in the module options. Are you sure your API doesn\'t require authentication? If so, you may not need this module.')
+    if (!options.token || Object.keys(options.headers!).length === 0)
+      logger.warn('Missing `API_PARTY_TOKEN` in `.env` file for bearer authentication and custom headers in module options. Are you sure your API doesn\'t require authentication? If so, you may not need this module.')
 
     // Private runtime config
     nuxt.options.runtimeConfig.apiParty = defu(
