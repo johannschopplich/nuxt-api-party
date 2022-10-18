@@ -1,14 +1,14 @@
+![Nuxt API Party module](./.github/og.png)
+
 # nuxt-api-party
 
 [![npm version](https://img.shields.io/npm/v/nuxt-api-party?color=a1b858&label=)](https://www.npmjs.com/package/nuxt-api-party)
 
-This module provides composables to fetch data from an API of your choice securely.
-
-You can customize the composable names! Given `json-placeholder` set as the module option `name` in your Nuxt config, the composables `$jsonPlaceholder` and `useJsonPlaceholderData` will be available globally.
+This module enables you to securely fetch data from any API by proxying the request in a Nuxt server route. Composable names are dynamic – given `json-placeholder` set as the module option `name` in your Nuxt config, the composables `$jsonPlaceholder` and `useJsonPlaceholderData` will be available globally.
 
 ## Features
 
-- 🪅 [Dynamic composable names](#composables)
+- 🪅 [Generated composable names](#composables)
 - 🔒 Protect your API credentials in the client
 - 🪢 Token-based authentication built-in or bring your own headers
 - 🍱 Handle request similar to [`useFetch`](https://v3.nuxtjs.org/api/composables/use-fetch)
@@ -27,7 +27,7 @@ npm i -D nuxt-api-party
 
 ## How It Works
 
-Composables will initiate a POST request to the Nuxt server route `/api/__api_party__`, which then fetches the actual data for a given route from your API and passes the response back to the template/client. This proxy behaviour has the benefit of omitting CORS issues, since data is sent from server to server.
+Composables will initiate a POST request to the Nuxt server route `/api/__api_party__`, which then fetches the actual data for a given route from your API and passes the response back to the template/client. This proxy behavior has the benefit of omitting CORS issues, since data is sent from server to server.
 
 During server-side rendering, calls to the Nuxt server route will directly call the relevant function (emulating the request), saving an additional API call.
 
@@ -60,7 +60,7 @@ API_PARTY_BASE_URL=https://jsonplaceholder.typicode.com
 If you were to call your API `json-placeholder`, the generated composables are:
 
 - `$jsonPlaceholder` – Returns the response data, similar to `$fetch`
-- `useJsonPlaceholderData` – Returns [multiple values](#usepartydata) similar to `useFetch`
+- `useJsonPlaceholderData` – Returns [multiple values](#usepartydata-respectively-pascal-cased-api-name) similar to `useFetch`
 
 Finally, fetch data from your API in your template:
 
@@ -87,56 +87,122 @@ const { data, pending, refresh, error } = await useJsonPlaceholderData<Post>('po
 
 ## Module Options
 
+<table>
+
+<thead>
+<tr>
+<th>Option</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+
+<tr>
+<td valign="top">
+
+`name`
+
+</td><td valign="top">
+
+`string`
+
+</td><td valign="top">
+
+`party`
+
+</td><td valign="top">
+
+**API name used for composables**
+
+For example, if you set it to `foo`, the composables will be called `$foo` and `useFooData`.
+
+</td>
+</tr>
+
+<tr>
+<td valign="top">
+
+`url`
+
+</td><td valign="top">
+
+`string`
+
+</td><td valign="top">
+
+`process.env.API_PARTY_BASE_URL`
+
+</td><td valign="top">
+
+**API base URL**
+
+For example, if you set it to `foo`, the composables will be called `$foo` and `useFooData`.
+
+</td>
+</tr>
+
+<tr>
+<td valign="top">
+
+`token`
+
+</td><td valign="top">
+
+`string`
+
+</td><td valign="top">
+
+`process.env.API_PARTY_TOKEN`
+
+</td><td valign="top">
+
+**Optional API token for bearer authentication**
+
+You can set a custom header with the `headers` module option instead.
+
+</td>
+</tr>
+
+<tr>
+<td valign="top">
+
+`headers`
+
+</td><td valign="top">
+
+`Record<string, string>`
+
+</td><td valign="top">
+
+`{}`
+
+</td><td valign="top">
+
+**Custom headers sent with every request to the API**
+
+Add authorization headers if you want to use a custom authorization method.
+
+Example:
+
 ```ts
-interface ModuleOptions {
-  /**
-   * API name used for composables
-   *
-   * @remarks
-   * For example, if you set it to `foo`, the composables will be called `$foo` and `useFooData`
-   *
-   * @default 'party'
-   */
-  name?: string
+const username = 'foo'
+const password = 'bar'
 
-  /**
-   * API base URL
-   *
-   * @default process.env.API_PARTY_BASE_URL
-   */
-  url?: string
-
-  /**
-   * Optional API token for bearer authentication
-   *
-   * @remarks
-   * You can set a custom header with the `headers` module option instead
-   *
-   * @default process.env.API_PARTY_TOKEN
-   */
-  token?: string
-
-  /**
-   * Custom headers sent with every request to the API
-   *
-   * @remarks
-   * Add authorization headers if you want to use a custom authorization method
-   *
-   * @example
-   * defineNuxtConfig({
-   *   i18n: {
-   *     headers: {
-   *       'Custom-Api-Header': 'foo',
-   *       Authorization: Buffer.from(`${username}:${password}`).toString('base64')
-   *     }
-   *   }
-   * }
-   *
-   * @default {}
-   */
-  headers?: Record<string, string>
-}
+export default defineNuxtConfig({
+  i18n: {
+    headers: {
+      'Custom-Api-Header': 'foo',
+      'Authorization': Buffer.from(`${username}:${password}`).toString('base64')
+    }
+  }
+})
 ```
+
+</td>
+</tr>
+
+</table>
 
 ## Composables
 
@@ -148,7 +214,7 @@ Customize your API's composable names with the `name` in your Nuxt config module
 
 Returns the API response data.
 
-**Types**
+**Type Declarations**
 
 ```ts
 function $party<T = any>(
@@ -203,7 +269,7 @@ Return values:
 
 By default, Nuxt waits until a `refresh` is finished before it can be executed again. Passing `true` as parameter skips that wait.
 
-**Types**
+**Type Declarations**
 
 ```ts
 export function usePartyData<T = any>(
@@ -260,6 +326,7 @@ const { data, pending, error, refresh } = await usePartyData('posts/1')
 ## Special Thanks
 
 - [Dennis Baum](https://github.com/dennisbaum) for sponsoring this package!
+- [SVGBackgrounds.com](https://www.svgbackgrounds.com) for the OpenGraph image background pattern.
 
 ## License
 
