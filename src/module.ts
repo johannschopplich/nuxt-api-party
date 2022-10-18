@@ -38,14 +38,14 @@ export interface ModuleOptions {
    * Add authorization headers if you want to use a custom authorization method
    *
    * @example
-   * defineNuxtConfig({
+   * export default defineNuxtConfig({
    *   i18n: {
    *     headers: {
    *       'Custom-Api-Header': 'foo',
-   *       Authorization: Buffer.from(`${username}:${password}`).toString('base64')
+   *       'Authorization': Buffer.from(`${username}:${password}`).toString('base64')
    *     }
    *   }
-   * }
+   * })
    *
    * @default {}
    */
