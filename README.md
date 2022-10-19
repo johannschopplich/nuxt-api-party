@@ -93,7 +93,6 @@ const { data, pending, refresh, error } = await useJsonPlaceholderData<Post>('po
 <tr>
 <th>Option</th>
 <th>Type</th>
-<th>Default</th>
 <th>Description</th>
 </tr>
 </thead>
@@ -109,13 +108,11 @@ const { data, pending, refresh, error } = await useJsonPlaceholderData<Post>('po
 
 </td><td valign="top">
 
-`party`
-
-</td><td valign="top">
-
 **API name used for composables**
 
 For example, if you set it to `foo`, the composables will be called `$foo` and `useFooData`.
+
+Default value: `party`
 
 </td>
 </tr>
@@ -131,13 +128,11 @@ For example, if you set it to `foo`, the composables will be called `$foo` and `
 
 </td><td valign="top">
 
-`process.env.API_PARTY_BASE_URL`
-
-</td><td valign="top">
-
 **API base URL**
 
 For example, if you set it to `foo`, the composables will be called `$foo` and `useFooData`.
+
+Default value: `process.env.API_PARTY_BASE_URL`
 
 </td>
 </tr>
@@ -153,13 +148,11 @@ For example, if you set it to `foo`, the composables will be called `$foo` and `
 
 </td><td valign="top">
 
-`process.env.API_PARTY_TOKEN`
-
-</td><td valign="top">
-
 **Optional API token for bearer authentication**
 
 You can set a custom header with the `headers` module option instead.
+
+Default value: `process.env.API_PARTY_TOKEN`
 
 </td>
 </tr>
@@ -175,13 +168,11 @@ You can set a custom header with the `headers` module option instead.
 
 </td><td valign="top">
 
-`{}`
-
-</td><td valign="top">
-
 **Custom headers sent with every request to the API**
 
 Add authorization headers if you want to use a custom authorization method.
+
+Default value: `{}`
 
 Example:
 
