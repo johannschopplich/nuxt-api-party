@@ -263,7 +263,7 @@ By default, Nuxt waits until a `refresh` is finished before it can be executed a
 **Type Declarations**
 
 ```ts
-export function usePartyData<T = any>(
+function usePartyData<T = any>(
   path: MaybeComputedRef<string>,
   opts: UseApiDataOptions<T> = {},
 ): AsyncData<T, FetchError | null | true>
