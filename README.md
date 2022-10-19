@@ -164,7 +164,7 @@ Default value: `process.env.API_PARTY_TOKEN`
 
 </td><td valign="top">
 
-`Record<string, string>`
+`Record<string, string>`
 
 </td><td valign="top">
 
