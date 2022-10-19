@@ -184,7 +184,9 @@ export default defineNuxtConfig({
   i18n: {
     headers: {
       'Custom-Api-Header': 'foo',
-      'Authorization': Buffer.from(`${username}:${password}`).toString('base64')
+      'Authorization': Buffer
+        .from(`${username}:${password}`)
+        .toString('base64')
     }
   }
 })
