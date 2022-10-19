@@ -9,7 +9,7 @@ This module enables you to securely fetch data from any API by proxying the requ
 ## Features
 
 - 🪅 [Dynamic composable names](#composables)
-- 🔒 Protect your API credentials in the client
+- 🔒 Protected API credentials in the client
 - 🪢 Token-based authentication built-in or bring your own headers
 - 🍱 Feels just like [`useFetch`](https://v3.nuxtjs.org/api/composables/use-fetch)
 - 🗃 Cached responses
