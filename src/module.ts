@@ -39,7 +39,7 @@ export interface ModuleOptions {
    *
    * @example
    * export default defineNuxtConfig({
-   *   i18n: {
+   *   apiParty: {
    *     headers: {
    *       'Custom-Api-Header': 'foo',
    *       'Authorization': Buffer.from(`${username}:${password}`).toString('base64')

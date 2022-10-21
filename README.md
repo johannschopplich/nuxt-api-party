@@ -181,7 +181,7 @@ const username = 'foo'
 const password = 'bar'
 
 export default defineNuxtConfig({
-  i18n: {
+  apiParty: {
     headers: {
       'Custom-Api-Header': 'foo',
       'Authorization': Buffer
