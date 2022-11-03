@@ -74,7 +74,7 @@ export default defineNuxtModule<ModuleOptions>({
       logger.error('Missing `API_PARTY_BASE_URL` in `.env` file')
 
     // Make sure authentication credentials are set
-    if (!options.token || Object.keys(options.headers!).length === 0)
+    if (!options.token && Object.keys(options.headers!).length === 0)
       logger.warn('Missing `API_PARTY_TOKEN` in `.env` file for bearer authentication and custom headers in module options. Are you sure your API doesn\'t require authentication? If so, you may not need this module.')
 
     // Private runtime config
