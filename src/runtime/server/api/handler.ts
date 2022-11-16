@@ -1,5 +1,5 @@
 import { createError, defineEventHandler, readBody } from 'h3'
-import type { FetchError } from 'ohmyfetch'
+import type { FetchError } from 'ofetch'
 import { useRuntimeConfig } from '#imports'
 
 export default defineEventHandler(async (event): Promise<any> => {

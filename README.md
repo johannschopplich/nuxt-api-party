@@ -277,7 +277,6 @@ type UseApiDataOptions<T> = Pick<
   | 'lazy'
   | 'default'
   | 'watch'
-  | 'initialCache'
   | 'immediate'
   // Pick from `FetchOptions`
   | 'onRequest'

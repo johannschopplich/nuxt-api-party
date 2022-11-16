@@ -1,5 +1,5 @@
 import { hash } from 'ohash'
-import type { FetchOptions } from 'ohmyfetch'
+import type { FetchOptions } from 'ofetch'
 import { apiServerRoute, headersToObject } from '../utils'
 import { useNuxtApp } from '#imports'
 

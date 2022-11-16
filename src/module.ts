@@ -94,8 +94,8 @@ export default defineNuxtModule<ModuleOptions>({
       handler: resolve('runtime/server/api/handler'),
     })
 
-    const rawComposableName = `$${camelCase(options.name)}`
-    const dataComposableName = `use${pascalCase(options.name)}Data`
+    const rawComposableName = `$${camelCase(options.name!)}`
+    const dataComposableName = `use${pascalCase(options.name!)}Data`
 
     addImportsSources({
       from: '#build/api-party',
