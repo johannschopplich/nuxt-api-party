@@ -42,7 +42,7 @@ export interface ModuleOptions {
    *   apiParty: {
    *     headers: {
    *       'Custom-Api-Header': 'foo',
-   *       'Authorization': Buffer.from(`${username}:${password}`).toString('base64')
+   *       'Authorization': `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`
    *     }
    *   }
    * })

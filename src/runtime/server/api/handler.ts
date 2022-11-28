@@ -13,6 +13,7 @@ export default defineEventHandler(async (event): Promise<any> => {
       baseURL: apiParty.url,
       headers: {
         ...(apiParty.token && { Authorization: `Bearer ${apiParty.token}` }),
+        ...apiParty.headers,
         ...headers,
       },
     })
