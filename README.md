@@ -271,14 +271,14 @@ function usePartyData<T = any>(
 ): AsyncData<T, FetchError | null | true>
 
 type UseApiDataOptions<T> = Pick<
-  UseFetchOptions<T>,
-  // Pick from `AsyncDataOptions`
+  AsyncDataOptions<T>,
   | 'server'
   | 'lazy'
   | 'default'
   | 'watch'
   | 'immediate'
-  // Pick from `FetchOptions`
+> & Pick<
+  FetchOptions,
   | 'onRequest'
   | 'onRequestError'
   | 'onResponse'
