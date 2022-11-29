@@ -23,7 +23,13 @@ export type UseApiDataOptions<T> = Pick<
   | 'headers'
 >
 
-export function useApiData<T = any>(
+export declare function useApiData<T = any>(
+  path: MaybeComputedRef<string>,
+  opts?: UseApiDataOptions<T>,
+): AsyncData<T, FetchError | null | true>
+
+export function _useApiData<T = any>(
+  endpoint: string,
   path: MaybeComputedRef<string>,
   opts: UseApiDataOptions<T> = {},
 ) {
@@ -55,6 +61,7 @@ export function useApiData<T = any>(
         body: {
           path: _path.value,
           headers: headersToObject(unref(headers)),
+          endpoint,
         },
       }) as Promise<T>
     },

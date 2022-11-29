@@ -11,6 +11,7 @@ This module enables you to securely fetch data from any API by proxying the requ
 - 🪅 [Dynamic composable names](#composables)
 - 🔒 Protected API credentials in the client
 - 🪢 Token-based authentication built-in or bring your own headers
+- 🧇 [Connect multiple API endpoints](#multiple-api-endpoints)
 - 🍱 Feels just like [`useFetch`](https://v3.nuxtjs.org/api/composables/use-fetch)
 - 🗃 Cached responses
 - 🦾 Strongly typed
@@ -49,6 +50,8 @@ export default defineNuxtConfig({
 })
 ```
 
+### Singular API Endpoint
+
 Set the following environment variables in your project's `.env` file:
 
 ```bash
@@ -83,6 +86,44 @@ const { data, pending, refresh, error } = await useJsonPlaceholderData<Post>('po
     <pre>{{ JSON.stringify(data, undefined, 2) }}</pre>
   </div>
 </template>
+```
+
+## Multiple API Endpoints
+
+> ℹ️ Using the `endpoints` module option will invalidate other module options of the default API endpoint.
+
+You may want to connect multiple APIs to your Nuxt application. Utilize the `endpoints` module option for this use-case, expecting a record of API endpoint configurations with the following type:
+
+```ts
+type ApiPartyEndpoints = Record<
+  string,
+  {
+    url: string
+    token?: string
+    headers?: Record<string, string>
+  }
+>
+```
+
+The key of each item will intrinsically be used as the API name. A custom `url`, as well as optionally `token` and `headers` can be set in the endpoint details configuration:
+
+```ts
+export default defineNuxtConfig({
+  apiParty: {
+    endpoints: {
+      'json-placeholder': {
+        url: process.env.JSON_PLACEHOLDER_API_BASE_URL,
+        token: process.env.JSON_PLACEHOLDER_API_TOKEN
+      },
+      'client': {
+        url: process.env.CLIENT_API_BASE_URL,
+        headers: {
+          Authorization: process.env.CLIENT_API_AUTH_HEADER
+        }
+      }
+    }
+  }
+})
 ```
 
 ## Module Options
@@ -193,6 +234,56 @@ export default defineNuxtConfig({
 </td>
 </tr>
 
+<tr>
+<td valign="top">
+
+`endpoints`
+
+</td><td valign="top">
+
+```ts
+type ApiPartyEndpoints = Record<
+  string,
+  {
+    url: string
+    token?: string
+    headers?: Record<string, string>
+  }
+>
+```
+
+</td><td valign="top">
+
+**Multiple API endpoints**
+
+This will create multiple API composables and invalidate the `name`, `url`, `token` and `headers` module options of the default endpoint.
+
+Default value: `{}`
+
+Example:
+
+```ts
+export default defineNuxtConfig({
+  apiParty: {
+    endpoints: {
+      'json-placeholder': {
+        url: process.env.JSON_PLACEHOLDER_API_BASE_URL,
+        token: process.env.JSON_PLACEHOLDER_API_TOKEN
+      },
+      'client': {
+        url: process.env.CLIENT_API_BASE_URL,
+        headers: {
+          Authorization: process.env.CLIENT_API_AUTH_HEADER
+        }
+      }
+    }
+  }
+})
+```
+
+</td>
+</tr>
+
 </table>
 
 ## Composables
@@ -210,7 +301,7 @@ Returns the API response data.
 ```ts
 function $party<T = any>(
   path: string,
-  opts: ApiFetchOptions = {},
+  opts?: ApiFetchOptions,
 ): Promise<T>
 
 type ApiFetchOptions = Pick<
@@ -237,7 +328,7 @@ const data = await $party(
     },
     async onResponseError({ error }) {
       console.log(error)
-    },
+    }
   }
 )
 </script>
@@ -265,7 +356,7 @@ By default, Nuxt waits until a `refresh` is finished before it can be executed a
 ```ts
 function usePartyData<T = any>(
   path: MaybeComputedRef<string>,
-  opts: UseApiDataOptions<T> = {},
+  opts?: UseApiDataOptions<T>,
 ): AsyncData<T, FetchError | null | true>
 
 type UseApiDataOptions<T> = Pick<

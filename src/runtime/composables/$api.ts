@@ -8,7 +8,13 @@ export type ApiFetchOptions = Pick<
   'onRequest' | 'onRequestError' | 'onResponse' | 'onResponseError' | 'headers'
 >
 
-export function $api<T = any>(
+export declare function $api<T = any>(
+  path: string,
+  opts?: ApiFetchOptions,
+): Promise<T>
+
+export function _$api<T = any>(
+  endpoint: string,
   path: string,
   opts: ApiFetchOptions = {},
 ): Promise<T> {
@@ -30,6 +36,7 @@ export function $api<T = any>(
     body: {
       path,
       headers: headersToObject(headers),
+      endpoint,
     },
   }).then((response) => {
     nuxt.payload.data![key] = response

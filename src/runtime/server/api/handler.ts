@@ -1,19 +1,25 @@
 import { createError, defineEventHandler, readBody } from 'h3'
 import type { FetchError } from 'ofetch'
+import type { ModuleOptions } from '../../../module'
 import { useRuntimeConfig } from '#imports'
 
 export default defineEventHandler(async (event): Promise<any> => {
-  const body = await readBody(event)
-  const path: string = body.path || ''
-  const headers: Record<string, string> = body.headers || {}
+  const body = await readBody<{
+    path: string
+    headers: Record<string, string>
+    endpoint: string
+  }>(event)
+
+  const { path, headers } = body
   const { apiParty } = useRuntimeConfig()
+  const endpoint = (apiParty.endpoints as ModuleOptions['endpoints'])![body.endpoint]
 
   try {
     return await $fetch(path, {
-      baseURL: apiParty.url,
+      baseURL: endpoint.url,
       headers: {
-        ...(apiParty.token && { Authorization: `Bearer ${apiParty.token}` }),
-        ...apiParty.headers,
+        ...(endpoint.token && { Authorization: `Bearer ${endpoint.token}` }),
+        ...endpoint.headers,
         ...headers,
       },
     })
