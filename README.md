@@ -90,8 +90,6 @@ const { data, pending, refresh, error } = await useJsonPlaceholderData<Post>('po
 
 ## Multiple API Endpoints
 
-> ℹ️ Using the `endpoints` module option will invalidate other module options of the default API endpoint.
-
 You may want to connect multiple APIs to your Nuxt application. Utilize the `endpoints` module option for this use-case, expecting a record of API endpoint configurations with the following type:
 
 ```ts
@@ -104,6 +102,8 @@ type ApiPartyEndpoints = Record<
   }
 >
 ```
+
+> ℹ️ You can keep the default endpoint as well.
 
 The key of each item will intrinsically be used as the API name. A custom `url`, as well as optionally `token` and `headers` can be set in the endpoint details configuration:
 
@@ -145,7 +145,7 @@ export default defineNuxtConfig({
 
 </td><td valign="top">
 
-`string`
+`string | undefined`
 
 </td><td valign="top">
 
@@ -153,7 +153,7 @@ export default defineNuxtConfig({
 
 For example, if you set it to `foo`, the composables will be called `$foo` and `useFooData`.
 
-Default value: `party`
+Default value: `undefined`
 
 </td>
 </tr>
@@ -165,7 +165,7 @@ Default value: `party`
 
 </td><td valign="top">
 
-`string`
+`string | undefined`
 
 </td><td valign="top">
 
@@ -185,7 +185,7 @@ Default value: `process.env.API_PARTY_BASE_URL`
 
 </td><td valign="top">
 
-`string`
+`string | undefined`
 
 </td><td valign="top">
 
@@ -205,7 +205,7 @@ Default value: `process.env.API_PARTY_TOKEN`
 
 </td><td valign="top">
 
-`Record<string, string>`
+`Record<string, string> | undefined`
 
 </td><td valign="top">
 
@@ -249,14 +249,14 @@ type ApiPartyEndpoints = Record<
     token?: string
     headers?: Record<string, string>
   }
->
+> | undefined
 ```
 
 </td><td valign="top">
 
 **Multiple API endpoints**
 
-This will create multiple API composables and invalidate the `name`, `url`, `token` and `headers` module options of the default endpoint.
+This will create multiple API composables for the given endpoint configurations. You can keep the default endpoint as well.
 
 Default value: `{}`
 

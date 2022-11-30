@@ -8,8 +8,6 @@ export interface ModuleOptions {
    *
    * @remarks
    * For example, if you set it to `foo`, the composables will be called `$foo` and `useFooData`
-   *
-   * @default 'party'
    */
   name?: string
 
@@ -54,7 +52,7 @@ export interface ModuleOptions {
    * Multiple API endpoints
    *
    * @remarks
-   * This will create multiple API composables and invalidate the `name`, `url`, `token` and `headers` module options of the default endpoint
+   * This will create multiple API composables for the given endpoint configurations. You can keep the default endpoint as well.
    *
    * @default {}
    */
@@ -77,7 +75,7 @@ export default defineNuxtModule<ModuleOptions>({
     },
   },
   defaults: {
-    name: 'party',
+    name: undefined,
     url: process.env.API_PARTY_BASE_URL as string,
     token: process.env.API_PARTY_TOKEN as string,
     headers: {},
@@ -89,7 +87,10 @@ export default defineNuxtModule<ModuleOptions>({
     const getRawComposableName = (endpointId: string) => `$${camelCase(endpointId)}`
     const getDataComposableName = (endpointId: string) => `use${pascalCase(endpointId)}Data`
 
-    if (!hasMultipleEndpoints) {
+    if (!hasMultipleEndpoints && !options.name)
+      logger.error('No name provided for the API. Please set the `name` option.')
+
+    if (options.name) {
       // Make sure API base URL is set
       if (!options.url)
         logger.error('Missing `API_PARTY_BASE_URL` in `.env` file')
@@ -99,7 +100,7 @@ export default defineNuxtModule<ModuleOptions>({
         logger.warn('Missing `API_PARTY_TOKEN` in `.env` file for bearer authentication and custom headers in module options. Are you sure your API doesn\'t require authentication? If so, you may not need this module.')
 
       // Add default endpoint to collection of endpoints
-      options.endpoints![options.name!] = {
+      options.endpoints![options.name] = {
         url: options.url!,
         token: options.token,
         headers: options.headers,
@@ -148,12 +149,13 @@ export const ${getDataComposableName(i)} = (...args) => _useApiData('${i}', ...a
     addTemplate({
       filename: 'api-party.d.ts',
       getContents() {
-        return endpointKeys.map(i => `
-import { $Api } from '${resolve('runtime/composables/$api')}'
-import { UseApiData } from '${resolve('runtime/composables/useApiData')}'
+        return `
+import type { $Api } from '${resolve('runtime/composables/$api')}'
+import type { UseApiData } from '${resolve('runtime/composables/useApiData')}'
+${endpointKeys.map(i => `
 export declare const ${getRawComposableName(i)}: $Api
 export declare const ${getDataComposableName(i)}: UseApiData
-`.trimStart()).join('')
+`.trimStart()).join('')}`.trimStart()
       },
     })
   },
