@@ -1,6 +1,6 @@
 import { hash } from 'ohash'
 import type { FetchOptions } from 'ofetch'
-import { apiServerRoute, headersToObject } from '../utils'
+import { headersToObject } from '../utils'
 import { useNuxtApp } from '#imports'
 
 export type ApiFetchOptions = Pick<
@@ -14,7 +14,7 @@ export declare function $api<T = any>(
 ): Promise<T>
 
 export function _$api<T = any>(
-  endpoint: string,
+  endpointId: string,
   path: string,
   opts: ApiFetchOptions = {},
 ): Promise<T> {
@@ -30,13 +30,12 @@ export function _$api<T = any>(
   if (promiseMap.has(key))
     return promiseMap.get(key)!
 
-  const request = $fetch(apiServerRoute, {
+  const request = $fetch(`/api/__api_party__/${endpointId}`, {
     ...fetchOptions,
     method: 'POST',
     body: {
       path,
       headers: headersToObject(headers),
-      endpoint,
     },
   }).then((response) => {
     nuxt.payload.data![key] = response

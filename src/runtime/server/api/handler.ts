@@ -4,15 +4,23 @@ import type { ModuleOptions } from '../../../module'
 import { useRuntimeConfig } from '#imports'
 
 export default defineEventHandler(async (event): Promise<any> => {
+  const { apiParty } = useRuntimeConfig()
   const body = await readBody<{
     path: string
     headers: Record<string, string>
-    endpoint: string
   }>(event)
+  const { endpointId } = event.context.params
+  const endpoints = (apiParty.endpoints as ModuleOptions['endpoints'])!
+
+  if (!(endpointId in endpoints)) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: 'Unknown endpoint ID received',
+    })
+  }
 
   const { path, headers } = body
-  const { apiParty } = useRuntimeConfig()
-  const endpoint = (apiParty.endpoints as ModuleOptions['endpoints'])![body.endpoint]
+  const endpoint = endpoints[endpointId]
 
   try {
     return await $fetch(path, {

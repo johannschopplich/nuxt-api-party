@@ -1,7 +1,6 @@
 import { defu } from 'defu'
 import { camelCase, pascalCase } from 'scule'
 import { addImportsSources, addServerHandler, addTemplate, createResolver, defineNuxtModule, useLogger } from '@nuxt/kit'
-import { apiServerRoute } from './runtime/utils'
 
 export interface ModuleOptions {
   /**
@@ -87,8 +86,8 @@ export default defineNuxtModule<ModuleOptions>({
   async setup(options, nuxt) {
     const logger = useLogger('nuxt-api-party')
     const hasMultipleEndpoints = Object.keys(options.endpoints!).length > 0
-    const getRawComposableName = (endpointName: string) => `$${camelCase(endpointName)}`
-    const getDataComposableName = (endpointName: string) => `use${pascalCase(endpointName)}Data`
+    const getRawComposableName = (endpointId: string) => `$${camelCase(endpointId)}`
+    const getDataComposableName = (endpointId: string) => `use${pascalCase(endpointId)}Data`
 
     if (!hasMultipleEndpoints) {
       // Make sure API base URL is set
@@ -119,7 +118,7 @@ export default defineNuxtModule<ModuleOptions>({
 
     // Add Nuxt server route to proxy the API request server-side
     addServerHandler({
-      route: apiServerRoute,
+      route: '/api/__api_party__/:endpointId',
       method: 'post',
       handler: resolve('runtime/server/api/handler'),
     })
@@ -150,7 +149,7 @@ export const ${getDataComposableName(i)} = (...args) => _useApiData('${i}', ...a
       filename: 'api-party.d.ts',
       getContents() {
         return endpointKeys.map(i => `
-export declare const ${getRawComposableName(i)}: typeof import('${resolve('runtime/composables/$api')}')['$api']
+export declare const ${getRawComposableName(i)}: import('${resolve('runtime/composables/$api')}')['$Api']
 export declare const ${getDataComposableName(i)}: typeof import('${resolve('runtime/composables/useApiData')}')['useApiData']
 `.trimStart()).join('')
       },

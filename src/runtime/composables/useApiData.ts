@@ -2,7 +2,7 @@ import { computed, unref } from 'vue'
 import { hash } from 'ohash'
 import type { FetchError, FetchOptions } from 'ofetch'
 import type { AsyncData, AsyncDataOptions } from 'nuxt/app'
-import { apiServerRoute, headersToObject, resolveUnref } from '../utils'
+import { headersToObject, resolveUnref } from '../utils'
 import type { MaybeComputedRef } from '../utils'
 import { useAsyncData } from '#imports'
 
@@ -29,7 +29,7 @@ export declare function useApiData<T = any>(
 ): AsyncData<T, FetchError | null | true>
 
 export function _useApiData<T = any>(
-  endpoint: string,
+  endpointId: string,
   path: MaybeComputedRef<string>,
   opts: UseApiDataOptions<T> = {},
 ) {
@@ -55,13 +55,12 @@ export function _useApiData<T = any>(
   return useAsyncData<T, FetchError>(
     `$party${hash(_path.value)}`,
     () => {
-      return $fetch(apiServerRoute, {
+      return $fetch(`/api/__api_party__/${endpointId}`, {
         ...fetchOptions,
         method: 'POST',
         body: {
           path: _path.value,
           headers: headersToObject(unref(headers)),
-          endpoint,
         },
       }) as Promise<T>
     },
