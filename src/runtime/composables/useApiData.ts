@@ -23,10 +23,10 @@ export type UseApiDataOptions<T> = Pick<
   | 'headers'
 >
 
-export declare function useApiData<T = any>(
+export type UseApiData = <T = any>(
   path: MaybeComputedRef<string>,
   opts?: UseApiDataOptions<T>,
-): AsyncData<T, FetchError | null | true>
+) => AsyncData<T, FetchError | null | true>
 
 export function _useApiData<T = any>(
   endpointId: string,

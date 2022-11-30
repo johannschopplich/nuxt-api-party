@@ -149,8 +149,10 @@ export const ${getDataComposableName(i)} = (...args) => _useApiData('${i}', ...a
       filename: 'api-party.d.ts',
       getContents() {
         return endpointKeys.map(i => `
-export declare const ${getRawComposableName(i)}: import('${resolve('runtime/composables/$api')}')['$Api']
-export declare const ${getDataComposableName(i)}: typeof import('${resolve('runtime/composables/useApiData')}')['useApiData']
+import { $Api } from '${resolve('runtime/composables/$api')}'
+import { UseApiData } from '${resolve('runtime/composables/useApiData')}'
+export declare const ${getRawComposableName(i)}: $Api
+export declare const ${getDataComposableName(i)}: UseApiData
 `.trimStart()).join('')
       },
     })

@@ -8,10 +8,10 @@ export type ApiFetchOptions = Pick<
   'onRequest' | 'onRequestError' | 'onResponse' | 'onResponseError' | 'headers'
 >
 
-export declare function $api<T = any>(
+export type $Api = <T = any>(
   path: string,
   opts?: ApiFetchOptions,
-): Promise<T>
+) => Promise<T>
 
 export function _$api<T = any>(
   endpointId: string,
