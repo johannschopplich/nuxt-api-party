@@ -81,7 +81,7 @@ export default defineNuxtModule<ModuleOptions>({
     headers: {},
     endpoints: {},
   },
-  async setup(options, nuxt) {
+  setup(options, nuxt) {
     const logger = useLogger('nuxt-api-party')
     const hasMultipleEndpoints = Object.keys(options.endpoints!).length > 0
     const getRawComposableName = (endpointId: string) => `$${camelCase(endpointId)}`

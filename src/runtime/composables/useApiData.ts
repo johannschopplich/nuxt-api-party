@@ -1,6 +1,7 @@
 import { computed, unref } from 'vue'
 import { hash } from 'ohash'
 import type { FetchError, FetchOptions } from 'ofetch'
+import type { QueryObject } from 'ufo'
 import type { AsyncData, AsyncDataOptions } from 'nuxt/app'
 import { headersToObject, resolveUnref } from '../utils'
 import type { MaybeComputedRef } from '../utils'
@@ -21,7 +22,11 @@ export type UseApiDataOptions<T> = Pick<
   | 'onResponseError'
   // Pick from `globalThis.RequestInit`
   | 'headers'
->
+  | 'method'
+> & {
+  query?: QueryObject
+  body?: Record<string, any>
+}
 
 export type UseApiData = <T = any>(
   path: MaybeComputedRef<string>,
@@ -40,6 +45,9 @@ export function _useApiData<T = any>(
     default: defaultFn,
     immediate,
     headers,
+    query,
+    method,
+    body,
     ...fetchOptions
   } = opts
 
@@ -61,6 +69,9 @@ export function _useApiData<T = any>(
         body: {
           path: _path.value,
           headers: headersToObject(unref(headers)),
+          query,
+          method,
+          body,
         },
       }) as Promise<T>
     },

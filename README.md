@@ -306,8 +306,11 @@ function $party<T = any>(
 
 type ApiFetchOptions = Pick<
   FetchOptions,
-  'onRequest' | 'onRequestError' | 'onResponse' | 'onResponseError' | 'headers'
->
+  'onRequest' | 'onRequestError' | 'onResponse' | 'onResponseError' | 'headers' | 'method'
+> & {
+  query?: QueryObject
+  body?: Record<string, any>
+}
 ```
 
 **Example**
@@ -315,8 +318,12 @@ type ApiFetchOptions = Pick<
 ```vue
 <script setup lang="ts">
 const data = await $party(
-  'posts/1',
+  'posts',
   {
+    method: 'POST',
+    body: {
+      foo: 'bar'
+    },
     async onRequest({ request }) {
       console.log(request)
     },
@@ -374,16 +381,56 @@ type UseApiDataOptions<T> = Pick<
   | 'onResponseError'
   // Pick from `globalThis.RequestInit`
   | 'headers'
->
+  | 'method'
+> & {
+  query?: QueryObject
+  body?: Record<string, any>
+}
 ```
 
 The composable infers most of the [`useAsyncData` options](https://v3.nuxtjs.org/api/composables/use-async-data/#params).
 
-**Example**
+**Basic example**
 
 ```vue
 <script setup lang="ts">
 const { data, pending, error, refresh } = await usePartyData('posts/1')
+</script>
+
+<template>
+  <div>
+    <h1>{{ data?.result?.title }}</h1>
+    <button @click="refresh()">
+      Refresh
+    </button>
+  </div>
+</template>
+```
+
+**Example including all parameters**
+
+```vue
+<script setup lang="ts">
+const { data, pending, refresh, error } = await usePartyData('posts/1', {
+  // Custom query parameters to be added to the request
+  query: {
+    foo: 'bar',
+  },
+  // Whether to resolve the async function after loading the route, instead of blocking client-side navigation (defaults to `false`)
+  lazy: false,
+  // A factory function to set the default value of the data, before the async function resolves - particularly useful with the `lazy: true` option
+  default: () => ({
+    foo: 'bar',
+  }),
+  // Whether to fetch the data on the server (defaults to `true`)
+  server: true,
+  // When set to `false`, will prevent the request from firing immediately. (defaults to `true`)
+  immediate: true,
+  // Custom headers to be sent with the request
+  headers: {
+    'X-Foo': 'bar',
+  },
+})
 </script>
 
 <template>

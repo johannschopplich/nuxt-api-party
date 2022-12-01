@@ -1,12 +1,17 @@
 import { createError, defineEventHandler, readBody } from 'h3'
+import { withQuery } from 'ufo'
 import type { FetchError } from 'ofetch'
+import type { QueryObject } from 'ufo'
 import type { ModuleOptions } from '../../../module'
 import { useRuntimeConfig } from '#imports'
 
 export default defineEventHandler(async (event): Promise<any> => {
   const { apiParty } = useRuntimeConfig()
-  const body = await readBody<{
+  const eventBody = await readBody<{
     path: string
+    query?: QueryObject
+    method?: string
+    body?: Record<string, any>
     headers: Record<string, string>
   }>(event)
   const { endpointId } = event.context.params
@@ -19,12 +24,14 @@ export default defineEventHandler(async (event): Promise<any> => {
     })
   }
 
-  const { path, headers } = body
+  const { path, query, method, body, headers } = eventBody
   const endpoint = endpoints[endpointId]
 
   try {
-    return await $fetch(path, {
+    return await $fetch(withQuery(path, query ?? {}), {
       baseURL: endpoint.url,
+      method,
+      body,
       headers: {
         ...(endpoint.token && { Authorization: `Bearer ${endpoint.token}` }),
         ...endpoint.headers,
