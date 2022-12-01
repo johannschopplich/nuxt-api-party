@@ -414,13 +414,13 @@ const { data, pending, error, refresh } = await usePartyData('posts/1')
 const { data, pending, refresh, error } = await usePartyData('posts/1', {
   // Custom query parameters to be added to the request
   query: {
-    foo: 'bar',
+    foo: 'bar'
   },
   // Whether to resolve the async function after loading the route, instead of blocking client-side navigation (defaults to `false`)
   lazy: false,
   // A factory function to set the default value of the data, before the async function resolves - particularly useful with the `lazy: true` option
   default: () => ({
-    foo: 'bar',
+    foo: 'bar'
   }),
   // Whether to fetch the data on the server (defaults to `true`)
   server: true,
@@ -428,8 +428,8 @@ const { data, pending, refresh, error } = await usePartyData('posts/1', {
   immediate: true,
   // Custom headers to be sent with the request
   headers: {
-    'X-Foo': 'bar',
-  },
+    'X-Foo': 'bar'
+  }
 })
 </script>
 
