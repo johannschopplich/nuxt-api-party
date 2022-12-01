@@ -61,7 +61,7 @@ export function _useApiData<T = any>(
   }
 
   return useAsyncData<T, FetchError>(
-    `$party${hash(_path.value)}`,
+    `$party${hash([endpointId, _path.value, query, method, body, headers])}`,
     () => {
       return $fetch(`/api/__api_party__/${endpointId}`, {
         ...fetchOptions,
