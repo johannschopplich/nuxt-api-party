@@ -22,16 +22,22 @@ export default defineEventHandler(async (event): Promise<any> => {
   const endpoint = endpoints[endpointId]
 
   try {
-    return await $fetch(withQuery(path, query ?? {}), {
-      baseURL: endpoint.url,
-      method,
-      body,
-      headers: {
-        ...(endpoint.token && { Authorization: `Bearer ${endpoint.token}` }),
-        ...endpoint.headers,
-        ...headers,
+    return await $fetch(
+      withQuery(path, {
+        ...endpoint.query,
+        ...query,
+      }),
+      {
+        baseURL: endpoint.url,
+        method,
+        body,
+        headers: {
+          ...(endpoint.token && { Authorization: `Bearer ${endpoint.token}` }),
+          ...endpoint.headers,
+          ...headers,
+        },
       },
-    })
+    )
   }
   catch (err) {
     throw createError({

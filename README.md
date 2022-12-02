@@ -201,6 +201,24 @@ Default value: `process.env.API_PARTY_TOKEN`
 <tr>
 <td valign="top">
 
+`query`
+
+</td><td valign="top">
+
+`Record<string, QueryValue | QueryValue[]> | undefined`
+
+</td><td valign="top">
+
+**Custom query parameters sent with every request to the API**
+
+Default value: `undefined`
+
+</td>
+</tr>
+
+<tr>
+<td valign="top">
+
 `headers`
 
 </td><td valign="top">
@@ -213,7 +231,7 @@ Default value: `process.env.API_PARTY_TOKEN`
 
 Add authorization headers if you want to use a custom authorization method.
 
-Default value: `{}`
+Default value: `undefined`
 
 Example:
 
@@ -247,6 +265,7 @@ type ApiPartyEndpoints = Record<
   {
     url: string
     token?: string
+    query?: QueryObject
     headers?: Record<string, string>
   }
 > | undefined

@@ -1,6 +1,7 @@
 import { defu } from 'defu'
 import { camelCase, pascalCase } from 'scule'
 import { addImportsSources, addServerHandler, addTemplate, createResolver, defineNuxtModule, useLogger } from '@nuxt/kit'
+import type { QueryObject } from 'ufo'
 
 export interface ModuleOptions {
   /**
@@ -27,6 +28,11 @@ export interface ModuleOptions {
    * @default process.env.API_PARTY_TOKEN
    */
   token?: string
+
+  /**
+   * Custom query parameters sent with every request to the API
+   */
+  query?: QueryObject
 
   /**
    * Custom headers sent with every request to the API
@@ -61,6 +67,7 @@ export interface ModuleOptions {
     {
       url: string
       token?: string
+      query?: QueryObject
       headers?: Record<string, string>
     }
  >
@@ -78,7 +85,8 @@ export default defineNuxtModule<ModuleOptions>({
     name: undefined,
     url: process.env.API_PARTY_BASE_URL as string,
     token: process.env.API_PARTY_TOKEN as string,
-    headers: {},
+    query: undefined,
+    headers: undefined,
     endpoints: {},
   },
   setup(options, nuxt) {
@@ -103,6 +111,7 @@ export default defineNuxtModule<ModuleOptions>({
       options.endpoints![options.name] = {
         url: options.url!,
         token: options.token,
+        query: options.query,
         headers: options.headers,
       }
     }
