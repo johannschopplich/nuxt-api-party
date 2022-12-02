@@ -2,6 +2,7 @@ import { hash } from 'ohash'
 import type { FetchOptions } from 'ofetch'
 import type { QueryObject } from 'ufo'
 import { headersToObject } from '../utils'
+import type { EndpointBody } from '../utils'
 import { useNuxtApp } from '#imports'
 
 export type ApiFetchOptions = Pick<
@@ -43,7 +44,7 @@ export function _$api<T = any>(
       method,
       body,
       headers: headersToObject(headers),
-    },
+    } satisfies EndpointBody,
   }).then((response) => {
     if (process.server)
       nuxt.payload.data![key] = response

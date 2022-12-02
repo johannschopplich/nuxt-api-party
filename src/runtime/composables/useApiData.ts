@@ -4,7 +4,7 @@ import type { FetchError, FetchOptions } from 'ofetch'
 import type { QueryObject } from 'ufo'
 import type { AsyncData, AsyncDataOptions } from 'nuxt/app'
 import { headersToObject, resolveUnref } from '../utils'
-import type { MaybeComputedRef } from '../utils'
+import type { EndpointBody, MaybeComputedRef } from '../utils'
 import { useAsyncData } from '#imports'
 
 export type UseApiDataOptions<T> = Pick<
@@ -44,10 +44,10 @@ export function _useApiData<T = any>(
     lazy,
     default: defaultFn,
     immediate,
-    headers,
     query,
     method,
     body,
+    headers,
     ...fetchOptions
   } = opts
 
@@ -68,11 +68,11 @@ export function _useApiData<T = any>(
         method: 'POST',
         body: {
           path: _path.value,
-          headers: headersToObject(unref(headers)),
           query,
           method,
           body,
-        },
+          headers: headersToObject(unref(headers)),
+        } satisfies EndpointBody,
       }) as Promise<T>
     },
     asyncDataOptions,

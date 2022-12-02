@@ -1,19 +1,13 @@
 import { createError, defineEventHandler, readBody } from 'h3'
 import { withQuery } from 'ufo'
 import type { FetchError } from 'ofetch'
-import type { QueryObject } from 'ufo'
+import type { EndpointBody } from '../../utils'
 import type { ModuleOptions } from '../../../module'
 import { useRuntimeConfig } from '#imports'
 
 export default defineEventHandler(async (event): Promise<any> => {
   const { apiParty } = useRuntimeConfig()
-  const eventBody = await readBody<{
-    path: string
-    query?: QueryObject
-    method?: string
-    body?: Record<string, any>
-    headers: Record<string, string>
-  }>(event)
+  const eventBody = await readBody<EndpointBody>(event)
   const { endpointId } = event.context.params
   const endpoints = (apiParty.endpoints as ModuleOptions['endpoints'])!
 
