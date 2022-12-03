@@ -28,7 +28,7 @@ npm i -D nuxt-api-party
 
 ## How It Works
 
-Composables will initiate a POST request to the Nuxt server route `/api/__api_party__`, which then fetches the actual data for a given route from your API and passes the response back to the template/client. This proxy behavior has the benefit of omitting CORS issues, since data is sent from server to server.
+Composables will initiate a POST request to the Nuxt server route `/api/__api_party`, which then fetches the actual data for a given route from your API and passes the response back to the template/client. This proxy behavior has the benefit of omitting CORS issues, since data is sent from server to server.
 
 During server-side rendering, calls to the Nuxt server route will directly call the relevant function (emulating the request), saving an additional API call.
 

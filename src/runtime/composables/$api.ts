@@ -35,7 +35,7 @@ export function _$api<T = any>(
   if (promiseMap.has(key))
     return promiseMap.get(key)!
 
-  const request = $fetch(`/api/__api_party__/${endpointId}`, {
+  const request = $fetch(`/api/__api_party/${endpointId}`, {
     ...fetchOptions,
     method: 'POST',
     body: {
