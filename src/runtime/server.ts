@@ -7,7 +7,7 @@ import { useRuntimeConfig } from '#imports'
 export default defineEventHandler(async (event): Promise<any> => {
   const { apiParty } = useRuntimeConfig()
   const endpoints = (apiParty.endpoints as ModuleOptions['endpoints'])!
-  const { endpointId } = event.context.params
+  const { endpointId, path } = event.context.params
 
   if (!(endpointId in endpoints)) {
     throw createError({
@@ -16,8 +16,14 @@ export default defineEventHandler(async (event): Promise<any> => {
     })
   }
 
+  if (!path) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: `Missing path for API endpoint "${endpointId}"`,
+    })
+  }
+
   const {
-    request,
     query,
     headers,
     ...fetchOptions
@@ -31,7 +37,7 @@ export default defineEventHandler(async (event): Promise<any> => {
 
   try {
     return await $fetch(
-      request,
+      path,
       {
         ...fetchOptions,
         baseURL: endpoint.url,

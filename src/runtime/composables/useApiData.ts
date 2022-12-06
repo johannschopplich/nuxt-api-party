@@ -37,16 +37,16 @@ export type UseApiDataOptions<T> = Pick<
 }
 
 export type UseApiData = <T = any>(
-  request: MaybeComputedRef<string>,
+  path: MaybeComputedRef<string>,
   opts?: UseApiDataOptions<T>,
 ) => AsyncData<T, FetchError | null | true>
 
 export function _useApiData<T = any>(
   endpointId: string,
-  request: MaybeComputedRef<string>,
+  path: MaybeComputedRef<string>,
   opts: UseApiDataOptions<T> = {},
 ) {
-  const _request = computed(() => resolveUnref(request))
+  const _path = computed(() => resolveUnref(path))
 
   const {
     server,
@@ -64,7 +64,6 @@ export function _useApiData<T = any>(
   const _fetchOptions = reactive(fetchOptions)
 
   const endpointFetchOptions: EndpointFetchOptions = reactive({
-    request: _request.value,
     query,
     headers: headersToObject(unref(headers)),
     method,
@@ -77,7 +76,7 @@ export function _useApiData<T = any>(
     default: defaultFn,
     immediate,
     watch: [
-      _request,
+      _path,
       endpointFetchOptions,
       ...(watch || []),
     ],
@@ -86,12 +85,12 @@ export function _useApiData<T = any>(
   let controller: AbortController
 
   return useAsyncData<T, FetchError>(
-    `$party${hash([endpointId, _request.value, unref(query)])}`,
+    `$party${hash([endpointId, _path.value, unref(query)])}`,
     () => {
       controller?.abort?.()
       controller = typeof AbortController !== 'undefined' ? new AbortController() : {} as AbortController
 
-      return $fetch(`/api/__api_party/${endpointId}`, {
+      return $fetch(`/api/__api_party/${endpointId}/${_path.value}`, {
         ..._fetchOptions,
         signal: controller.signal,
         method: 'POST',

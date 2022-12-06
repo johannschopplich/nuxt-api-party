@@ -3,7 +3,6 @@ import type { QueryObject } from 'ufo'
 import type { ComputedRef, Ref } from 'vue'
 
 export interface EndpointFetchOptions {
-  request: string
   query?: QueryObject
   method?: string
   body?: Record<string, any>

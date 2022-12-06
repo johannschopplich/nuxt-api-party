@@ -14,20 +14,20 @@ export type ApiFetchOptions = Pick<
 }
 
 export type $Api = <T = any>(
-  request: string,
+  path: string,
   opts?: ApiFetchOptions,
 ) => Promise<T>
 
 export function _$api<T = any>(
   endpointId: string,
-  request: string,
+  path: string,
   opts: ApiFetchOptions = {},
 ): Promise<T> {
   const nuxt = useNuxtApp()
   const { query, headers, method, body, ...fetchOptions } = opts
 
   const promiseMap: Map<string, Promise<T>> = nuxt._promiseMap = nuxt._promiseMap || new Map()
-  const key = `$party${hash([endpointId, request, query])}`
+  const key = `$party${hash([endpointId, path, query])}`
 
   if (key in nuxt.payload.data!)
     return Promise.resolve(nuxt.payload.data![key])
@@ -36,14 +36,13 @@ export function _$api<T = any>(
     return promiseMap.get(key)!
 
   const endpointFetchOptions: EndpointFetchOptions = {
-    request,
     query,
     headers: headersToObject(headers),
     method,
     body,
   }
 
-  const _request = $fetch(`/api/__api_party/${endpointId}`, {
+  const request = $fetch(`/api/__api_party/${endpointId}/${path}`, {
     ...fetchOptions,
     method: 'POST',
     body: endpointFetchOptions,
@@ -54,7 +53,7 @@ export function _$api<T = any>(
     return response
   }) as Promise<T>
 
-  promiseMap.set(key, _request)
+  promiseMap.set(key, request)
 
-  return _request
+  return request
 }
