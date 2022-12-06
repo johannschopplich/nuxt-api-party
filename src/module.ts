@@ -133,7 +133,7 @@ export default defineNuxtModule<ModuleOptions>({
     addServerHandler({
       route: '/api/__api_party/:endpointId',
       method: 'post',
-      handler: resolve('runtime/server/api/handler'),
+      handler: resolve('runtime/server'),
     })
 
     const endpointKeys = Object.keys(options.endpoints!)

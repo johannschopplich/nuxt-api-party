@@ -1,36 +1,41 @@
 import { createError, defineEventHandler, readBody } from 'h3'
-import { withQuery } from 'ufo'
 import type { FetchError } from 'ofetch'
-import type { EndpointBody } from '../../utils'
-import type { ModuleOptions } from '../../../module'
+import type { ModuleOptions } from '../module'
+import type { EndpointFetchOptions } from './utils'
 import { useRuntimeConfig } from '#imports'
 
 export default defineEventHandler(async (event): Promise<any> => {
   const { apiParty } = useRuntimeConfig()
-  const eventBody = await readBody<EndpointBody>(event)
-  const { endpointId } = event.context.params
   const endpoints = (apiParty.endpoints as ModuleOptions['endpoints'])!
+  const { endpointId } = event.context.params
 
   if (!(endpointId in endpoints)) {
     throw createError({
       statusCode: 404,
-      statusMessage: 'Unknown endpoint ID received',
+      statusMessage: `Unknown API endpoint "${endpointId}"`,
     })
   }
 
-  const { path, query, method, body, headers } = eventBody
+  const {
+    request,
+    query,
+    headers,
+    ...fetchOptions
+  } = await readBody<EndpointFetchOptions>(event)
   const endpoint = endpoints[endpointId]
+
+  const _query = {
+    ...endpoint.query,
+    ...query,
+  }
 
   try {
     return await $fetch(
-      withQuery(path, {
-        ...endpoint.query,
-        ...query,
-      }),
+      request,
       {
+        ...fetchOptions,
         baseURL: endpoint.url,
-        method,
-        body,
+        query: Object.keys(_query).length ? _query : undefined,
         headers: {
           ...(endpoint.token && { Authorization: `Bearer ${endpoint.token}` }),
           ...endpoint.headers,
@@ -42,7 +47,7 @@ export default defineEventHandler(async (event): Promise<any> => {
   catch (err) {
     throw createError({
       statusCode: 500,
-      statusMessage: 'Couldn\'t fetch API data',
+      statusMessage: `Failed to fetch from API endpoint "${endpointId}"`,
       data: (err as FetchError).message,
     })
   }

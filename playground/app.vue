@@ -1,22 +1,30 @@
 <script setup lang="ts">
-interface Post {
-  userId: number
+interface Comment {
+  postId: number
   id: number
-  title: string
+  name: string
+  email: string
   body: string
 }
 
 const postId = ref(1)
 
-const { data, refresh } = await useJsonPlaceholderData<Post>(
-  computed(() => `posts/${postId.value}`),
+const { data, refresh } = await useJsonPlaceholderData<Comment>(
+  'comments',
   {
-    async onResponse({ response }) {
+    query: computed(() => ({
+      postId: `${postId.value}`,
+    })),
+    onResponse({ response }) {
       // eslint-disable-next-line no-console
       console[process.server ? 'info' : 'table'](response._data)
     },
   },
 )
+
+function incrementPostId() {
+  postId.value++
+}
 </script>
 
 <template>
@@ -26,7 +34,7 @@ const { data, refresh } = await useJsonPlaceholderData<Post>(
     <hr>
     <h2>Response</h2>
     <pre>{{ JSON.stringify(data, undefined, 2) }}</pre>
-    <button @click="postId++">
+    <button @click="incrementPostId()">
       Increment Post ID
     </button>
     <button @click="refresh()">
