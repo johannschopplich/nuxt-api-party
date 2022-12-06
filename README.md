@@ -393,16 +393,16 @@ type UseApiDataOptions<T> = Pick<
   | 'watch'
   | 'immediate'
 > & Pick<
-  FetchOptions,
+  ComputedOptions<FetchOptions>,
   | 'onRequest'
   | 'onRequestError'
   | 'onResponse'
   | 'onResponseError'
   // Pick from `globalThis.RequestInit`
+  | 'query'
   | 'headers'
   | 'method'
 > & {
-  query?: QueryObject
   body?: Record<string, any>
 }
 ```
