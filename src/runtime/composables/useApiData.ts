@@ -92,10 +92,10 @@ export function _useApiData<T = any>(
       controller?.abort?.()
 
       if (key in nuxt.payload.data)
-        return Promise.resolve(nuxt.payload.data[key])
+        return nuxt.payload.data[key]
 
       if (key in nuxt.static.data)
-        return Promise.resolve(nuxt.static.data[key])
+        return nuxt.static.data[key]
 
       controller = typeof AbortController !== 'undefined'
         ? new AbortController()
