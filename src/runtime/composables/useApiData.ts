@@ -5,7 +5,7 @@ import type { Ref } from 'vue'
 import type { AsyncData, AsyncDataOptions } from 'nuxt/app'
 import { headersToObject, resolveUnref } from '../utils'
 import type { EndpointFetchOptions, MaybeComputedRef } from '../utils'
-import { useAsyncData } from '#imports'
+import { useAsyncData, useNuxtApp } from '#imports'
 
 type ComputedOptions<T extends Record<string, any>> = {
   [K in keyof T]: T[K] extends Function
@@ -46,7 +46,9 @@ export function _useApiData<T = any>(
   path: MaybeComputedRef<string>,
   opts: UseApiDataOptions<T> = {},
 ) {
+  const nuxt = useNuxtApp()
   const _path = computed(() => resolveUnref(path))
+  const key = `$party${hash([endpointId, _path.value, unref(opts.query)])}`
 
   const {
     server,
@@ -85,17 +87,32 @@ export function _useApiData<T = any>(
   let controller: AbortController
 
   return useAsyncData<T, FetchError>(
-    `$party${hash([endpointId, _path.value, unref(query)])}`,
-    () => {
+    key,
+    async () => {
       controller?.abort?.()
-      controller = typeof AbortController !== 'undefined' ? new AbortController() : {} as AbortController
 
-      return $fetch(`/api/__api_party/${endpointId}/${_path.value}`, {
+      if (key in nuxt.payload.data)
+        return Promise.resolve(nuxt.payload.data[key])
+
+      if (key in nuxt.static.data)
+        return Promise.resolve(nuxt.static.data[key])
+
+      controller = typeof AbortController !== 'undefined'
+        ? new AbortController()
+        : ({} as AbortController)
+
+      const result = await $fetch<T>(`/api/__api_party/${endpointId}/${_path.value}`, {
         ..._fetchOptions,
         signal: controller.signal,
         method: 'POST',
         body: endpointFetchOptions,
-      }) as Promise<T>
+      }) as T
+
+      // Workaround to persist response client-side
+      // https://github.com/nuxt/framework/issues/8917
+      nuxt.static.data[key] = result
+
+      return result
     },
     asyncDataOptions,
   ) as AsyncData<T, FetchError | null | true>
