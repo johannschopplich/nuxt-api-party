@@ -9,7 +9,7 @@ interface Comment {
 
 const postId = ref(1)
 
-const { data, refresh } = await useJsonPlaceholderData<Comment>(
+const { data } = await useJsonPlaceholderData<Comment>(
   'comments',
   {
     query: computed(() => ({
@@ -24,6 +24,8 @@ const { data, refresh } = await useJsonPlaceholderData<Comment>(
 
 function incrementPostId() {
   postId.value++
+  // eslint-disable-next-line no-console
+  console.log('Post ID:', postId.value)
 }
 </script>
 
@@ -36,9 +38,6 @@ function incrementPostId() {
     <pre>{{ JSON.stringify(data, undefined, 2) }}</pre>
     <button @click="incrementPostId()">
       Increment Post ID
-    </button>
-    <button @click="refresh()">
-      Refresh
     </button>
   </div>
 </template>

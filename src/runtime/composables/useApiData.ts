@@ -5,7 +5,7 @@ import type { Ref } from 'vue'
 import type { AsyncData, AsyncDataOptions } from 'nuxt/app'
 import { headersToObject, resolveUnref } from '../utils'
 import type { EndpointFetchOptions, MaybeComputedRef } from '../utils'
-import { useAsyncData, useNuxtApp } from '#imports'
+import { useAsyncData } from '#imports'
 
 type ComputedOptions<T extends Record<string, any>> = {
   [K in keyof T]: T[K] extends Function
@@ -46,10 +46,7 @@ export function _useApiData<T = any>(
   path: MaybeComputedRef<string>,
   opts: UseApiDataOptions<T> = {},
 ) {
-  const nuxt = useNuxtApp()
   const _path = computed(() => resolveUnref(path))
-  const key = `$party${hash([endpointId, _path.value, unref(opts.query)])}`
-
   const {
     server,
     lazy,
@@ -66,7 +63,7 @@ export function _useApiData<T = any>(
   const _fetchOptions = reactive(fetchOptions)
 
   const endpointFetchOptions: EndpointFetchOptions = reactive({
-    path: _path.value,
+    path: _path,
     query,
     headers: headersToObject(unref(headers)),
     method,
@@ -79,24 +76,23 @@ export function _useApiData<T = any>(
     default: defaultFn,
     immediate,
     watch: [
-      _path,
       endpointFetchOptions,
       ...(watch || []),
     ],
   }
 
   let controller: AbortController
+  const key = computed(() => `$party${hash([endpointId, endpointFetchOptions])}`)
 
   return useAsyncData<T, FetchError>(
-    key,
-    async () => {
+    key.value,
+    async (nuxt) => {
       controller?.abort?.()
 
-      if (key in nuxt.payload.data)
-        return nuxt.payload.data[key]
-
-      if (key in nuxt.static.data)
-        return nuxt.static.data[key]
+      // Workaround to persist response client-side
+      // https://github.com/nuxt/framework/issues/8917
+      if (key.value in nuxt!.static.data)
+        return nuxt!.static.data[key.value]
 
       controller = typeof AbortController !== 'undefined'
         ? new AbortController()
@@ -112,9 +108,7 @@ export function _useApiData<T = any>(
         },
       )) as T
 
-      // Workaround to persist response client-side
-      // https://github.com/nuxt/framework/issues/8917
-      nuxt.static.data[key] = result
+      nuxt!.static.data[key.value] = result
 
       return result
     },

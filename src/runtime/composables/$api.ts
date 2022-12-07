@@ -27,8 +27,8 @@ export function _$api<T = any>(
   const promiseMap: Map<string, Promise<T>> = nuxt._promiseMap = nuxt._promiseMap || new Map()
   const key = `$party${hash([endpointId, path, query])}`
 
-  if (key in nuxt.payload.data!)
-    return Promise.resolve(nuxt.payload.data![key])
+  if (key in nuxt.payload.data)
+    return Promise.resolve(nuxt.payload.data[key])
 
   if (promiseMap.has(key))
     return promiseMap.get(key)!
