@@ -101,12 +101,15 @@ export function _useApiData<T = any>(
         ? new AbortController()
         : ({} as AbortController)
 
-      const result = await $fetch<T>(`/api/__api_party/${endpointId}/${_path.value}`, {
-        ..._fetchOptions,
-        signal: controller.signal,
-        method: 'POST',
-        body: endpointFetchOptions,
-      }) as T
+      const result = (await $fetch<T>(
+        `/api/__api_party/${endpointId}/${_path.value}`,
+        {
+          ..._fetchOptions,
+          signal: controller.signal,
+          method: 'POST',
+          body: endpointFetchOptions,
+        },
+      )) as T
 
       // Workaround to persist response client-side
       // https://github.com/nuxt/framework/issues/8917
