@@ -430,11 +430,12 @@ const { data, pending, error, refresh } = await usePartyData('posts/1')
 
 ```vue
 <script setup lang="ts">
-const { data, pending, refresh, error } = await usePartyData('posts/1', {
-  // Custom query parameters to be added to the request
-  query: {
-    foo: 'bar'
-  },
+const postId = ref(1)
+const { data, pending, refresh, error } = await usePartyData('comments', {
+  // Custom query parameters to be added to the request, can be reactive
+  query: computed(() => ({
+    postId: postId.value
+  })),
   // Whether to resolve the async function after loading the route, instead of blocking client-side navigation (defaults to `false`)
   lazy: false,
   // A factory function to set the default value of the data, before the async function resolves - particularly useful with the `lazy: true` option
