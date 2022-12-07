@@ -1,7 +1,7 @@
 {
   "name": "nuxt-api-party",
   "type": "module",
-  "version": "0.5.5",
+  "version": "0.5.6",
   "packageManager": "pnpm@7.18.0",
   "description": "Nuxt 3 module to securely connect with any API",
   "author": "Johann Schopplich <pkg@johannschopplich.com>",
