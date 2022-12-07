@@ -1,5 +1,10 @@
 import { unref } from 'vue'
 import type { ComputedRef, Ref } from 'vue'
+import type { FetchOptions } from 'ofetch'
+
+export type EndpointFetchOptions = FetchOptions & {
+  path: string
+}
 
 export type MaybeComputedRef<T> = (() => T) | ComputedRef<T> | Ref<T> | T
 

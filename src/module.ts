@@ -131,7 +131,7 @@ export default defineNuxtModule<ModuleOptions>({
 
     // Add Nuxt server route to proxy the API request server-side
     addServerHandler({
-      route: '/api/__api_party/:endpointId/:path',
+      route: '/api/__api_party/:endpointId',
       method: 'post',
       handler: resolve('runtime/server'),
     })

@@ -1,14 +1,13 @@
 import { hash } from 'ohash'
 import type { FetchOptions } from 'ofetch'
-import type { QueryObject } from 'ufo'
 import { headersToObject } from '../utils'
+import type { EndpointFetchOptions } from '../utils'
 import { useNuxtApp } from '#imports'
 
 export type ApiFetchOptions = Pick<
   FetchOptions,
-  'onRequest' | 'onRequestError' | 'onResponse' | 'onResponseError' | 'headers' | 'method'
+  'onRequest' | 'onRequestError' | 'onResponse' | 'onResponseError' | 'query' | 'headers' | 'method'
 > & {
-  query?: QueryObject
   body?: Record<string, any>
 }
 
@@ -34,14 +33,15 @@ export function _$api<T = any>(
   if (promiseMap.has(key))
     return promiseMap.get(key)!
 
-  const endpointFetchOptions: FetchOptions = {
+  const endpointFetchOptions: EndpointFetchOptions = {
+    path,
     query,
     headers: headersToObject(headers),
     method,
     body,
   }
 
-  const request = $fetch(`/api/__api_party/${endpointId}/${path}`, {
+  const request = $fetch(`/api/__api_party/${endpointId}`, {
     ...fetchOptions,
     method: 'POST',
     body: endpointFetchOptions,

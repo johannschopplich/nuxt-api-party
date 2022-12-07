@@ -1,12 +1,13 @@
 import { createError, defineEventHandler, readBody } from 'h3'
-import type { FetchError, FetchOptions } from 'ofetch'
+import type { FetchError } from 'ofetch'
 import type { ModuleOptions } from '../module'
+import type { EndpointFetchOptions } from './utils'
 import { useRuntimeConfig } from '#imports'
 
 export default defineEventHandler(async (event): Promise<any> => {
   const { apiParty } = useRuntimeConfig()
   const endpoints = (apiParty.endpoints as ModuleOptions['endpoints'])!
-  const { endpointId, path } = event.context.params
+  const { endpointId } = event.context.params
 
   if (!(endpointId in endpoints)) {
     throw createError({
@@ -16,12 +17,20 @@ export default defineEventHandler(async (event): Promise<any> => {
   }
 
   const {
+    path,
     query,
     headers,
     ...fetchOptions
-  } = await readBody<FetchOptions>(event)
-  const endpoint = endpoints[endpointId]
+  } = await readBody<EndpointFetchOptions>(event)
 
+  if (!path) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: `Missing path for API endpoint "${endpointId}"`,
+    })
+  }
+
+  const endpoint = endpoints[endpointId]
   const _query = {
     ...endpoint.query,
     ...query,
