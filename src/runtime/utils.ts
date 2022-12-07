@@ -1,13 +1,5 @@
 import { unref } from 'vue'
-import type { QueryObject } from 'ufo'
 import type { ComputedRef, Ref } from 'vue'
-
-export interface EndpointFetchOptions {
-  query?: QueryObject
-  method?: string
-  body?: Record<string, any>
-  headers?: Record<string, string>
-}
 
 export type MaybeComputedRef<T> = (() => T) | ComputedRef<T> | Ref<T> | T
 

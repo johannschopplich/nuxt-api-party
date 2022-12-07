@@ -4,7 +4,7 @@ import type { FetchError, FetchOptions } from 'ofetch'
 import type { Ref } from 'vue'
 import type { AsyncData, AsyncDataOptions } from 'nuxt/app'
 import { headersToObject, resolveUnref } from '../utils'
-import type { EndpointFetchOptions, MaybeComputedRef } from '../utils'
+import type { MaybeComputedRef } from '../utils'
 import { useAsyncData, useNuxtApp } from '#imports'
 
 type ComputedOptions<T extends Record<string, any>> = {
@@ -65,7 +65,7 @@ export function _useApiData<T = any>(
 
   const _fetchOptions = reactive(fetchOptions)
 
-  const endpointFetchOptions: EndpointFetchOptions = reactive({
+  const endpointFetchOptions: FetchOptions = reactive({
     query,
     headers: headersToObject(unref(headers)),
     method,

@@ -2,7 +2,6 @@ import { hash } from 'ohash'
 import type { FetchOptions } from 'ofetch'
 import type { QueryObject } from 'ufo'
 import { headersToObject } from '../utils'
-import type { EndpointFetchOptions } from '../utils'
 import { useNuxtApp } from '#imports'
 
 export type ApiFetchOptions = Pick<
@@ -35,7 +34,7 @@ export function _$api<T = any>(
   if (promiseMap.has(key))
     return promiseMap.get(key)!
 
-  const endpointFetchOptions: EndpointFetchOptions = {
+  const endpointFetchOptions: FetchOptions = {
     query,
     headers: headersToObject(headers),
     method,
