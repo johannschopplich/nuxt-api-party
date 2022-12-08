@@ -9,6 +9,11 @@ export type ApiFetchOptions = Pick<
   'onRequest' | 'onRequestError' | 'onResponse' | 'onResponseError' | 'query' | 'headers' | 'method'
 > & {
   body?: Record<string, any>
+  /**
+   * Cache the response for the same request
+   * @default false
+   */
+  cache?: boolean
 }
 
 export type $Api = <T = any>(
@@ -22,17 +27,8 @@ export function _$api<T = any>(
   opts: ApiFetchOptions = {},
 ): Promise<T> {
   const nuxt = useNuxtApp()
-  const { query, headers, method, body, ...fetchOptions } = opts
-
   const promiseMap: Map<string, Promise<T>> = nuxt._promiseMap = nuxt._promiseMap || new Map()
-  const key = `$party${hash([endpointId, path, query])}`
-
-  if (key in nuxt.payload.data)
-    return Promise.resolve(nuxt.payload.data[key])
-
-  if (promiseMap.has(key))
-    return promiseMap.get(key)!
-
+  const { query, headers, method, body, cache = false, ...fetchOptions } = opts
   const endpointFetchOptions: EndpointFetchOptions = {
     path,
     query,
@@ -41,13 +37,21 @@ export function _$api<T = any>(
     body,
   }
 
+  const key = `$party${hash([endpointId, endpointFetchOptions])}`
+
+  if ((nuxt.isHydrating || cache) && key in nuxt.payload.data)
+    return Promise.resolve(nuxt.payload.data[key])
+
+  if (promiseMap.has(key))
+    return promiseMap.get(key)!
+
   const request = $fetch(`/api/__api_party/${endpointId}`, {
     ...fetchOptions,
     method: 'POST',
     body: endpointFetchOptions,
   }).then((response) => {
-    if (process.server)
-      nuxt.payload.data![key] = response
+    if (process.server || cache)
+      nuxt.payload.data[key] = response
     promiseMap.delete(key)
     return response
   }) as Promise<T>

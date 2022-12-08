@@ -313,7 +313,9 @@ Customize your API's composable names with the `name` in your Nuxt config module
 
 ### `$party` (Respectively Camel-Cased API Name)
 
-Returns the API response data.
+Returns the raw response of the API endpoint.
+
+Responses can be cached between function calls for the same path based on a calculated hash by setting `cache` to `true`.
 
 **Type Declarations**
 
@@ -325,10 +327,14 @@ function $party<T = any>(
 
 type ApiFetchOptions = Pick<
   FetchOptions,
-  'onRequest' | 'onRequestError' | 'onResponse' | 'onResponseError' | 'headers' | 'method'
+  'onRequest' | 'onRequestError' | 'onResponse' | 'onResponseError' | 'query' | 'headers' | 'method'
 > & {
-  query?: QueryObject
   body?: Record<string, any>
+  /**
+   * Cache the response for the same request
+   * @default false
+   */
+  cache?: boolean
 }
 ```
 
@@ -377,6 +383,8 @@ Return values:
 
 By default, Nuxt waits until a `refresh` is finished before it can be executed again. Passing `true` as parameter skips that wait.
 
+Responses **are cached** between function calls for the same path based on a calculated hash. You can disable this behavior by setting `cache` to `false`.
+
 **Type Declarations**
 
 ```ts
@@ -404,6 +412,11 @@ type UseApiDataOptions<T> = Pick<
   | 'method'
 > & {
   body?: Record<string, any>
+  /**
+   * Cache the response for the same request
+   * @default true
+   */
+  cache?: boolean
 }
 ```
 

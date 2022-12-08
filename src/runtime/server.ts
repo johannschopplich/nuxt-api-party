@@ -16,20 +16,7 @@ export default defineEventHandler(async (event): Promise<any> => {
     })
   }
 
-  const {
-    path,
-    query,
-    headers,
-    ...fetchOptions
-  } = await readBody<EndpointFetchOptions>(event)
-
-  if (!path) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: `Missing path for API endpoint "${endpointId}"`,
-    })
-  }
-
+  const { path = '', query, headers, ...fetchOptions } = await readBody<EndpointFetchOptions>(event)
   const endpoint = endpoints[endpointId]
   const _query = {
     ...endpoint.query,

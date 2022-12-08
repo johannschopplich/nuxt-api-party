@@ -34,6 +34,11 @@ export type UseApiDataOptions<T> = Pick<
   | 'method'
 > & {
   body?: Record<string, any>
+  /**
+   * Cache the response for the same request
+   * @default true
+   */
+  cache?: boolean
 }
 
 export type UseApiData = <T = any>(
@@ -57,6 +62,7 @@ export function _useApiData<T = any>(
     headers,
     method,
     body,
+    cache = true,
     ...fetchOptions
   } = opts
 
@@ -91,8 +97,8 @@ export function _useApiData<T = any>(
 
       // Workaround to persist response client-side
       // https://github.com/nuxt/framework/issues/8917
-      if (key.value in nuxt!.static.data)
-        return nuxt!.static.data[key.value]
+      if ((nuxt!.isHydrating || cache) && key.value in nuxt!.payload.data)
+        return nuxt!.payload.data[key.value]
 
       controller = typeof AbortController !== 'undefined'
         ? new AbortController()
@@ -108,7 +114,8 @@ export function _useApiData<T = any>(
         },
       )) as T
 
-      nuxt!.static.data[key.value] = result
+      if (cache)
+        nuxt!.payload.data[key.value] = result
 
       return result
     },
