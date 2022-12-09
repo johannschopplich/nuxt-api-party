@@ -2,6 +2,9 @@
   publish = "playground/dist"
   command = "pnpm run dev:build"
 
+[functions]
+  directory = "playground/.netlify/functions-internal"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
