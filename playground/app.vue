@@ -1,15 +1,10 @@
 <script setup lang="ts">
-interface Comment {
-  postId: number
-  id: number
-  name: string
-  email: string
-  body: string
-}
+import type { JsonPlaceholderComment } from './types'
 
 const postId = ref(1)
 
-const { data, error } = await useJsonPlaceholderData<Comment>(
+// Intended for similar use cases as `useFetch`
+const { data, error } = await useJsonPlaceholderData<JsonPlaceholderComment>(
   'comments',
   {
     query: computed(() => ({
@@ -23,24 +18,69 @@ const { data, error } = await useJsonPlaceholderData<Comment>(
 )
 
 // eslint-disable-next-line no-console
-watchEffect(() => console.log(error.value))
+watch(error, value => console.log(value))
 
 function incrementPostId() {
   postId.value++
   // eslint-disable-next-line no-console
   console.log('Post ID:', postId.value)
 }
+
+const formResponse = ref()
+
+// Intended for similar use cases as `$fetch`
+async function onSubmit() {
+  try {
+    formResponse.value = await $jsonPlaceholder('posts', {
+      method: 'POST',
+      body: {
+        title: 'foo',
+        body: 'bar',
+        userId: 1,
+      },
+    })
+
+    // eslint-disable-next-line no-console
+    console.log('formResponse:', formResponse.value)
+  }
+  catch (e) {
+    console.error(e)
+  }
+}
 </script>
 
 <template>
+  <Head>
+    <Link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@exampledev/new.css@1.1.2/new.min.css" />
+  </Head>
+
   <div>
     <h1>{JSON} Placeholder</h1>
     <p>Requests are proxied by a Nuxt server route and passed back to the client.</p>
     <hr>
-    <h2>Response</h2>
+
+    <h2>
+      Example <code>$jsonPlaceholder</code>
+    </h2>
+    <p>Responses are <strong>not</strong> cached by default.</p>
+    <blockquote>(Imagine form fields here)</blockquote>
+    <p>
+      <button @click="onSubmit()">
+        Submit
+      </button>
+    </p>
+    <pre v-if="formResponse">{{ JSON.stringify(formResponse, undefined, 2) }}</pre>
+    <hr>
+
+    <h2>
+      Example <code>useJsonPlaceholderData</code>
+    </h2>
+    <p>Responses are cached by default.</p>
+    <p>
+      <button @click="incrementPostId()">
+        Increment Post ID
+      </button>
+    </p>
     <pre>{{ JSON.stringify(data, undefined, 2) }}</pre>
-    <button @click="incrementPostId()">
-      Increment Post ID
-    </button>
   </div>
 </template>

@@ -12,7 +12,7 @@ This module enables you to securely fetch data from any API by proxying the requ
 - 🔒 Protected API credentials in the client
 - 🪢 Token-based authentication built-in or bring your own headers
 - 🧇 [Connect multiple API endpoints](#multiple-api-endpoints)
-- 🍱 Feels just like [`useFetch`](https://v3.nuxtjs.org/api/composables/use-fetch)
+- 🍱 Feels just like [`useFetch`](https://nuxt.com/docs/api/composables/use-fetch)
 - 🗃 Cached responses
 - 🦾 Strongly typed
 
@@ -50,6 +50,11 @@ export default defineNuxtConfig({
 })
 ```
 
+If you were to call your API `json-placeholder`, the generated composables are:
+
+- `$jsonPlaceholder` – Returns the response data, similar to [`$fetch`](https://nuxt.com/docs/api/utils/dollarfetch#fetch)
+- `useJsonPlaceholderData` – Returns [multiple values](#usepartydata-respectively-pascal-cased-api-name) similar to [`useFetch`](https://nuxt.com/docs/api/composables/use-fetch)
+
 ### Singular API Endpoint
 
 Set the following environment variables in your project's `.env` file:
@@ -59,11 +64,6 @@ API_PARTY_BASE_URL=https://jsonplaceholder.typicode.com
 # Optionally, add a bearer token
 # API_PARTY_TOKEN=test
 ```
-
-If you were to call your API `json-placeholder`, the generated composables are:
-
-- `$jsonPlaceholder` – Returns the response data, similar to `$fetch`
-- `useJsonPlaceholderData` – Returns [multiple values](#usepartydata-respectively-pascal-cased-api-name) similar to `useFetch`
 
 Finally, fetch data from your API in your template:
 
@@ -420,7 +420,7 @@ type UseApiDataOptions<T> = Pick<
 }
 ```
 
-The composable infers most of the [`useAsyncData` options](https://v3.nuxtjs.org/api/composables/use-async-data/#params).
+The composable infers most of the [`useAsyncData` options](https://nuxt.com/docs/api/composables/use-async-data/#params).
 
 **Basic example**
 
