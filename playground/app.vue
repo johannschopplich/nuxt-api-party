@@ -9,7 +9,7 @@ interface Comment {
 
 const postId = ref(1)
 
-const { data } = await useJsonPlaceholderData<Comment>(
+const { data, error } = await useJsonPlaceholderData<Comment>(
   'comments',
   {
     query: computed(() => ({
@@ -21,6 +21,9 @@ const { data } = await useJsonPlaceholderData<Comment>(
     },
   },
 )
+
+// eslint-disable-next-line no-console
+watchEffect(() => console.log(error.value))
 
 function incrementPostId() {
   postId.value++

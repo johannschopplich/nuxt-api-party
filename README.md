@@ -313,7 +313,7 @@ Customize your API's composable names with the `name` in your Nuxt config module
 
 ### `$party` (Respectively Camel-Cased API Name)
 
-Returns the raw response of the API endpoint.
+Returns the raw response of the API endpoint. Intended for actions inside methods, e. g. when sending form data to the API when clicking a submit button.
 
 Responses can be cached between function calls for the same path based on a calculated hash by setting `cache` to `true`.
 
@@ -476,6 +476,48 @@ const { data, pending, refresh, error } = await usePartyData('comments', {
 </template>
 ```
 
+## FAQ
+
+### How Can I Inspect the Error Thrown by My API?
+
+As the idea of this module is to mask your real API by creating a Nuxt server proxy, `nuxt-api-party` will always throw the same HTTP status code if your API fails to deliver.
+
+But the error reason of the failed API request is available via the `error` reactive variable. Example usage:
+
+```ts
+const { data, error } = await useJsonPlaceholderData('not_available')
+
+// `data` key of `error` ref will contain the rejection reason
+watchEffect(() => console.log(error.value))
+```
+
+Of, if using inside methods:
+
+```ts
+function onSubmit() {
+  try {
+    const response = await $jsonPlaceholder({
+      method: 'POST',
+      body: form.value
+    })
+  }
+  catch (e) {
+    console.log(e)
+  }
+}
+```
+
+Inspecting the server log, you can find the `data` key with the rejection reason:
+
+```json
+{
+  "url": "/api/__api_party/json-placeholder",
+  "statusCode": 500,
+  "statusMessage": "Failed to fetch from API endpoint \"json-placeholder\"",
+  "data": "404 Not Found (https://jsonplaceholder.typicode.com/not_available)"
+}
+```
+
 ## 💻 Development
 
 1. Clone this repository
@@ -486,7 +528,7 @@ const { data, pending, refresh, error } = await usePartyData('comments', {
 
 ## Special Thanks
 
-- [Dennis Baum](https://github.com/dennisbaum) for sponsoring this package!
+- [Dennis Baum](https://github.com/dennisbaum) for sponsoring the initial version package!
 - [SVGBackgrounds.com](https://www.svgbackgrounds.com) for the OpenGraph image background pattern.
 
 ## License
