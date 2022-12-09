@@ -70,7 +70,7 @@ export interface ModuleOptions {
       query?: QueryObject
       headers?: Record<string, string>
     }
- >
+  >
 }
 
 export default defineNuxtModule<ModuleOptions>({
