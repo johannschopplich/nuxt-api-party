@@ -3,7 +3,7 @@ import { hash } from 'ohash'
 import type { FetchError, FetchOptions } from 'ofetch'
 import type { Ref } from 'vue'
 import type { AsyncData, AsyncDataOptions } from 'nuxt/app'
-import { headersToObject, resolveUnref } from '../utils'
+import { headersToObject, isFormData, resolveUnref, serializeFormData } from '../utils'
 import type { EndpointFetchOptions, MaybeComputedRef } from '../utils'
 import { useAsyncData } from '#imports'
 
@@ -33,7 +33,7 @@ export type UseApiDataOptions<T> = Pick<
   | 'headers'
   | 'method'
 > & {
-  body?: Record<string, any>
+  body?: string | Record<string, any> | FormData | null
   /**
    * Cache the response for the same request
    * @default true
@@ -61,17 +61,30 @@ export function _useApiData<T = any>(
     query,
     headers,
     method,
-    body,
+    body: rawBody,
     cache = true,
     ...fetchOptions
   } = opts
+
+  let body = rawBody
+  const customHeaders: Record<string, string> = {}
+
+  // Detect if body is a `FormData`
+  if (isFormData(body)) {
+    const serialized = serializeFormData(body)
+    body = serialized.body
+    Object.assign(customHeaders, serialized.headers)
+  }
 
   const _fetchOptions = reactive(fetchOptions)
 
   const endpointFetchOptions: EndpointFetchOptions = reactive({
     path: _path,
     query,
-    headers: headersToObject(unref(headers)),
+    headers: {
+      ...headersToObject(unref(headers)),
+      ...customHeaders,
+    },
     method,
     body,
   })

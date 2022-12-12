@@ -329,7 +329,7 @@ type ApiFetchOptions = Pick<
   FetchOptions,
   'onRequest' | 'onRequestError' | 'onResponse' | 'onResponseError' | 'query' | 'headers' | 'method'
 > & {
-  body?: Record<string, any>
+  body?: string | Record<string, any> | FormData | null
   /**
    * Cache the response for the same request
    * @default false
@@ -411,7 +411,7 @@ type UseApiDataOptions<T> = Pick<
   | 'headers'
   | 'method'
 > & {
-  body?: Record<string, any>
+  body?: string | Record<string, any> | FormData | null
   /**
    * Cache the response for the same request
    * @default true

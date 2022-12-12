@@ -1,6 +1,6 @@
 import { hash } from 'ohash'
 import type { FetchOptions } from 'ofetch'
-import { headersToObject } from '../utils'
+import { headersToObject, isFormData, serializeFormData } from '../utils'
 import type { EndpointFetchOptions } from '../utils'
 import { useNuxtApp } from '#imports'
 
@@ -8,7 +8,7 @@ export type ApiFetchOptions = Pick<
   FetchOptions,
   'onRequest' | 'onRequestError' | 'onResponse' | 'onResponseError' | 'query' | 'headers' | 'method'
 > & {
-  body?: Record<string, any>
+  body?: string | Record<string, any> | FormData | null
   /**
    * Cache the response for the same request
    * @default false
@@ -28,11 +28,22 @@ export function _$api<T = any>(
 ): Promise<T> {
   const nuxt = useNuxtApp()
   const promiseMap: Map<string, Promise<T>> = nuxt._promiseMap = nuxt._promiseMap || new Map()
-  const { query, headers, method, body, cache = false, ...fetchOptions } = opts
+  const { query, headers: rawHeaders, method, body: rawBody, cache = false, ...fetchOptions } = opts
+
+  const headers = headersToObject(rawHeaders)
+  let body = rawBody
+
+  // Detect if body is a `FormData`
+  if (isFormData(body)) {
+    const serialized = serializeFormData(body)
+    body = serialized.body
+    Object.assign(headers, serialized.headers)
+  }
+
   const endpointFetchOptions: EndpointFetchOptions = {
     path,
     query,
-    headers: headersToObject(headers),
+    headers,
     method,
     body,
   }

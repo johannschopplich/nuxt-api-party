@@ -15,7 +15,6 @@ export function resolveUnref<T>(r: MaybeComputedRef<T>): T {
 }
 
 export function headersToObject(headers: HeadersInit = {}): Record<string, string> {
-  // SSR compatibility for `Headers` prototype
   if (typeof Headers !== 'undefined' && headers instanceof Headers)
     return Object.fromEntries([...headers.entries()])
 
@@ -23,4 +22,25 @@ export function headersToObject(headers: HeadersInit = {}): Record<string, strin
     return Object.fromEntries(headers)
 
   return headers as Record<string, string>
+}
+
+export function isFormData(obj: unknown): obj is FormData {
+  return typeof FormData !== 'undefined' && obj instanceof FormData
+}
+
+export function serializeFormData(data: FormData) {
+  const body = data.toString()
+  const headers: Record<string, string> = {
+    'Content-Type': 'multipart/form-data',
+    // Calculate content size
+    'Content-Length': `${[...data.entries()].reduce((size, [, value]) => {
+      if (value instanceof File)
+        return size + value.size
+      if (typeof value === 'string')
+        return size + value.length
+      return size
+    }, 0)}`,
+  }
+
+  return { body, headers }
 }
