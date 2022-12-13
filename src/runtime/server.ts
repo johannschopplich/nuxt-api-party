@@ -1,6 +1,7 @@
 import { createError, defineEventHandler, readBody } from 'h3'
 import type { FetchError } from 'ofetch'
 import type { ModuleOptions } from '../module'
+import { deserializeMaybeEncodedBody } from './utils'
 import type { EndpointFetchOptions } from './utils'
 import { useRuntimeConfig } from '#imports'
 
@@ -16,7 +17,7 @@ export default defineEventHandler(async (event): Promise<any> => {
     })
   }
 
-  const { path = '', query, headers, ...fetchOptions } = await readBody<EndpointFetchOptions>(event)
+  const { path, query, headers, body, ...fetchOptions } = await readBody<EndpointFetchOptions>(event)
   const endpoint = endpoints[endpointId]
   const _query = {
     ...endpoint.query,
@@ -25,7 +26,7 @@ export default defineEventHandler(async (event): Promise<any> => {
 
   try {
     return await $fetch(
-      path,
+      path!,
       {
         ...fetchOptions,
         baseURL: endpoint.url,
@@ -35,6 +36,7 @@ export default defineEventHandler(async (event): Promise<any> => {
           ...endpoint.headers,
           ...headers,
         },
+        body: deserializeMaybeEncodedBody(body),
       },
     )
   }

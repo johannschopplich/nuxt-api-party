@@ -46,6 +46,7 @@
   "dependencies": {
     "@nuxt/kit": "^3.0.0",
     "defu": "^6.1.1",
+    "formdata-polyfill": "^4.0.10",
     "ofetch": "^1.0.0",
     "ohash": "^1.0.0",
     "scule": "^1.0.0",

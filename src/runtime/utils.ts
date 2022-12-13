@@ -1,6 +1,8 @@
 import { unref } from 'vue'
 import type { ComputedRef, Ref } from 'vue'
 import type { FetchOptions } from 'ofetch'
+import type { ApiFetchOptions } from './composables/$api'
+import { formDataToObject, isFormData, isSerializedFormData, objectToFormData } from './formData'
 
 export type EndpointFetchOptions = FetchOptions & {
   path: string
@@ -24,23 +26,16 @@ export function headersToObject(headers: HeadersInit = {}): Record<string, strin
   return headers as Record<string, string>
 }
 
-export function isFormData(obj: unknown): obj is FormData {
-  return typeof FormData !== 'undefined' && obj instanceof FormData
+export async function serializeMaybeEncodedBody(value: ApiFetchOptions['body']) {
+  if (isFormData(value))
+    return await formDataToObject(value)
+
+  return value
 }
 
-export function serializeFormData(data: FormData) {
-  const body = data.toString()
-  const headers: Record<string, string> = {
-    'Content-Type': 'multipart/form-data',
-    // Calculate content size
-    'Content-Length': `${[...data.entries()].reduce((size, [, value]) => {
-      if (value instanceof File)
-        return size + value.size
-      if (typeof value === 'string')
-        return size + value.length
-      return size
-    }, 0)}`,
-  }
+export function deserializeMaybeEncodedBody(value: ApiFetchOptions['body']) {
+  if (isSerializedFormData(value))
+    return objectToFormData(value)
 
-  return { body, headers }
+  return value
 }

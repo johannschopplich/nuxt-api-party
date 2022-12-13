@@ -11,8 +11,10 @@ const { data, error } = await useJsonPlaceholderData<JsonPlaceholderComment>(
       postId: `${postId.value}`,
     })),
     onResponse({ response }) {
+      if (process.server)
+        return
       // eslint-disable-next-line no-console
-      console[process.server ? 'info' : 'table'](response._data)
+      console.log(response._data)
     },
   },
 )

@@ -3,7 +3,7 @@ import { hash } from 'ohash'
 import type { FetchError, FetchOptions } from 'ofetch'
 import type { Ref } from 'vue'
 import type { AsyncData, AsyncDataOptions } from 'nuxt/app'
-import { headersToObject, isFormData, resolveUnref, serializeFormData } from '../utils'
+import { headersToObject, resolveUnref, serializeMaybeEncodedBody } from '../utils'
 import type { EndpointFetchOptions, MaybeComputedRef } from '../utils'
 import { useAsyncData } from '#imports'
 
@@ -61,32 +61,18 @@ export function _useApiData<T = any>(
     query,
     headers,
     method,
-    body: rawBody,
+    body,
     cache = true,
     ...fetchOptions
   } = opts
-
-  let body = rawBody
-  const customHeaders: Record<string, string> = {}
-
-  // Detect if body is a `FormData`
-  if (isFormData(body)) {
-    const serialized = serializeFormData(body)
-    body = serialized.body
-    Object.assign(customHeaders, serialized.headers)
-  }
 
   const _fetchOptions = reactive(fetchOptions)
 
   const endpointFetchOptions: EndpointFetchOptions = reactive({
     path: _path,
     query,
-    headers: {
-      ...headersToObject(unref(headers)),
-      ...customHeaders,
-    },
+    headers: headersToObject(unref(headers)),
     method,
-    body,
   })
 
   const asyncDataOptions: AsyncDataOptions<T> = {
@@ -101,7 +87,7 @@ export function _useApiData<T = any>(
   }
 
   let controller: AbortController
-  const key = computed(() => `$party${hash([endpointId, endpointFetchOptions])}`)
+  const key = computed(() => `$party${hash([endpointId, _path.value, unref(query), unref(method)])}`)
 
   return useAsyncData<T, FetchError>(
     key.value,
@@ -123,7 +109,10 @@ export function _useApiData<T = any>(
           ..._fetchOptions,
           signal: controller.signal,
           method: 'POST',
-          body: endpointFetchOptions,
+          body: {
+            ...endpointFetchOptions,
+            body: await serializeMaybeEncodedBody(body),
+          },
         },
       )) as T
 
