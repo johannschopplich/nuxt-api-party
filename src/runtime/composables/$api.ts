@@ -29,14 +29,6 @@ export function _$api<T = any>(
   const nuxt = useNuxtApp()
   const promiseMap: Map<string, Promise<T>> = nuxt._promiseMap = nuxt._promiseMap || new Map()
   const { query, headers, method, body, cache = false, ...fetchOptions } = opts
-
-  const endpointFetchOptions: EndpointFetchOptions = {
-    path,
-    query,
-    headers: headersToObject(headers),
-    method,
-  }
-
   const key = `$party${hash([endpointId, path, query, method])}`
 
   if ((nuxt.isHydrating || cache) && key in nuxt.payload.data)
@@ -44,6 +36,13 @@ export function _$api<T = any>(
 
   if (promiseMap.has(key))
     return promiseMap.get(key)!
+
+  const endpointFetchOptions: EndpointFetchOptions = {
+    path,
+    query,
+    headers: headersToObject(headers),
+    method,
+  }
 
   const fetcher = async () =>
     (await $fetch(`/api/__api_party/${endpointId}`, {
