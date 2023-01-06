@@ -29,7 +29,7 @@ export function _$api<T = any>(
   const nuxt = useNuxtApp()
   const promiseMap: Map<string, Promise<T>> = nuxt._promiseMap = nuxt._promiseMap || new Map()
   const { query, headers, method, body, cache = false, ...fetchOptions } = opts
-  const key = `$party${hash([endpointId, path, query, method])}`
+  const key = `$party${hash([endpointId, path, query, method, body])}`
 
   if ((nuxt.isHydrating || cache) && key in nuxt.payload.data)
     return Promise.resolve(nuxt.payload.data[key])

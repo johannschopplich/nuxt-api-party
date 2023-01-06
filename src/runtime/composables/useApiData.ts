@@ -87,7 +87,13 @@ export function _useApiData<T = any>(
   }
 
   let controller: AbortController
-  const key = computed(() => `$party${hash([endpointId, _path.value, unref(query), unref(method)])}`)
+  const key = computed(() => `$party${hash([
+    endpointId,
+    _path.value,
+    unref(query),
+    unref(method),
+    body,
+  ])}`)
 
   return useAsyncData<T, FetchError>(
     key.value,
