@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { FetchError } from 'ofetch'
 import type { JsonPlaceholderComment } from './types'
 
 const postId = ref(1)
@@ -33,7 +34,7 @@ const formResponse = ref()
 // Intended for similar use cases as `$fetch`
 async function onSubmit() {
   try {
-    formResponse.value = await $jsonPlaceholder('posts', {
+    formResponse.value = await $jsonPlaceholder('postss', {
       method: 'POST',
       body: {
         title: 'foo',
@@ -46,7 +47,9 @@ async function onSubmit() {
     console.log('formResponse:', formResponse.value)
   }
   catch (e) {
-    console.error(e)
+    console.error('statusCode:', (e as FetchError).statusCode)
+    console.error('statusMessage:', (e as FetchError).statusMessage)
+    console.error('data:', (e as FetchError).data)
   }
 }
 </script>

@@ -41,10 +41,6 @@ export default defineEventHandler(async (event): Promise<any> => {
     )
   }
   catch (err) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: `Failed to fetch from API endpoint "${endpointId}"`,
-      data: (err as FetchError).message,
-    })
+    throw createError((err as FetchError))
   }
 })

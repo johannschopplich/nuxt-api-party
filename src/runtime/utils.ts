@@ -1,10 +1,10 @@
 import { unref } from 'vue'
 import type { ComputedRef, Ref } from 'vue'
-import type { FetchOptions } from 'ofetch'
+import type { NitroFetchOptions } from 'nitropack'
 import type { ApiFetchOptions } from './composables/$api'
 import { formDataToObject, isFormData, isSerializedFormData, objectToFormData } from './formData'
 
-export type EndpointFetchOptions = FetchOptions & {
+export type EndpointFetchOptions = NitroFetchOptions<string> & {
   path: string
 }
 

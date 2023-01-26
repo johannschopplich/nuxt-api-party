@@ -326,7 +326,7 @@ function $party<T = any>(
 ): Promise<T>
 
 type ApiFetchOptions = Pick<
-  FetchOptions,
+  NitroFetchOptions<string>,
   'onRequest' | 'onRequestError' | 'onResponse' | 'onResponseError' | 'query' | 'headers' | 'method'
 > & {
   body?: string | Record<string, any> | FormData | null
@@ -480,41 +480,34 @@ const { data, pending, refresh, error } = await usePartyData('comments', {
 
 ### How Can I Inspect the Error Thrown by My API?
 
-As the idea of this module is to mask your real API by creating a Nuxt server proxy, `nuxt-api-party` will always throw the same HTTP status code if your API fails to deliver.
+Although the idea of this module is to mask your real API by creating a Nuxt server proxy, `nuxt-api-party` will forward error responses – including `statusCode`, `statusMessage` as well as the API response body as `data` – to the client if your API fails to deliver.
 
-But the error reason of the failed API request is available via the `error` reactive variable. Example usage:
+**Example usage with `useJsonPlaceholderData()`**
 
 ```ts
-const { data, error } = await useJsonPlaceholderData('not_available')
-
-// `data` key of `error` ref will contain the rejection reason
-watchEffect(() => console.log(error.value))
+const { data, error } = await useJsonPlaceholderData('not-found')
+watchEffect(() => {
+  console.error('statusCode:', error.value.statusCode)
+  console.error('statusMessage:', error.value.statusMessage)
+  console.error('data:', error.value.data)
+})
 ```
 
-Of, if using inside methods:
+**Example usage with `$jsonPlaceholder()`**
 
 ```ts
 function onSubmit() {
   try {
-    const response = await $jsonPlaceholder({
+    const response = await $jsonPlaceholder('not-found', {
       method: 'POST',
       body: form.value
     })
   }
   catch (e) {
-    console.log(e)
+    console.error('statusCode:', e.statusCode)
+    console.error('statusMessage:', e.statusMessage)
+    console.error('data:', e.data)
   }
-}
-```
-
-Inspecting the server log, you can find the `data` key with the rejection reason:
-
-```json
-{
-  "url": "/api/__api_party/json-placeholder",
-  "statusCode": 500,
-  "statusMessage": "Failed to fetch from API endpoint \"json-placeholder\"",
-  "data": "404 Not Found (https://jsonplaceholder.typicode.com/not_available)"
 }
 ```
 
