@@ -1,11 +1,11 @@
 import { hash } from 'ohash'
-import type { FetchOptions } from 'ofetch'
+import type { NitroFetchOptions } from 'nitropack'
 import { headersToObject, serializeMaybeEncodedBody } from '../utils'
 import type { EndpointFetchOptions } from '../utils'
 import { useNuxtApp } from '#imports'
 
 export type ApiFetchOptions = Pick<
-  FetchOptions,
+  NitroFetchOptions<string>,
   'onRequest' | 'onRequestError' | 'onResponse' | 'onResponseError' | 'query' | 'headers' | 'method'
 > & {
   body?: string | Record<string, any> | FormData | null

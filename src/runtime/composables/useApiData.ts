@@ -1,6 +1,7 @@
 import { computed, reactive, unref } from 'vue'
 import { hash } from 'ohash'
-import type { FetchError, FetchOptions } from 'ofetch'
+import type { FetchError } from 'ofetch'
+import type { NitroFetchOptions } from 'nitropack'
 import type { Ref } from 'vue'
 import type { AsyncData, AsyncDataOptions } from 'nuxt/app'
 import { headersToObject, resolveUnref, serializeMaybeEncodedBody } from '../utils'
@@ -23,7 +24,7 @@ export type UseApiDataOptions<T> = Pick<
   | 'watch'
   | 'immediate'
 > & Pick<
-  ComputedOptions<FetchOptions>,
+  ComputedOptions<NitroFetchOptions<string>>,
   | 'onRequest'
   | 'onRequestError'
   | 'onResponse'
