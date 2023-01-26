@@ -521,7 +521,7 @@ function onSubmit() {
 
 ## Special Thanks
 
-- [Dennis Baum](https://github.com/dennisbaum) for sponsoring the initial version package!
+- [Dennis Baum](https://github.com/dennisbaum) for sponsoring the initial version of this package.
 - [SVGBackgrounds.com](https://www.svgbackgrounds.com) for the OpenGraph image background pattern.
 
 ## License
