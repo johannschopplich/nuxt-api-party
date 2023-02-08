@@ -2,6 +2,7 @@ import { hash } from 'ohash'
 import type { NitroFetchOptions } from 'nitropack'
 import { headersToObject, serializeMaybeEncodedBody } from '../utils'
 import type { EndpointFetchOptions } from '../utils'
+import { isFormData } from '../formData'
 import { useNuxtApp } from '#imports'
 
 export type ApiFetchOptions = Pick<
@@ -29,7 +30,13 @@ export function _$api<T = any>(
   const nuxt = useNuxtApp()
   const promiseMap: Map<string, Promise<T>> = nuxt._promiseMap = nuxt._promiseMap || new Map()
   const { query, headers, method, body, cache = false, ...fetchOptions } = opts
-  const key = `$party${hash([endpointId, path, query, method, body])}`
+  const key = `$party${hash([
+    endpointId,
+    path,
+    query,
+    method,
+    ...(isFormData(body) ? [] : [body]),
+  ])}`
 
   if ((nuxt.isHydrating || cache) && key in nuxt.payload.data)
     return Promise.resolve(nuxt.payload.data[key])

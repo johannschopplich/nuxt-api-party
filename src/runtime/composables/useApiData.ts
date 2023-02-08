@@ -6,6 +6,7 @@ import type { Ref } from 'vue'
 import type { AsyncData, AsyncDataOptions } from 'nuxt/app'
 import { headersToObject, resolveUnref, serializeMaybeEncodedBody } from '../utils'
 import type { EndpointFetchOptions, MaybeComputedRef } from '../utils'
+import { isFormData } from '../formData'
 import { useAsyncData } from '#imports'
 
 type ComputedOptions<T extends Record<string, any>> = {
@@ -93,7 +94,7 @@ export function _useApiData<T = any>(
     _path.value,
     unref(query),
     unref(method),
-    body,
+    ...(isFormData(body) ? [] : [body]),
   ])}`)
 
   return useAsyncData<T, FetchError>(
