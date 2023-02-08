@@ -8,7 +8,7 @@ import { useRuntimeConfig } from '#imports'
 export default defineEventHandler(async (event): Promise<any> => {
   const { apiParty } = useRuntimeConfig()
   const endpoints = (apiParty.endpoints as ModuleOptions['endpoints'])!
-  const { endpointId } = event.context.params
+  const { endpointId } = event.context.params!
 
   if (!(endpointId in endpoints)) {
     throw createError({
