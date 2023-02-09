@@ -47,7 +47,7 @@
     "@nuxt/kit": "^3.2.0",
     "@types/node": "^18.13.0",
     "defu": "^6.1.2",
-    "formdata-polyfill": "^4.0.10",
+    "formdata-node": "^5.0.0",
     "ofetch": "^1.0.0",
     "ohash": "^1.0.0",
     "scule": "^1.0.0",

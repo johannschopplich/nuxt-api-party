@@ -1,5 +1,3 @@
-import { FormData as _FormData } from 'formdata-polyfill/esm.min.js'
-
 export interface SerializedBlob {
   data: string
   type: string
@@ -39,8 +37,18 @@ export async function formDataToObject(formData: FormData) {
   return obj
 }
 
-export function objectToFormData(obj: SerializedFormData) {
-  const formData = typeof FormData === 'undefined' ? new _FormData() : new FormData()
+export async function objectToFormData(obj: SerializedFormData) {
+  let formData: FormData
+
+  if (typeof FormData === 'undefined') {
+    const { FormData: FormDataPonyfill } = await import('formdata-node')
+    // @ts-expect-error: Types misalign with native `FormData`
+    formData = new FormDataPonyfill()
+  }
+  else {
+    formData = new FormData()
+  }
+
   const entries = Object.entries(obj).filter(([key]) => key !== '__type')
 
   for (const [key, value] of entries) {

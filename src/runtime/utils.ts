@@ -33,9 +33,9 @@ export async function serializeMaybeEncodedBody(value: ApiFetchOptions['body']) 
   return value
 }
 
-export function deserializeMaybeEncodedBody(value: ApiFetchOptions['body']) {
+export async function deserializeMaybeEncodedBody(value: ApiFetchOptions['body']) {
   if (isSerializedFormData(value))
-    return objectToFormData(value)
+    return await objectToFormData(value)
 
   return value
 }

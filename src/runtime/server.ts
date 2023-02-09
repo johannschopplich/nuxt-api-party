@@ -36,7 +36,7 @@ export default defineEventHandler(async (event): Promise<any> => {
           ...endpoint.headers,
           ...headers,
         },
-        ...(body && { body: deserializeMaybeEncodedBody(body) }),
+        ...(body && { body: await deserializeMaybeEncodedBody(body) }),
       },
     )
   }
