@@ -34,7 +34,7 @@ const formResponse = ref()
 // Intended for similar use cases as `$fetch`
 async function onSubmit() {
   try {
-    formResponse.value = await $jsonPlaceholder('postss', {
+    formResponse.value = await $jsonPlaceholder('posts', {
       method: 'POST',
       body: {
         title: 'foo',
