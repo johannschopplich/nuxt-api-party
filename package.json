@@ -2,7 +2,7 @@
   "name": "nuxt-api-party",
   "type": "module",
   "version": "0.7.1",
-  "packageManager": "pnpm@7.26.2",
+  "packageManager": "pnpm@7.27.0",
   "description": "Nuxt 3 module to securely connect with any API",
   "author": "Johann Schopplich <pkg@johannschopplich.com>",
   "license": "MIT",
@@ -44,7 +44,7 @@
     "prepare": "nuxi prepare playground"
   },
   "dependencies": {
-    "@nuxt/kit": "^3.1.2",
+    "@nuxt/kit": "^3.2.0",
     "@types/node": "^18.13.0",
     "defu": "^6.1.2",
     "formdata-polyfill": "^4.0.10",
@@ -58,7 +58,7 @@
     "@nuxt/module-builder": "^0.2.1",
     "bumpp": "^8.2.1",
     "eslint": "^8.33.0",
-    "nuxt": "^3.1.2",
+    "nuxt": "^3.2.0",
     "nuxt-api-party": "workspace:*",
     "typescript": "^4.9.5",
     "vue-tsc": "^1.0.24"
