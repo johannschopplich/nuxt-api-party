@@ -134,7 +134,10 @@ export default defineNuxtModule<ModuleOptions>({
     nuxt.hook('nitro:config', (config) => {
       config.externals = config.externals || {}
       config.externals.inline = config.externals.inline || []
-      config.externals.inline.push(...[resolve('runtime/utils'), resolve('runtime/formData')])
+      config.externals.inline.push(
+        resolve('runtime/utils'),
+        resolve('runtime/formData'),
+      )
     })
 
     // Add Nuxt server route to proxy the API request server-side
