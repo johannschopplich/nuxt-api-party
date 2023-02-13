@@ -7,7 +7,7 @@ import { useRuntimeConfig } from '#imports'
 
 export default defineEventHandler(async (event): Promise<any> => {
   const { apiParty } = useRuntimeConfig()
-  const endpoints = (apiParty.endpoints as ModuleOptions['endpoints'])!
+  const endpoints = (apiParty as ModuleOptions).endpoints!
   const { endpointId } = event.context.params!
 
   if (!(endpointId in endpoints)) {
@@ -19,10 +19,6 @@ export default defineEventHandler(async (event): Promise<any> => {
 
   const { path, query, headers, body, ...fetchOptions } = await readBody<EndpointFetchOptions>(event)
   const endpoint = endpoints[endpointId]
-  const _query = {
-    ...endpoint.query,
-    ...query,
-  }
 
   try {
     return await $fetch(
@@ -30,7 +26,10 @@ export default defineEventHandler(async (event): Promise<any> => {
       {
         ...fetchOptions,
         baseURL: endpoint.url,
-        query: Object.keys(_query).length ? _query : undefined,
+        query: {
+          ...endpoint.query,
+          ...query,
+        },
         headers: {
           ...(endpoint.token && { Authorization: `Bearer ${endpoint.token}` }),
           ...endpoint.headers,

@@ -1,15 +1,22 @@
 import { hash } from 'ohash'
 import type { NitroFetchOptions } from 'nitropack'
 import { headersToObject, serializeMaybeEncodedBody } from '../utils'
+import type { ModuleOptions } from '../../module'
 import type { EndpointFetchOptions } from '../utils'
 import { isFormData } from '../formData'
-import { useNuxtApp } from '#imports'
+import { useNuxtApp, useRuntimeConfig } from '#imports'
 
 export type ApiFetchOptions = Pick<
   NitroFetchOptions<string>,
   'onRequest' | 'onRequestError' | 'onResponse' | 'onResponseError' | 'query' | 'headers' | 'method'
 > & {
   body?: string | Record<string, any> | FormData | null
+  /**
+   * Skip the Nuxt server proxy and fetch directly from the API
+   * Requires `client` to be enabled in the module options as well
+   * @default false
+   */
+  client?: boolean
   /**
    * Cache the response for the same request
    * @default false
@@ -29,7 +36,8 @@ export function _$api<T = any>(
 ): Promise<T> {
   const nuxt = useNuxtApp()
   const promiseMap: Map<string, Promise<T>> = nuxt._promiseMap = nuxt._promiseMap || new Map()
-  const { query, headers, method, body, cache = false, ...fetchOptions } = opts
+  const { query, headers, method, body, client = false, cache = false, ...fetchOptions } = opts
+  const { apiParty } = useRuntimeConfig().public
   const key = `$party${hash([
     endpointId,
     path,
@@ -38,11 +46,17 @@ export function _$api<T = any>(
     ...(isFormData(body) ? [] : [body]),
   ])}`
 
+  if (client && !apiParty.client)
+    throw new Error('Client-side API requests are disabled. Set "client: true" in the module options to enable them.')
+
   if ((nuxt.isHydrating || cache) && key in nuxt.payload.data)
     return Promise.resolve(nuxt.payload.data[key])
 
   if (promiseMap.has(key))
     return promiseMap.get(key)!
+
+  const endpoints = (apiParty as ModuleOptions).endpoints!
+  const endpoint = endpoints?.[endpointId]
 
   const endpointFetchOptions: EndpointFetchOptions = {
     path,
@@ -51,14 +65,34 @@ export function _$api<T = any>(
     method,
   }
 
+  const clientFetchOptions: NitroFetchOptions<string> = {
+    baseURL: endpoint?.url,
+    method,
+    query: {
+      ...endpoint?.query,
+      ...query,
+    },
+    headers: {
+      ...(endpoint?.token && { Authorization: `Bearer ${endpoint.token}` }),
+      ...endpoint?.headers,
+      ...headers,
+    },
+    body,
+  }
+
   const fetcher = async () =>
-    (await $fetch(`/api/__api_party/${endpointId}`, {
+    (await $fetch(client ? path : `/api/__api_party/${endpointId}`, {
       ...fetchOptions,
-      method: 'POST',
-      body: {
-        ...endpointFetchOptions,
-        body: await serializeMaybeEncodedBody(body),
-      },
+      ...(client
+        ? clientFetchOptions
+        : {
+            method: 'POST',
+            body: {
+              ...endpointFetchOptions,
+              body: await serializeMaybeEncodedBody(body),
+            },
+          }
+      ),
     })) as T
 
   const request = fetcher().then((response) => {
