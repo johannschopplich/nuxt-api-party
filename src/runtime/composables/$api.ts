@@ -12,8 +12,8 @@ export type ApiFetchOptions = Pick<
 > & {
   body?: string | Record<string, any> | FormData | null
   /**
-   * Skip the Nuxt server proxy and fetch directly from the API
-   * Requires `client` to be enabled in the module options as well
+   * Skip the Nuxt server proxy and fetch directly from the API.
+   * Requires `client` to be enabled in the module options as well.
    * @default false
    */
   client?: boolean
@@ -56,46 +56,38 @@ export function _$api<T = any>(
     return promiseMap.get(key)!
 
   const endpoints = (apiParty as ModuleOptions).endpoints!
-  const endpoint = endpoints?.[endpointId]
+  const endpoint = endpoints[endpointId]
 
-  const endpointFetchOptions: EndpointFetchOptions = {
-    path,
-    query,
-    headers: headersToObject(headers),
-    method,
-  }
-
-  const clientFetchOptions: NitroFetchOptions<string> = {
-    baseURL: endpoint?.url,
+  const clientFetcher = () => $fetch<T>(path, {
+    ...fetchOptions,
+    baseURL: endpoint.url,
     method,
     query: {
-      ...endpoint?.query,
+      ...endpoint.query,
       ...query,
     },
     headers: {
-      ...(endpoint?.token && { Authorization: `Bearer ${endpoint.token}` }),
-      ...endpoint?.headers,
-      ...headers,
+      ...(endpoint.token && { Authorization: `Bearer ${endpoint.token}` }),
+      ...endpoint.headers,
+      ...headersToObject(headers),
     },
     body,
-  }
+  }) as Promise<T>
 
-  const fetcher = async () =>
-    (await $fetch(client ? path : `/api/__api_party/${endpointId}`, {
+  const serverFetcher = async () =>
+    (await $fetch<T>(`/api/__api_party/${endpointId}`, {
       ...fetchOptions,
-      ...(client
-        ? clientFetchOptions
-        : {
-            method: 'POST',
-            body: {
-              ...endpointFetchOptions,
-              body: await serializeMaybeEncodedBody(body),
-            },
-          }
-      ),
+      method: 'POST',
+      body: {
+        path,
+        query,
+        headers: headersToObject(headers),
+        method,
+        body: await serializeMaybeEncodedBody(body),
+      } satisfies EndpointFetchOptions,
     })) as T
 
-  const request = fetcher().then((response) => {
+  const request = (client ? clientFetcher() : serverFetcher()).then((response) => {
     if (process.server || cache)
       nuxt.payload.data[key] = response
     promiseMap.delete(key)
