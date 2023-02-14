@@ -6,14 +6,11 @@ import type { EndpointFetchOptions } from '../utils'
 import { isFormData } from '../formData'
 import { useNuxtApp, useRuntimeConfig } from '#imports'
 
-export type ApiFetchOptions = Pick<
-  NitroFetchOptions<string>,
-  'onRequest' | 'onRequestError' | 'onResponse' | 'onResponseError' | 'query' | 'headers' | 'method'
-> & {
+export type ApiFetchOptions = Omit<NitroFetchOptions<string>, 'body'> & {
   body?: string | Record<string, any> | FormData | null
   /**
    * Skip the Nuxt server proxy and fetch directly from the API.
-   * Requires `client` to be enabled in the module options as well.
+   * Requires `allowClient` to be enabled in the module options as well.
    * @default false
    */
   client?: boolean
@@ -46,8 +43,8 @@ export function _$api<T = any>(
     ...(isFormData(body) ? [] : [body]),
   ])}`
 
-  if (client && !apiParty.client)
-    throw new Error('Client-side API requests are disabled. Set "client: true" in the module options to enable them.')
+  if (client && !apiParty.allowClient)
+    throw new Error('Client-side API requests are disabled. Set "allowClient: true" in the module options to enable them.')
 
   if ((nuxt.isHydrating || cache) && key in nuxt.payload.data)
     return Promise.resolve(nuxt.payload.data[key])

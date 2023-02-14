@@ -39,7 +39,7 @@ export type UseApiDataOptions<T> = Pick<
   body?: string | Record<string, any> | FormData | null
   /**
    * Skip the Nuxt server proxy and fetch directly from the API.
-   * Requires `client` to be enabled in the module options as well.
+   * Requires `allowClient` to be enabled in the module options as well.
    * @default false
    */
   client?: boolean
@@ -77,8 +77,8 @@ export function _useApiData<T = any>(
     ...fetchOptions
   } = opts
 
-  if (client && !apiParty.client)
-    throw new Error('Client-side API requests are disabled. Set "client: true" in the module options to enable them.')
+  if (client && !apiParty.allowClient)
+    throw new Error('Client-side API requests are disabled. Set "allowClient: true" in the module options to enable them.')
 
   const endpoints = (apiParty as ModuleOptions).endpoints!
   const endpoint = endpoints[endpointId]

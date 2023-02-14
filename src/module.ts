@@ -73,7 +73,7 @@ export interface ModuleOptions {
   >
 
   /**
-   * Enable client-side requests besides server-side ones
+   * Allow client-side requests besides server-side ones
    *
    * @remarks
    * By default, API requests are only made on the server-side. This option allows you to make requests on the client-side as well. Keep in mind that this will expose your API credentials to the client.
@@ -83,7 +83,7 @@ export interface ModuleOptions {
    *
    * @default false
    */
-  client?: boolean
+  allowClient?: boolean
 }
 
 export default defineNuxtModule<ModuleOptions>({
@@ -101,7 +101,7 @@ export default defineNuxtModule<ModuleOptions>({
     query: undefined,
     headers: undefined,
     endpoints: {},
-    client: false,
+    allowClient: false,
   },
   setup(options, nuxt) {
     const logger = useLogger('nuxt-api-party')
@@ -142,9 +142,9 @@ export default defineNuxtModule<ModuleOptions>({
     // Write options to public runtime config if client requests are enabled
     nuxt.options.runtimeConfig.public.apiParty = defu(
       nuxt.options.runtimeConfig.public.apiParty,
-      options.client
+      options.allowClient
         ? options
-        : { endpoints: {}, client: false },
+        : { endpoints: {}, allowClient: false },
     )
 
     // Transpile runtime

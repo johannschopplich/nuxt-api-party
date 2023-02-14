@@ -325,11 +325,14 @@ function $party<T = any>(
   opts?: ApiFetchOptions,
 ): Promise<T>
 
-type ApiFetchOptions = Pick<
-  NitroFetchOptions<string>,
-  'onRequest' | 'onRequestError' | 'onResponse' | 'onResponseError' | 'query' | 'headers' | 'method'
-> & {
+type ApiFetchOptions = Omit<NitroFetchOptions<string>, 'body'> & {
   body?: string | Record<string, any> | FormData | null
+  /**
+   * Skip the Nuxt server proxy and fetch directly from the API.
+   * Requires `allowClient` to be enabled in the module options as well.
+   * @default false
+   */
+  client?: boolean
   /**
    * Cache the response for the same request
    * @default false
@@ -412,6 +415,12 @@ type UseApiDataOptions<T> = Pick<
   | 'method'
 > & {
   body?: string | Record<string, any> | FormData | null
+  /**
+   * Skip the Nuxt server proxy and fetch directly from the API.
+   * Requires `allowClient` to be enabled in the module options as well.
+   * @default false
+   */
+  client?: boolean
   /**
    * Cache the response for the same request
    * @default true
