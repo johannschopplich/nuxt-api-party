@@ -31,7 +31,6 @@ export type UseApiDataOptions<T> = Pick<
   | 'onRequestError'
   | 'onResponse'
   | 'onResponseError'
-  // Pick from `globalThis.RequestInit`
   | 'query'
   | 'headers'
   | 'method'
