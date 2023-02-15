@@ -144,7 +144,7 @@ export default defineNuxtModule<ModuleOptions>({
       nuxt.options.runtimeConfig.public.apiParty,
       options.allowClient
         ? options
-        : { endpoints: {}, allowClient: false },
+        : { allowClient: false },
     )
 
     // Transpile runtime

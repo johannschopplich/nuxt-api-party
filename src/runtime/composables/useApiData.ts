@@ -79,7 +79,7 @@ export function _useApiData<T = any>(
   if (client && !apiParty.allowClient)
     throw new Error('Client-side API requests are disabled. Set "allowClient: true" in the module options to enable them.')
 
-  const endpoints = (apiParty as ModuleOptions).endpoints!
+  const endpoints = (apiParty as ModuleOptions).endpoints || {}
   const endpoint = endpoints[endpointId]
 
   const _fetchOptions = reactive(fetchOptions)
