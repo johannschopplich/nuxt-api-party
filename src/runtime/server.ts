@@ -1,4 +1,4 @@
-import { createError, defineEventHandler, readBody } from 'h3'
+import { createError, defineEventHandler, getRouterParams, readBody } from 'h3'
 import type { FetchError } from 'ofetch'
 import type { ModuleOptions } from '../module'
 import { deserializeMaybeEncodedBody } from './utils'
@@ -6,19 +6,25 @@ import type { EndpointFetchOptions } from './utils'
 import { useRuntimeConfig } from '#imports'
 
 export default defineEventHandler(async (event): Promise<any> => {
+  const { endpointId } = getRouterParams(event)
   const { apiParty } = useRuntimeConfig()
   const endpoints = (apiParty as ModuleOptions).endpoints!
-  const { endpointId } = event.context.params!
+  const endpoint = endpoints[endpointId]
 
-  if (!(endpointId in endpoints)) {
+  if (!endpoint) {
     throw createError({
       statusCode: 404,
       statusMessage: `Unknown API endpoint "${endpointId}"`,
     })
   }
 
-  const { path, query, headers, body, ...fetchOptions } = await readBody<EndpointFetchOptions>(event)
-  const endpoint = endpoints[endpointId]
+  const {
+    path,
+    query,
+    headers,
+    body,
+    ...fetchOptions
+  } = await readBody<EndpointFetchOptions>(event)
 
   try {
     return await $fetch(
