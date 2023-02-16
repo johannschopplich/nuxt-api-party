@@ -131,15 +131,15 @@ export function _useApiData<T = any>(
         result = (await $fetch<T>(_path.value, {
           ..._fetchOptions,
           baseURL: endpoint.url,
-          method: unref(method),
+          method: endpointFetchOptions.method,
           query: {
             ...endpoint.query,
-            ...unref(query),
+            ...endpointFetchOptions.query,
           },
           headers: {
             ...(endpoint.token && { Authorization: `Bearer ${endpoint.token}` }),
             ...endpoint.headers,
-            ...headersToObject(unref(headers)),
+            ...endpointFetchOptions.headers,
           },
           body,
         })) as T
