@@ -2,7 +2,14 @@ export default defineNuxtConfig({
   modules: ['../src/module.ts'],
 
   apiParty: {
-    name: 'json-placeholder',
+    endpoints: {
+      'json-placeholder': {
+        url: process.env.JSON_PLACEHOLDER_BASE_URL!,
+      },
+      'dummy-json': {
+        url: 'https://dummyjson.com',
+      },
+    },
   },
 
   typescript: {
