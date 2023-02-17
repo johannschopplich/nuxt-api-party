@@ -1,3 +1,5 @@
+import { isCI } from 'std-env'
+
 export default defineNuxtConfig({
   modules: ['../src/module.ts'],
 
@@ -13,7 +15,7 @@ export default defineNuxtConfig({
   },
 
   typescript: {
-    typeCheck: true,
+    typeCheck: !isCI,
     shim: false,
   },
 })

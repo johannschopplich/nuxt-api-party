@@ -1,0 +1,12 @@
+// Vitest Snapshot v1
+
+exports[`nuxt-api-party > fetches data with $jsonPlaceholder 1`] = `""`;
+
+exports[`nuxt-api-party > fetches data with useJsonPlaceholderData 1`] = `
+{
+  "completed": false,
+  "id": 1,
+  "title": "delectus aut autem",
+  "userId": 1,
+}
+`;
