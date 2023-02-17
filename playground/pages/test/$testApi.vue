@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { data } = await $jsonPlaceholder('todos/1')
+const data = await $testApi('todos')
 
 useTestResult(data)
 </script>

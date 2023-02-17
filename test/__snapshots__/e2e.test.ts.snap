@@ -1,12 +1,47 @@
 // Vitest Snapshot v1
 
-exports[`nuxt-api-party > fetches data with $jsonPlaceholder 1`] = `""`;
+exports[`nuxt-api-party > fetches data with $testApi 1`] = `
+[
+  {
+    "completed": false,
+    "id": 1,
+    "title": "delectus aut autem",
+    "userId": 1,
+  },
+  {
+    "completed": false,
+    "id": 2,
+    "title": "quis ut nam facilis et officia qui",
+    "userId": 1,
+  },
+  {
+    "completed": false,
+    "id": 3,
+    "title": "fugiat veniam minus",
+    "userId": 1,
+  },
+]
+`;
 
-exports[`nuxt-api-party > fetches data with useJsonPlaceholderData 1`] = `
-{
-  "completed": false,
-  "id": 1,
-  "title": "delectus aut autem",
-  "userId": 1,
-}
+exports[`nuxt-api-party > fetches data with useTestApiData 1`] = `
+[
+  {
+    "completed": false,
+    "id": 1,
+    "title": "delectus aut autem",
+    "userId": 1,
+  },
+  {
+    "completed": false,
+    "id": 2,
+    "title": "quis ut nam facilis et officia qui",
+    "userId": 1,
+  },
+  {
+    "completed": false,
+    "id": 3,
+    "title": "fugiat veniam minus",
+    "userId": 1,
+  },
+]
 `;

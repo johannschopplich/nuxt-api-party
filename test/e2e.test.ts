@@ -9,13 +9,13 @@ describe('nuxt-api-party', async () => {
     rootDir: fileURLToPath(new URL('../playground', import.meta.url)),
   })
 
-  it('fetches data with $jsonPlaceholder', async () => {
-    const html = await $fetch('/test/$jsonPlaceholder')
+  it('fetches data with $testApi', async () => {
+    const html = await $fetch('/test/$testApi')
     expect(getTestResult(html)).toMatchSnapshot()
   })
 
-  it('fetches data with useJsonPlaceholderData', async () => {
-    const html = await $fetch('/test/useJsonPlaceholderData')
+  it('fetches data with useTestApiData', async () => {
+    const html = await $fetch('/test/useTestApiData')
     expect(getTestResult(html)).toMatchSnapshot()
   })
 })

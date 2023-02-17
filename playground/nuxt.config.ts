@@ -8,14 +8,16 @@ export default defineNuxtConfig({
       'json-placeholder': {
         url: process.env.JSON_PLACEHOLDER_BASE_URL!,
       },
-      'dummy-json': {
-        url: 'https://dummyjson.com',
+      'test-api': {
+        url: '/api',
       },
     },
   },
 
   typescript: {
-    typeCheck: !isCI,
+    // Enable again, once this is resolved:
+    // https://github.com/fi3ework/vite-plugin-checker/pull/223
+    // typeCheck: !isCI,
     shim: false,
   },
 })
