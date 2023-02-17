@@ -1,4 +1,4 @@
-import { isCI } from 'std-env'
+// import { isCI } from 'std-env'
 
 export default defineNuxtConfig({
   modules: ['../src/module.ts'],
