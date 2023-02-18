@@ -1,4 +1,4 @@
-// import { isCI } from 'std-env'
+import { isCI } from 'std-env'
 
 export default defineNuxtConfig({
   modules: ['../src/module.ts'],
@@ -15,9 +15,7 @@ export default defineNuxtConfig({
   },
 
   typescript: {
-    // Enable again, once this is resolved:
-    // https://github.com/fi3ework/vite-plugin-checker/pull/223
-    // typeCheck: !isCI,
+    typeCheck: !isCI,
     shim: false,
   },
 })
