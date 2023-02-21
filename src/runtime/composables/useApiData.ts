@@ -11,8 +11,6 @@ import type { EndpointFetchOptions, MaybeComputedRef } from '../utils'
 import { isFormData } from '../formData'
 import { useAsyncData, useNuxtApp, useRuntimeConfig } from '#imports'
 
-type _Transform<Input = any, Output = any> = (input: Input) => Output
-
 type ComputedOptions<T extends Record<string, any>> = {
   [K in keyof T]: T[K] extends Function
     ? T[K]
@@ -23,7 +21,7 @@ type ComputedOptions<T extends Record<string, any>> = {
 
 export type UseApiDataOptions<
   T,
-  Transform extends _Transform<T, any> = _Transform<T, T>,
+  Transform extends (res: T) => any = (res: T) => T,
 > = Pick<
   AsyncDataOptions<T, Transform>,
   | 'server'
@@ -59,7 +57,7 @@ export type UseApiDataOptions<
 export type UseApiData = <T = any>(
   path: MaybeComputedRef<string>,
   opts?: UseApiDataOptions<T>,
-) => AsyncData<T, FetchError | null | true>
+) => AsyncData<T, FetchError>
 
 export function _useApiData<
   T = any,

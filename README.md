@@ -289,10 +289,10 @@ export default defineNuxtConfig({
         url: process.env.JSON_PLACEHOLDER_API_BASE_URL,
         token: process.env.JSON_PLACEHOLDER_API_TOKEN
       },
-      'client': {
-        url: process.env.CLIENT_API_BASE_URL,
+      'cms': {
+        url: process.env.CMS_API_BASE_URL,
         headers: {
-          Authorization: process.env.CLIENT_API_AUTH_HEADER
+          Authorization: process.env.CMS_API_AUTH_HEADER
         }
       }
     }
@@ -401,7 +401,7 @@ function usePartyData<
 
 type UseApiDataOptions<
   T,
-  Transform extends _Transform<T, any> = _Transform<T, T>,
+  Transform extends (res: T) => any = (res: T) => T,
 > = Pick<
   AsyncDataOptions<T, Transform>,
   | 'server'
