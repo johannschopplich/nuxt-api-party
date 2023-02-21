@@ -49,10 +49,13 @@ exports[`nuxt-api-party > fetches data with useTestApiData 1`] = `
 exports[`nuxt-api-party > throws error for invalid response 1`] = `
 {
   "data": {
+    "message": "Not Found",
+    "stack": "",
     "statusCode": 404,
     "statusMessage": "Not Found",
+    "url": "/api/not-found",
   },
-  "message": " (404  (/api/not-found))",
+  "message": " (404 Not Found (/api/not-found))",
   "stack": "",
   "statusCode": 404,
   "statusMessage": "Not Found",

@@ -1,10 +1,6 @@
-import { setResponseStatus } from 'h3'
-
 export default defineEventHandler((event) => {
-  setResponseStatus(event, 404)
-
-  return {
+  throw createError({
     statusCode: 404,
     statusMessage: 'Not Found',
-  }
+  })
 })
