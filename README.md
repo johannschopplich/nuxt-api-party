@@ -391,20 +391,26 @@ Responses **are cached** between function calls for the same path based on a cal
 **Type Declarations**
 
 ```ts
-function usePartyData<T = any>(
+function usePartyData<
+  T = any,
+  Transform extends (res: T) => any = (res: T) => T,
+>(
   path: MaybeComputedRef<string>,
-  opts?: UseApiDataOptions<T>,
-): AsyncData<T, FetchError | null | true>
+  opts?: UseApiDataOptions<T, Transform>,
+): AsyncData<T, FetchError>
 
-type UseApiDataOptions<T> = Pick<
-  AsyncDataOptions<T>,
+type UseApiDataOptions<
+  T,
+  Transform extends _Transform<T, any> = _Transform<T, T>,
+> = Pick<
+  AsyncDataOptions<T, Transform>,
   | 'server'
   | 'lazy'
   | 'default'
   | 'watch'
   | 'immediate'
 > & Pick<
-  ComputedOptions<FetchOptions>,
+  ComputedOptions<NitroFetchOptions<string>>,
   | 'onRequest'
   | 'onRequestError'
   | 'onResponse'
@@ -453,10 +459,6 @@ const { data, pending, error, refresh } = await usePartyData('posts/1')
 <script setup lang="ts">
 const postId = ref(1)
 const { data, pending, refresh, error } = await usePartyData('comments', {
-  // Custom query parameters to be added to the request, can be reactive
-  query: computed(() => ({
-    postId: postId.value
-  })),
   // Whether to resolve the async function after loading the route, instead of blocking client-side navigation (defaults to `false`)
   lazy: false,
   // A factory function to set the default value of the data, before the async function resolves - particularly useful with the `lazy: true` option
@@ -465,8 +467,16 @@ const { data, pending, refresh, error } = await usePartyData('comments', {
   }),
   // Whether to fetch the data on the server (defaults to `true`)
   server: true,
+  // A function that can be used to alter handler function result after resolving
+  transform: res => res,
   // When set to `false`, will prevent the request from firing immediately. (defaults to `true`)
   immediate: true,
+  // Watch reactive sources to auto-refresh
+  watch: [],
+  // Custom query parameters to be added to the request, can be reactive
+  query: computed(() => ({
+    postId: postId.value
+  })),
   // Custom headers to be sent with the request
   headers: {
     'X-Foo': 'bar'

@@ -1,5 +1,7 @@
 <script setup lang="ts">
-const data = await $testApi('todos')
+import type { TestApiTodo } from '~/types'
+
+const data = await $testApi<TestApiTodo>('todos')
 
 useTestResult(data)
 </script>

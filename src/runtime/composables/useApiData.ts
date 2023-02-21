@@ -11,6 +11,8 @@ import type { EndpointFetchOptions, MaybeComputedRef } from '../utils'
 import { isFormData } from '../formData'
 import { useAsyncData, useNuxtApp, useRuntimeConfig } from '#imports'
 
+type _Transform<Input = any, Output = any> = (input: Input) => Output
+
 type ComputedOptions<T extends Record<string, any>> = {
   [K in keyof T]: T[K] extends Function
     ? T[K]
@@ -19,11 +21,15 @@ type ComputedOptions<T extends Record<string, any>> = {
       : Ref<T[K]> | T[K];
 }
 
-export type UseApiDataOptions<T> = Pick<
-  AsyncDataOptions<T>,
+export type UseApiDataOptions<
+  T,
+  Transform extends _Transform<T, any> = _Transform<T, T>,
+> = Pick<
+  AsyncDataOptions<T, Transform>,
   | 'server'
   | 'lazy'
   | 'default'
+  | 'transform'
   | 'watch'
   | 'immediate'
 > & Pick<
@@ -55,10 +61,13 @@ export type UseApiData = <T = any>(
   opts?: UseApiDataOptions<T>,
 ) => AsyncData<T, FetchError | null | true>
 
-export function _useApiData<T = any>(
+export function _useApiData<
+  T = any,
+  Transform extends (res: T) => any = (res: T) => T,
+>(
   endpointId: string,
   path: MaybeComputedRef<string>,
-  opts: UseApiDataOptions<T> = {},
+  opts: UseApiDataOptions<T, Transform> = {},
 ) {
   const { apiParty } = useRuntimeConfig().public
   const _path = computed(() => resolveUnref(path))
@@ -66,8 +75,9 @@ export function _useApiData<T = any>(
     server,
     lazy,
     default: defaultFn,
-    immediate,
+    transform,
     watch,
+    immediate,
     query,
     headers,
     method,
@@ -85,22 +95,23 @@ export function _useApiData<T = any>(
 
   const _fetchOptions = reactive(fetchOptions)
 
-  const endpointFetchOptions: EndpointFetchOptions = reactive({
+  const _endpointFetchOptions: EndpointFetchOptions = reactive({
     path: _path,
     query,
     headers: headersToObject(unref(headers)),
     method,
   })
 
-  const asyncDataOptions: AsyncDataOptions<T> = {
+  const _asyncDataOptions: AsyncDataOptions<T, Transform> = {
     server,
     lazy,
     default: defaultFn,
-    immediate,
+    transform,
     watch: [
-      endpointFetchOptions,
+      _endpointFetchOptions,
       ...(watch || []),
     ],
+    immediate,
   }
 
   let controller: AbortController
@@ -121,7 +132,7 @@ export function _useApiData<T = any>(
     _$fetch = (event?.$fetch as typeof globalThis.$fetch) || globalThis.$fetch
   }
 
-  return useAsyncData<T, FetchError>(
+  return useAsyncData<T, FetchError, Transform>(
     key.value,
     async (nuxt) => {
       controller?.abort?.()
@@ -141,15 +152,15 @@ export function _useApiData<T = any>(
         result = (await _$fetch<T>(_path.value, {
           ..._fetchOptions,
           baseURL: endpoint.url,
-          method: endpointFetchOptions.method,
+          method: _endpointFetchOptions.method,
           query: {
             ...endpoint.query,
-            ...endpointFetchOptions.query,
+            ..._endpointFetchOptions.query,
           },
           headers: {
             ...(endpoint.token && { Authorization: `Bearer ${endpoint.token}` }),
             ...endpoint.headers,
-            ...endpointFetchOptions.headers,
+            ..._endpointFetchOptions.headers,
           },
           body,
         })) as T
@@ -162,7 +173,7 @@ export function _useApiData<T = any>(
             signal: controller.signal,
             method: 'POST',
             body: {
-              ...endpointFetchOptions,
+              ..._endpointFetchOptions,
               body: await serializeMaybeEncodedBody(body),
             } satisfies EndpointFetchOptions,
           },
@@ -174,6 +185,6 @@ export function _useApiData<T = any>(
 
       return result
     },
-    asyncDataOptions,
-  ) as AsyncData<T, FetchError | null | true>
+    _asyncDataOptions,
+  ) as AsyncData<T, FetchError>
 }

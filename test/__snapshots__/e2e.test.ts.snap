@@ -28,18 +28,21 @@ exports[`nuxt-api-party > fetches data with useTestApiData 1`] = `
   {
     "completed": false,
     "id": 1,
+    "isTransformed": true,
     "title": "delectus aut autem",
     "userId": 1,
   },
   {
     "completed": false,
     "id": 2,
+    "isTransformed": true,
     "title": "quis ut nam facilis et officia qui",
     "userId": 1,
   },
   {
     "completed": false,
     "id": 3,
+    "isTransformed": true,
     "title": "fugiat veniam minus",
     "userId": 1,
   },
