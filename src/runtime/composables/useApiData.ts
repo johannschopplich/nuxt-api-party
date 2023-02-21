@@ -1,6 +1,7 @@
 import { computed, reactive, unref } from 'vue'
 import { hash } from 'ohash'
 import type { FetchError } from 'ofetch'
+import type { H3Event } from 'h3'
 import type { NitroFetchOptions } from 'nitropack'
 import type { Ref } from 'vue'
 import type { AsyncData, AsyncDataOptions } from 'nuxt/app'
@@ -8,7 +9,7 @@ import type { ModuleOptions } from '../../module'
 import { headersToObject, resolveUnref, serializeMaybeEncodedBody } from '../utils'
 import type { EndpointFetchOptions, MaybeComputedRef } from '../utils'
 import { isFormData } from '../formData'
-import { useAsyncData, useRuntimeConfig } from '#imports'
+import { useAsyncData, useNuxtApp, useRuntimeConfig } from '#imports'
 
 type ComputedOptions<T extends Record<string, any>> = {
   [K in keyof T]: T[K] extends Function
@@ -111,6 +112,15 @@ export function _useApiData<T = any>(
     ...(isFormData(body) ? [] : [body]),
   ])}`)
 
+  const isLocalFetch = _path.value.startsWith('/')
+  let _$fetch = globalThis.$fetch
+
+  // Use fetch with request context and headers for server direct API calls
+  if (process.server && isLocalFetch) {
+    const event = useNuxtApp().ssrContext?.event as H3Event
+    _$fetch = (event?.$fetch as typeof globalThis.$fetch) || globalThis.$fetch
+  }
+
   return useAsyncData<T, FetchError>(
     key.value,
     async (nuxt) => {
@@ -128,7 +138,7 @@ export function _useApiData<T = any>(
       let result: T
 
       if (client) {
-        result = (await $fetch<T>(_path.value, {
+        result = (await _$fetch<T>(_path.value, {
           ..._fetchOptions,
           baseURL: endpoint.url,
           method: endpointFetchOptions.method,
@@ -145,7 +155,7 @@ export function _useApiData<T = any>(
         })) as T
       }
       else {
-        result = (await $fetch<T>(
+        result = (await _$fetch<T>(
           `/api/__api_party/${endpointId}`,
           {
             ..._fetchOptions,
