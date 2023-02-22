@@ -388,28 +388,17 @@ By default, Nuxt waits until a `refresh` is finished before it can be executed a
 
 Responses **are cached** between function calls for the same path based on a calculated hash. You can disable this behavior by setting `cache` to `false`.
 
+The composable supports every [`useAsyncData` option](https://nuxt.com/docs/api/composables/use-async-data/#params).
+
 **Type Declarations**
 
 ```ts
-function usePartyData<
-  T = any,
-  Transform extends (res: T) => any = (res: T) => T,
->(
+function usePartyData<T = any>(
   path: MaybeComputedRef<string>,
-  opts?: UseApiDataOptions<T, Transform>,
+  opts?: UseApiDataOptions<T>,
 ): AsyncData<T, FetchError>
 
-type UseApiDataOptions<
-  T,
-  Transform extends (res: T) => any = (res: T) => T,
-> = Pick<
-  AsyncDataOptions<T, Transform>,
-  | 'server'
-  | 'lazy'
-  | 'default'
-  | 'watch'
-  | 'immediate'
-> & Pick<
+type UseApiDataOptions<T> = AsyncDataOptions<T> & Pick<
   ComputedOptions<NitroFetchOptions<string>>,
   | 'onRequest'
   | 'onRequestError'
@@ -433,8 +422,6 @@ type UseApiDataOptions<
   cache?: boolean
 }
 ```
-
-The composable infers most of the [`useAsyncData` options](https://nuxt.com/docs/api/composables/use-async-data/#params).
 
 **Basic example**
 

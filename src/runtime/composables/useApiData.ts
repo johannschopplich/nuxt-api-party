@@ -19,18 +19,7 @@ type ComputedOptions<T extends Record<string, any>> = {
       : Ref<T[K]> | T[K];
 }
 
-export type UseApiDataOptions<
-  T,
-  Transform extends (res: T) => any = (res: T) => T,
-> = Pick<
-  AsyncDataOptions<T, Transform>,
-  | 'server'
-  | 'lazy'
-  | 'default'
-  | 'transform'
-  | 'watch'
-  | 'immediate'
-> & Pick<
+export type UseApiDataOptions<T> = AsyncDataOptions<T> & Pick<
   ComputedOptions<NitroFetchOptions<string>>,
   | 'onRequest'
   | 'onRequestError'
@@ -59,13 +48,10 @@ export type UseApiData = <T = any>(
   opts?: UseApiDataOptions<T>,
 ) => AsyncData<T, FetchError>
 
-export function _useApiData<
-  T = any,
-  Transform extends (res: T) => any = (res: T) => T,
->(
+export function _useApiData<T = any>(
   endpointId: string,
   path: MaybeComputedRef<string>,
-  opts: UseApiDataOptions<T, Transform> = {},
+  opts: UseApiDataOptions<T> = {},
 ) {
   const { apiParty } = useRuntimeConfig().public
   const _path = computed(() => resolveUnref(path))
@@ -74,6 +60,7 @@ export function _useApiData<
     lazy,
     default: defaultFn,
     transform,
+    pick,
     watch,
     immediate,
     query,
@@ -100,11 +87,12 @@ export function _useApiData<
     method,
   })
 
-  const _asyncDataOptions: AsyncDataOptions<T, Transform> = {
+  const _asyncDataOptions: AsyncDataOptions<T> = {
     server,
     lazy,
     default: defaultFn,
     transform,
+    pick,
     watch: [
       _endpointFetchOptions,
       ...(watch || []),
@@ -130,7 +118,7 @@ export function _useApiData<
     _$fetch = (event?.$fetch as typeof globalThis.$fetch) || globalThis.$fetch
   }
 
-  return useAsyncData<T, FetchError, Transform>(
+  return useAsyncData<T, FetchError>(
     key.value,
     async (nuxt) => {
       controller?.abort?.()
