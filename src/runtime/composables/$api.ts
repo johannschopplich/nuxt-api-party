@@ -1,9 +1,9 @@
 import { hash } from 'ohash'
 import type { NitroFetchOptions } from 'nitropack'
 import { headersToObject, serializeMaybeEncodedBody } from '../utils'
+import { isFormData } from '../formData'
 import type { ModuleOptions } from '../../module'
 import type { EndpointFetchOptions } from '../utils'
-import { isFormData } from '../formData'
 import { useNuxtApp, useRuntimeConfig } from '#imports'
 
 export type ApiFetchOptions = Omit<NitroFetchOptions<string>, 'body'> & {
@@ -55,7 +55,7 @@ export function _$api<T = any>(
   const endpoints = (apiParty as ModuleOptions).endpoints || {}
   const endpoint = endpoints[endpointId]
 
-  const clientFetcher = () => $fetch<T>(path, {
+  const clientFetcher = () => globalThis.$fetch<T>(path, {
     ...fetchOptions,
     baseURL: endpoint.url,
     method,
@@ -72,7 +72,7 @@ export function _$api<T = any>(
   }) as Promise<T>
 
   const serverFetcher = async () =>
-    (await $fetch<T>(`/api/__api_party/${endpointId}`, {
+    (await globalThis.$fetch<T>(`/api/__api_party/${endpointId}`, {
       ...fetchOptions,
       method: 'POST',
       body: {
