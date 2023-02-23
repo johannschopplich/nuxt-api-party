@@ -114,7 +114,7 @@ export function _useApiData<T = any>(
       controller?.abort?.()
 
       // Workaround to persist response client-side
-      // https://github.com/nuxt/framework/issues/8917
+      // https://github.com/nuxt/nuxt/issues/15445
       if ((nuxt!.isHydrating || cache) && key.value in nuxt!.payload.data)
         return nuxt!.payload.data[key.value]
 
