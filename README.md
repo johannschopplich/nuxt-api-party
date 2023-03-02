@@ -90,6 +90,19 @@ NUXT_API_PARTY_ENDPOINTS_JSON_PLACEHOLDER_TOKEN=
 
 ### Singular API Endpoint
 
+```ts
+// `nuxt.config.ts`
+export default defineNuxtConfig({
+  modules: ['nuxt-api-party'],
+
+  runtimeConfig: {
+    apiParty: {
+      name: 'json-placeholder'
+    }
+  }
+})
+```
+
 Set the following environment variables in your project's `.env` file:
 
 ```bash
@@ -350,7 +363,8 @@ Returns the raw response of the API endpoint. Intended for actions inside method
 
 Responses can be cached between function calls for the same path based on a calculated hash by setting `cache` to `true`.
 
-**Type Declarations**
+<details>
+<summary>🦾 <strong>Type Declarations</strong></summary>
 
 ```ts
 function $party<T = any>(
@@ -373,6 +387,8 @@ type ApiFetchOptions = Omit<NitroFetchOptions<string>, 'body'> & {
   cache?: boolean
 }
 ```
+
+</details>
 
 **Example**
 
@@ -423,7 +439,8 @@ Responses **are cached** between function calls for the same path based on a cal
 
 The composable supports every [`useAsyncData` option](https://nuxt.com/docs/api/composables/use-async-data/#params).
 
-**Type Declarations**
+<details>
+<summary>🦾 <strong>Type Declarations</strong></summary>
 
 ```ts
 function usePartyData<T = any>(
@@ -455,6 +472,8 @@ type UseApiDataOptions<T> = AsyncDataOptions<T> & Pick<
   cache?: boolean
 }
 ```
+
+</details>
 
 **Basic example**
 
