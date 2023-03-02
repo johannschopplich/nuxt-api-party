@@ -11,7 +11,7 @@ This module enables you to securely fetch data from any API by proxying the requ
 - 🪅 [Dynamic composable names](#composables)
 - 🔒 Protected API credentials in the client
 - 🪢 Token-based authentication built-in or bring your own headers
-- 🧇 [Connect multiple API endpoints](#multiple-api-endpoints)
+- 🧇 [Connect multiple API endpoints](#basic-usage)
 - 🍱 Feels just like [`useFetch`](https://nuxt.com/docs/api/composables/use-fetch)
 - 🗃 Cached responses
 - 🦾 Strongly typed
