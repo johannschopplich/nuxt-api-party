@@ -5,7 +5,7 @@ import type { JsonPlaceholderComment } from '../types'
 const postId = ref(1)
 
 // Intended for similar use cases as `useFetch`
-const { data, error } = await useJsonPlaceholderData<JsonPlaceholderComment>(
+const { data, pending, error } = await useJsonPlaceholderData<JsonPlaceholderComment>(
   'comments',
   {
     query: computed(() => ({
@@ -69,6 +69,11 @@ async function onSubmit() {
 
     <h2>useJsonPlaceholderData</h2>
     <p>Responses are cached by default.</p>
+    <p>
+      Status:
+      <mark v-if="pending">pending</mark>
+      <code v-else>fetched</code>
+    </p>
     <p>
       <button @click="incrementPostId()">
         Increment Post ID
