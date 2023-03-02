@@ -1,4 +1,4 @@
-// Vitest Snapshot v1
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`nuxt-api-party > fetches data with $testApi 1`] = `
 [
@@ -62,6 +62,6 @@ exports[`nuxt-api-party > throws error for invalid response 1`] = `
   "stack": "",
   "statusCode": 404,
   "statusMessage": "Not Found",
-  "url": "/api/__api_party/test-api",
+  "url": "/api/__api_party/testApi",
 }
 `;
