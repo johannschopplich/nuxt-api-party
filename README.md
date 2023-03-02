@@ -28,7 +28,7 @@ npm i -D nuxt-api-party
 
 ## How It Works
 
-Composables will initiate a POST request to the Nuxt server route `/api/__api_party`, which then fetches the actual data for a given route from your API and passes the response back to the template/client. This proxy behavior has the benefit of omitting CORS issues, since data is sent from server to server.
+The generated composables will initiate a POST request to the Nuxt server route `/api/__api_party`, which then fetches the actual data for a given route from your API and passes the response back to the template/client. This proxy behavior has the benefit of omitting CORS issues, since data is sent from server to server.
 
 During server-side rendering, calls to the Nuxt server route will directly call the relevant function (emulating the request), saving an additional API call.
 
@@ -36,7 +36,7 @@ During server-side rendering, calls to the Nuxt server route will directly call 
 
 ## Basic Usage
 
-Add `nuxt-api-party` to your Nuxt config and tell the module options the name of your API:
+Add `nuxt-api-party` to your Nuxt config and enable the module by adding a `apiParty` endpoint object with the following properties:
 
 ```ts
 // `nuxt.config.ts`
@@ -44,8 +44,12 @@ export default defineNuxtConfig({
   modules: ['nuxt-api-party'],
 
   apiParty: {
-    // Needed for the names of the composables
-    name: 'json-placeholder'
+    endpoints: {
+      'json-placeholder': {
+        url: process.env.JSON_PLACEHOLDER_API_BASE_URL,
+        token: process.env.JSON_PLACEHOLDER_API_TOKEN
+      }
+    }
   }
 })
 ```
@@ -54,6 +58,35 @@ If you were to call your API `json-placeholder`, the generated composables are:
 
 - `$jsonPlaceholder` – Returns the response data, similar to [`$fetch`](https://nuxt.com/docs/api/utils/dollarfetch#fetch)
 - `useJsonPlaceholderData` – Returns [multiple values](#usepartydata-respectively-pascal-cased-api-name) similar to [`useFetch`](https://nuxt.com/docs/api/composables/use-fetch)
+
+### Runtime Config
+
+Instead of the `apiParty` module option, you can also use the [runtime config](https://nuxt.com/docs/api/configuration/nuxt-config#runtimeconfig) to set your API endpoints:
+
+```ts
+// `nuxt.config.ts`
+export default defineNuxtConfig({
+  modules: ['nuxt-api-party'],
+
+  runtimeConfig: {
+    apiParty: {
+      endpoints: {
+        jsonPlaceholder: {
+          url: '',
+          token: ''
+        }
+      }
+    }
+  }
+})
+```
+
+Leveraging automatically [replaced public runtime config values](https://nuxt.com/docs/api/configuration/nuxt-config#runtimeconfig) by matching `.env` variables at runtime, set your desired option in your project's `.env` file:
+
+```
+NUXT_API_PARTY_ENDPOINTS_JSON_PLACEHOLDER_URL=https://jsonplaceholder.typicode.com
+NUXT_API_PARTY_ENDPOINTS_JSON_PLACEHOLDER_TOKEN=
+```
 
 ### Singular API Endpoint
 
