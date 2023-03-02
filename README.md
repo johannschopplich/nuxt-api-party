@@ -4,7 +4,7 @@
 
 [![npm version](https://img.shields.io/npm/v/nuxt-api-party?color=a1b858&label=)](https://www.npmjs.com/package/nuxt-api-party)
 
-This module enables you to securely fetch data from any API by proxying the request in a Nuxt server route. Composable names are dynamic – given `json-placeholder` set as the module option `name` in your Nuxt config, the composables `$jsonPlaceholder` and `useJsonPlaceholderData` will be available globally.
+This module enables you to securely fetch data from any API by proxying the request in a Nuxt server route. Composable names are dynamic – given `jsonPlaceholder` set as the module option `name` in your Nuxt config, the composables `$jsonPlaceholder` and `useJsonPlaceholderData` will be available globally.
 
 ## Features
 
@@ -36,7 +36,7 @@ During server-side rendering, calls to the Nuxt server route will directly call 
 
 ## Basic Usage
 
-Add `nuxt-api-party` to your Nuxt config and enable the module by adding a `apiParty` endpoint object with the following properties:
+Add this module `nuxt-api-party` to your Nuxt config and prepare your first API connection by setting an endpoint object with the following properties for the `apiParty` module option:
 
 ```ts
 // `nuxt.config.ts`
@@ -45,19 +45,37 @@ export default defineNuxtConfig({
 
   apiParty: {
     endpoints: {
-      'json-placeholder': {
-        url: process.env.JSON_PLACEHOLDER_API_BASE_URL,
-        token: process.env.JSON_PLACEHOLDER_API_TOKEN
+      jsonPlaceholder: {
+        url: process.env.JSON_PLACEHOLDER_API_BASE_URL!,
+        token: process.env.JSON_PLACEHOLDER_API_TOKEN!,
+        headers: {
+          'X-Foo': 'bar'
+        }
       }
     }
   }
 })
 ```
 
-If you were to call your API `json-placeholder`, the generated composables are:
+If you were to call your API `jsonPlaceholder`, the generated composables are:
 
 - `$jsonPlaceholder` – Returns the response data, similar to [`$fetch`](https://nuxt.com/docs/api/utils/dollarfetch#fetch)
 - `useJsonPlaceholderData` – Returns [multiple values](#usepartydata-respectively-pascal-cased-api-name) similar to [`useFetch`](https://nuxt.com/docs/api/composables/use-fetch)
+
+Use the composables in your templates or components:
+
+```vue
+<script setup lang="ts">
+const { data, pending, refresh, error } = await useJsonPlaceholderData('posts/1')
+</script>
+
+<template>
+  <h1>{{ data?.title }}</h1>
+  <pre>{{ JSON.stringify(data, undefined, 2) }}</pre>
+</template>
+```
+
+> ℹ️ You can connect as many APIs as you want, just add them to the `endpoints` object.
 
 ### Runtime Config
 
@@ -95,10 +113,8 @@ NUXT_API_PARTY_ENDPOINTS_JSON_PLACEHOLDER_TOKEN=
 export default defineNuxtConfig({
   modules: ['nuxt-api-party'],
 
-  runtimeConfig: {
-    apiParty: {
-      name: 'json-placeholder'
-    }
+  apiParty: {
+    name: 'jsonPlaceholder'
   }
 })
 ```
@@ -109,67 +125,6 @@ Set the following environment variables in your project's `.env` file:
 API_PARTY_BASE_URL=https://jsonplaceholder.typicode.com
 # Optionally, add a bearer token
 # API_PARTY_TOKEN=test
-```
-
-Finally, fetch data from your API in your template:
-
-```vue
-<script setup lang="ts">
-interface Post {
-  userId: number
-  id: number
-  title: string
-  body: string
-}
-
-// `data` will be typed as `Ref<Post | null>`
-const { data, pending, refresh, error } = await useJsonPlaceholderData<Post>('posts/1')
-</script>
-
-<template>
-  <div>
-    <h1>{{ data?.title }}</h1>
-    <pre>{{ JSON.stringify(data, undefined, 2) }}</pre>
-  </div>
-</template>
-```
-
-## Multiple API Endpoints
-
-You may want to connect multiple APIs to your Nuxt application. Utilize the `endpoints` module option for this use-case, expecting a record of API endpoint configurations with the following type:
-
-```ts
-type ApiPartyEndpoints = Record<
-  string,
-  {
-    url: string
-    token?: string
-    headers?: Record<string, string>
-  }
->
-```
-
-> ℹ️ You can keep the default endpoint as well.
-
-The key of each item will intrinsically be used as the API name. A custom `url`, as well as optionally `token` and `headers` can be set in the endpoint details configuration:
-
-```ts
-export default defineNuxtConfig({
-  apiParty: {
-    endpoints: {
-      'json-placeholder': {
-        url: process.env.JSON_PLACEHOLDER_API_BASE_URL,
-        token: process.env.JSON_PLACEHOLDER_API_TOKEN
-      },
-      'cms': {
-        url: process.env.CMS_API_BASE_URL,
-        headers: {
-          Authorization: process.env.CMS_API_AUTH_HEADER
-        }
-      }
-    }
-  }
-})
 ```
 
 ## Module Options
@@ -331,14 +286,14 @@ Example:
 export default defineNuxtConfig({
   apiParty: {
     endpoints: {
-      'json-placeholder': {
-        url: process.env.JSON_PLACEHOLDER_API_BASE_URL,
-        token: process.env.JSON_PLACEHOLDER_API_TOKEN
+      jsonPlaceholder: {
+        url: process.env.JSON_PLACEHOLDER_API_BASE_URL!,
+        token: process.env.JSON_PLACEHOLDER_API_TOKEN!
       },
-      'cms': {
-        url: process.env.CMS_API_BASE_URL,
+      cms: {
+        url: process.env.CMS_API_BASE_URL!,
         headers: {
-          Authorization: process.env.CMS_API_AUTH_HEADER
+          Authorization: process.env.CMS_API_AUTH_HEADER!
         }
       }
     }
@@ -353,7 +308,7 @@ export default defineNuxtConfig({
 
 ## Composables
 
-Customize your API's composable names with the `name` in your Nuxt config module option. Given it is set to `json-placeholder`, the composables `$jsonPlaceholder` and `useJsonPlaceholderData` will be available globally.
+Customize your API's composable names with the `name` in your Nuxt config module option. Given it is set to `jsonPlaceholder`, the composables `$jsonPlaceholder` and `useJsonPlaceholderData` will be available globally.
 
 > ℹ️ The headings of the following sections aren't available as-is. As an example, the module option `name` is set to `party`.
 

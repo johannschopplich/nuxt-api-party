@@ -5,10 +5,10 @@ export default defineNuxtConfig({
 
   apiParty: {
     endpoints: {
-      'json-placeholder': {
+      jsonPlaceholder: {
         url: process.env.JSON_PLACEHOLDER_BASE_URL!,
       },
-      'test-api': {
+      testApi: {
         url: '/api',
       },
     },

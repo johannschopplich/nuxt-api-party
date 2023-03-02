@@ -105,12 +105,18 @@ export default defineNuxtModule<ModuleOptions>({
   },
   setup(options, nuxt) {
     const logger = useLogger('nuxt-api-party')
-    const hasMultipleEndpoints = Object.keys(options.endpoints!).length > 0
     const getRawComposableName = (endpointId: string) => `$${camelCase(endpointId)}`
     const getDataComposableName = (endpointId: string) => `use${pascalCase(endpointId)}Data`
 
-    if (!hasMultipleEndpoints && !options.name)
-      logger.error('No name provided for the API. Please set the `name` option.')
+    if (
+      // Single endpoint
+      !options.name
+      // Multiple endpoints
+      && Object.keys(options.endpoints!).length === 0
+      // Runtime config
+      && !nuxt.options.runtimeConfig.apiParty
+    )
+      logger.error('Missing any API endpoint configuration. Please set `apiParty` module options in `nuxt.config.ts`.')
 
     if (options.name) {
       // Make sure API base URL is set
@@ -169,7 +175,7 @@ export default defineNuxtModule<ModuleOptions>({
       handler: resolve('runtime/server'),
     })
 
-    const endpointKeys = Object.keys(options.endpoints!)
+    const endpointKeys = Object.keys(nuxt.options.runtimeConfig.apiParty.endpoints)
 
     addImportsSources({
       from: '#build/api-party',
