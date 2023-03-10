@@ -1,13 +1,10 @@
-name: "\U0001F41E Bug report"
+name: 🐞 Bug report
 description: Create a report to help me improve Nuxt API Party
-labels: ["pending triage"]
+labels: [pending triage]
 body:
   - type: markdown
     attributes:
       value: |
-        Please carefully read the contribution docs before creating a bug report
-        👉 https://nuxt.com/docs/community/reporting-bugs
-
         Please use a template below to create a minimal reproduction
         👉 https://stackblitz.com/github/nuxt/starter/tree/v3-stackblitz
         👉 https://codesandbox.io/p/github/nuxt/starter/v3-codesandbox
