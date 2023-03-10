@@ -2,14 +2,14 @@
 import type { FetchError } from 'ofetch'
 import type { JsonPlaceholderComment } from '../types'
 
-const postId = ref(1)
+const route = useRoute()
 
 // Intended for similar use cases as `useFetch`
 const { data, pending, error } = await useJsonPlaceholderData<JsonPlaceholderComment>(
   'comments',
   {
     query: computed(() => ({
-      postId: `${postId.value}`,
+      postId: `${route.query.postId || 1}`,
     })),
     onResponse({ response }) {
       if (process.server)
@@ -23,10 +23,14 @@ const { data, pending, error } = await useJsonPlaceholderData<JsonPlaceholderCom
 // eslint-disable-next-line no-console
 watch(error, value => console.log(value))
 
-function incrementPostId() {
-  postId.value++
+async function incrementPostId() {
+  await navigateTo({
+    query: {
+      postId: `${Number(route.query.postId || 1) + 1}`,
+    },
+  })
   // eslint-disable-next-line no-console
-  console.log('Post ID:', postId.value)
+  console.log('Post ID:', route.query.postId)
 }
 
 const formResponse = ref()
