@@ -90,7 +90,7 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
         { text: 'How to Track Errors?', link: '/guide/faq-how-to-track-errors' },
       ],
     },
-    { text: 'Playground', link: 'https://nuxt-api-party.netlify.app' },
+    { text: 'Playground', link: 'https://github.com/johannschopplich/nuxt-api-party/tree/main/playground' },
   ]
 }
 
