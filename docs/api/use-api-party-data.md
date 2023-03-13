@@ -1,4 +1,4 @@
-### `useApiPartyData`
+# `useApiPartyData`
 
 ::: info
 `useApiPartyData` is a placeholder name. Composables are generated based on your endpoint API names. For example, if you were to call an endpoint `jsonPlaceholder`, the composable will be called `useJsonPlaceholderData`.
