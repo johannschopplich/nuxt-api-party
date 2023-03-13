@@ -1,9 +1,6 @@
 [build]
-  publish = "playground/dist"
-  command = "pnpm run dev:build"
-
-[functions]
-  directory = "playground/.netlify/functions-internal"
+  publish = "docs/.vitepress/dist"
+  command = "pnpm run docs:build"
 
 [[redirects]]
   from = "/*"
