@@ -50,7 +50,7 @@
   },
   "dependencies": {
     "@nuxt/kit": "^3.2.3",
-    "@types/node": "^18.15.1",
+    "@types/node": "^18.15.3",
     "defu": "^6.1.2",
     "formdata-node": "^5.0.0",
     "ofetch": "^1.0.1",
