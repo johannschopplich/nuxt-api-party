@@ -11,8 +11,8 @@ export interface ModuleOptions {
    * Each key represents an endpoint ID, which is used to generate the composables. The value is an object with the following properties:
    * - `url`: The URL of the API endpoint
    * - `token`: The API token to use for the endpoint (optional)
-   * - `query`: The query parameters to use for the endpoint (optional)
-   * - `headers`: The headers to use for the endpoint (optional)
+   * - `query`: Query parameters to send with the each request (optional)
+   * - `headers`: Headers to send with each request (optional)
    *
    * @example
    * export default defineNuxtConfig({

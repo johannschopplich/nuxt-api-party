@@ -20,8 +20,8 @@ Main module configuration for your API endpoints. Each key represents an endpoin
 
 - `url`: The URL of the API endpoint
 - `token`: The API token to use for the endpoint (optional)
-- `query`: The query parameters to use for the endpoint (optional)
-- `headers`: The headers to use for the endpoint (optional)
+- `query`: Query parameters to send with the each request (optional)
+- `headers`: Headers to send with each request (optional)
 
 ::: info
 The composables are generated based on your API endpoint ID. For example, if you were to call an endpoint `jsonPlaceholder`, the composables will be called `useJsonPlaceholderData` and `$jsonPlaceholder`.
