@@ -59,7 +59,7 @@ export default defineNuxtConfig({
 If you were to call your API `jsonPlaceholder`, the generated composables are:
 
 - `$jsonPlaceholder` – Returns the response data, similar to [`$fetch`](https://nuxt.com/docs/api/utils/dollarfetch#fetch)
-- `useJsonPlaceholderData` – Returns [multiple values](#usepartydata-respectively-pascal-cased-api-name) similar to [`useFetch`](https://nuxt.com/docs/api/composables/use-fetch)
+- `useJsonPlaceholderData` – Returns [multiple values](https://nuxt-api-party.jhnn.dev/api/use-api-party-data.html#return-values) similar to [`useFetch`](https://nuxt.com/docs/api/composables/use-fetch)
 
 Use these composables in your templates or components:
 
