@@ -1,7 +1,7 @@
 # `useApiPartyData`
 
 ::: info
-`useApiPartyData` is a placeholder name. Composables are generated based on your endpoint API names. For example, if you were to call an endpoint `jsonPlaceholder`, the composable will be called `useJsonPlaceholderData`.
+`useApiPartyData` is a placeholder used as an example in the documentation. The composable is generated based on your API endpoint ID. For example, if you were to call an endpoint `jsonPlaceholder`, the composable will be called `useJsonPlaceholderData`.
 :::
 
 Returns the raw response of the API endpoint. Intended for data which requires reactive updates, e.g. when using the data in a template.
@@ -71,26 +71,21 @@ const { data, pending, error, refresh } = await usePartyData('posts/1')
 </template>
 ```
 
-**Full example including all parameters**
+**Extended example**
 
 ```vue
 <script setup lang="ts">
 const postId = ref(1)
+
 const { data, pending, refresh, error } = await usePartyData('comments', {
   // Whether to resolve the async function after loading the route, instead of blocking client-side navigation (defaults to `false`)
-  lazy: false,
+  lazy: true,
   // A factory function to set the default value of the data, before the async function resolves - particularly useful with the `lazy: true` option
   default: () => ({
-    foo: 'bar'
+    title: ''
   }),
-  // Whether to fetch the data on the server (defaults to `true`)
-  server: true,
   // A function that can be used to alter handler function result after resolving
   transform: res => res,
-  // When set to `false`, will prevent the request from firing immediately. (defaults to `true`)
-  immediate: true,
-  // Watch reactive sources to auto-refresh
-  watch: [],
   // Custom query parameters to be added to the request, can be reactive
   query: computed(() => ({
     postId: postId.value
@@ -98,7 +93,7 @@ const { data, pending, refresh, error } = await usePartyData('comments', {
   // Custom headers to be sent with the request
   headers: {
     'X-Foo': 'bar'
-  }
+  },
 })
 </script>
 

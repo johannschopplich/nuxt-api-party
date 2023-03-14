@@ -1,7 +1,7 @@
 # `$apiParty`
 
 ::: info
-`$apiParty` is a placeholder name. Composables are generated based on your endpoint API names. For example, if you were to call an endpoint `jsonPlaceholder`, the composable will be called `$jsonPlaceholder`.
+`$apiParty` is a placeholder used as an example in the documentation. The composable is generated based on your API endpoint ID. For example, if you were to call an endpoint `jsonPlaceholder`, the composable will be called `$jsonPlaceholder`.
 :::
 
 Returns the raw response of the API endpoint. Intended for actions inside methods, e.g. when sending form data to the API when clicking a submit button.

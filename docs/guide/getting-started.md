@@ -29,7 +29,12 @@ export default defineNuxtConfig({
 
 ## Step 3: Set up the API endpoints
 
-Prepare your first API connection by setting an endpoint object with the following properties for the `apiParty` module option:
+Prepare your first API connection by setting an endpoint object. Each key represents an endpoint ID, which is used to generate the composables. The value is an object with the following properties:
+
+- `url`: The URL of the API endpoint
+- `token`: The API token to use for the endpoint (optional)
+- `query`: The query parameters to use for the endpoint (optional)
+- `headers`: The headers to use for the endpoint (optional)
 
 ```ts
 // `nuxt.config.ts`
@@ -50,13 +55,13 @@ export default defineNuxtConfig({
 })
 ```
 
-If you were to call your API `jsonPlaceholder`, the generated composables are:
+For the API endpoint `jsonPlaceholder` above, the following composables are generated:
 
 - `$jsonPlaceholder` – Returns the response data, similar to [`$fetch`](https://nuxt.com/docs/api/utils/dollarfetch#fetch)
 - `useJsonPlaceholderData` – Returns [multiple values](/api/use-api-party-data.html#return-values) similar to [`useFetch`](https://nuxt.com/docs/api/composables/use-fetch)
 
 ::: tip
-You can connect as many APIs as you want, just add them to the `endpoints` object.
+Connect to as many API endpoints as you like. Each endpoint will generate two composables.
 :::
 
 ### Runtime Config

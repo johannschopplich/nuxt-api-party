@@ -88,10 +88,11 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
     {
       text: 'FAQ',
       items: [
-        { text: 'How to Track Errors?', link: '/guide/faq-how-to-track-errors' },
+        { text: 'How to Track Errors', link: '/guide/faq-how-to-track-errors' },
       ],
     },
     { text: 'Playground', link: 'https://github.com/johannschopplich/nuxt-api-party/tree/main/playground' },
+    { text: 'Migration', link: '/guide/migration' },
   ]
 }
 

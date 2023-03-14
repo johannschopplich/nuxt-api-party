@@ -5,60 +5,27 @@ import type { QueryObject } from 'ufo'
 
 export interface ModuleOptions {
   /**
-   * API name used for composables
+   * API endpoints
    *
    * @remarks
-   * For example, if you set it to `foo`, the composables will be called `$foo` and `useFooData`
-   */
-  name?: string
-
-  /**
-   * API base URL
-   *
-   * @default process.env.API_PARTY_BASE_URL
-   */
-  url?: string
-
-  /**
-   * Optional API token for bearer authentication
-   *
-   * @remarks
-   * You can set a custom header with the `headers` module option instead
-   *
-   * @default process.env.API_PARTY_TOKEN
-   */
-  token?: string
-
-  /**
-   * Custom query parameters sent with every request to the API
-   */
-  query?: QueryObject
-
-  /**
-   * Custom headers sent with every request to the API
-   *
-   * @remarks
-   * Add authorization headers if you want to use a custom authorization method
+   * Each key represents an endpoint ID, which is used to generate the composables. The value is an object with the following properties:
+   * - `url`: The URL of the API endpoint
+   * - `token`: The API token to use for the endpoint (optional)
+   * - `query`: The query parameters to use for the endpoint (optional)
+   * - `headers`: The headers to use for the endpoint (optional)
    *
    * @example
    * export default defineNuxtConfig({
    *   apiParty: {
-   *     headers: {
-   *       'Custom-Api-Header': 'foo',
-   *       'Authorization': `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`
+   *     jsonPlaceholder: {
+   *       url: 'https://jsonplaceholder.typicode.com'
+   *       headers: {
+   *         'X-Foo': 'bar',
+   *         'Authorization': `Basic ${Buffer.from('foo:bar').toString('base64')}`
+   *       }
    *     }
    *   }
    * })
-   *
-   * @default {}
-   */
-  headers?: Record<string, string>
-
-  /**
-   * Multiple API endpoints
-   *
-   * @remarks
-   * This will create multiple API composables for the given endpoint configurations. You can keep the default endpoint as well.
    *
    * @default {}
    */
@@ -79,7 +46,7 @@ export interface ModuleOptions {
    * By default, API requests are only made on the server-side. This option allows you to make requests on the client-side as well. Keep in mind that this will expose your API credentials to the client.
    *
    * @example
-   * $jsonPlaceholder('/posts/1', { client: true })
+   * useJsonPlaceholderData('/posts/1', { client: true })
    *
    * @default false
    */
@@ -95,11 +62,6 @@ export default defineNuxtModule<ModuleOptions>({
     },
   },
   defaults: {
-    name: undefined,
-    url: process.env.API_PARTY_BASE_URL as string,
-    token: process.env.API_PARTY_TOKEN as string,
-    query: undefined,
-    headers: undefined,
     endpoints: {},
     allowClient: false,
   },
@@ -109,35 +71,10 @@ export default defineNuxtModule<ModuleOptions>({
     const getDataComposableName = (endpointId: string) => `use${pascalCase(endpointId)}Data`
 
     if (
-      // Single endpoint
-      !options.name
-      // Multiple endpoints
-      && Object.keys(options.endpoints!).length === 0
-      // Runtime config
+      Object.keys(options.endpoints!).length === 0
       && !nuxt.options.runtimeConfig.apiParty
     )
       logger.error('Missing any API endpoint configuration. Please set `apiParty` module options in `nuxt.config.ts`.')
-
-    if (options.name) {
-      // Make sure API base URL is set
-      if (!options.url)
-        logger.error('Missing `API_PARTY_BASE_URL` in `.env` file')
-
-      // Make sure authentication credentials are set
-      if (!options.token && !options.headers && !options.query) {
-        logger.warn(
-          'Missing `API_PARTY_TOKEN` in `.env` file for bearer authentication and custom headers in module options. Are you sure your API doesn\'t require authentication? If so, you may not need this module.',
-        )
-      }
-
-      // Add default endpoint to collection of endpoints
-      options.endpoints![options.name] = {
-        url: options.url!,
-        token: options.token,
-        query: options.query,
-        headers: options.headers,
-      }
-    }
 
     // Private runtime config
     nuxt.options.runtimeConfig.apiParty = defu(

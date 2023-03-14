@@ -1,4 +1,4 @@
-# How to Track Errors?
+# How to Track Errors
 
 Although the idea of this module is to mask your real API by creating a Nuxt server proxy, `nuxt-api-party` will forward error responses to the client if your API fails to deliver, including:
 

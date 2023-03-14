@@ -26,7 +26,7 @@ hero:
 features:
   - title: Dynamic composable names
     icon: 🪅
-    details: Auto-generated composables for each API endpoint
+    details: Auto-generated composables for each API endpoint.
   - title: Protected API credentials
     icon: 🔒
     details: A Nuxt server route proxies your requests. No CORS issues!
