@@ -58,8 +58,7 @@ export default defineNuxtConfig({
       cms: {
         url: process.env.CMS_API_BASE_URL!,
         headers: {
-          'X-Foo': 'bar',
-          'Authorization': `Basic ${Buffer.from(`${process.env.CMS_API_USERNAME}:${process.env.CMS_API_PASSWORD}`).toString('base64')}`
+          Authorization: `Basic ${Buffer.from(`${process.env.CMS_API_USERNAME}:${process.env.CMS_API_PASSWORD}`).toString('base64')}`
         }
       }
     }

@@ -46,9 +46,9 @@ export default defineNuxtConfig({
     endpoints: {
       jsonPlaceholder: {
         url: process.env.JSON_PLACEHOLDER_API_BASE_URL!,
-        token: process.env.JSON_PLACEHOLDER_API_TOKEN!,
+        // Global headers sent with each request
         headers: {
-          'X-Foo': 'bar'
+          Authorization: `Bearer ${process.env.JSON_PLACEHOLDER_API_TOKEN}`
         }
       }
     }

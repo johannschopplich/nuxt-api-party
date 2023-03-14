@@ -20,8 +20,7 @@ export interface ModuleOptions {
    *     jsonPlaceholder: {
    *       url: 'https://jsonplaceholder.typicode.com'
    *       headers: {
-   *         'X-Foo': 'bar',
-   *         'Authorization': `Basic ${Buffer.from('foo:bar').toString('base64')}`
+   *         Authorization: `Basic ${Buffer.from('foo:bar').toString('base64')}`
    *       }
    *     }
    *   }
