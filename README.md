@@ -11,7 +11,7 @@
 
 ## Features
 
-- 🪅 [Dynamic composable names](#composables)
+- 🪅 [Dynamic composable names](https://nuxt-api-party.jhnn.dev/api/#dynamic-composables)
 - 🔒 Protected API credentials in the client
 - 🪢 Token-based authentication built-in or bring your own headers
 - 🧇 [Connect multiple API endpoints](#basic-usage)

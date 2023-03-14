@@ -105,7 +105,7 @@ Default value: `process.env.API_PARTY_TOKEN`
 ## `apiParty.query`
 
 ::: info
-Not applied if you use the `endpoints` module option.
+Only for single API endpoint usage. Not applied if you use the `endpoints` module option.
 :::
 
 Custom query parameters sent with every API request.
@@ -119,7 +119,7 @@ Default value: `undefined`
 ## `apiParty.headers`
 
 ::: info
-Not applied if you use the `endpoints` module option.
+Only for single API endpoint usage. Not applied if you use the `endpoints` module option.
 :::
 
 Custom headers sent with every API request. Add authorization headers if you want to use a custom authorization method.

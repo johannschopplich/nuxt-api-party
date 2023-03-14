@@ -79,8 +79,9 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
       ],
     },
     {
-      text: 'Configuration',
+      text: 'In-Depth',
       items: [
+        { text: 'Hydration', link: '/guide/hydration' },
         { text: 'Caching', link: '/guide/caching' },
       ],
     },
