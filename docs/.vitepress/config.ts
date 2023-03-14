@@ -8,6 +8,8 @@ import {
   releases,
 } from './meta'
 
+const url = new URL(ogUrl)
+
 export default defineConfig({
   lang: 'en-US',
   title: name,
@@ -24,7 +26,7 @@ export default defineConfig({
     ['meta', { name: 'twitter:image', content: ogImage }],
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
     // Plausible analytics
-    ['script', { 'src': 'https://plausible.io/js/script.js', 'defer': '', 'data-domain': 'nuxt-api-party.jhnn.dev' }],
+    ['script', { 'src': 'https://plausible.io/js/script.js', 'defer': '', 'data-domain': url.hostname }],
   ],
 
   themeConfig: {
