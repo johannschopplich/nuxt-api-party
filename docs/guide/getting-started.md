@@ -2,7 +2,7 @@
 
 This guide will walk you through the steps to get started with `nuxt-api-party`.
 
-## Step 1: Install nuxt-api-party
+## Step 1: Install `nuxt-api-party`
 
 Using [pnpm](https://pnpm.io):
 
@@ -16,7 +16,7 @@ Using npm:
 $ npm i -D nuxt-api-party
 ```
 
-## Step 2: Add nuxt-api-party to Nuxt
+## Step 2: Use `nuxt-api-party`
 
 Add `nuxt-api-party` to your Nuxt config:
 
