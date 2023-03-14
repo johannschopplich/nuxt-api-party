@@ -2,6 +2,10 @@
 
 ## v0.10.0
 
+::: tip
+If you're using the `endpoints` module option, you can skip this section. Nothing has changed for you!
+:::
+
 Support for the single API endpoint has been removed to keep the module simple and focused. Migration is fairly straightforward by moving your API configuration into the `endpoints` object:
 
 ```diff
