@@ -93,7 +93,7 @@ NUXT_API_PARTY_ENDPOINTS_JSON_PLACEHOLDER_URL=https://jsonplaceholder.typicode.c
 NUXT_API_PARTY_ENDPOINTS_JSON_PLACEHOLDER_TOKEN=
 ```
 
-## Step 4: Send Queries
+## Step 4: Send Requests
 
 Use these composables in your templates or components:
 
