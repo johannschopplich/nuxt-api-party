@@ -27,7 +27,7 @@ export default defineNuxtConfig({
 })
 ```
 
-## Step 3: Set up the API endpoints
+## Step 3: Set up API endpoints
 
 Prepare your first API connection by setting an endpoint object. Each key represents an endpoint ID, which is used to generate the composables. The value is an object with the following properties:
 
