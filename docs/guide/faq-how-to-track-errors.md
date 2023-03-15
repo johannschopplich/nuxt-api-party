@@ -6,10 +6,10 @@ Although the idea of this module is to mask your real API by creating a Nuxt ser
 - `statusMessage`
 - API response body as `data`
 
+## Examples
+
 ::: info
 The examples below assume that you have set up an API endpoint called `jsonPlaceholder`:
-
-## Examples
 
 ```ts
 // `nuxt.config.ts`
