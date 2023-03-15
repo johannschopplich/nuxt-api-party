@@ -24,10 +24,17 @@ The cache key is reactive when using `useApiPartyData`. This means that the cach
 
 ## Cache Options
 
-You can disable the cache for each request by setting the `cache` option to `false`. This is necessary for the `useApiPartyData` composable.
+You can disable the cache for each request by setting the `cache` option to `false`. This is necessary for the `useApiPartyData` composable:
+
+```ts
+// Disable caching for a single request
+const { data } = await useJsonPlaceholderData('posts/1', {
+  cache: false
+})
+```
 
 ::: info
-The example below assume that you have set up an API endpoint called `jsonPlaceholder`:
+These examples assume that you have set up an API endpoint called `jsonPlaceholder`:
 
 ```ts
 // `nuxt.config.ts`
@@ -45,13 +52,6 @@ export default defineNuxtConfig({
 ```
 
 :::
-
-```ts
-// Disable caching for a single request
-const { data } = await useJsonPlaceholderData('posts/1', {
-  cache: false
-})
-```
 
 Although the `$apiParty` composables are intended for one-time API calls, like submitting form data, you can also cache their responses when needed:
 
