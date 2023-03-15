@@ -1,6 +1,6 @@
 # Caching
 
-Apart from [hydration](/guide/hydration), you can also cache your API responses to improve performance between multiple calls like for page navigation.
+You can cache your API responses to improve performance between multiple calls like for page navigation.
 
 ::: info
 Responses from `useApiPartyData` are cached by default. On the other hand, you have to enable caching for `$apiParty` manually.
@@ -24,14 +24,38 @@ The cache key is reactive when using `useApiPartyData`. This means that the cach
 
 ## Cache Options
 
-You can disable the cache for each request by setting the `cache` option to `false`:
+You can disable the cache for each request by setting the `cache` option to `false`. This is necessary for the `useApiPartyData` composable.
+
+::: info
+The example below assume that you have set up an API endpoint called `jsonPlaceholder`:
+
+```ts
+// `nuxt.config.ts`
+export default defineNuxtConfig({
+  modules: ['nuxt-api-party'],
+
+  apiParty: {
+    endpoints: {
+      jsonPlaceholder: {
+        url: 'https://jsonplaceholder.typicode.com'
+      }
+    }
+  }
+})
+```
+
+:::
 
 ```ts
 // Disable caching for a single request
 const { data } = await useJsonPlaceholderData('posts/1', {
   cache: false
 })
+```
 
+Although the `$apiParty` composables are intended for one-time API calls, like submitting form data, you can also cache their responses when needed:
+
+```ts
 // Enable cache for a single request
 const response = $jsonPlaceholder('posts/1', {
   method: 'POST',
