@@ -9,6 +9,8 @@ Although the idea of this module is to mask your real API by creating a Nuxt ser
 ::: info
 The examples below assume that you have set up an API endpoint called `jsonPlaceholder`:
 
+## Examples
+
 ```ts
 // `nuxt.config.ts`
 export default defineNuxtConfig({
@@ -26,7 +28,7 @@ export default defineNuxtConfig({
 
 :::
 
-## Example usage with `useJsonPlaceholderData`
+### Usage with `useJsonPlaceholderData`
 
 ```ts
 const { data, error } = await useJsonPlaceholderData('not-found')
@@ -38,7 +40,7 @@ watchEffect(() => {
 })
 ```
 
-## Example usage with `$jsonPlaceholder`
+### Usage with `$jsonPlaceholder`
 
 ```ts
 function onSubmit() {
