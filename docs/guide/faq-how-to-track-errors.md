@@ -6,6 +6,26 @@ Although the idea of this module is to mask your real API by creating a Nuxt ser
 - `statusMessage`
 - API response body as `data`
 
+::: info
+The examples below assume that you have set up an API endpoint called `jsonPlaceholder`:
+
+```ts
+// `nuxt.config.ts`
+export default defineNuxtConfig({
+  modules: ['nuxt-api-party'],
+
+  apiParty: {
+    endpoints: {
+      jsonPlaceholder: {
+        url: 'https://jsonplaceholder.typicode.com'
+      }
+    }
+  }
+})
+```
+
+:::
+
 ## Example usage with `useJsonPlaceholderData`
 
 ```ts
