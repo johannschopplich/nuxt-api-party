@@ -54,11 +54,31 @@ By default, Nuxt waits until a `refresh` is finished before it can be executed a
 
 ## Examples
 
-**Basic**
+::: info
+The examples below assume that you have set up an API endpoint called `jsonPlaceholder`:
+
+```ts
+// `nuxt.config.ts`
+export default defineNuxtConfig({
+  modules: ['nuxt-api-party'],
+
+  apiParty: {
+    endpoints: {
+      jsonPlaceholder: {
+        url: 'https://jsonplaceholder.typicode.com'
+      }
+    }
+  }
+})
+```
+
+:::
+
+### Basic
 
 ```vue
 <script setup lang="ts">
-const { data, pending, error, refresh } = await useApiPartyData('posts/1')
+const { data, pending, error, refresh } = await useJsonPlaceholderData('posts/1')
 </script>
 
 <template>
@@ -71,13 +91,13 @@ const { data, pending, error, refresh } = await useApiPartyData('posts/1')
 </template>
 ```
 
-**Extended example**
+### Extended example
 
 ```vue
 <script setup lang="ts">
 const postId = ref(1)
 
-const { data, pending, refresh, error } = await useApiPartyData('comments', {
+const { data, pending, refresh, error } = await useJsonPlaceholderData('comments', {
   // Whether to resolve the async function after loading the route, instead of blocking client-side navigation (defaults to `false`)
   lazy: true,
   // A factory function to set the default value of the data, before the async function resolves - particularly useful with the `lazy: true` option
