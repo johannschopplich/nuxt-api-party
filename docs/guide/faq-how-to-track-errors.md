@@ -34,9 +34,12 @@ export default defineNuxtConfig({
 const { data, error } = await useJsonPlaceholderData('not-found')
 
 watchEffect(() => {
+  if (!error.value)
+    return
   console.error('statusCode:', error.value.statusCode)
   console.error('statusMessage:', error.value.statusMessage)
-  console.error('data:', error.value.data)
+  // Log the API response body
+  console.log('data:', error.value.data)
 })
 ```
 
@@ -53,6 +56,7 @@ function onSubmit() {
   catch (e) {
     console.error('statusCode:', e.statusCode)
     console.error('statusMessage:', e.statusMessage)
+    // Log the API response body
     console.error('data:', e.data)
   }
 }

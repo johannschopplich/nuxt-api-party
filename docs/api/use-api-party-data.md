@@ -129,8 +129,31 @@ const { data, pending, refresh, error } = await useJsonPlaceholderData('comments
 
 ## Client Requests
 
-To fetch data directly from your API, without the Nuxt proxy, set the option `{ client: true }`. Requires `apiParty.allowClient` option to be `true` in `nuxt.config.ts` as well.
-
 ::: warning
 Authorization credentials will be publicly visible. Also, possible CORS issues ahead if the backend is not configured properly.
 :::
+
+To fetch data directly from your API, without the Nuxt proxy, set the option `client` to `true`:
+
+```ts{3}
+const { data } = await useJsonPlaceholderData(
+  'comments',
+  { client: true }
+)
+```
+
+Requires the `allowClient` option to be `true` in your `apiParty` module configuration:
+
+```ts{9}
+// `nuxt.config.ts`
+export default defineNuxtConfig({
+  modules: ['nuxt-api-party'],
+
+  apiParty: {
+    endpoints: {
+      // ...
+    },
+    allowClient: true
+  }
+})
+```

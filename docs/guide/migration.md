@@ -6,12 +6,12 @@
 If you're using the `endpoints` module option, you can skip this section. Nothing has changed for you!
 :::
 
-Support for the single API endpoint has been removed to keep the module simple and focused. Migration is fairly straightforward by moving your API configuration into the `endpoints` object:
+Support for the single API endpoint has been removed to keep the module simple and focused. Migration is fairly straightforward by moving your API configuration into the `endpoints` object. The former `name` property is now the key of the endpoint object:
 
 ```diff
 export default defineNuxtConfig({
   apiParty: {
--   name: 'myApi',
+-    name: 'myApi',
 -    url: '<your-api-url>',
 -    token: '<your-api-token>',
 -    query: {},
@@ -28,7 +28,7 @@ export default defineNuxtConfig({
 })
 ```
 
-If you previously used the following environment variables in your project's `.env` file:
+If you are using the following environment variables in your project's `.env` file:
 
 ```bash
 API_PARTY_BASE_URL=your-api-url
