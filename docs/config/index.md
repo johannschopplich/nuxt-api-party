@@ -6,6 +6,7 @@ Adapt `nuxt-api-party` to your needs with the following options in your `nuxt.co
 // `nuxt.config.ts`
 export default defineNuxtConfig({
   modules: ['nuxt-api-party'],
+
   apiParty: {
     endpoints: {
       // ... your API endpoints

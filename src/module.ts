@@ -17,10 +17,12 @@ export interface ModuleOptions {
    * @example
    * export default defineNuxtConfig({
    *   apiParty: {
-   *     jsonPlaceholder: {
-   *       url: 'https://jsonplaceholder.typicode.com'
-   *       headers: {
-   *         Authorization: `Basic ${Buffer.from('foo:bar').toString('base64')}`
+   *     endpoints: {
+   *       jsonPlaceholder: {
+   *         url: 'https://jsonplaceholder.typicode.com'
+   *         headers: {
+   *           Authorization: `Basic ${Buffer.from('foo:bar').toString('base64')}`
+   *         }
    *       }
    *     }
    *   }
