@@ -98,12 +98,12 @@ export default defineNuxtModule<ModuleOptions>({
     // Inline module runtime in Nitro bundle
     // Needed to circumvent "cannot find module" error in `server.ts` for the `utils` import
     nuxt.hook('nitro:config', (config) => {
-      config.externals = config.externals || {}
-      config.externals.inline = config.externals.inline || []
-      config.externals.inline.push(
-        resolve('runtime/utils'),
-        resolve('runtime/formData'),
-      )
+      config.externals = defu(config.externals, {
+        inline: [
+          resolve('runtime/utils'),
+          resolve('runtime/formData'),
+        ],
+      })
     })
 
     // Add Nuxt server route to proxy the API request server-side
