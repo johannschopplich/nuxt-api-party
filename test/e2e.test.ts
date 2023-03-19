@@ -6,21 +6,21 @@ import { $fetch, setup } from '@nuxt/test-utils'
 describe('nuxt-api-party', async () => {
   await setup({
     server: true,
-    rootDir: fileURLToPath(new URL('../playground', import.meta.url)),
+    rootDir: fileURLToPath(new URL('./fixture', import.meta.url)),
   })
 
   it('fetches data with $testApi', async () => {
-    const html = await $fetch('/test/$testApi')
+    const html = await $fetch('/$testApi')
     expect(getTestResult(html)).toMatchSnapshot()
   })
 
   it('fetches data with useTestApiData', async () => {
-    const html = await $fetch('/test/useTestApiData')
+    const html = await $fetch('/useTestApiData')
     expect(getTestResult(html)).toMatchSnapshot()
   })
 
   it('throws error for invalid response', async () => {
-    const html = await $fetch('/test/invalid')
+    const html = await $fetch('/invalid')
     expect(getTestResult(html)).toMatchSnapshot()
   })
 })

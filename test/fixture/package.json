@@ -1,0 +1,9 @@
+{
+  "name": "test",
+  "private": true,
+  "scripts": {
+    "dev": "nuxi dev",
+    "build": "nuxi build",
+    "prepare": "nuxi prepare"
+  }
+}
