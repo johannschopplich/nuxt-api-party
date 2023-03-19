@@ -43,7 +43,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "vitest",
-    "test:run": "vitest --run",
+    "test:run": "pnpm -C test/fixture prepare && vitest --run",
     "test:types": "tsc --noEmit",
     "release": "bumpp --commit --push --tag",
     "prepare": "nuxi prepare playground"
