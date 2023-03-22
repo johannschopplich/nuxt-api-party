@@ -43,10 +43,10 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "vitest",
-    "test:run": "pnpm -C test/fixture prepare && vitest --run",
+    "test:run": "vitest --run",
     "test:types": "tsc --noEmit",
     "release": "bumpp --commit --push --tag",
-    "prepare": "nuxi prepare playground"
+    "prepare": "nuxi prepare playground && nuxi prepare test/fixture"
   },
   "dependencies": {
     "@nuxt/kit": "^3.3.1",
