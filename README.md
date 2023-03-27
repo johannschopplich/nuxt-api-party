@@ -1,4 +1,4 @@
-[![nuxt-api-party](./docs/public/og.png)](https://nuxt-api-party.jhnn.dev)
+[![nuxt-api-party](./docs/public/og.png)](https://nuxt-api-party.byjohann.dev)
 
 # nuxt-api-party
 
@@ -7,11 +7,11 @@
 > [Nuxt 3](https://nuxt.com) module to securely connect with any API.
 
 - [✨ &nbsp;Release Notes](https://github.com/johannschopplich/nuxt-api-party/releases)
-- [📖 &nbsp;Read the documentation](https://nuxt-api-party.jhnn.dev)
+- [📖 &nbsp;Read the documentation](https://nuxt-api-party.byjohann.dev)
 
 ## Features
 
-- 🪅 [Dynamic composable names](https://nuxt-api-party.jhnn.dev/api/#dynamic-composables)
+- 🪅 [Dynamic composable names](https://nuxt-api-party.byjohann.dev/api/#dynamic-composables)
 - 🔒 Protected API credentials in the client
 - 🪢 Token-based authentication built-in or bring your own headers
 - 🧇 [Connect multiple API endpoints](#basic-usage)
@@ -21,7 +21,7 @@
 
 ## Setup
 
-> [📖 Read the documentation](https://nuxt-api-party.jhnn.dev)
+> [📖 Read the documentation](https://nuxt-api-party.byjohann.dev)
 
 ```bash
 # pnpm
@@ -33,7 +33,7 @@ npm i -D nuxt-api-party
 
 ## Basic Usage
 
-> [📖 Read the documentation](https://nuxt-api-party.jhnn.dev)
+> [📖 Read the documentation](https://nuxt-api-party.byjohann.dev)
 
 Add this module `nuxt-api-party` to your Nuxt config and prepare your first API connection by setting an endpoint object with the following properties for the `apiParty` module option:
 
@@ -59,7 +59,7 @@ export default defineNuxtConfig({
 If you were to call your API `jsonPlaceholder`, the generated composables are:
 
 - `$jsonPlaceholder` – Returns the response data, similar to [`$fetch`](https://nuxt.com/docs/api/utils/dollarfetch#fetch)
-- `useJsonPlaceholderData` – Returns [multiple values](https://nuxt-api-party.jhnn.dev/api/use-api-party-data.html#return-values) similar to [`useFetch`](https://nuxt.com/docs/api/composables/use-fetch)
+- `useJsonPlaceholderData` – Returns [multiple values](https://nuxt-api-party.byjohann.dev/api/use-api-party-data.html#return-values) similar to [`useFetch`](https://nuxt.com/docs/api/composables/use-fetch)
 
 Use these composables in your templates or components:
 
