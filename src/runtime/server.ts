@@ -1,3 +1,4 @@
+import { Buffer } from 'node:buffer'
 import { createError, defineEventHandler, getRouterParams, readBody } from 'h3'
 import destr from 'destr'
 import type { FetchError } from 'ofetch'
