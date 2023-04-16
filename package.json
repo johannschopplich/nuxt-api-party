@@ -49,7 +49,7 @@
     "prepare": "nuxi prepare playground && nuxi prepare test/fixture"
   },
   "dependencies": {
-    "@nuxt/kit": "^3.3.3",
+    "@nuxt/kit": "^3.4.1",
     "@types/node": "^18.15.11",
     "defu": "^6.1.2",
     "formdata-node": "^5.0.0",
@@ -61,10 +61,10 @@
   "devDependencies": {
     "@antfu/eslint-config": "^0.38.4",
     "@nuxt/module-builder": "^0.3.0",
-    "@nuxt/test-utils": "^3.4.0",
+    "@nuxt/test-utils": "^3.4.1",
     "bumpp": "^9.1.0",
     "eslint": "^8.38.0",
-    "nuxt": "^3.3.3",
+    "nuxt": "^3.4.1",
     "nuxt-api-party": "workspace:*",
     "typescript": "^5.0.4",
     "vitest": "^0.30.1",
