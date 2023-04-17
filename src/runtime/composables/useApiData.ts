@@ -5,9 +5,9 @@ import type { NitroFetchOptions } from 'nitropack'
 import type { Ref } from 'vue'
 import type { AsyncData, AsyncDataOptions } from 'nuxt/app'
 import type { ModuleOptions } from '../../module'
-import { headersToObject, resolveUnref, serializeMaybeEncodedBody } from '../utils'
+import { headersToObject, serializeMaybeEncodedBody, toValue } from '../utils'
 import { isFormData } from '../formData'
-import type { EndpointFetchOptions, MaybeComputedRef, MaybeRef } from '../utils'
+import type { EndpointFetchOptions, MaybeRef, MaybeRefOrGetter } from '../utils'
 import { useAsyncData, useRuntimeConfig } from '#imports'
 
 type ComputedOptions<T extends Record<string, any>> = {
@@ -43,17 +43,17 @@ export type UseApiDataOptions<T> = AsyncDataOptions<T> & Pick<
 }
 
 export type UseApiData = <T = any>(
-  path: MaybeComputedRef<string>,
+  path: MaybeRefOrGetter<string>,
   opts?: UseApiDataOptions<T>,
 ) => AsyncData<T, FetchError>
 
 export function _useApiData<T = any>(
   endpointId: string,
-  path: MaybeComputedRef<string>,
+  path: MaybeRefOrGetter<string>,
   opts: UseApiDataOptions<T> = {},
 ) {
   const { apiParty } = useRuntimeConfig().public
-  const _path = computed(() => resolveUnref(path))
+  const _path = computed(() => toValue(path))
   const {
     server,
     lazy,

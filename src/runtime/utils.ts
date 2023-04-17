@@ -1,7 +1,7 @@
 import { unref } from 'vue'
 import type { H3Event } from 'h3'
 import type { NitroFetchOptions } from 'nitropack'
-import type { ComputedRef, Ref } from 'vue'
+import type { Ref } from 'vue'
 import type { NuxtApp } from 'nuxt/app'
 import type { ApiFetchOptions } from './composables/$api'
 import { formDataToObject, isFormData, isSerializedFormData, objectToFormData } from './formData'
@@ -11,12 +11,11 @@ export type EndpointFetchOptions = NitroFetchOptions<string> & {
 }
 
 export type MaybeRef<T> = T | Ref<T>
-export type MaybeComputedRef<T> = MaybeReadonlyRef<T> | MaybeRef<T>
-export type MaybeReadonlyRef<T> = (() => T) | ComputedRef<T>
+export type MaybeRefOrGetter<T> = MaybeRef<T> | (() => T)
 
-export function resolveUnref<T>(r: MaybeComputedRef<T>): T {
+export function toValue<T>(r: MaybeRefOrGetter<T>): T {
   return typeof r === 'function'
-    ? (r as any)()
+    ? (r as (...args: any[]) => any)()
     : unref(r)
 }
 

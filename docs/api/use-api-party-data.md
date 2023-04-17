@@ -14,7 +14,7 @@ The composable supports every [`useAsyncData` option](https://nuxt.com/docs/api/
 
 ```ts
 function useApiPartyData<T = any>(
-  path: MaybeComputedRef<string>,
+  path: MaybeRefOrGetter<string>,
   opts?: UseApiDataOptions<T>,
 ): AsyncData<T, FetchError>
 
