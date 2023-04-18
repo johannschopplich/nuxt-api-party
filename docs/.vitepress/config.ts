@@ -41,7 +41,7 @@ export default defineConfig({
 
     sidebar: {
       '/guide/': sidebarGuide(),
-      '/config/': sidebarConfig(),
+      '/config/': sidebarGuide(),
       '/api/': sidebarApi(),
     },
 
@@ -62,9 +62,36 @@ export default defineConfig({
 
 function nav(): DefaultTheme.NavItem[] {
   return [
-    { text: 'Guide', link: '/guide/getting-started', activeMatch: '/guide/' },
-    { text: 'Config', link: '/config/' },
-    { text: 'API', link: '/api/', activeMatch: '/api/' },
+    {
+      text: 'Guide',
+      items: [
+        {
+          text: 'Guide',
+          items: [
+            { text: 'Getting Started', link: '/guide/getting-started' },
+            { text: 'How It Works', link: '/guide/how-it-works' },
+          ],
+        },
+        {
+          text: 'In-Depth',
+          items: [
+            { text: 'Hydration', link: '/guide/hydration' },
+            { text: 'Caching', link: '/guide/caching' },
+          ],
+        },
+      ],
+      activeMatch: '^/guide/',
+    },
+    {
+      text: 'Config',
+      link: '/config/',
+      activeMatch: '^/config/',
+    },
+    {
+      text: 'API',
+      link: '/api/',
+      activeMatch: '^/api/',
+    },
     {
       text: `v${version}`,
       items: [
@@ -80,10 +107,17 @@ function nav(): DefaultTheme.NavItem[] {
 function sidebarGuide(): DefaultTheme.SidebarItem[] {
   return [
     {
-      text: 'Introduction',
+      text: 'Guides',
       items: [
         { text: 'Getting Started', link: '/guide/getting-started' },
+        { text: 'Configuration', link: '/guide/config' },
         { text: 'How It Works', link: '/guide/how-it-works' },
+      ],
+    },
+    {
+      text: 'Module',
+      items: [
+        { text: 'Configuration', link: '/config/' },
       ],
     },
     {
@@ -99,19 +133,9 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
         { text: 'How to Track Errors', link: '/guide/faq-how-to-track-errors' },
       ],
     },
-    { text: 'Playground', link: 'https://github.com/johannschopplich/nuxt-api-party/tree/main/playground' },
     { text: 'Migration', link: '/guide/migration' },
-  ]
-}
-
-function sidebarConfig(): DefaultTheme.SidebarItem[] {
-  return [
-    {
-      text: 'Config',
-      items: [
-        { text: 'Module Config', link: '/config/' },
-      ],
-    },
+    { text: 'API', link: '/api/' },
+    { text: 'Playground', link: 'https://github.com/johannschopplich/nuxt-api-party/tree/main/playground' },
   ]
 }
 
