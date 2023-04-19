@@ -15,15 +15,17 @@ export default defineConfig({
   title: name,
   description: 'Connect with any API securely',
   head: [
-    ['meta', { name: 'theme-color', content: '#ffffff' }],
     ['link', { rel: 'icon', href: '/logo.svg', type: 'image/svg+xml' }],
+    ['meta', { name: 'author', content: 'Johann Schopplich' }],
+    ['meta', { property: 'og:type', content: 'website' }],
+    ['meta', { property: 'og:url', content: ogUrl }],
     ['meta', { property: 'og:title', content: name }],
     ['meta', { property: 'og:description', content: description }],
-    ['meta', { property: 'og:url', content: ogUrl }],
     ['meta', { property: 'og:image', content: ogImage }],
     ['meta', { name: 'twitter:title', content: name }],
     ['meta', { name: 'twitter:description', content: description }],
     ['meta', { name: 'twitter:image', content: ogImage }],
+    ['meta', { name: 'twitter:site', content: '@jschopplich' }],
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
     // Plausible analytics
     ['script', { 'src': 'https://plausible.io/js/script.js', 'defer': '', 'data-domain': url.hostname }],
@@ -64,6 +66,7 @@ function nav(): DefaultTheme.NavItem[] {
   return [
     {
       text: 'Guide',
+      activeMatch: '^/guide/',
       items: [
         {
           text: 'Guide',
@@ -80,7 +83,6 @@ function nav(): DefaultTheme.NavItem[] {
           ],
         },
       ],
-      activeMatch: '^/guide/',
     },
     {
       text: 'Config',
@@ -89,8 +91,19 @@ function nav(): DefaultTheme.NavItem[] {
     },
     {
       text: 'API',
-      link: '/api/',
-      activeMatch: '^/api/',
+      items: [
+        {
+          text: 'Overview',
+          link: '/api/',
+        },
+        {
+          text: 'Composables',
+          items: [
+            { text: 'useApiPartyData', link: '/api/use-api-party-data' },
+            { text: '$apiParty', link: '/api/api-party' },
+          ],
+        },
+      ],
     },
     {
       text: `v${version}`,
@@ -110,7 +123,6 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
       text: 'Guides',
       items: [
         { text: 'Getting Started', link: '/guide/getting-started' },
-        { text: 'Configuration', link: '/guide/config' },
         { text: 'How It Works', link: '/guide/how-it-works' },
       ],
     },
@@ -142,10 +154,8 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
 function sidebarApi(): DefaultTheme.SidebarItem[] {
   return [
     {
-      text: 'API Reference',
-      items: [
-        { text: 'Overview', link: '/api/' },
-      ],
+      text: 'Overview',
+      link: '/api/',
     },
     {
       text: 'Composables',

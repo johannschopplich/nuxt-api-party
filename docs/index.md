@@ -27,13 +27,21 @@ features:
   - title: Dynamic composable names
     icon: 🪅
     details: Auto-generated composables for each API endpoint.
+    link: /api/
+    linkText: API Reference
   - title: Protected API credentials
     icon: 🔒
     details: A Nuxt server route proxies your requests. No CORS issues!
+    link: /guide/how-it-works
+    linkText: How It Works
   - title: Familiar Data Handling
     icon: 🍱
     details: Handle requests just like useFetch or $fetch.
+    link: /api/use-api-party-data
+    linkText: useApiPartyData
   - title: Connect multiple APIs
     icon: 🧇
     details: Use multiple APIs in your app with one module.
+    link: /guide/getting-started.html#step-3-set-up-api-endpoints
+    linkText: Set Up API Endpoints
 ---
