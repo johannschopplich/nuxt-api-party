@@ -4,26 +4,26 @@ This guide will walk you through the steps to get started with `nuxt-api-party`.
 
 ## Step 1: Install `nuxt-api-party`
 
-Using [pnpm](https://pnpm.io):
-
-```bash
-$ pnpm add -D nuxt-api-party
-```
-
-Using npm:
-
-```bash
-$ npm i -D nuxt-api-party
-```
+::: code-group
+  ```bash [pnpm]
+  pnpm add -D nuxt-api-party
+  ```
+  ```bash [yarn]
+  yarn add -D nuxt-api-party
+  ```
+  ```bash [npm]
+  npm install -D nuxt-api-party
+  ```
+:::
 
 ## Step 2: Use `nuxt-api-party`
 
-Add `nuxt-api-party` to your Nuxt config:
+Add `nuxt-api-party` to your Nuxt configuration:
 
 ```ts
 // `nuxt.config.ts`
 export default defineNuxtConfig({
-  modules: ['nuxt-api-party'],
+  modules: ['nuxt-api-party']
 })
 ```
 

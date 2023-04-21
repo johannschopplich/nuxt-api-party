@@ -11,7 +11,7 @@ Returns the raw response of the API endpoint. Intended for actions inside method
 ```ts
 function $apiParty<T = any>(
   path: string,
-  opts?: ApiFetchOptions,
+  opts?: ApiFetchOptions
 ): Promise<T>
 
 type ApiFetchOptions = Omit<NitroFetchOptions<string>, 'body'> & {

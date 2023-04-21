@@ -44,9 +44,9 @@ export default defineNuxtConfig({
     endpoints: {
       myApi: {
         url: process.env.API_PARTY_BASE_URL!,
-        token: process.env.API_PARTY_TOKEN!,
-      },
-    },
+        token: process.env.API_PARTY_TOKEN!
+      }
+    }
   }
 })
 ```
