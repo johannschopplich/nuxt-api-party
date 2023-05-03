@@ -33,7 +33,7 @@ export async function formDataToObject(formData: FormData) {
       obj[key] = {
         __type: 'blob',
         ...(await serializeBlob(value)),
-        name: (value).name,
+        name: value.name,
       }
     }
     else {
