@@ -2,6 +2,7 @@ export interface SerializedBlob {
   data: string
   type: string
   size: number
+  name?: string
 }
 
 export type SerializedFormData = Record<
@@ -14,7 +15,12 @@ export function isFormData(obj: unknown): obj is FormData {
 }
 
 export function isSerializedFormData(obj: unknown): obj is SerializedFormData {
-  return typeof obj === 'object' && obj !== null && '__type' in obj && obj.__type === 'form-data'
+  return (
+    typeof obj === 'object'
+    && obj !== null
+    && '__type' in obj
+    && obj.__type === 'form-data'
+  )
 }
 
 export async function formDataToObject(formData: FormData) {
@@ -27,6 +33,7 @@ export async function formDataToObject(formData: FormData) {
       obj[key] = {
         __type: 'blob',
         ...(await serializeBlob(value)),
+        name: (value).name,
       }
     }
     else {
@@ -55,7 +62,7 @@ export async function objectToFormData(obj: SerializedFormData) {
     if (isSerializedBlob(value)) {
       const arrayBuffer = Uint8Array.from(atob(value.data), c => c.charCodeAt(0))
       const blob = new Blob([arrayBuffer], { type: value.type })
-      formData.append(key, blob)
+      formData.append(key, blob, value.name)
     }
     else {
       formData.append(key, value)
@@ -66,26 +73,23 @@ export async function objectToFormData(obj: SerializedFormData) {
 }
 
 function isSerializedBlob(obj: unknown): obj is SerializedBlob {
-  return typeof obj === 'object' && obj !== null && '__type' in obj && obj.__type === 'blob'
+  return (
+    typeof obj === 'object'
+    && obj !== null
+    && '__type' in obj
+    && obj.__type === 'blob'
+  )
 }
 
-function serializeBlob(file: Blob) {
-  return new Promise<SerializedBlob>((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onload = () => {
-      const arrayBuffer = reader.result as ArrayBuffer
-      const bytes = new Uint8Array(arrayBuffer)
-      const binary = bytes.reduce((acc, byte) => acc + String.fromCharCode(byte), '')
-      const base64 = btoa(binary)
-      resolve({
-        data: base64,
-        type: file.type,
-        size: file.size,
-      })
-    }
-    reader.onerror = (error) => {
-      reject(error)
-    }
-    reader.readAsArrayBuffer(file)
-  })
+async function serializeBlob(blob: Blob) {
+  const arrayBuffer = await blob.arrayBuffer()
+  const bytes = new Uint8Array(arrayBuffer)
+  const binary = bytes.reduce((acc, byte) => acc + String.fromCharCode(byte), '')
+  const base64 = btoa(binary)
+
+  return {
+    data: base64,
+    type: blob.type,
+    size: blob.size,
+  }
 }
