@@ -45,17 +45,7 @@ export async function formDataToObject(formData: FormData) {
 }
 
 export async function objectToFormData(obj: SerializedFormData) {
-  let formData: FormData
-
-  if (typeof FormData === 'undefined') {
-    const { FormData: FormDataPonyfill } = await import('formdata-node')
-    // @ts-expect-error: Types misalign with native `FormData`
-    formData = new FormDataPonyfill()
-  }
-  else {
-    formData = new FormData()
-  }
-
+  const formData = new FormData()
   const entries = Object.entries(obj).filter(([key]) => key !== '__type')
 
   for (const [key, value] of entries) {
