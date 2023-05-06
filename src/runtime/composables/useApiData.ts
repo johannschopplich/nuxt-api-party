@@ -1,8 +1,7 @@
-import { computed, reactive, unref } from 'vue'
+import { computed, reactive } from 'vue'
 import { hash } from 'ohash'
 import type { FetchError } from 'ofetch'
 import type { NitroFetchOptions } from 'nitropack'
-import type { Ref } from 'vue'
 import type { AsyncData, AsyncDataOptions } from 'nuxt/app'
 import type { ModuleOptions } from '../../module'
 import { headersToObject, serializeMaybeEncodedBody, toValue } from '../utils'
@@ -14,8 +13,8 @@ type ComputedOptions<T extends Record<string, any>> = {
   [K in keyof T]: T[K] extends Function
     ? T[K]
     : T[K] extends Record<string, any>
-      ? ComputedOptions<T[K]> | Ref<T[K]> | T[K]
-      : Ref<T[K]> | T[K];
+      ? ComputedOptions<T[K]> | MaybeRef<T[K]>
+      : MaybeRef<T[K]>;
 }
 
 export type UseApiDataOptions<T> = AsyncDataOptions<T> & Pick<
@@ -28,7 +27,7 @@ export type UseApiDataOptions<T> = AsyncDataOptions<T> & Pick<
   | 'headers'
   | 'method'
 > & {
-  body?: string | Record<string, any> | FormData | null
+  body?: MaybeRef<string | Record<string, any> | FormData | null | undefined>
   /**
    * Skip the Nuxt server proxy and fetch directly from the API.
    * Requires `allowClient` to be enabled in the module options as well.
@@ -82,8 +81,9 @@ export function _useApiData<T = any>(
   const _endpointFetchOptions: EndpointFetchOptions = reactive({
     path: _path,
     query,
-    headers: computed(() => headersToObject(unref(headers as MaybeRef<HeadersInit>))),
+    headers: computed(() => headersToObject(toValue(headers))),
     method,
+    body,
   })
 
   const _asyncDataOptions: AsyncDataOptions<T> = {
@@ -103,9 +103,9 @@ export function _useApiData<T = any>(
   const key = computed(() => `$party${hash([
     endpointId,
     _path.value,
-    unref(query),
-    unref(method),
-    ...(isFormData(body) ? [] : [body]),
+    toValue(query),
+    toValue(method),
+    ...(isFormData(toValue(body)) ? [] : [toValue(body)]),
   ])}`)
 
   return useAsyncData<T, FetchError>(
@@ -138,7 +138,7 @@ export function _useApiData<T = any>(
             ...endpoint.headers,
             ..._endpointFetchOptions.headers,
           },
-          body,
+          body: _endpointFetchOptions.body,
         })) as T
       }
       else {
@@ -150,7 +150,7 @@ export function _useApiData<T = any>(
             method: 'POST',
             body: {
               ..._endpointFetchOptions,
-              body: await serializeMaybeEncodedBody(body),
+              body: await serializeMaybeEncodedBody(_endpointFetchOptions.body),
             } satisfies EndpointFetchOptions,
           },
         )) as T
