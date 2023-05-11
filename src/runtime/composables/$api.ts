@@ -6,7 +6,7 @@ import type { ModuleOptions } from '../../module'
 import type { EndpointFetchOptions } from '../utils'
 import { useNuxtApp, useRuntimeConfig } from '#imports'
 
-export type ApiFetchOptions = Omit<NitroFetchOptions<string>, 'body'> & {
+export type ApiFetchOptions = Omit<NitroFetchOptions<string>, 'body' | 'cache'> & {
   body?: string | Record<string, any> | FormData | null
   /**
    * Skip the Nuxt server proxy and fetch directly from the API.
