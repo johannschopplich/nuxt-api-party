@@ -5,7 +5,7 @@ Sometimes your authorization token is stored in a cookie (e.g. coming from SSO).
 ## Examples
 
 ::: info
-The examples below assume that you have set up an API endpoint called `jsonPlaceholder`. The API endpoint is authorized by a cookie which is provided by an external SSO service. To pass on the cookie provided by the external SSO, you can enable `cookies` in your endpoint configuration.:
+The examples below assume that you have set up an API endpoint called `jsonPlaceholder`. The API endpoint is authorized by a cookie which is provided by an external SSO service. To pass on the cookie provided by the external SSO, you can enable `cookies` in your endpoint configuration.
 
 ```ts
 // `nuxt.config.ts`

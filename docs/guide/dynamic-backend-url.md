@@ -6,7 +6,7 @@ If you need to change the backend URL at runtime, you can do so by using a custo
 
 ::: info
 
-The examples below assume that you have set up an API endpoint called `jsonPlaceholder`. In this case you can use the `JSON_PLACEHOLDER_BACKEND_URL` header to change the backend URL at runtime.:
+The examples below assume that you have set up an API endpoint called `jsonPlaceholder`. In this case you can use the `JSON_PLACEHOLDER_BACKEND_URL` header to change the backend URL at runtime.
 
 ```ts
 const { data } = await useJsonPlaceholderData(
