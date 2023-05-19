@@ -4,7 +4,7 @@ import { headersToObject, serializeMaybeEncodedBody } from '../utils'
 import { isFormData } from '../formData'
 import type { ModuleOptions } from '../../module'
 import type { EndpointFetchOptions } from '../utils'
-import { useNuxtApp, useRuntimeConfig } from '#imports'
+import { useNuxtApp, useRequestHeaders, useRuntimeConfig } from '#imports'
 
 export type ApiFetchOptions = Omit<NitroFetchOptions<string>, 'body' | 'cache'> & {
   body?: string | Record<string, any> | FormData | null
@@ -55,11 +55,6 @@ export function _$api<T = any>(
   const endpoints = (apiParty as ModuleOptions).endpoints || {}
   const endpoint = endpoints[endpointId]
 
-  const _headers = {
-    ...headers,
-    ...useRequestHeaders(['cookie']),
-  }
-
   const clientFetcher = () => globalThis.$fetch<T>(path, {
     ...fetchOptions,
     baseURL: endpoint.url,
@@ -71,7 +66,7 @@ export function _$api<T = any>(
     headers: {
       ...(endpoint.token && { Authorization: `Bearer ${endpoint.token}` }),
       ...endpoint.headers,
-      ...headersToObject(_headers),
+      ...headersToObject(headers),
     },
     body,
   }) as Promise<T>
@@ -83,7 +78,10 @@ export function _$api<T = any>(
       body: {
         path,
         query,
-        headers: headersToObject(_headers),
+        headers: {
+          ...headersToObject(headers),
+          ...useRequestHeaders(['cookie']),
+        },
         method,
         body: await serializeMaybeEncodedBody(body),
       } satisfies EndpointFetchOptions,

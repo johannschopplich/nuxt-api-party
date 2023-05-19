@@ -5,15 +5,15 @@ If you need to change the backend URL at runtime, you can do so by using a custo
 ## Example
 
 ::: info
-
-The examples below assume that you have set up an API endpoint called `jsonPlaceholder`. In this case you can use the `JSON_PLACEHOLDER_BACKEND_URL` header to change the backend URL at runtime.
+The examples below assume that you have set up an API endpoint called `jsonPlaceholder`. In this case you can use the `JSON_PLACEHOLDER_ENDPOINT_URL` header to change the backend URL at runtime.
+:::
 
 ```ts
 const { data } = await useJsonPlaceholderData(
   'comments',
   {
     headers: {
-      JSON_PLACEHOLDER_BACKEND_URL: 'https://jsonplaceholder-v2.typicode.com'
+      JSON_PLACEHOLDER_ENDPOINT_URL: 'https://jsonplaceholder-v2.typicode.com'
     }
   }
 )
