@@ -55,8 +55,8 @@ export default defineEventHandler(async (event): Promise<any> => {
         },
         headers: {
           ...(endpoint.token && { Authorization: `Bearer ${endpoint.token}` }),
-          ...endpoint.headers,
           cookie: getRequestHeader(event, 'cookie') as string,
+          ...endpoint.headers,
           ...headers,
         },
         ...(body && { body: await deserializeMaybeEncodedBody(body) }),
