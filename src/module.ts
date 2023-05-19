@@ -11,7 +11,7 @@ export interface ModuleOptions {
    * Each key represents an endpoint ID, which is used to generate the composables. The value is an object with the following properties:
    * - `url`: The URL of the API endpoint
    * - `token`: The API token to use for the endpoint (optional)
-   * - `query`: Query parameters to send with the each request (optional)
+   * - `query`: Query parameters to send with each request (optional)
    * - `headers`: Headers to send with each request (optional)
    * - `cookies`: Whether to send cookies with each request (optional)
    *
@@ -90,7 +90,15 @@ export default defineNuxtModule<ModuleOptions>({
       nuxt.options.runtimeConfig.public.apiParty,
       options.allowClient
         ? options
-        : { allowClient: false },
+        : {
+            // Only expose cookies endpoint option to the client
+            endpoints: Object.fromEntries(
+              Object.entries(options.endpoints!).map(
+                ([endpointId, endpoint]) => [endpointId, { cookies: endpoint.cookies }],
+              ),
+            ),
+            allowClient: false,
+          },
     )
 
     // Transpile runtime

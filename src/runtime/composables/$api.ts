@@ -52,7 +52,7 @@ export function _$api<T = any>(
   if (promiseMap.has(key))
     return promiseMap.get(key)!
 
-  const endpoints = (apiParty as ModuleOptions).endpoints || {}
+  const endpoints = (apiParty as unknown as ModuleOptions).endpoints || {}
   const endpoint = endpoints[endpointId]
 
   const clientFetcher = () => globalThis.$fetch<T>(path, {

@@ -33,7 +33,7 @@ Prepare your first API connection by setting an endpoint object. Each key repres
 
 - `url`: The URL of the API endpoint
 - `token`: The API token to use for the endpoint (optional)
-- `query`: Query parameters to send with the each request (optional)
+- `query`: Query parameters to send with each request (optional)
 - `headers`: Headers to send with each request (optional)
 
 ```ts

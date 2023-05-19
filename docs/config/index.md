@@ -21,7 +21,7 @@ Main module configuration for your API endpoints. Each key represents an endpoin
 
 - `url`: The URL of the API endpoint
 - `token`: The API token to use for the endpoint (optional)
-- `query`: Query parameters to send with the each request (optional)
+- `query`: Query parameters to send with each request (optional)
 - `headers`: Headers to send with each request (optional)
 - `cookies`: Whether to send cookies with each request (optional)
 
