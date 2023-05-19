@@ -80,6 +80,8 @@ function nav(): DefaultTheme.NavItem[] {
           items: [
             { text: 'Hydration', link: '/guide/hydration' },
             { text: 'Caching', link: '/guide/caching' },
+            { text: 'Cookies', link: '/guide/cookies' },
+            { text: 'Dynamic Backend URL', link: '/guide/dynamic-backend-url' },
           ],
         },
       ],
@@ -137,6 +139,8 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
       items: [
         { text: 'Hydration', link: '/guide/hydration' },
         { text: 'Caching', link: '/guide/caching' },
+        { text: 'Cookies', link: '/guide/cookies' },
+        { text: 'Dynamic Backend URL', link: '/guide/dynamic-backend-url' },
       ],
     },
     {

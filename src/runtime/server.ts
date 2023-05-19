@@ -34,18 +34,23 @@ export default defineEventHandler(async (event): Promise<any> => {
     ...fetchOptions
   } = _body
 
+  // Allows to overwrite the backend url with a custom header
+  // (e.g. `jsonPlaceholder` endpoint becomes `JSON_PLACEHOLDER_ENDPOINT_URL`)
+  const baseURL = new Headers(headers).get(`${endpointId}_endpoint_url`) || endpoint.url
+
   try {
     return await $fetch(
       path!,
       {
         ...fetchOptions,
-        baseURL: endpoint.url,
+        baseURL,
         query: {
           ...endpoint.query,
           ...query,
         },
         headers: {
           ...(endpoint.token && { Authorization: `Bearer ${endpoint.token}` }),
+          ...(endpoint.cookies && { cookie: getRequestHeader(event, 'cookie') }),
           ...endpoint.headers,
           ...headers,
         },

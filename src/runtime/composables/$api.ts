@@ -4,7 +4,7 @@ import { headersToObject, serializeMaybeEncodedBody } from '../utils'
 import { isFormData } from '../formData'
 import type { ModuleOptions } from '../../module'
 import type { EndpointFetchOptions } from '../utils'
-import { useNuxtApp, useRuntimeConfig } from '#imports'
+import { useNuxtApp, useRequestHeaders, useRuntimeConfig } from '#imports'
 
 export type ApiFetchOptions = Omit<NitroFetchOptions<string>, 'body' | 'cache'> & {
   body?: string | Record<string, any> | FormData | null
@@ -78,7 +78,10 @@ export function _$api<T = any>(
       body: {
         path,
         query,
-        headers: headersToObject(headers),
+        headers: {
+          ...headersToObject(headers),
+          ...useRequestHeaders(['cookie']),
+        },
         method,
         body: await serializeMaybeEncodedBody(body),
       } satisfies EndpointFetchOptions,

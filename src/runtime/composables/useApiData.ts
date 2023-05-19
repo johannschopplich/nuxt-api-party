@@ -81,7 +81,10 @@ export function _useApiData<T = any>(
   const _endpointFetchOptions: EndpointFetchOptions = reactive({
     path: _path,
     query,
-    headers: computed(() => headersToObject(toValue(headers))),
+    headers: computed(() => ({
+      ...headersToObject(toValue(headers)),
+      ...useRequestHeaders(['cookie']),
+    })),
     method,
     body,
   })
