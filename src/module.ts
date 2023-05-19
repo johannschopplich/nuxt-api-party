@@ -13,6 +13,7 @@ export interface ModuleOptions {
    * - `token`: The API token to use for the endpoint (optional)
    * - `query`: Query parameters to send with the each request (optional)
    * - `headers`: Headers to send with each request (optional)
+   * - `cookies`: Whether to send cookies with each request (optional)
    *
    * @example
    * export default defineNuxtConfig({
@@ -37,6 +38,7 @@ export interface ModuleOptions {
       token?: string
       query?: QueryObject
       headers?: Record<string, string>
+      cookies?: boolean
     }
   >
 

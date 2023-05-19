@@ -55,6 +55,11 @@ export function _$api<T = any>(
   const endpoints = (apiParty as ModuleOptions).endpoints || {}
   const endpoint = endpoints[endpointId]
 
+  const _headers = {
+    ...headers,
+    ...useRequestHeaders(['cookie']),
+  }
+
   const clientFetcher = () => globalThis.$fetch<T>(path, {
     ...fetchOptions,
     baseURL: endpoint.url,
@@ -66,7 +71,7 @@ export function _$api<T = any>(
     headers: {
       ...(endpoint.token && { Authorization: `Bearer ${endpoint.token}` }),
       ...endpoint.headers,
-      ...headersToObject(headers),
+      ...headersToObject(_headers),
     },
     body,
   }) as Promise<T>
@@ -78,7 +83,7 @@ export function _$api<T = any>(
       body: {
         path,
         query,
-        headers: headersToObject(headers),
+        headers: headersToObject(_headers),
         method,
         body: await serializeMaybeEncodedBody(body),
       } satisfies EndpointFetchOptions,

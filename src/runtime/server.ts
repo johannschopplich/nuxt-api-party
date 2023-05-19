@@ -34,6 +34,9 @@ export default defineEventHandler(async (event): Promise<any> => {
     ...fetchOptions
   } = _body
 
+  // Pass on cookies to the backend if the endpoint is configured to do so
+  const cookies = endpoint.cookies ? parseCookies(event) : undefined
+
   try {
     return await $fetch(
       path!,
@@ -49,6 +52,7 @@ export default defineEventHandler(async (event): Promise<any> => {
           ...endpoint.headers,
           ...headers,
         },
+        cookies,
         ...(body && { body: await deserializeMaybeEncodedBody(body) }),
       },
     )
