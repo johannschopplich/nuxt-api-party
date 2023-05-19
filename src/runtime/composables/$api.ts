@@ -80,7 +80,7 @@ export function _$api<T = any>(
         query,
         headers: {
           ...headersToObject(headers),
-          ...useRequestHeaders(['cookie']),
+          ...(endpoint.cookies && useRequestHeaders(['cookie'])),
         },
         method,
         body: await serializeMaybeEncodedBody(body),

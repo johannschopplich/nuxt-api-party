@@ -50,7 +50,6 @@ export default defineEventHandler(async (event): Promise<any> => {
         },
         headers: {
           ...(endpoint.token && { Authorization: `Bearer ${endpoint.token}` }),
-          ...(endpoint.cookies && { cookie: getRequestHeader(event, 'cookie') }),
           ...endpoint.headers,
           ...headers,
         },

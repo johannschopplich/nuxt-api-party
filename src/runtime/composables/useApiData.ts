@@ -7,7 +7,7 @@ import type { ModuleOptions } from '../../module'
 import { headersToObject, serializeMaybeEncodedBody, toValue } from '../utils'
 import { isFormData } from '../formData'
 import type { EndpointFetchOptions, MaybeRef, MaybeRefOrGetter } from '../utils'
-import { useAsyncData, useRuntimeConfig } from '#imports'
+import { useAsyncData, useRequestHeaders, useRuntimeConfig } from '#imports'
 
 type ComputedOptions<T extends Record<string, any>> = {
   [K in keyof T]: T[K] extends Function
@@ -83,7 +83,7 @@ export function _useApiData<T = any>(
     query,
     headers: computed(() => ({
       ...headersToObject(toValue(headers)),
-      ...useRequestHeaders(['cookie']),
+      ...(endpoint.cookies && useRequestHeaders(['cookie'])),
     })),
     method,
     body,
