@@ -1,4 +1,5 @@
 import { createError, defineEventHandler, getRouterParams, readBody } from 'h3'
+import { snakeCase } from 'scule'
 import destr from 'destr'
 import type { FetchError } from 'ofetch'
 import type { ModuleOptions } from '../module'
@@ -37,12 +38,17 @@ export default defineEventHandler(async (event): Promise<any> => {
   // Pass on cookies to the backend if the endpoint is configured to do so
   const cookies = endpoint.cookies ? parseCookies(event) : undefined
 
+  // Allow to overwrite the backend url with a custom header (e.g. jsonPlaceholder endpoint
+  // becomes JSON_PLACEHOLDER_BACKEND_URL)
+  const customBackendURLHeader = `${snakeCase(endpointId).toUpperCase()}_BACKEND_URL`
+  const baseURL = new Headers(headers).get(customBackendURLHeader) || endpoint.url
+
   try {
     return await $fetch(
       path!,
       {
         ...fetchOptions,
-        baseURL: endpoint.url,
+        baseURL,
         query: {
           ...endpoint.query,
           ...query,
