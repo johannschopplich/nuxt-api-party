@@ -1,4 +1,4 @@
-import { createError, defineEventHandler, getRouterParams, readBody } from 'h3'
+import { createError, defineEventHandler, getRouterParam, readBody } from 'h3'
 import destr from 'destr'
 import type { FetchError } from 'ofetch'
 import type { ModuleOptions } from '../module'
@@ -7,7 +7,7 @@ import type { EndpointFetchOptions } from './utils'
 import { useRuntimeConfig } from '#imports'
 
 export default defineEventHandler(async (event): Promise<any> => {
-  const { endpointId } = getRouterParams(event)
+  const endpointId = getRouterParam(event, 'endpointId') as string
   const { apiParty } = useRuntimeConfig()
   const endpoints = (apiParty as ModuleOptions).endpoints!
   const endpoint = endpoints[endpointId]
@@ -35,8 +35,8 @@ export default defineEventHandler(async (event): Promise<any> => {
   } = _body
 
   // Allows to overwrite the backend url with a custom header
-  // (e.g. `jsonPlaceholder` endpoint becomes `JSON_PLACEHOLDER_ENDPOINT_URL`)
-  const baseURL = new Headers(headers).get(`${endpointId}_endpoint_url`) || endpoint.url
+  // (e.g. `jsonPlaceholder` endpoint becomes `Json-Placeholder-Endpoint-Url`)
+  const baseURL = new Headers(headers).get(`${endpointId}-endpoint-url`) || endpoint.url
 
   try {
     return await $fetch(
