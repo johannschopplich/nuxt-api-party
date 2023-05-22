@@ -1,4 +1,4 @@
-import { createError, defineEventHandler, getRouterParam, readBody } from 'h3'
+import { createError, defineEventHandler, getRequestHeader, getRouterParam, readBody } from 'h3'
 import destr from 'destr'
 import type { FetchError } from 'ofetch'
 import type { ModuleOptions } from '../module'
