@@ -1,5 +1,4 @@
 import { createError, defineEventHandler, getRequestHeader, getRouterParam, readBody } from 'h3'
-import destr from 'destr'
 import type { FetchError } from 'ofetch'
 import type { ModuleOptions } from '../module'
 import { deserializeMaybeEncodedBody } from './utils'
@@ -19,12 +18,7 @@ export default defineEventHandler(async (event): Promise<any> => {
     })
   }
 
-  let _body = await readBody<EndpointFetchOptions>(event)
-
-  // Inconsistent `readBody` behavior in some Nitro presets
-  // https://github.com/unjs/nitro/issues/912
-  if (Buffer.isBuffer(_body))
-    _body = destr((_body as Buffer).toString())
+  const _body = await readBody<EndpointFetchOptions>(event)
 
   const {
     path,
