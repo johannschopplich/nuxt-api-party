@@ -18,7 +18,7 @@ export function toValue<T>(r: MaybeRefOrGetter<T>): T {
 }
 
 export function headersToObject(headers: HeadersInit = {}): Record<string, string> {
-  if (typeof Headers !== 'undefined' && headers instanceof Headers)
+  if (headers instanceof Headers)
     return Object.fromEntries([...headers.entries()])
 
   if (Array.isArray(headers))
