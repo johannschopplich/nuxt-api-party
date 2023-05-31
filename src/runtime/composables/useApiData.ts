@@ -102,7 +102,7 @@ export function _useApiData<T = any>(
     immediate,
   }
 
-  let controller: AbortController
+  let controller: AbortController | undefined
   const key = computed(() => `$party${hash([
     endpointId,
     _path.value,
@@ -121,9 +121,7 @@ export function _useApiData<T = any>(
       if ((nuxt!.isHydrating || cache) && key.value in nuxt!.payload.data)
         return nuxt!.payload.data[key.value]
 
-      controller = typeof AbortController !== 'undefined'
-        ? new AbortController()
-        : ({} as AbortController)
+      controller = new AbortController()
 
       let result: T
 
