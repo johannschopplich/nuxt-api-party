@@ -85,15 +85,17 @@ export default defineNuxtModule<ModuleOptions>({
       options,
     )
 
+    const resolvedOptions = nuxt.options.runtimeConfig.apiParty as Required<ModuleOptions>
+
     // Write options to public runtime config if client requests are enabled
     nuxt.options.runtimeConfig.public.apiParty = defu(
       nuxt.options.runtimeConfig.public.apiParty,
-      options.allowClient
-        ? options
+      resolvedOptions.allowClient
+        ? resolvedOptions
         : {
             // Only expose cookies endpoint option to the client
             endpoints: Object.fromEntries(
-              Object.entries(options.endpoints!).map(
+              Object.entries(resolvedOptions.endpoints).map(
                 ([endpointId, endpoint]) => [endpointId, { cookies: endpoint.cookies }],
               ),
             ),
@@ -123,7 +125,7 @@ export default defineNuxtModule<ModuleOptions>({
       handler: resolve('runtime/server'),
     })
 
-    const endpointKeys = Object.keys(nuxt.options.runtimeConfig.apiParty.endpoints)
+    const endpointKeys = Object.keys(resolvedOptions.endpoints)
 
     addImportsSources({
       from: '#build/api-party',
