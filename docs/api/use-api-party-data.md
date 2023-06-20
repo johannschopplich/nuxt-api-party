@@ -18,29 +18,37 @@ function useApiPartyData<T = any>(
   opts?: UseApiDataOptions<T>
 ): AsyncData<T, FetchError>
 
-type UseApiDataOptions<T> = AsyncDataOptions<T> & Pick<
-  ComputedOptions<NitroFetchOptions<string>>,
-  | 'onRequest'
-  | 'onRequestError'
-  | 'onResponse'
-  | 'onResponseError'
-  | 'query'
-  | 'headers'
-  | 'method'
-> & {
-  body?: string | Record<string, any> | FormData | null
-  /**
-   * Skip the Nuxt server proxy and fetch directly from the API.
-   * Requires `allowClient` to be enabled in the module options as well.
-   * @default false
-   */
-  client?: boolean
-  /**
-   * Cache the response for the same request
-   * @default true
-   */
-  cache?: boolean
-}
+type UseApiDataOptions<T> =
+  Omit<AsyncDataOptions<T>, 'watch'>
+  & Pick<
+    ComputedOptions<NitroFetchOptions<string>>,
+    | 'onRequest'
+    | 'onRequestError'
+    | 'onResponse'
+    | 'onResponseError'
+    | 'query'
+    | 'headers'
+    | 'method'
+  >
+  & {
+    body?: MaybeRef<string | Record<string, any> | FormData | null | undefined>
+    /**
+     * Skip the Nuxt server proxy and fetch directly from the API.
+     * Requires `allowClient` to be enabled in the module options as well.
+     * @default false
+     */
+    client?: boolean
+    /**
+     * Cache the response for the same request
+     * @default true
+     */
+    cache?: boolean
+    /**
+     * Watch an array of reactive sources and auto-refresh the fetch result when they change.
+     * Fetch options and URL are watched by default. You can completely ignore reactive sources by using `watch: false`.
+     */
+    watch?: (WatchSource<unknown> | object)[] | false
+  }
 ```
 
 ## Return Values

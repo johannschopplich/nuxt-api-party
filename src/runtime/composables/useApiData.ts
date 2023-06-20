@@ -2,6 +2,7 @@ import { computed, reactive } from 'vue'
 import { hash } from 'ohash'
 import type { FetchError } from 'ofetch'
 import type { NitroFetchOptions } from 'nitropack'
+import type { WatchSource } from 'vue'
 import type { AsyncData, AsyncDataOptions } from 'nuxt/app'
 import type { ModuleOptions } from '../../module'
 import { headersToObject, serializeMaybeEncodedBody, toValue } from '../utils'
@@ -17,29 +18,37 @@ type ComputedOptions<T extends Record<string, any>> = {
       : MaybeRef<T[K]>;
 }
 
-export type UseApiDataOptions<T> = AsyncDataOptions<T> & Pick<
-  ComputedOptions<NitroFetchOptions<string>>,
-  | 'onRequest'
-  | 'onRequestError'
-  | 'onResponse'
-  | 'onResponseError'
-  | 'query'
-  | 'headers'
-  | 'method'
-> & {
-  body?: MaybeRef<string | Record<string, any> | FormData | null | undefined>
-  /**
-   * Skip the Nuxt server proxy and fetch directly from the API.
-   * Requires `allowClient` to be enabled in the module options as well.
-   * @default false
-   */
-  client?: boolean
-  /**
-   * Cache the response for the same request
-   * @default true
-   */
-  cache?: boolean
-}
+export type UseApiDataOptions<T> =
+  Omit<AsyncDataOptions<T>, 'watch'>
+  & Pick<
+    ComputedOptions<NitroFetchOptions<string>>,
+    | 'onRequest'
+    | 'onRequestError'
+    | 'onResponse'
+    | 'onResponseError'
+    | 'query'
+    | 'headers'
+    | 'method'
+  >
+  & {
+    body?: MaybeRef<string | Record<string, any> | FormData | null | undefined>
+    /**
+     * Skip the Nuxt server proxy and fetch directly from the API.
+     * Requires `allowClient` to be enabled in the module options as well.
+     * @default false
+     */
+    client?: boolean
+    /**
+     * Cache the response for the same request
+     * @default true
+     */
+    cache?: boolean
+    /**
+     * Watch an array of reactive sources and auto-refresh the fetch result when they change.
+     * Fetch options and URL are watched by default. You can completely ignore reactive sources by using `watch: false`.
+     */
+    watch?: (WatchSource<unknown> | object)[] | false
+  }
 
 export type UseApiData = <T = any>(
   path: MaybeRefOrGetter<string>,
@@ -95,10 +104,12 @@ export function _useApiData<T = any>(
     default: defaultFn,
     transform,
     pick,
-    watch: [
-      _endpointFetchOptions,
-      ...(watch || []),
-    ],
+    watch: watch === false
+      ? []
+      : [
+          _endpointFetchOptions,
+          ...(watch || []),
+        ],
     immediate,
   }
 
