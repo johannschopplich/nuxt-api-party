@@ -5,7 +5,7 @@
 | Version  | Supported          | Support Status                                  |
 | -------- | ------------------ | ----------------------------------------------- |
 | 0.13.x   | :white_check_mark: | Active                                          |
-| < 0.13.0 | :x:                | Not supported (end of life) since June 27, 2023 |
+| ≤ 0.12.x | :x:                | Not supported (end of life) since June 27, 2023 |
 
 ## Past Security Incidents
 
