@@ -28,6 +28,14 @@ export default defineEventHandler(async (event): Promise<any> => {
     ...fetchOptions
   } = _body
 
+  // Check if the path is an absolute URL
+  if (new URL(path, 'http://localhost').origin !== 'http://localhost') {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Absolute URLs are not allowed',
+    })
+  }
+
   // Allows to overwrite the backend url with a custom header
   // (e.g. `jsonPlaceholder` endpoint becomes `Json-Placeholder-Endpoint-Url`)
   const baseURL = new Headers(headers).get(`${endpointId}-endpoint-url`) || endpoint.url
