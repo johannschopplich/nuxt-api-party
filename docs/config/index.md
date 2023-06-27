@@ -24,6 +24,7 @@ Main module configuration for your API endpoints. Each key represents an endpoin
 - `query`: Query parameters to send with each request (optional)
 - `headers`: Headers to send with each request (optional)
 - `cookies`: Whether to send cookies with each request (optional)
+- `allowedUrls`: A list of allowed URLs to change the [backend URL at runtime](/guide/dynamic-backend-url) (optional)
 
 ::: info
 The composables are generated based on your API endpoint ID. For example, if you were to call an endpoint `jsonPlaceholder`, the composables will be called `useJsonPlaceholderData` and `$jsonPlaceholder`.
@@ -42,6 +43,7 @@ type ApiPartyEndpoints = Record<
     query?: QueryObject
     headers?: Record<string, string>
     cookies?: boolean
+    allowedUrls?: string[]
   }
 > | undefined
 ```

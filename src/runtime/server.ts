@@ -32,9 +32,20 @@ export default defineEventHandler(async (event): Promise<any> => {
   // (e.g. `jsonPlaceholder` endpoint becomes `Json-Placeholder-Endpoint-Url`)
   const baseURL = new Headers(headers).get(`${endpointId}-endpoint-url`) || endpoint.url
 
+  // Check if the base URL is in the allow list
+  if (
+    baseURL !== endpoint.url
+    && !endpoint.allowedUrls?.includes(baseURL)
+  ) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: `Base URL "${baseURL}" is not allowed`,
+    })
+  }
+
   try {
-    return await $fetch(
-      path!,
+    return await globalThis.$fetch(
+      path,
       {
         ...fetchOptions,
         baseURL,

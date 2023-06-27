@@ -14,6 +14,7 @@ export interface ModuleOptions {
    * - `query`: Query parameters to send with each request (optional)
    * - `headers`: Headers to send with each request (optional)
    * - `cookies`: Whether to send cookies with each request (optional)
+   * - `allowedUrls`: A list of allowed URLs to change the backend URL at runtime (optional)
    *
    * @example
    * export default defineNuxtConfig({
@@ -39,6 +40,7 @@ export interface ModuleOptions {
       query?: QueryObject
       headers?: Record<string, string>
       cookies?: boolean
+      allowedUrls?: string[]
     }
   >
 
