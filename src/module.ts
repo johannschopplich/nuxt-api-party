@@ -109,7 +109,7 @@ export default defineNuxtModule<ModuleOptions>({
     const { resolve } = createResolver(import.meta.url)
     nuxt.options.build.transpile.push(resolve('runtime'))
 
-    // Inline module runtime in Nitro bundle
+    // Inline server handler into Nitro bundle
     // Needed to circumvent "cannot find module" error in `server.ts` for the `utils` import
     nuxt.hook('nitro:config', (config) => {
       config.externals = defu(config.externals, {

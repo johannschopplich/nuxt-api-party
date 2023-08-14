@@ -6,7 +6,7 @@ import type { EndpointFetchOptions } from './utils'
 import { useRuntimeConfig } from '#imports'
 
 export default defineEventHandler(async (event): Promise<any> => {
-  const endpointId = getRouterParam(event, 'endpointId') as string
+  const endpointId = getRouterParam(event, 'endpointId')!
   const { apiParty } = useRuntimeConfig()
   const endpoints = (apiParty as unknown as ModuleOptions).endpoints!
   const endpoint = endpoints[endpointId]
