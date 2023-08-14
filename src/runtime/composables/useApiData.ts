@@ -11,7 +11,7 @@ import type { EndpointFetchOptions, MaybeRef, MaybeRefOrGetter } from '../utils'
 import { useAsyncData, useRequestHeaders, useRuntimeConfig } from '#imports'
 
 type ComputedOptions<T extends Record<string, any>> = {
-  [K in keyof T]: T[K] extends Function
+  [K in keyof T]: T[K] extends (...args: any[]) => any
     ? T[K]
     : T[K] extends Record<string, any>
       ? ComputedOptions<T[K]> | MaybeRef<T[K]>
@@ -29,6 +29,7 @@ export type UseApiDataOptions<T> =
     | 'query'
     | 'headers'
     | 'method'
+    | 'retry'
   >
   & {
     body?: MaybeRef<string | Record<string, any> | FormData | null | undefined>

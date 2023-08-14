@@ -29,6 +29,7 @@ type UseApiDataOptions<T> =
     | 'query'
     | 'headers'
     | 'method'
+    | 'retry'
   >
   & {
     body?: MaybeRef<string | Record<string, any> | FormData | null | undefined>
