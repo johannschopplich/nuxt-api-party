@@ -8,7 +8,7 @@ export default defineNuxtConfig({
       },
       petStore: {
         url: process.env.PET_STORE_BASE_URL!,
-        schema: `${process.env.PET_STORE_BASE_URL!}/openapi.json`,
+        schema: './schemas/petStore.json',
       },
     },
   },
