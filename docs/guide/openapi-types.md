@@ -135,12 +135,12 @@ type Foo = components['schemas']['Foo']
 
 ### Use OpenAPI defined path parameters
 
-OpenAPI can define path parameters on some of the endpoints. They are declared as `/foo/{bar}`. Unfortunately, the endpoint is defined as `/foo/{bar}`, not `/foo/baz`, so using that as the path will break type inference.
+OpenAPI can define path parameters on some of the endpoints. They are declared as `/foo/{id}`. Unfortunately, the endpoint is not defined as `/foo/10`, so using that as the path will break type inference.
 
 To get around this, set an object of the parameters to the property `pathParams`. You can then use the declared path for type inference, and the type checker will ensure you provide all required path parameters. The parameters will be interpolated into the path before the request is made.
 
 ```ts
-const data = await $myApi('/foo/{id}', {
+const data = await $myApi('foo/{id}', {
   pathParams: {
     id: 10
   },
@@ -159,10 +159,10 @@ In the example schema, `GET /foo` will return a `Foo[]` array, but `POST /foo` w
 
 ```ts
 // resolved type: `{ id?: number; bar: string }[]`
-const result1 = await $myApi('/foo')
+const result1 = await $myApi('foo')
 
 // resolved type: `{  id?: number; bar: string }`
-const result = await $myApi('/foo', {
+const result = await $myApi('foo', {
   method: 'POST',
   body: {
     bar: 'string'
