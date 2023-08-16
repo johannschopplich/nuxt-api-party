@@ -1,7 +1,21 @@
+import nodePath from 'node:path'
 import { defu } from 'defu'
 import { camelCase, pascalCase } from 'scule'
-import { addImportsSources, addServerHandler, addTemplate, createResolver, defineNuxtModule, useLogger } from '@nuxt/kit'
+import { addImportsSources, addServerHandler, addTemplate, addTypeTemplate, createResolver, defineNuxtModule, useLogger } from '@nuxt/kit'
+import type { Nuxt } from 'nuxt/schema'
+import type { OpenAPI3, OpenAPITSOptions } from 'openapi-typescript'
 import type { QueryObject } from 'ufo'
+
+export interface Endpoint {
+  url: string
+  token?: string
+  query?: QueryObject
+  headers?: Record<string, string>
+  cookies?: boolean
+  allowedUrls?: string[]
+  schema?: string | URL | OpenAPI3 | (() => Promise<OpenAPI3>)
+  openAPITS?: OpenAPITSOptions
+}
 
 export interface ModuleOptions {
   /**
@@ -32,17 +46,7 @@ export interface ModuleOptions {
    *
    * @default {}
    */
-  endpoints?: Record<
-    string,
-    {
-      url: string
-      token?: string
-      query?: QueryObject
-      headers?: Record<string, string>
-      cookies?: boolean
-      allowedUrls?: string[]
-    }
-  >
+  endpoints?: Record<string, Endpoint>
 
   /**
    * Allow client-side requests besides server-side ones
@@ -56,6 +60,76 @@ export interface ModuleOptions {
    * @default false
    */
   allowClient?: boolean
+
+  /**
+   * Global options for openapi-typescript
+   */
+  openAPITS?: OpenAPITSOptions
+}
+
+function isOpenapiTSInstalled(): boolean {
+  try {
+    require.resolve('openapi-typescript')
+    return true
+  }
+  catch {
+    return false
+  }
+}
+
+async function resolveSchema(nuxt: Nuxt, { schema }: Endpoint): Promise<string | URL | OpenAPI3> {
+  if (typeof schema === 'function')
+    return await schema()
+
+  // detect file path and fix it.
+  if (typeof schema === 'string' && !schema.match(/^https?:\/\//))
+    schema = nodePath.resolve(nuxt.options.rootDir, schema)
+
+  return schema!
+}
+
+type OpenapiTS = typeof import('openapi-typescript')['default']
+
+function generateTypes(nuxt: Nuxt, endpoints: Record<string, Endpoint>, ids: string[], globalOpenApiOptions: OpenAPITSOptions): () => Promise<string> {
+  // openapi-typescript uses process.exit() to handle errors
+  let runningCount = 0
+  process.on('exit', () => {
+    if (runningCount > 0)
+      throw new Error('caught process.exit()')
+  })
+  return async () => {
+    const openapiTS: OpenapiTS = await import('openapi-typescript') as any
+    const schemas = await Promise.all(ids.map(async (id) => {
+      let types = ''
+      if (id in endpoints && 'schema' in endpoints[id]) {
+        const { openAPITS = {} } = endpoints[id]
+        const schema = await resolveSchema(nuxt, endpoints[id])
+
+        runningCount++
+        try {
+          types = await openapiTS(schema, { commentHeader: '', ...globalOpenApiOptions, ...openAPITS })
+        }
+        catch {
+          types = `
+export type paths = Record<string, any>
+export type webhooks = Record<string, any>
+export type components = Record<string, any>
+export type external = Record<string, any>
+export type operations = Record<string, any>
+          `.trimStart()
+        }
+        finally {
+          runningCount--
+        }
+      }
+      return `
+declare module '#nuxt-api-party/${id}' {
+${types.replace(/^/gm, '  ').trimEnd()}
+}`.trimStart()
+    }))
+
+    return schemas.join('\n\n')
+  }
 }
 
 export default defineNuxtModule<ModuleOptions>({
@@ -69,6 +143,7 @@ export default defineNuxtModule<ModuleOptions>({
   defaults: {
     endpoints: {},
     allowClient: false,
+    openAPITS: {},
   },
   setup(options, nuxt) {
     const logger = useLogger('nuxt-api-party')
@@ -148,6 +223,22 @@ export const ${getDataComposableName(i)} = (...args) => _useApiData('${i}', ...a
       },
     })
 
+    const schemaEndpoints: string[] = Object.entries(resolvedOptions.endpoints)
+      .filter(([,endpoint]) => 'schema' in endpoint)
+      .map(([id]) => id)
+
+    if (schemaEndpoints.length) {
+      if (isOpenapiTSInstalled()) {
+        addTypeTemplate({
+          filename: 'types/api-party-types.d.ts',
+          getContents: generateTypes(nuxt, resolvedOptions.endpoints, schemaEndpoints, resolvedOptions.openAPITS),
+        })
+      }
+      else {
+        console.warn('openapi-typescript is not installed. Endpoint types will not be generated.')
+        schemaEndpoints.length = 0
+      }
+    }
     // Add types for generated composables
     addTemplate({
       filename: 'api-party.d.ts',
@@ -155,9 +246,12 @@ export const ${getDataComposableName(i)} = (...args) => _useApiData('${i}', ...a
         return `
 import type { $Api } from '${resolve('runtime/composables/$api')}'
 import type { UseApiData } from '${resolve('runtime/composables/useApiData')}'
+${schemaEndpoints.map(i => `
+import type { paths as ${pascalCase(i)}Paths } from '#nuxt-api-party/${i}'
+`).join('')}
 ${endpointKeys.map(i => `
-export declare const ${getRawComposableName(i)}: $Api
-export declare const ${getDataComposableName(i)}: UseApiData
+export declare const ${getRawComposableName(i)}: $Api${schemaEndpoints.includes(i) ? `<${pascalCase(i)}Paths>` : ''}
+export declare const ${getDataComposableName(i)}: UseApiData${schemaEndpoints.includes(i) ? `<${pascalCase(i)}Paths>` : ''}
 `.trimStart()).join('')}`.trimStart()
       },
     })

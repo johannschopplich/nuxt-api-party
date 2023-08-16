@@ -6,5 +6,10 @@
         {JSON} Placeholder
       </NuxtLink>
     </li>
+    <li>
+      <NuxtLink to="/petStore">
+        Pet Store (OpenAPI)
+      </NuxtLink>
+    </li>
   </ul>
 </template>

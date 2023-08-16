@@ -6,6 +6,10 @@ export default defineNuxtConfig({
       jsonPlaceholder: {
         url: process.env.JSON_PLACEHOLDER_BASE_URL!,
       },
+      petStore: {
+        url: process.env.PET_STORE_BASE_URL!,
+        schema: `${process.env.PET_STORE_BASE_URL!}/openapi.json`,
+      },
     },
   },
 

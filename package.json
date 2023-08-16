@@ -67,5 +67,8 @@
     "typescript": "^5.1.6",
     "vitest": "^0.33.0",
     "vue-tsc": "^1.8.8"
+  },
+  "optionalDependencies": {
+    "openapi-typescript": "5.x || 6.x"
   }
 }
