@@ -1,10 +1,10 @@
-import nodePath from 'node:path'
+import { relative } from 'pathe'
 import { defu } from 'defu'
 import { camelCase, pascalCase } from 'scule'
-import { addImportsSources, addServerHandler, addTemplate, addTypeTemplate, createResolver, defineNuxtModule, useLogger } from '@nuxt/kit'
-import type { Nuxt } from 'nuxt/schema'
+import { addImportsSources, addServerHandler, addTemplate, createResolver, defineNuxtModule, tryResolveModule, useLogger } from '@nuxt/kit'
 import type { OpenAPI3, OpenAPITSOptions } from 'openapi-typescript'
 import type { QueryObject } from 'ufo'
+import { generateTypes } from './openapi'
 
 export interface Endpoint {
   url: string
@@ -67,71 +67,6 @@ export interface ModuleOptions {
   openAPITS?: OpenAPITSOptions
 }
 
-function isOpenapiTSInstalled(): boolean {
-  try {
-    require.resolve('openapi-typescript')
-    return true
-  }
-  catch {
-    return false
-  }
-}
-
-async function resolveSchema(nuxt: Nuxt, { schema }: Endpoint): Promise<string | URL | OpenAPI3> {
-  if (typeof schema === 'function')
-    return await schema()
-
-  // detect file path and fix it.
-  if (typeof schema === 'string' && !schema.match(/^https?:\/\//))
-    schema = nodePath.resolve(nuxt.options.rootDir, schema)
-
-  return schema!
-}
-
-type OpenapiTS = typeof import('openapi-typescript')['default']
-
-function generateTypes(nuxt: Nuxt, endpoints: Record<string, Endpoint>, ids: string[], globalOpenApiOptions: OpenAPITSOptions): () => Promise<string> {
-  // openapi-typescript uses process.exit() to handle errors
-  let runningCount = 0
-  process.on('exit', () => {
-    if (runningCount > 0)
-      throw new Error('caught process.exit()')
-  })
-  return async () => {
-    const openapiTS: OpenapiTS = await import('openapi-typescript') as any
-    const schemas = await Promise.all(ids.map(async (id) => {
-      let types = ''
-      if (id in endpoints && 'schema' in endpoints[id]) {
-        const { openAPITS = {} } = endpoints[id]
-        const schema = await resolveSchema(nuxt, endpoints[id])
-
-        runningCount++
-        try {
-          types = await openapiTS(schema, { commentHeader: '', ...globalOpenApiOptions, ...openAPITS })
-        }
-        catch {
-          types = `
-export type paths = Record<string, any>
-export type webhooks = Record<string, any>
-export type components = Record<string, any>
-export type external = Record<string, any>
-export type operations = Record<string, any>
-          `.trimStart()
-        }
-        finally {
-          runningCount--
-        }
-      }
-      return `
-declare module '#nuxt-api-party/${id}' {
-${types.replace(/^/gm, '  ').trimEnd()}
-}`.trimStart()
-    }))
-
-    return schemas.join('\n\n')
-  }
-}
-
 export default defineNuxtModule<ModuleOptions>({
   meta: {
     name: 'nuxt-api-party',
@@ -145,8 +80,9 @@ export default defineNuxtModule<ModuleOptions>({
     allowClient: false,
     openAPITS: {},
   },
-  setup(options, nuxt) {
-    const logger = useLogger('nuxt-api-party')
+  async setup(options, nuxt) {
+    const moduleName = 'nuxt-api-party'
+    const logger = useLogger(moduleName)
     const getRawComposableName = (endpointId: string) => `$${camelCase(endpointId)}`
     const getDataComposableName = (endpointId: string) => `use${pascalCase(endpointId)}Data`
 
@@ -184,17 +120,6 @@ export default defineNuxtModule<ModuleOptions>({
     const { resolve } = createResolver(import.meta.url)
     nuxt.options.build.transpile.push(resolve('runtime'))
 
-    // Inline server handler into Nitro bundle
-    // Needed to circumvent "cannot find module" error in `server.ts` for the `utils` import
-    nuxt.hook('nitro:config', (config) => {
-      config.externals = defu(config.externals, {
-        inline: [
-          resolve('runtime/utils'),
-          resolve('runtime/formData'),
-        ],
-      })
-    })
-
     // Add Nuxt server route to proxy the API request server-side
     addServerHandler({
       route: '/api/__api_party/:endpointId',
@@ -202,16 +127,37 @@ export default defineNuxtModule<ModuleOptions>({
       handler: resolve('runtime/server'),
     })
 
+    nuxt.hook('nitro:config', (config) => {
+      // Inline server handler into Nitro bundle
+      // Needed to circumvent "cannot find module" error in `server.ts` for the `utils` import
+      config.externals ||= {}
+      config.externals.inline ||= []
+      config.externals.inline.push(...[
+        resolve('runtime/utils'),
+        resolve('runtime/formData'),
+      ])
+    })
+
     const endpointKeys = Object.keys(resolvedOptions.endpoints)
 
+    // Nuxt will resolve the imports relative to the `srcDir`, so we can't use
+    // `#nuxt-api-party` with `declare module` pattern here
     addImportsSources({
-      from: '#build/api-party',
+      from: resolve(nuxt.options.buildDir, `module/${moduleName}-imports.mjs`),
       imports: endpointKeys.flatMap(i => [getRawComposableName(i), getDataComposableName(i)]),
     })
 
-    // Add generated composables
+    // Add `#nuxt-api-party` module alias for generated composables
+    nuxt.options.alias[`#${moduleName}`] = resolve(nuxt.options.buildDir, `module/${moduleName}-imports.mjs`)
+
+    const relativeTo = (path: string) => relative(
+      resolve(nuxt.options.rootDir, nuxt.options.buildDir, 'module'),
+      resolve(path),
+    )
+
+    // Add module template for generated composables
     addTemplate({
-      filename: 'api-party.mjs',
+      filename: `module/${moduleName}-imports.mjs`,
       getContents() {
         return `
 import { _$api } from '${resolve('runtime/composables/$api')}'
@@ -223,37 +169,58 @@ export const ${getDataComposableName(i)} = (...args) => _useApiData('${i}', ...a
       },
     })
 
-    const schemaEndpoints: string[] = Object.entries(resolvedOptions.endpoints)
-      .filter(([,endpoint]) => 'schema' in endpoint)
+    const schemaEndpointIds = Object.entries(resolvedOptions.endpoints)
+      .filter(([, endpoint]) => 'schema' in endpoint)
       .map(([id]) => id)
+    const hasOpenAPIPkg = await tryResolveModule('openapi-typescript', [nuxt.options.rootDir])
 
-    if (schemaEndpoints.length) {
-      if (isOpenapiTSInstalled()) {
-        addTypeTemplate({
-          filename: 'types/api-party-types.d.ts',
-          getContents: generateTypes(nuxt, resolvedOptions.endpoints, schemaEndpoints, resolvedOptions.openAPITS),
-        })
-      }
-      else {
-        console.warn('openapi-typescript is not installed. Endpoint types will not be generated.')
-        schemaEndpoints.length = 0
-      }
+    if (schemaEndpointIds.length && !hasOpenAPIPkg) {
+      logger.warn('OpenAPI types generation is enabled, but the `openapi-typescript` package is not found. Please install it to enable endpoint types generation.')
+      schemaEndpointIds.length = 0
     }
-    // Add types for generated composables
+
+    // Use generated types for generated composables for
+    // (1) Nuxt auto-imports
+    // (2) global import from `#nuxt-api-party`
     addTemplate({
-      filename: 'api-party.d.ts',
+      filename: `module/${moduleName}-imports.d.ts`,
       getContents() {
         return `
-import type { $Api } from '${resolve('runtime/composables/$api')}'
-import type { UseApiData } from '${resolve('runtime/composables/useApiData')}'
-${schemaEndpoints.map(i => `
-import type { paths as ${pascalCase(i)}Paths } from '#nuxt-api-party/${i}'
-`).join('')}
+// Generated by ${moduleName}
+import type { $Api } from '${relativeTo('runtime/composables/$api')}'
+import type { UseApiData } from '${relativeTo('runtime/composables/useApiData')}'
+
+${schemaEndpointIds.map(i => `import type { paths as ${pascalCase(i)}Paths } from '#${moduleName}/${i}'`).join('')}
+
 ${endpointKeys.map(i => `
-export declare const ${getRawComposableName(i)}: $Api${schemaEndpoints.includes(i) ? `<${pascalCase(i)}Paths>` : ''}
-export declare const ${getDataComposableName(i)}: UseApiData${schemaEndpoints.includes(i) ? `<${pascalCase(i)}Paths>` : ''}
-`.trimStart()).join('')}`.trimStart()
+export declare const ${getRawComposableName(i)}: $Api${schemaEndpointIds.includes(i) ? `<${pascalCase(i)}Paths>` : ''}
+export declare const ${getDataComposableName(i)}: UseApiData${schemaEndpointIds.includes(i) ? `<${pascalCase(i)}Paths>` : ''}
+`.trimStart()).join('').trimEnd()}
+`.trimStart()
       },
+    })
+
+    // Add global `#nuxt-api-party` and OpenAPI endpoint types
+    addTemplate({
+      filename: `module/${moduleName}.d.ts`,
+      async getContents() {
+        return `
+// Generated by ${moduleName}
+declare module '#${moduleName}' {
+  export * from './${moduleName}-imports'
+}
+
+${schemaEndpointIds.length
+  ? await generateTypes(resolvedOptions.endpoints, schemaEndpointIds, resolvedOptions.openAPITS)
+  : ''}
+`.trimStart()
+      },
+    })
+
+    // Add type references to TypeScript config
+    nuxt.hook('prepare:types', (options) => {
+      options.references.push({ path: resolve(nuxt.options.buildDir, `module/${moduleName}.d.ts`) })
+      options.references.push({ path: resolve(nuxt.options.buildDir, `module/${moduleName}-imports.d.ts`) })
     })
   },
 })
