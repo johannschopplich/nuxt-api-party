@@ -59,28 +59,30 @@ async function onSubmit() {
 </script>
 
 <template>
-  <h2>$jsonPlaceholder</h2>
-  <p>Responses are <strong>not</strong> cached by default.</p>
-  <blockquote>(Imagine form fields here)</blockquote>
-  <p>
-    <button @click="onSubmit()">
-      Submit
-    </button>
-  </p>
-  <pre v-if="formResponse">{{ JSON.stringify(formResponse, undefined, 2) }}</pre>
-  <hr>
+  <div>
+    <h2>$jsonPlaceholder</h2>
+    <p>Responses are <strong>not</strong> cached by default.</p>
+    <blockquote>(Imagine form fields here)</blockquote>
+    <p>
+      <button @click="onSubmit()">
+        Submit
+      </button>
+    </p>
+    <pre v-if="formResponse">{{ JSON.stringify(formResponse, undefined, 2) }}</pre>
+    <hr>
 
-  <h2>useJsonPlaceholderData</h2>
-  <p>Responses are cached by default.</p>
-  <p>
-    Status:
-    <mark v-if="pending">pending</mark>
-    <code v-else>fetched</code>
-  </p>
-  <p>
-    <button @click="incrementPostId()">
-      Increment Post ID
-    </button>
-  </p>
-  <pre>{{ JSON.stringify(data, undefined, 2) }}</pre>
+    <h2>useJsonPlaceholderData</h2>
+    <p>Responses are cached by default.</p>
+    <p>
+      Status:
+      <mark v-if="pending">pending</mark>
+      <code v-else>fetched</code>
+    </p>
+    <p>
+      <button @click="incrementPostId()">
+        Increment Post ID
+      </button>
+    </p>
+    <pre>{{ JSON.stringify(data, undefined, 2) }}</pre>
+  </div>
 </template>
