@@ -54,8 +54,8 @@ export type UseApiDataOptions<T> = BaseApiDataOptions<T> & Pick<
   | 'method'
   | 'retry'
 > & {
-  body?: MaybeRef<string | Record<string, any> | FormData | null | undefined>
   pathParams?: MaybeRef<Record<string, string>>
+  body?: MaybeRef<string | Record<string, any> | FormData | null | undefined>
 }
 
 export type UntypedUseApiData = <T = any>(
@@ -90,10 +90,10 @@ export function _useApiData<T = any>(
     pick,
     watch,
     immediate,
+    pathParams,
     query,
     headers,
     method,
-    pathParams,
     body,
     client = false,
     cache = true,
