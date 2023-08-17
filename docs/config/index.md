@@ -37,18 +37,18 @@ Default value: `{}`
 **Type**
 
 ```ts
-type ApiPartyEndpoints = Record<
-  string,
-  {
-    url: string
-    token?: string
-    query?: QueryObject
-    headers?: Record<string, string>
-    cookies?: boolean
-    allowedUrls?: string[]
-    schema?: string | URL | OpenAPI3 | (() => Promise<OpenAPI3>)
-  }
-> | undefined
+interface Endpoint {
+  url: string
+  token?: string
+  query?: QueryObject
+  headers?: Record<string, string>
+  cookies?: boolean
+  allowedUrls?: string[]
+  schema?: string | URL | OpenAPI3 | (() => Promise<OpenAPI3>)
+  openAPITS?: OpenAPITSOptions
+}
+
+type ApiPartyEndpoints = Record<string, Endpoint> | undefined
 ```
 
 **Example**
