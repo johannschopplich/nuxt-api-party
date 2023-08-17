@@ -18,17 +18,17 @@ export type RequestBody<T> = T extends { requestBody: { content: infer Body } }
           body: string | Blob
           headers: { 'content-type': 'application/octet-stream' }
         }
-      : {})
+      : object)
     | (Body extends { 'application/json': infer Schema }
-      ? { body: Schema }
-      : {})
+      ? { body: Schema; headers?: { 'content-type'?: 'application/json' } }
+      : object)
     | (Body extends { 'application/x-www-form-urlencoded': any }
       ? {
           body: FormData
           headers: { 'content-type': 'application/x-www-form-urlencoded' }
         }
-      : {})
-  : {}
+      : object)
+  : unknown
 
 export type Method<M extends IgnoreCase<HttpMethod>> =
   'get' extends Lowercase<M> ? { method?: M } : { method: M }
@@ -37,7 +37,7 @@ export type Param<T, N extends string, K extends string = N> = T extends {
   parameters: { [_ in N]?: any }
 }
   ? { [_ in keyof Pick<T['parameters'], N> as K]: T['parameters'][N] }
-  : {}
+  : unknown
 
 export type QueryParameters<T> = Param<T, 'query'>
 export type HeaderParameters<T> = Param<T, 'header', 'headers'>
