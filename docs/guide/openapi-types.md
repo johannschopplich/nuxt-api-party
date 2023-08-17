@@ -1,10 +1,10 @@
 # OpenAPI Types
 
-If your API has an [OpenAPI](https://swagger.io/resources/open-api/) schema, Nuxt API Party can use it to generate types for you. These include path names, supported http methods, request body, response body, query parameters, and headers.
+If your API has an [OpenAPI](https://swagger.io/resources/open-api/) schema, Nuxt API Party can use it to generate types for you. These include path names, supported HTTP methods, request body, response body, query parameters, and headers.
 
-Usage of this feature requires [`openapi-typescript`](https://www.npmjs.com/package/openapi-typescript) to be installed. This library generates typescript definitions from your OpenAPI schema file.
+Usage of this feature requires [`openapi-typescript`](https://www.npmjs.com/package/openapi-typescript) to be installed. This library generates TypeScript definitions from your OpenAPI schema file.
 
-Install it before proceeding.
+Install it before proceeding:
 
 ::: code-group
 
@@ -22,9 +22,9 @@ npm install -D openapi-typescript
 
 :::
 
-## Schema generation
+## Schema Generation
 
-Some web frameworks can generate an OpenAPI schema for you based on your configured routes. These include:
+Some web frameworks can generate an OpenAPI schema for you based on your configured routes. Some examples include:
 
 - [NestJS](https://docs.nestjs.com/openapi/introduction)
 - [FastAPI](https://fastapi.tiangolo.com/)
@@ -102,6 +102,8 @@ components:
         - bar
 ```
 
+Reference the schema file in your endpoint config:
+
 ```ts
 // `nuxt.config.ts`
 export default defineNuxtConfig({
@@ -114,13 +116,13 @@ export default defineNuxtConfig({
 })
 ```
 
-## Using the types
+## Using the Types
 
 For most usages, no further intervention is needed. Nuxt API Party will use the types generated from this config to infer the correct types automatically when `$myApi` and `useMyApiData` is used.
 
 However, there may be a few things you may want to do now that you have type information.
 
-### Extract the response body type
+### Extract the Response Body Type
 
 You can get the request and response bodies directly from the exported `components` interface of the virtual module containing the types.
 
@@ -133,9 +135,9 @@ import { components } from '#nuxt-api-party/myApi'
 type Foo = components['schemas']['Foo']
 ```
 
-### Use OpenAPI defined path parameters
+### Use OpenAPI Defined Path Parameters
 
-OpenAPI can define path parameters on some of the endpoints. They are declared as `/foo/{id}`. Unfortunately, the endpoint is not defined as `/foo/10`, so using that as the path will break type inference.
+OpenAPI can define path parameters on some endpoints. They are declared as `/foo/{id}`. Unfortunately, the endpoint is not defined as `/foo/10`, so using that as the path will break type inference.
 
 To get around this, set an object of the parameters to the property `pathParams`. You can then use the declared path for type inference, and the type checker will ensure you provide all required path parameters. The parameters will be interpolated into the path before the request is made.
 
@@ -143,7 +145,7 @@ To get around this, set an object of the parameters to the property `pathParams`
 const data = await $myApi('foo/{id}', {
   pathParams: {
     id: 10
-  },
+  }
 })
 ```
 
@@ -151,7 +153,7 @@ const data = await $myApi('foo/{id}', {
 Issues will **NOT** be reported at runtime by nuxt-api-party if the wrong parameters are used. The **incomplete** path will be sent to the backend **AS IS**.
 :::
 
-### Route method overloading
+### Route Method Overloading
 
 Some routes may be overloaded with multiple HTTP methods. The typing supports this natively and chooses the type based on the `method` property. When the property is omitted, the typing is smart enough to know `GET` is the default.
 
@@ -161,7 +163,7 @@ In the example schema, `GET /foo` will return a `Foo[]` array, but `POST /foo` w
 // resolved type: `{ id?: number; bar: string }[]`
 const result1 = await $myApi('foo')
 
-// resolved type: `{  id?: number; bar: string }`
+// resolved type: `{ id?: number; bar: string }`
 const result = await $myApi('foo', {
   method: 'POST',
   body: {
