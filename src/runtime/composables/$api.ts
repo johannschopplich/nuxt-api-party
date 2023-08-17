@@ -11,6 +11,7 @@ export type ApiFetchOptions = Omit<NitroFetchOptions<string>, 'body' | 'cache'> 
   pathParams?: Record<string, any>
   body?: string | Record<string, any> | FormData | null
 }
+
 export interface BaseApiFetchOptions {
   /**
    * Skip the Nuxt server proxy and fetch directly from the API.

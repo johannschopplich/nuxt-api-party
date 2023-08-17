@@ -19,8 +19,7 @@ type ComputedOptions<T extends Record<string, any>> = {
       : MaybeRef<T[K]>;
 }
 
-export type BaseApiDataOptions<T> = Omit<AsyncDataOptions<T>, 'watch'>
-& {
+export type BaseApiDataOptions<T> = Omit<AsyncDataOptions<T>, 'watch'> & {
   /**
    * Skip the Nuxt server proxy and fetch directly from the API.
    * Requires `allowClient` to be enabled in the module options as well.
@@ -39,22 +38,22 @@ export type BaseApiDataOptions<T> = Omit<AsyncDataOptions<T>, 'watch'>
   watch?: (WatchSource<unknown> | object)[] | false
 }
 
-export type UseOpenAPIDataOptions<P extends PathItemObject, M extends IgnoreCase<keyof P & HttpMethod>> = BaseApiDataOptions<APIResponse<P[Lowercase<M>]>>
-& ComputedOptions<APIRequestOptions<P, M>>
+export type UseOpenAPIDataOptions<
+  P extends PathItemObject,
+  M extends IgnoreCase<keyof P & HttpMethod>,
+> = BaseApiDataOptions<APIResponse<P[Lowercase<M>]>> & ComputedOptions<APIRequestOptions<P, M>>
 
-export type UseApiDataOptions<T> = BaseApiDataOptions<T>
-& Pick<
-    ComputedOptions<NitroFetchOptions<string>>,
-    | 'onRequest'
-    | 'onRequestError'
-    | 'onResponse'
-    | 'onResponseError'
-    | 'query'
-    | 'headers'
-    | 'method'
-    | 'retry'
-  >
-& {
+export type UseApiDataOptions<T> = BaseApiDataOptions<T> & Pick<
+  ComputedOptions<NitroFetchOptions<string>>,
+  | 'onRequest'
+  | 'onRequestError'
+  | 'onResponse'
+  | 'onResponseError'
+  | 'query'
+  | 'headers'
+  | 'method'
+  | 'retry'
+> & {
   body?: MaybeRef<string | Record<string, any> | FormData | null | undefined>
   pathParams?: MaybeRef<Record<string, string>>
 }
