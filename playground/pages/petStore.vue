@@ -54,9 +54,9 @@ async function abandonGarfield() {
   }
   catch (e) {
     if (e instanceof FetchError) {
-      console.error('statusCode:', (e as FetchError).statusCode)
-      console.error('statusMessage:', (e as FetchError).statusMessage)
-      console.error('data:', (e as FetchError).data)
+      console.error('statusCode:', e.statusCode)
+      console.error('statusMessage:', e.statusMessage)
+      console.error('data:', e.data)
     }
     else {
       console.error(e)
