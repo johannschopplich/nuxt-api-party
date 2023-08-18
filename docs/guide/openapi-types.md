@@ -150,7 +150,7 @@ const data = await $myApi('foo/{id}', {
 ```
 
 ::: warning
-Issues will **NOT** be reported at runtime by nuxt-api-party if the wrong parameters are used. The **incomplete** path will be sent to the backend **AS IS**.
+Issues will **NOT** be reported at runtime by Nuxt API Party if the wrong parameters are used. The **incomplete** path will be sent to the backend **AS IS**.
 :::
 
 ### Route Method Overloading

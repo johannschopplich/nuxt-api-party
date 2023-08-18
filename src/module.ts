@@ -169,9 +169,11 @@ export const ${getDataComposableName(i)} = (...args) => _useApiData('${i}', ...a
       },
     })
 
-    const schemaEndpointIds = Object.entries(resolvedOptions.endpoints)
-      .filter(([, endpoint]) => 'schema' in endpoint)
-      .map(([id]) => id)
+    const schemaEndpoints = Object.fromEntries(
+      Object.entries(resolvedOptions.endpoints)
+        .filter(([, endpoint]) => 'schema' in endpoint),
+    )
+    const schemaEndpointIds = Object.keys(schemaEndpoints)
     const hasOpenAPIPkg = await tryResolveModule('openapi-typescript', [nuxt.options.rootDir])
 
     if (schemaEndpointIds.length && !hasOpenAPIPkg) {
@@ -211,7 +213,7 @@ declare module '#${moduleName}' {
 }
 
 ${schemaEndpointIds.length
-  ? await generateTypes(resolvedOptions.endpoints, schemaEndpointIds, resolvedOptions.openAPITS)
+  ? await generateTypes(schemaEndpoints, resolvedOptions.openAPITS)
   : ''}
 `.trimStart()
       },

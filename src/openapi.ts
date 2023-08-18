@@ -5,8 +5,7 @@ import type { Endpoint } from './module'
 
 export async function generateTypes(
   endpoints: Record<string, Endpoint>,
-  ids: string[],
-  globalOpenApiOptions: OpenAPITSOptions,
+  globalOpenAPIOptions: OpenAPITSOptions,
 ) {
   // Note: openapi-typescript uses `process.exit()` to handle errors
   let runningCount = 0
@@ -18,34 +17,32 @@ export async function generateTypes(
 
   const openapiTS = await import('openapi-typescript')
   const schemas = await Promise.all(
-    ids.map(async (id) => {
+    Object.keys(endpoints).map(async (id) => {
       let types = ''
 
-      if (id in endpoints && 'schema' in endpoints[id]) {
-        const { openAPITS = {} } = endpoints[id]
-        const schema = await resolveSchema(endpoints[id])
-        runningCount++
+      const { openAPITS: openAPIOptions = {} } = endpoints[id]
+      const schema = await resolveSchema(endpoints[id])
+      runningCount++
 
-        try {
-          // @ts-expect-error: ESM import type mismatch
-          types = await openapiTS(schema, {
-            commentHeader: '',
-            ...globalOpenApiOptions,
-            ...openAPITS,
-          })
-        }
-        catch {
-          types = `
+      try {
+        // @ts-expect-error: ESM import type mismatch
+        types = await openapiTS(schema, {
+          commentHeader: '',
+          ...globalOpenAPIOptions,
+          ...openAPIOptions,
+        })
+      }
+      catch {
+        types = `
 export type paths = Record<string, any>
 export type webhooks = Record<string, any>
 export type components = Record<string, any>
 export type external = Record<string, any>
 export type operations = Record<string, any>
         `.trimStart()
-        }
-        finally {
-          runningCount--
-        }
+      }
+      finally {
+        runningCount--
       }
 
       return `
