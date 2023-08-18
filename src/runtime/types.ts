@@ -18,16 +18,16 @@ export type RequestBody<T> = T extends { requestBody: { content: infer Body } }
           body: string | Blob
           headers: { 'content-type': 'application/octet-stream' }
         }
-      : object)
+      : Record<string, any>)
     | (Body extends { 'application/json': infer Schema }
       ? { body: Schema; headers?: { 'content-type'?: 'application/json' } }
-      : object)
+      : Record<string, any>)
     | (Body extends { 'application/x-www-form-urlencoded': any }
       ? {
           body: FormData
           headers: { 'content-type': 'application/x-www-form-urlencoded' }
         }
-      : object)
+      : Record<string, any>)
   : unknown
 
 export type Method<M extends IgnoreCase<HttpMethod>> =
