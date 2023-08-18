@@ -117,8 +117,4 @@ type AnyApi = <T = any>(
   path: string,
   opts?: AnyApiFetchOptions,
 ) => Promise<T>
-
-type $Api<Paths extends Record<string, PathItemObject> = never> = [Paths] extends [never]
-  ? AnyApi
-  : OpenApi<Paths>
 ```

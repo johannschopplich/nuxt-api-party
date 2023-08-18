@@ -166,8 +166,4 @@ type UseAnyApiData = <T = any>(
   path: MaybeRefOrGetter<string>,
   opts?: UseAnyApiDataOptions<T>,
 ) => AsyncData<T, FetchError>
-
-type UseApiData<Paths extends Record<string, PathItemObject> = never> = [Paths] extends [never]
-  ? UseAnyApiData
-  : UseOpenApiData<Paths>
 ```
