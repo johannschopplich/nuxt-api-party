@@ -15,7 +15,7 @@ export default defineNuxtConfig({
 
   typescript: {
     // TODO: Re-enable when test directory can be excluded from type checking
-    // typeCheck: true,
+    // typeCheck: 'build,
     shim: false,
     tsConfig: {
       compilerOptions: {

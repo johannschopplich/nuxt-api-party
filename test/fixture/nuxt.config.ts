@@ -12,7 +12,7 @@ export default defineNuxtConfig({
   },
 
   typescript: {
-    typeCheck: !isCI,
+    typeCheck: !isCI ? 'build' : false,
     shim: false,
   },
 })

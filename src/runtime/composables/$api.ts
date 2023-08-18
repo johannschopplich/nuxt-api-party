@@ -48,7 +48,7 @@ export type $Api<Paths extends Record<string, PathItemObject> = never> = [Paths]
 export function _$api<T = any>(
   endpointId: string,
   path: string,
-  opts: ApiFetchOptions & BaseApiFetchOptions,
+  opts: ApiFetchOptions & BaseApiFetchOptions = {},
 ): Promise<T> {
   const nuxt = useNuxtApp()
   const promiseMap = (nuxt._promiseMap = nuxt._promiseMap || new Map()) as Map<string, Promise<T>>
