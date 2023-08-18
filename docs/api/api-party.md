@@ -1,34 +1,10 @@
-# `$apiParty`
+# `$myApi`
 
 ::: info
-`$apiParty` is a placeholder used as an example in the documentation. The composable is generated based on your API endpoint ID. For example, if you were to call an endpoint `jsonPlaceholder`, the composable will be called `$jsonPlaceholder`.
+`$myApi` is a placeholder used as an example in the documentation. The composable is generated based on your API endpoint ID. For example, if you were to call an endpoint `jsonPlaceholder`, the composable will be called `$jsonPlaceholder`.
 :::
 
 Returns the raw response of the API endpoint. Intended for actions inside methods, e.g. when sending form data to the API when clicking a submit button.
-
-## Type Declarations
-
-```ts
-function $apiParty<T = any>(
-  path: string,
-  opts?: ApiFetchOptions
-): Promise<T>
-
-type ApiFetchOptions = Omit<NitroFetchOptions<string>, 'body'> & {
-  body?: string | Record<string, any> | FormData | null
-  /**
-   * Skip the Nuxt server proxy and fetch directly from the API.
-   * Requires `allowClient` to be enabled in the module options as well.
-   * @default false
-   */
-  client?: boolean
-  /**
-   * Cache the response for the same request
-   * @default false
-   */
-  cache?: boolean
-}
-```
 
 ## Example
 
@@ -113,4 +89,36 @@ export default defineNuxtConfig({
     allowClient: true
   }
 })
+```
+
+## Type Declarations
+
+```ts
+interface BaseApiFetchOptions {
+  /**
+   * Skip the Nuxt server proxy and fetch directly from the API.
+   * Requires `allowClient` to be enabled in the module options as well.
+   * @default false
+   */
+  client?: boolean
+  /**
+   * Cache the response for the same request
+   * @default false
+   */
+  cache?: boolean
+}
+
+type AnyApiFetchOptions = Omit<NitroFetchOptions<string>, 'body' | 'cache'> & {
+  pathParams?: Record<string, string>
+  body?: string | Record<string, any> | FormData | null
+} & BaseApiFetchOptions
+
+type AnyApi = <T = any>(
+  path: string,
+  opts?: AnyApiFetchOptions,
+) => Promise<T>
+
+type $Api<Paths extends Record<string, PathItemObject> = never> = [Paths] extends [never]
+  ? AnyApi
+  : OpenApi<Paths>
 ```

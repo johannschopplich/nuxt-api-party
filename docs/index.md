@@ -37,8 +37,8 @@ features:
   - title: Familiar Data Handling
     icon: 🍱
     details: Handle requests just like useFetch or $fetch.
-    link: /api/use-api-party-data
-    linkText: useApiPartyData
+    link: /api/use-my-api-data
+    linkText: useMyApiData
   - title: Connect multiple APIs
     icon: 🧇
     details: Use multiple APIs in your app with one module.

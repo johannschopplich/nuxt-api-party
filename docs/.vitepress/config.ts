@@ -103,8 +103,8 @@ function nav(): DefaultTheme.NavItem[] {
         {
           text: 'Composables',
           items: [
-            { text: 'useApiPartyData', link: '/api/use-api-party-data' },
-            { text: '$apiParty', link: '/api/api-party' },
+            { text: 'useMyApiData', link: '/api/use-my-api-data' },
+            { text: '$myApi', link: '/api/my-api' },
           ],
         },
       ],
@@ -168,8 +168,8 @@ function sidebarApi(): DefaultTheme.SidebarItem[] {
     {
       text: 'Composables',
       items: [
-        { text: 'useApiPartyData', link: '/api/use-api-party-data' },
-        { text: '$apiParty', link: '/api/api-party' },
+        { text: 'useMyApiData', link: '/api/use-my-api-data' },
+        { text: '$myApi', link: '/api/my-api' },
       ],
     },
   ]

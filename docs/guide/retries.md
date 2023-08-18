@@ -2,7 +2,7 @@
 
 From time to time, fetch requests may fail. This can happen for a variety of reasons, like a network error or a server error. In these cases, you may want to retry the request a few times before giving up.
 
-You can configure retries for a single request by passing a `retry` option to the `useApiPartyData` and `$apiParty` composables. It can be a number, `false` or `undefined`, either reactive or not:
+You can configure retries for a single request by passing a `retry` option to the `useMyApiData` and `$myApi` composables. It can be a number, `false` or `undefined`, either reactive or not:
 
 ```ts
 const retry: MaybeRef<number | false | undefined>

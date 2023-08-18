@@ -1,25 +1,21 @@
 # OpenAPI Types
 
-If your API has an [OpenAPI](https://swagger.io/resources/open-api/) schema, Nuxt API Party can use it to generate types for you. These include path names, supported HTTP methods, request body, response body, query parameters, and headers.
+If your API has an [OpenAPI](https://swagger.io/resources/open-api/) schema, `nuxt-api-party` can use it to generate types for you. These include path names, supported HTTP methods, request body, response body, query parameters, and headers.
 
 Usage of this feature requires [`openapi-typescript`](https://www.npmjs.com/package/openapi-typescript) to be installed. This library generates TypeScript definitions from your OpenAPI schema file.
 
 Install it before proceeding:
 
 ::: code-group
-
 ```bash [pnpm]
 pnpm add -D openapi-typescript
 ```
-
 ```bash [yarn]
 yarn add -D openapi-typescript
 ```
-
 ```bash [npm]
 npm install -D openapi-typescript
 ```
-
 :::
 
 ## Schema Generation
@@ -118,7 +114,7 @@ export default defineNuxtConfig({
 
 ## Using the Types
 
-For most usages, no further intervention is needed. Nuxt API Party will use the types generated from this config to infer the correct types automatically when `$myApi` and `useMyApiData` is used.
+For most usages, no further intervention is needed. `nuxt-api-party` will use the types generated from this config to infer the correct types automatically when `$myApi` and `useMyApiData` is used.
 
 However, there may be a few things you may want to do now that you have type information.
 
@@ -150,7 +146,7 @@ const data = await $myApi('foo/{id}', {
 ```
 
 ::: warning
-Issues will **NOT** be reported at runtime by Nuxt API Party if the wrong parameters are used. The **incomplete** path will be sent to the backend **AS IS**.
+Issues will **NOT** be reported at runtime by `nuxt-api-party` if the wrong parameters are used. The **incomplete** path will be sent to the backend **AS IS**.
 :::
 
 ### Route Method Overloading
@@ -161,10 +157,10 @@ In the example schema, `GET /foo` will return a `Foo[]` array, but `POST /foo` w
 
 ```ts
 // resolved type: `{ id?: number; bar: string }[]`
-const result1 = await $myApi('foo')
+const resultGet = await $myApi('foo')
 
 // resolved type: `{ id?: number; bar: string }`
-const result = await $myApi('foo', {
+const resultPost = await $myApi('foo', {
   method: 'POST',
   body: {
     bar: 'string'

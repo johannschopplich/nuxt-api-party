@@ -58,7 +58,7 @@ export default defineNuxtConfig({
 For the API endpoint `jsonPlaceholder` above, the following composables are generated:
 
 - `$jsonPlaceholder` – Returns the response data, similar to [`$fetch`](https://nuxt.com/docs/api/utils/dollarfetch#fetch)
-- `useJsonPlaceholderData` – Returns [multiple values](/api/use-api-party-data.html#return-values) similar to [`useFetch`](https://nuxt.com/docs/api/composables/use-fetch)
+- `useJsonPlaceholderData` – Returns [multiple values](/api/use-my-api-data.html#return-values) similar to [`useFetch`](https://nuxt.com/docs/api/composables/use-fetch)
 
 ::: tip
 Connect to as many API endpoints as you like. Each endpoint will generate two composables.

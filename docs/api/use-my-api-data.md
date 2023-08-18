@@ -1,7 +1,7 @@
-# `useApiPartyData`
+# `useMyApiData`
 
 ::: info
-`useApiPartyData` is a placeholder used as an example in the documentation. The composable is generated based on your API endpoint ID. For example, if you were to call an endpoint `jsonPlaceholder`, the composable will be called `useJsonPlaceholderData`.
+`useMyApiData` is a placeholder used as an example in the documentation. The composable is generated based on your API endpoint ID. For example, if you were to call an endpoint `jsonPlaceholder`, the composable will be called `useJsonPlaceholderData`.
 :::
 
 Returns the raw response of the API endpoint. Intended for data which requires reactive updates, e.g. when using the data in a template.
@@ -9,48 +9,6 @@ Returns the raw response of the API endpoint. Intended for data which requires r
 Responses are **cached** between function calls for the same path based on a calculated hash. You can disable this behavior by setting `cache` to `false`.
 
 The composable supports every [`useAsyncData` option](https://nuxt.com/docs/api/composables/use-async-data/#params).
-
-## Type Declarations
-
-```ts
-function useApiPartyData<T = any>(
-  path: MaybeRefOrGetter<string>,
-  opts?: UseApiDataOptions<T>
-): AsyncData<T, FetchError>
-
-type UseApiDataOptions<T> =
-  Omit<AsyncDataOptions<T>, 'watch'>
-  & Pick<
-    ComputedOptions<NitroFetchOptions<string>>,
-    | 'onRequest'
-    | 'onRequestError'
-    | 'onResponse'
-    | 'onResponseError'
-    | 'query'
-    | 'headers'
-    | 'method'
-    | 'retry'
-  >
-  & {
-    body?: MaybeRef<string | Record<string, any> | FormData | null | undefined>
-    /**
-     * Skip the Nuxt server proxy and fetch directly from the API.
-     * Requires `allowClient` to be enabled in the module options as well.
-     * @default false
-     */
-    client?: boolean
-    /**
-     * Cache the response for the same request
-     * @default true
-     */
-    cache?: boolean
-    /**
-     * Watch an array of reactive sources and auto-refresh the fetch result when they change.
-     * Fetch options and URL are watched by default. You can completely ignore reactive sources by using `watch: false`.
-     */
-    watch?: (WatchSource<unknown> | object)[] | false
-  }
-```
 
 ## Return Values
 
@@ -165,4 +123,51 @@ export default defineNuxtConfig({
     allowClient: true
   }
 })
+```
+
+## Type Declarations
+
+```ts
+type BaseUseApiDataOptions<T> = Omit<AsyncDataOptions<T>, 'watch'> & {
+  /**
+   * Skip the Nuxt server proxy and fetch directly from the API.
+   * Requires `allowClient` to be enabled in the module options as well.
+   * @default false
+   */
+  client?: boolean
+  /**
+   * Cache the response for the same request
+   * @default true
+   */
+  cache?: boolean
+  /**
+   * Watch an array of reactive sources and auto-refresh the fetch result when they change.
+   * Fetch options and URL are watched by default. You can completely ignore reactive sources by using `watch: false`.
+   */
+  watch?: (WatchSource<unknown> | object)[] | false
+}
+
+type UseAnyApiDataOptions<T> = Pick<
+  ComputedOptions<NitroFetchOptions<string>>,
+  | 'onRequest'
+  | 'onRequestError'
+  | 'onResponse'
+  | 'onResponseError'
+  | 'query'
+  | 'headers'
+  | 'method'
+  | 'retry'
+> & {
+  pathParams?: MaybeRef<Record<string, string>>
+  body?: MaybeRef<string | Record<string, any> | FormData | null | undefined>
+} & BaseUseApiDataOptions<T>
+
+type UseAnyApiData = <T = any>(
+  path: MaybeRefOrGetter<string>,
+  opts?: UseAnyApiDataOptions<T>,
+) => AsyncData<T, FetchError>
+
+type UseApiData<Paths extends Record<string, PathItemObject> = never> = [Paths] extends [never]
+  ? UseAnyApiData
+  : UseOpenApiData<Paths>
 ```
