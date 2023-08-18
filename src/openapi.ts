@@ -33,6 +33,7 @@ export async function generateTypes(
         })
       }
       catch {
+        // TODO: Use `Record<string, never>`?
         types = `
 export type paths = Record<string, any>
 export type webhooks = Record<string, any>
