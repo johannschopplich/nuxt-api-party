@@ -83,6 +83,7 @@ function nav(): DefaultTheme.NavItem[] {
             { text: 'Cookies', link: '/guide/cookies' },
             { text: 'Retries', link: '/guide/retries' },
             { text: 'Dynamic Backend URL', link: '/guide/dynamic-backend-url' },
+            { text: 'OpenAPI Types', link: '/guide/openapi-types' },
           ],
         },
       ],
@@ -143,6 +144,7 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
         { text: 'Cookies', link: '/guide/cookies' },
         { text: 'Retries', link: '/guide/retries' },
         { text: 'Dynamic Backend URL', link: '/guide/dynamic-backend-url' },
+        { text: 'OpenAPI Types', link: '/guide/openapi-types' },
       ],
     },
     {

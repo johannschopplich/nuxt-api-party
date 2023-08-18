@@ -5,9 +5,10 @@ import type { NitroFetchOptions } from 'nitropack'
 import type { WatchSource } from 'vue'
 import type { AsyncData, AsyncDataOptions } from 'nuxt/app'
 import type { ModuleOptions } from '../../module'
-import { headersToObject, serializeMaybeEncodedBody, toValue } from '../utils'
+import { headersToObject, resolvePath, serializeMaybeEncodedBody, toValue } from '../utils'
 import { isFormData } from '../formData'
 import type { EndpointFetchOptions, MaybeRef, MaybeRefOrGetter } from '../utils'
+import type { APIError, APIRequestOptions, APIResponse, AllPaths, GETPlainPaths, HttpMethod, IgnoreCase, PathItemObject } from '../types'
 import { useAsyncData, useRequestHeaders, useRuntimeConfig } from '#imports'
 
 type ComputedOptions<T extends Record<string, any>> = {
@@ -18,43 +19,62 @@ type ComputedOptions<T extends Record<string, any>> = {
       : MaybeRef<T[K]>;
 }
 
-export type UseApiDataOptions<T> =
-  Omit<AsyncDataOptions<T>, 'watch'>
-  & Pick<
-    ComputedOptions<NitroFetchOptions<string>>,
-    | 'onRequest'
-    | 'onRequestError'
-    | 'onResponse'
-    | 'onResponseError'
-    | 'query'
-    | 'headers'
-    | 'method'
-    | 'retry'
-  >
-  & {
-    body?: MaybeRef<string | Record<string, any> | FormData | null | undefined>
-    /**
-     * Skip the Nuxt server proxy and fetch directly from the API.
-     * Requires `allowClient` to be enabled in the module options as well.
-     * @default false
-     */
-    client?: boolean
-    /**
-     * Cache the response for the same request
-     * @default true
-     */
-    cache?: boolean
-    /**
-     * Watch an array of reactive sources and auto-refresh the fetch result when they change.
-     * Fetch options and URL are watched by default. You can completely ignore reactive sources by using `watch: false`.
-     */
-    watch?: (WatchSource<unknown> | object)[] | false
-  }
+export type BaseApiDataOptions<T> = Omit<AsyncDataOptions<T>, 'watch'> & {
+  /**
+   * Skip the Nuxt server proxy and fetch directly from the API.
+   * Requires `allowClient` to be enabled in the module options as well.
+   * @default false
+   */
+  client?: boolean
+  /**
+   * Cache the response for the same request
+   * @default true
+   */
+  cache?: boolean
+  /**
+   * Watch an array of reactive sources and auto-refresh the fetch result when they change.
+   * Fetch options and URL are watched by default. You can completely ignore reactive sources by using `watch: false`.
+   */
+  watch?: (WatchSource<unknown> | object)[] | false
+}
 
-export type UseApiData = <T = any>(
+export type UseOpenAPIDataOptions<
+  P extends PathItemObject,
+  M extends IgnoreCase<keyof P & HttpMethod>,
+> = BaseApiDataOptions<APIResponse<P[Lowercase<M>]>> & ComputedOptions<APIRequestOptions<P, M>>
+
+export type UseApiDataOptions<T> = BaseApiDataOptions<T> & Pick<
+  ComputedOptions<NitroFetchOptions<string>>,
+  | 'onRequest'
+  | 'onRequestError'
+  | 'onResponse'
+  | 'onResponseError'
+  | 'query'
+  | 'headers'
+  | 'method'
+  | 'retry'
+> & {
+  pathParams?: MaybeRef<Record<string, string>>
+  body?: MaybeRef<string | Record<string, any> | FormData | null | undefined>
+}
+
+export type UntypedUseApiData = <T = any>(
   path: MaybeRefOrGetter<string>,
   opts?: UseApiDataOptions<T>,
 ) => AsyncData<T, FetchError>
+
+export interface UseOpenAPIData<Paths extends Record<string, PathItemObject>> {
+  <P extends GETPlainPaths<Paths>>(
+    path: MaybeRefOrGetter<P>
+  ): AsyncData<APIResponse<Paths[`/${P}`]['get']>, APIError<Paths[`/${P}`]['get']>>
+<P extends AllPaths<Paths>, M extends IgnoreCase<keyof Paths[`/${P}`] & HttpMethod>>(
+    path: MaybeRefOrGetter<P>,
+    opts?: UseOpenAPIDataOptions<Paths[`/${P}`], M>,
+  ): AsyncData<APIResponse<Paths[`/${P}`][Lowercase<M>]>, APIError<Paths[`/${P}`][Lowercase<M>]>>
+}
+export type UseApiData<Paths extends Record<string, PathItemObject> = never> = [Paths] extends [never]
+  ? UntypedUseApiData
+  : UseOpenAPIData<Paths>
 
 export function _useApiData<T = any>(
   endpointId: string,
@@ -62,7 +82,6 @@ export function _useApiData<T = any>(
   opts: UseApiDataOptions<T> = {},
 ) {
   const { apiParty } = useRuntimeConfig().public
-  const _path = computed(() => toValue(path))
   const {
     server,
     lazy,
@@ -71,6 +90,7 @@ export function _useApiData<T = any>(
     pick,
     watch,
     immediate,
+    pathParams,
     query,
     headers,
     method,
@@ -79,6 +99,7 @@ export function _useApiData<T = any>(
     cache = true,
     ...fetchOptions
   } = opts
+  const _path = computed(() => resolvePath(toValue(path), toValue(pathParams)))
 
   if (client && !apiParty.allowClient)
     throw new Error('Client-side API requests are disabled. Set "allowClient: true" in the module options to enable them.')

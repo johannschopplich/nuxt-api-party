@@ -40,3 +40,16 @@ export async function deserializeMaybeEncodedBody(value: ApiFetchOptions['body']
 
   return value
 }
+
+export function resolvePath(path: string, params?: Record<string, string>) {
+  // To simplify typings, OpenAPI path parameters can be expanded here
+  if (params) {
+    return Object.entries(params).reduce(
+      (path, [name, value]) =>
+        path.replace(`{${name}}`, encodeURIComponent(toValue(value))),
+      path,
+    )
+  }
+
+  return path
+}

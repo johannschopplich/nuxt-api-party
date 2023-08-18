@@ -25,6 +25,8 @@ Main module configuration for your API endpoints. Each key represents an endpoin
 - `headers`: Headers to send with each request (optional)
 - `cookies`: Whether to send cookies with each request (optional)
 - `allowedUrls`: A list of allowed URLs to change the [backend URL at runtime](/guide/dynamic-backend-url) (optional)
+- `schema`: A URL, file path, object, or async function pointing to an [OpenAPI Schema](https://swagger.io/resources/open-api) used to [generate types](/guide/openapi-types) (optional)
+- `openAPITS`: [Configuration options](https://openapi-ts.pages.dev/node/#options) for `openapi-typescript`. Options defined here will override the global `openAPITS`
 
 ::: info
 The composables are generated based on your API endpoint ID. For example, if you were to call an endpoint `jsonPlaceholder`, the composables will be called `useJsonPlaceholderData` and `$jsonPlaceholder`.
@@ -35,17 +37,18 @@ Default value: `{}`
 **Type**
 
 ```ts
-type ApiPartyEndpoints = Record<
-  string,
-  {
-    url: string
-    token?: string
-    query?: QueryObject
-    headers?: Record<string, string>
-    cookies?: boolean
-    allowedUrls?: string[]
-  }
-> | undefined
+interface Endpoint {
+  url: string
+  token?: string
+  query?: QueryObject
+  headers?: Record<string, string>
+  cookies?: boolean
+  allowedUrls?: string[]
+  schema?: string | URL | OpenAPI3 | (() => Promise<OpenAPI3>)
+  openAPITS?: OpenAPITSOptions
+}
+
+type ApiPartyEndpoints = Record<string, Endpoint> | undefined
 ```
 
 **Example**
@@ -65,8 +68,17 @@ export default defineNuxtConfig({
         headers: {
           Authorization: `Basic ${Buffer.from(`${process.env.CMS_API_USERNAME}:${process.env.CMS_API_PASSWORD}`).toString('base64')}`
         }
+      },
+      // Will generate `$petStore` and `usePetStore` as well as types for each path
+      petStore: {
+        url: process.env.PET_STORE_API_BASE_URL!,
+        schema: `${process.env.PET_STORE_API_BASE_URL!}/openapi.json`
       }
     }
   }
 })
 ```
+
+## `apiParty.openAPITS`
+
+The global [configuration options](https://openapi-ts.pages.dev/node/#options) for `openapi-typescript`. Options set here will be applied to every endpoint schema, but can be overridden by individual endpoint options.

@@ -1,7 +1,21 @@
+import { relative } from 'pathe'
 import { defu } from 'defu'
 import { camelCase, pascalCase } from 'scule'
-import { addImportsSources, addServerHandler, addTemplate, createResolver, defineNuxtModule, useLogger } from '@nuxt/kit'
+import { addImportsSources, addServerHandler, addTemplate, createResolver, defineNuxtModule, tryResolveModule, useLogger } from '@nuxt/kit'
+import type { OpenAPI3, OpenAPITSOptions } from 'openapi-typescript'
 import type { QueryObject } from 'ufo'
+import { generateTypes } from './openapi'
+
+export interface Endpoint {
+  url: string
+  token?: string
+  query?: QueryObject
+  headers?: Record<string, string>
+  cookies?: boolean
+  allowedUrls?: string[]
+  schema?: string | URL | OpenAPI3 | (() => Promise<OpenAPI3>)
+  openAPITS?: OpenAPITSOptions
+}
 
 export interface ModuleOptions {
   /**
@@ -32,17 +46,7 @@ export interface ModuleOptions {
    *
    * @default {}
    */
-  endpoints?: Record<
-    string,
-    {
-      url: string
-      token?: string
-      query?: QueryObject
-      headers?: Record<string, string>
-      cookies?: boolean
-      allowedUrls?: string[]
-    }
-  >
+  endpoints?: Record<string, Endpoint>
 
   /**
    * Allow client-side requests besides server-side ones
@@ -56,6 +60,11 @@ export interface ModuleOptions {
    * @default false
    */
   allowClient?: boolean
+
+  /**
+   * Global options for openapi-typescript
+   */
+  openAPITS?: OpenAPITSOptions
 }
 
 export default defineNuxtModule<ModuleOptions>({
@@ -69,9 +78,11 @@ export default defineNuxtModule<ModuleOptions>({
   defaults: {
     endpoints: {},
     allowClient: false,
+    openAPITS: {},
   },
-  setup(options, nuxt) {
-    const logger = useLogger('nuxt-api-party')
+  async setup(options, nuxt) {
+    const moduleName = 'nuxt-api-party'
+    const logger = useLogger(moduleName)
     const getRawComposableName = (endpointId: string) => `$${camelCase(endpointId)}`
     const getDataComposableName = (endpointId: string) => `use${pascalCase(endpointId)}Data`
 
@@ -109,17 +120,6 @@ export default defineNuxtModule<ModuleOptions>({
     const { resolve } = createResolver(import.meta.url)
     nuxt.options.build.transpile.push(resolve('runtime'))
 
-    // Inline server handler into Nitro bundle
-    // Needed to circumvent "cannot find module" error in `server.ts` for the `utils` import
-    nuxt.hook('nitro:config', (config) => {
-      config.externals = defu(config.externals, {
-        inline: [
-          resolve('runtime/utils'),
-          resolve('runtime/formData'),
-        ],
-      })
-    })
-
     // Add Nuxt server route to proxy the API request server-side
     addServerHandler({
       route: '/api/__api_party/:endpointId',
@@ -127,16 +127,37 @@ export default defineNuxtModule<ModuleOptions>({
       handler: resolve('runtime/server'),
     })
 
+    nuxt.hook('nitro:config', (config) => {
+      // Inline server handler into Nitro bundle
+      // Needed to circumvent "cannot find module" error in `server.ts` for the `utils` import
+      config.externals ||= {}
+      config.externals.inline ||= []
+      config.externals.inline.push(...[
+        resolve('runtime/utils'),
+        resolve('runtime/formData'),
+      ])
+    })
+
     const endpointKeys = Object.keys(resolvedOptions.endpoints)
 
+    // Nuxt will resolve the imports relative to the `srcDir`, so we can't use
+    // `#nuxt-api-party` with `declare module` pattern here
     addImportsSources({
-      from: '#build/api-party',
+      from: resolve(nuxt.options.buildDir, `module/${moduleName}-imports.mjs`),
       imports: endpointKeys.flatMap(i => [getRawComposableName(i), getDataComposableName(i)]),
     })
 
-    // Add generated composables
+    // Add `#nuxt-api-party` module alias for generated composables
+    nuxt.options.alias[`#${moduleName}`] = resolve(nuxt.options.buildDir, `module/${moduleName}-imports.mjs`)
+
+    const relativeTo = (path: string) => relative(
+      resolve(nuxt.options.rootDir, nuxt.options.buildDir, 'module'),
+      resolve(path),
+    )
+
+    // Add module template for generated composables
     addTemplate({
-      filename: 'api-party.mjs',
+      filename: `module/${moduleName}-imports.mjs`,
       getContents() {
         return `
 import { _$api } from '${resolve('runtime/composables/$api')}'
@@ -148,18 +169,60 @@ export const ${getDataComposableName(i)} = (...args) => _useApiData('${i}', ...a
       },
     })
 
-    // Add types for generated composables
+    const schemaEndpoints = Object.fromEntries(
+      Object.entries(resolvedOptions.endpoints)
+        .filter(([, endpoint]) => 'schema' in endpoint),
+    )
+    const schemaEndpointIds = Object.keys(schemaEndpoints)
+    const hasOpenAPIPkg = await tryResolveModule('openapi-typescript', [nuxt.options.rootDir])
+
+    if (schemaEndpointIds.length && !hasOpenAPIPkg) {
+      logger.warn('OpenAPI types generation is enabled, but the `openapi-typescript` package is not found. Please install it to enable endpoint types generation.')
+      schemaEndpointIds.length = 0
+    }
+
+    // Use generated types for generated composables for
+    // (1) Nuxt auto-imports
+    // (2) global import from `#nuxt-api-party`
     addTemplate({
-      filename: 'api-party.d.ts',
+      filename: `module/${moduleName}-imports.d.ts`,
       getContents() {
         return `
-import type { $Api } from '${resolve('runtime/composables/$api')}'
-import type { UseApiData } from '${resolve('runtime/composables/useApiData')}'
+// Generated by ${moduleName}
+import type { $Api } from '${relativeTo('runtime/composables/$api')}'
+import type { UseApiData } from '${relativeTo('runtime/composables/useApiData')}'
+
+${schemaEndpointIds.map(i => `import type { paths as ${pascalCase(i)}Paths } from '#${moduleName}/${i}'`).join('')}
+
 ${endpointKeys.map(i => `
-export declare const ${getRawComposableName(i)}: $Api
-export declare const ${getDataComposableName(i)}: UseApiData
-`.trimStart()).join('')}`.trimStart()
+export declare const ${getRawComposableName(i)}: $Api${schemaEndpointIds.includes(i) ? `<${pascalCase(i)}Paths>` : ''}
+export declare const ${getDataComposableName(i)}: UseApiData${schemaEndpointIds.includes(i) ? `<${pascalCase(i)}Paths>` : ''}
+`.trimStart()).join('').trimEnd()}
+`.trimStart()
       },
+    })
+
+    // Add global `#nuxt-api-party` and OpenAPI endpoint types
+    addTemplate({
+      filename: `module/${moduleName}.d.ts`,
+      async getContents() {
+        return `
+// Generated by ${moduleName}
+declare module '#${moduleName}' {
+  export * from './${moduleName}-imports'
+}
+
+${schemaEndpointIds.length
+  ? await generateTypes(schemaEndpoints, resolvedOptions.openAPITS)
+  : ''}
+`.trimStart()
+      },
+    })
+
+    // Add type references to TypeScript config
+    nuxt.hook('prepare:types', (options) => {
+      options.references.push({ path: resolve(nuxt.options.buildDir, `module/${moduleName}.d.ts`) })
+      options.references.push({ path: resolve(nuxt.options.buildDir, `module/${moduleName}-imports.d.ts`) })
     })
   },
 })
