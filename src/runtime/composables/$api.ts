@@ -41,6 +41,7 @@ export interface $OpenApi<Paths extends Record<string, PathItemObject>> {
   ): Promise<OpenApiResponse<Paths[`/${P}`][Lowercase<M>]>>
 }
 
+/** @remarks Prefer using `$AnyApi` and `$OpenApi` directly */
 export type $Api<Paths extends Record<string, PathItemObject> = never> = [Paths] extends [never]
   ? $AnyApi
   : $OpenApi<Paths>

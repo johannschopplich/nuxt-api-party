@@ -73,6 +73,7 @@ export interface UseOpenApiData<Paths extends Record<string, PathItemObject>> {
   ): AsyncData<OpenApiResponse<Paths[`/${P}`][Lowercase<M>]>, OpenApiError<Paths[`/${P}`][Lowercase<M>]>>
 }
 
+/** @remarks Prefer using `UseAnyApiData` and `UseOpenApiData` directly */
 export type UseApiData<Paths extends Record<string, PathItemObject> = never> = [Paths] extends [never]
   ? UseAnyApiData
   : UseOpenApiData<Paths>
