@@ -1,7 +1,7 @@
 import { unref } from 'vue'
 import type { NitroFetchOptions } from 'nitropack'
 import type { Ref } from 'vue'
-import type { ApiFetchOptions } from './composables/$api'
+import type { AnyApiFetchOptions } from './composables/$api'
 import { formDataToObject, isFormData, isSerializedFormData, objectToFormData } from './formData'
 
 export type EndpointFetchOptions = NitroFetchOptions<string> & {
@@ -27,14 +27,14 @@ export function headersToObject(headers: HeadersInit = {}): Record<string, strin
   return headers
 }
 
-export async function serializeMaybeEncodedBody(value: ApiFetchOptions['body']) {
+export async function serializeMaybeEncodedBody(value: AnyApiFetchOptions['body']) {
   if (isFormData(value))
     return await formDataToObject(value)
 
   return value
 }
 
-export async function deserializeMaybeEncodedBody(value: ApiFetchOptions['body']) {
+export async function deserializeMaybeEncodedBody(value: AnyApiFetchOptions['body']) {
   if (isSerializedFormData(value))
     return await objectToFormData(value)
 
@@ -46,7 +46,7 @@ export function resolvePath(path: string, params?: Record<string, string>) {
   if (params) {
     return Object.entries(params).reduce(
       (path, [name, value]) =>
-        path.replace(`{${name}}`, encodeURIComponent(toValue(value))),
+        path.replace(`{${name}}`, encodeURIComponent(value)),
       path,
     )
   }

@@ -4,13 +4,8 @@ import { headersToObject, resolvePath, serializeMaybeEncodedBody } from '../util
 import { isFormData } from '../formData'
 import type { ModuleOptions } from '../../module'
 import type { EndpointFetchOptions } from '../utils'
-import type { APIRequestOptions, APIResponse, AllPaths, GETPlainPaths, HttpMethod, IgnoreCase, PathItemObject } from '../types'
+import type { AllPaths, GETPlainPaths, HttpMethod, IgnoreCase, OpenApiRequestOptions, OpenApiResponse, PathItemObject } from '../types'
 import { useNuxtApp, useRequestHeaders, useRuntimeConfig } from '#imports'
-
-export type ApiFetchOptions = Omit<NitroFetchOptions<string>, 'body' | 'cache'> & {
-  pathParams?: Record<string, string>
-  body?: string | Record<string, any> | FormData | null
-}
 
 export interface BaseApiFetchOptions {
   /**
@@ -26,29 +21,34 @@ export interface BaseApiFetchOptions {
   cache?: boolean
 }
 
-type UntypedAPI = <T = any>(
+export type AnyApiFetchOptions = Omit<NitroFetchOptions<string>, 'body' | 'cache'> & {
+  pathParams?: Record<string, string>
+  body?: string | Record<string, any> | FormData | null
+} & BaseApiFetchOptions
+
+export type AnyApi = <T = any>(
   path: string,
-  opts?: ApiFetchOptions,
+  opts?: AnyApiFetchOptions,
 ) => Promise<T>
 
-interface $OpenAPI<Paths extends Record<string, PathItemObject>> {
+export interface OpenApi<Paths extends Record<string, PathItemObject>> {
   <P extends GETPlainPaths<Paths>>(
     path: P
-  ): Promise<APIResponse<Paths[`/${P}`]['get']>>
+  ): Promise<OpenApiResponse<Paths[`/${P}`]['get']>>
  <P extends AllPaths<Paths>, M extends IgnoreCase<keyof Paths[`/${P}`] & HttpMethod>>(
     path: P,
-    opts?: BaseApiFetchOptions & APIRequestOptions<Paths[`/${P}`], M>
-  ): Promise<APIResponse<Paths[`/${P}`][Lowercase<M>]>>
+    opts?: BaseApiFetchOptions & OpenApiRequestOptions<Paths[`/${P}`], M>
+  ): Promise<OpenApiResponse<Paths[`/${P}`][Lowercase<M>]>>
 }
 
 export type $Api<Paths extends Record<string, PathItemObject> = never> = [Paths] extends [never]
-  ? UntypedAPI
-  : $OpenAPI<Paths>
+  ? AnyApi
+  : OpenApi<Paths>
 
 export function _$api<T = any>(
   endpointId: string,
   path: string,
-  opts: ApiFetchOptions & BaseApiFetchOptions = {},
+  opts: AnyApiFetchOptions = {},
 ): Promise<T> {
   const nuxt = useNuxtApp()
   const promiseMap = (nuxt._promiseMap = nuxt._promiseMap || new Map()) as Map<string, Promise<T>>

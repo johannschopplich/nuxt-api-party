@@ -8,7 +8,7 @@ import type { ModuleOptions } from '../../module'
 import { headersToObject, resolvePath, serializeMaybeEncodedBody, toValue } from '../utils'
 import { isFormData } from '../formData'
 import type { EndpointFetchOptions, MaybeRef, MaybeRefOrGetter } from '../utils'
-import type { APIError, APIRequestOptions, APIResponse, AllPaths, GETPlainPaths, HttpMethod, IgnoreCase, PathItemObject } from '../types'
+import type { AllPaths, GETPlainPaths, HttpMethod, IgnoreCase, OpenApiError, OpenApiRequestOptions, OpenApiResponse, PathItemObject } from '../types'
 import { useAsyncData, useRequestHeaders, useRuntimeConfig } from '#imports'
 
 type ComputedOptions<T extends Record<string, any>> = {
@@ -19,7 +19,7 @@ type ComputedOptions<T extends Record<string, any>> = {
       : MaybeRef<T[K]>;
 }
 
-export type BaseApiDataOptions<T> = Omit<AsyncDataOptions<T>, 'watch'> & {
+export type BaseUseApiDataOptions<T> = Omit<AsyncDataOptions<T>, 'watch'> & {
   /**
    * Skip the Nuxt server proxy and fetch directly from the API.
    * Requires `allowClient` to be enabled in the module options as well.
@@ -38,12 +38,7 @@ export type BaseApiDataOptions<T> = Omit<AsyncDataOptions<T>, 'watch'> & {
   watch?: (WatchSource<unknown> | object)[] | false
 }
 
-export type UseOpenAPIDataOptions<
-  P extends PathItemObject,
-  M extends IgnoreCase<keyof P & HttpMethod>,
-> = BaseApiDataOptions<APIResponse<P[Lowercase<M>]>> & ComputedOptions<APIRequestOptions<P, M>>
-
-export type UseApiDataOptions<T> = BaseApiDataOptions<T> & Pick<
+export type UseAnyApiDataOptions<T> = Pick<
   ComputedOptions<NitroFetchOptions<string>>,
   | 'onRequest'
   | 'onRequestError'
@@ -56,30 +51,36 @@ export type UseApiDataOptions<T> = BaseApiDataOptions<T> & Pick<
 > & {
   pathParams?: MaybeRef<Record<string, string>>
   body?: MaybeRef<string | Record<string, any> | FormData | null | undefined>
-}
+} & BaseUseApiDataOptions<T>
 
-export type UntypedUseApiData = <T = any>(
+export type UseOpenApiDataOptions<
+  P extends PathItemObject,
+  M extends IgnoreCase<keyof P & HttpMethod>,
+> = BaseUseApiDataOptions<OpenApiResponse<P[Lowercase<M>]>> & ComputedOptions<OpenApiRequestOptions<P, M>>
+
+export type UseAnyApiData = <T = any>(
   path: MaybeRefOrGetter<string>,
-  opts?: UseApiDataOptions<T>,
+  opts?: UseAnyApiDataOptions<T>,
 ) => AsyncData<T, FetchError>
 
-export interface UseOpenAPIData<Paths extends Record<string, PathItemObject>> {
+export interface UseOpenApiData<Paths extends Record<string, PathItemObject>> {
   <P extends GETPlainPaths<Paths>>(
     path: MaybeRefOrGetter<P>
-  ): AsyncData<APIResponse<Paths[`/${P}`]['get']>, APIError<Paths[`/${P}`]['get']>>
+  ): AsyncData<OpenApiResponse<Paths[`/${P}`]['get']>, OpenApiError<Paths[`/${P}`]['get']>>
 <P extends AllPaths<Paths>, M extends IgnoreCase<keyof Paths[`/${P}`] & HttpMethod>>(
     path: MaybeRefOrGetter<P>,
-    opts?: UseOpenAPIDataOptions<Paths[`/${P}`], M>,
-  ): AsyncData<APIResponse<Paths[`/${P}`][Lowercase<M>]>, APIError<Paths[`/${P}`][Lowercase<M>]>>
+    opts?: UseOpenApiDataOptions<Paths[`/${P}`], M>,
+  ): AsyncData<OpenApiResponse<Paths[`/${P}`][Lowercase<M>]>, OpenApiError<Paths[`/${P}`][Lowercase<M>]>>
 }
+
 export type UseApiData<Paths extends Record<string, PathItemObject> = never> = [Paths] extends [never]
-  ? UntypedUseApiData
-  : UseOpenAPIData<Paths>
+  ? UseAnyApiData
+  : UseOpenApiData<Paths>
 
 export function _useApiData<T = any>(
   endpointId: string,
   path: MaybeRefOrGetter<string>,
-  opts: UseApiDataOptions<T> = {},
+  opts: UseAnyApiDataOptions<T> = {},
 ) {
   const { apiParty } = useRuntimeConfig().public
   const {

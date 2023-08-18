@@ -39,11 +39,11 @@ export type Param<T, N extends string, K extends string = N> = T extends {
   ? { [_ in keyof Pick<T['parameters'], N> as K]: T['parameters'][N] }
   : unknown
 
+export type PathParameters<T> = Param<T, 'path', 'pathParams'>
 export type QueryParameters<T> = Param<T, 'query'>
 export type HeaderParameters<T> = Param<T, 'header', 'headers'>
-export type PathParameters<T> = Param<T, 'path', 'pathParams'>
 
-export type APIRequestOptions<
+export type OpenApiRequestOptions<
   P extends PathItemObject,
   M extends IgnoreCase<keyof P & HttpMethod>,
 > = Omit<
@@ -66,8 +66,8 @@ type MediaTypes<T, Status extends keyof any> = {
 }[Status]
 
 // Fetch types
-export type APIResponse<T> = MediaTypes<T, OkStatus>
-export type APIError<T> = MediaTypes<T, ErrorStatus>
+export type OpenApiResponse<T> = MediaTypes<T, OkStatus>
+export type OpenApiError<T> = MediaTypes<T, ErrorStatus>
 
 export type AllPaths<Paths extends Record<string, PathItemObject>> =
   RemovePrefix<keyof Paths & string, '/'>
