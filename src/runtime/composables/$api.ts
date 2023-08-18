@@ -26,12 +26,12 @@ export type AnyApiFetchOptions = Omit<NitroFetchOptions<string>, 'body' | 'cache
   body?: string | Record<string, any> | FormData | null
 } & BaseApiFetchOptions
 
-export type AnyApi = <T = any>(
+export type $AnyApi = <T = any>(
   path: string,
   opts?: AnyApiFetchOptions,
 ) => Promise<T>
 
-export interface OpenApi<Paths extends Record<string, PathItemObject>> {
+export interface $OpenApi<Paths extends Record<string, PathItemObject>> {
   <P extends GETPlainPaths<Paths>>(
     path: P
   ): Promise<OpenApiResponse<Paths[`/${P}`]['get']>>
@@ -42,8 +42,8 @@ export interface OpenApi<Paths extends Record<string, PathItemObject>> {
 }
 
 export type $Api<Paths extends Record<string, PathItemObject> = never> = [Paths] extends [never]
-  ? AnyApi
-  : OpenApi<Paths>
+  ? $AnyApi
+  : $OpenApi<Paths>
 
 export function _$api<T = any>(
   endpointId: string,
