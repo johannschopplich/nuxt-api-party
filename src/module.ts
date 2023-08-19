@@ -178,10 +178,10 @@ export const ${getRawComposableName(i)} = (...args) => _$api('${i}', ...args)
 
       // Add Nitro auto-imports for generated composables
       config.imports = defu(config.imports, {
-        presets: endpointKeys.map(i => ({
+        presets: [{
           from: `#${moduleName}/server`,
-          imports: [{ name: getRawComposableName(i) }],
-        })),
+          imports: endpointKeys.map(i => ({ name: getRawComposableName(i) })),
+        }],
       })
     })
 
