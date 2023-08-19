@@ -22,8 +22,8 @@ export default defineNuxtConfig({
 +        token: '<your-api-token>',
 +        query: {},
 +        headers: {},
-+      },
-    },
++      }
+    }
   }
 })
 ```

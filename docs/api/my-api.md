@@ -108,13 +108,13 @@ interface BaseApiFetchOptions {
   cache?: boolean
 }
 
-type AnyApiFetchOptions = Omit<NitroFetchOptions<string>, 'body' | 'cache'> & {
+type ApiFetchOptions = Omit<NitroFetchOptions<string>, 'body' | 'cache'> & {
   pathParams?: Record<string, string>
   body?: string | Record<string, any> | FormData | null
-} & BaseApiFetchOptions
+}
 
-type AnyApi = <T = any>(
+type $Api = <T = any>(
   path: string,
-  opts?: AnyApiFetchOptions,
+  opts?: ApiFetchOptions & BaseApiFetchOptions
 ) => Promise<T>
 ```

@@ -13,7 +13,7 @@ Example:
 ```ts
 // Retry failed requests 3 times
 const { data } = await useJsonPlaceholderData('posts/1', {
-  retry: 3,
+  retry: 3
 })
 ```
 

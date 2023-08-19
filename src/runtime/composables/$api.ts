@@ -21,14 +21,14 @@ export interface BaseApiFetchOptions {
   cache?: boolean
 }
 
-export type AnyApiFetchOptions = Omit<NitroFetchOptions<string>, 'body' | 'cache'> & {
+export type ApiFetchOptions = Omit<NitroFetchOptions<string>, 'body' | 'cache'> & {
   pathParams?: Record<string, string>
   body?: string | Record<string, any> | FormData | null
-} & BaseApiFetchOptions
+}
 
-export type $AnyApi = <T = any>(
+export type $Api = <T = any>(
   path: string,
-  opts?: AnyApiFetchOptions,
+  opts?: ApiFetchOptions & BaseApiFetchOptions,
 ) => Promise<T>
 
 export interface $OpenApi<Paths extends Record<string, PathItemObject>> {
@@ -41,15 +41,10 @@ export interface $OpenApi<Paths extends Record<string, PathItemObject>> {
   ): Promise<OpenApiResponse<Paths[`/${P}`][Lowercase<M>]>>
 }
 
-/** @remarks Prefer using `$AnyApi` and `$OpenApi` directly */
-export type $Api<Paths extends Record<string, PathItemObject> = never> = [Paths] extends [never]
-  ? $AnyApi
-  : $OpenApi<Paths>
-
 export function _$api<T = any>(
   endpointId: string,
   path: string,
-  opts: AnyApiFetchOptions = {},
+  opts: ApiFetchOptions & BaseApiFetchOptions = {},
 ): Promise<T> {
   const nuxt = useNuxtApp()
   const promiseMap = (nuxt._promiseMap = nuxt._promiseMap || new Map()) as Map<string, Promise<T>>

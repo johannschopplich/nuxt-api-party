@@ -106,9 +106,9 @@ export default defineNuxtConfig({
   apiParty: {
     myApi: {
       url: process.env.MY_API_API_BASE_URL!,
-      schema: './schemas/myApi.yaml',
-    },
-  },
+      schema: './schemas/myApi.yaml'
+    }
+  }
 })
 ```
 

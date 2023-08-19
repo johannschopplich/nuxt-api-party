@@ -1,7 +1,7 @@
 import { unref } from 'vue'
 import type { NitroFetchOptions } from 'nitropack'
 import type { Ref } from 'vue'
-import type { AnyApiFetchOptions } from './composables/$api'
+import type { ApiFetchOptions } from './composables/$api'
 import { formDataToObject, isFormData, isSerializedFormData, objectToFormData } from './formData'
 
 export type EndpointFetchOptions = NitroFetchOptions<string> & {
@@ -27,14 +27,14 @@ export function headersToObject(headers: HeadersInit = {}): Record<string, strin
   return headers
 }
 
-export async function serializeMaybeEncodedBody(value: AnyApiFetchOptions['body']) {
+export async function serializeMaybeEncodedBody(value: ApiFetchOptions['body']) {
   if (isFormData(value))
     return await formDataToObject(value)
 
   return value
 }
 
-export async function deserializeMaybeEncodedBody(value: AnyApiFetchOptions['body']) {
+export async function deserializeMaybeEncodedBody(value: ApiFetchOptions['body']) {
   if (isSerializedFormData(value))
     return await objectToFormData(value)
 

@@ -80,7 +80,7 @@ const { data, pending, refresh, error } = await useJsonPlaceholderData('comments
   // Custom headers to be sent with the request
   headers: {
     'X-Foo': 'bar'
-  },
+  }
 })
 </script>
 
@@ -147,7 +147,7 @@ type BaseUseApiDataOptions<T> = Omit<AsyncDataOptions<T>, 'watch'> & {
   watch?: (WatchSource<unknown> | object)[] | false
 }
 
-type UseAnyApiDataOptions<T> = Pick<
+type UseApiDataOptions<T> = Pick<
   ComputedOptions<NitroFetchOptions<string>>,
   | 'onRequest'
   | 'onRequestError'
@@ -162,8 +162,8 @@ type UseAnyApiDataOptions<T> = Pick<
   body?: MaybeRef<string | Record<string, any> | FormData | null | undefined>
 } & BaseUseApiDataOptions<T>
 
-type UseAnyApiData = <T = any>(
+type UseApiData = <T = any>(
   path: MaybeRefOrGetter<string>,
-  opts?: UseAnyApiDataOptions<T>,
+  opts?: UseApiDataOptions<T>
 ) => AsyncData<T, FetchError>
 ```

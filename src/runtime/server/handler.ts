@@ -1,14 +1,14 @@
 import { createError, defineEventHandler, getRequestHeader, getRouterParam, readBody } from 'h3'
 import type { FetchError } from 'ofetch'
-import type { ModuleOptions } from '../module'
-import { deserializeMaybeEncodedBody } from './utils'
-import type { EndpointFetchOptions } from './utils'
+import type { ModuleOptions } from '../../module'
+import { deserializeMaybeEncodedBody } from '../utils'
+import type { EndpointFetchOptions } from '../utils'
 import { useRuntimeConfig } from '#imports'
 
 export default defineEventHandler(async (event): Promise<any> => {
   const endpointId = getRouterParam(event, 'endpointId')!
   const { apiParty } = useRuntimeConfig()
-  const endpoints = (apiParty as unknown as ModuleOptions).endpoints!
+  const endpoints = (apiParty as unknown as ModuleOptions).endpoints || {}
   const endpoint = endpoints[endpointId]
 
   if (!endpoint) {

@@ -38,7 +38,7 @@ export type BaseUseApiDataOptions<T> = Omit<AsyncDataOptions<T>, 'watch'> & {
   watch?: (WatchSource<unknown> | object)[] | false
 }
 
-export type UseAnyApiDataOptions<T> = Pick<
+export type UseApiDataOptions<T> = Pick<
   ComputedOptions<NitroFetchOptions<string>>,
   | 'onRequest'
   | 'onRequestError'
@@ -58,9 +58,9 @@ export type UseOpenApiDataOptions<
   M extends IgnoreCase<keyof P & HttpMethod>,
 > = BaseUseApiDataOptions<OpenApiResponse<P[Lowercase<M>]>> & ComputedOptions<OpenApiRequestOptions<P, M>>
 
-export type UseAnyApiData = <T = any>(
+export type UseApiData = <T = any>(
   path: MaybeRefOrGetter<string>,
-  opts?: UseAnyApiDataOptions<T>,
+  opts?: UseApiDataOptions<T>,
 ) => AsyncData<T, FetchError>
 
 export interface UseOpenApiData<Paths extends Record<string, PathItemObject>> {
@@ -73,15 +73,10 @@ export interface UseOpenApiData<Paths extends Record<string, PathItemObject>> {
   ): AsyncData<OpenApiResponse<Paths[`/${P}`][Lowercase<M>]>, OpenApiError<Paths[`/${P}`][Lowercase<M>]>>
 }
 
-/** @remarks Prefer using `UseAnyApiData` and `UseOpenApiData` directly */
-export type UseApiData<Paths extends Record<string, PathItemObject> = never> = [Paths] extends [never]
-  ? UseAnyApiData
-  : UseOpenApiData<Paths>
-
 export function _useApiData<T = any>(
   endpointId: string,
   path: MaybeRefOrGetter<string>,
-  opts: UseAnyApiDataOptions<T> = {},
+  opts: UseApiDataOptions<T> = {},
 ) {
   const { apiParty } = useRuntimeConfig().public
   const {
