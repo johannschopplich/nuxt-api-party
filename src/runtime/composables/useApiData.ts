@@ -187,9 +187,6 @@ export function _useApiData<T = any>(
             },
           )) as T
         }
-
-        if (cache)
-          nuxt!.payload.data[key.value] = result
       }
       catch (error) {
         // Invalidate cache if request fails
@@ -198,6 +195,9 @@ export function _useApiData<T = any>(
 
         throw error
       }
+
+      if (cache)
+        nuxt!.payload.data[key.value] = result
 
       return result
     },
