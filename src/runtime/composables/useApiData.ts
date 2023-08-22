@@ -155,40 +155,49 @@ export function _useApiData<T = any>(
 
       let result: T
 
-      if (client) {
-        result = (await globalThis.$fetch<T>(_path.value, {
-          ..._fetchOptions,
-          baseURL: endpoint.url,
-          method: _endpointFetchOptions.method,
-          query: {
-            ...endpoint.query,
-            ..._endpointFetchOptions.query,
-          },
-          headers: {
-            ...(endpoint.token && { Authorization: `Bearer ${endpoint.token}` }),
-            ...endpoint.headers,
-            ..._endpointFetchOptions.headers,
-          },
-          body: _endpointFetchOptions.body,
-        })) as T
-      }
-      else {
-        result = (await globalThis.$fetch<T>(
-          `/api/__api_party/${endpointId}`,
-          {
+      try {
+        if (client) {
+          result = (await globalThis.$fetch<T>(_path.value, {
             ..._fetchOptions,
-            signal: controller.signal,
-            method: 'POST',
-            body: {
-              ..._endpointFetchOptions,
-              body: await serializeMaybeEncodedBody(_endpointFetchOptions.body),
-            } satisfies EndpointFetchOptions,
-          },
-        )) as T
-      }
+            baseURL: endpoint.url,
+            method: _endpointFetchOptions.method,
+            query: {
+              ...endpoint.query,
+              ..._endpointFetchOptions.query,
+            },
+            headers: {
+              ...(endpoint.token && { Authorization: `Bearer ${endpoint.token}` }),
+              ...endpoint.headers,
+              ..._endpointFetchOptions.headers,
+            },
+            body: _endpointFetchOptions.body,
+          })) as T
+        }
+        else {
+          result = (await globalThis.$fetch<T>(
+            `/api/__api_party/${endpointId}`,
+            {
+              ..._fetchOptions,
+              signal: controller.signal,
+              method: 'POST',
+              body: {
+                ..._endpointFetchOptions,
+                body: await serializeMaybeEncodedBody(_endpointFetchOptions.body),
+              } satisfies EndpointFetchOptions,
+            },
+          )) as T
+        }
 
-      if (cache)
-        nuxt!.payload.data[key.value] = result
+        if (cache)
+          nuxt!.payload.data[key.value] = result
+      }
+      catch (error) {
+        // Invalidate cache if request fails
+        if (key.value in nuxt!.payload.data)
+          delete nuxt!.payload.data[key.value]
+
+        throw error
+      }
 
       return result
     },

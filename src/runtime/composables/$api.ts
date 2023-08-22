@@ -112,12 +112,20 @@ export function _$api<T = any>(
       } satisfies EndpointFetchOptions,
     })) as T
 
-  const request = (client ? clientFetcher() : serverFetcher()).then((response) => {
-    if (process.server || cache)
-      nuxt.payload.data[key] = response
-    promiseMap.delete(key)
-    return response
-  }) as Promise<T>
+  const request = (client ? clientFetcher() : serverFetcher())
+    .then((response) => {
+      if (process.server || cache)
+        nuxt.payload.data[key] = response
+      promiseMap.delete(key)
+      return response
+    })
+    // Invalidate cache if request fails
+    .catch((error) => {
+      if (key in nuxt.payload.data)
+        delete nuxt.payload.data[key]
+      promiseMap.delete(key)
+      throw error
+    }) as Promise<T>
 
   promiseMap.set(key, request)
 
