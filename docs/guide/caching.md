@@ -65,3 +65,7 @@ const response = $jsonPlaceholder('posts/1', {
   cache: true
 })
 ```
+
+## Invalidate Cache On Error
+
+If a request fails, the cache will be invalidated by default. This means that the next request will not return the cached response, but make a new API call instead.
