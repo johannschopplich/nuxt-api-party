@@ -7,15 +7,15 @@ export async function generateTypes(
   endpoints: Record<string, Endpoint>,
   globalOpenAPIOptions: OpenAPITSOptions,
 ) {
-  // Note: openapi-typescript uses `process.exit()` to handle errors
   let runningCount = 0
 
+  // openapi-typescript uses `process.exit()` to handle errors
   process.on('exit', () => {
     if (runningCount > 0)
-      throw new Error('Caught process.exit()')
+      throw new Error('Failed to generate OpenAPI types')
   })
 
-  const openapiTS = await import('openapi-typescript')
+  const openapiTS = await resolveOpenAPIImports()
   const schemas = await Promise.all(
     Object.keys(endpoints).map(async (id) => {
       let types = ''
@@ -25,7 +25,6 @@ export async function generateTypes(
       runningCount++
 
       try {
-        // @ts-expect-error: ESM import type mismatch
         types = await openapiTS(schema, {
           commentHeader: '',
           ...globalOpenAPIOptions,
@@ -67,4 +66,13 @@ async function resolveSchema({ schema }: Endpoint): Promise<string | URL | OpenA
     schema = resolve(nuxt.options.rootDir, schema)
 
   return schema!
+}
+
+function resolveOpenAPIImports() {
+  return import('openapi-typescript').then((openapiTS) => {
+    // Interop default export
+    return typeof openapiTS === 'object' && openapiTS !== null && 'default' in openapiTS
+      ? openapiTS.default
+      : openapiTS
+  })
 }
