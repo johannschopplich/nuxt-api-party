@@ -11,7 +11,7 @@ export type OkStatus = 200 | 201 | 202 | 203 | 204 | 206 | 207 | '2XX' | 'defaul
 export type ErrorStatus = 500 | '5XX' | 400 | 401 | 402 | 403 | 404 | 405 | 406 | 407 | 408 | 409 | 410 | 411 | 412 | 413 | 414 | 415 | 416 | 417 | 418 | 420 | 421 | 422 | 423 | 424 | 425 | 426 | 429 | 431 | 444 | 450 | 451 | 497 | 498 | 499 | '4XX'
 
 // General purpose types
-export type RequestBody<T> = T extends { requestBody: { content: infer Body } }
+export type RequestBody<T> = T extends { requestBody?: { content: infer Body } }
   ?
     | (Body extends { 'application/octet-stream': any }
       ? {
@@ -45,7 +45,7 @@ export type HeaderParameters<T> = Param<T, 'header', 'headers'>
 
 export type OpenApiRequestOptions<
   P extends PathItemObject,
-  M extends IgnoreCase<keyof P & HttpMethod>,
+  M extends IgnoreCase<keyof P & HttpMethod> = IgnoreCase<keyof P & 'get'>,
 > = Omit<
   NitroFetchOptions<any, Lowercase<M>>,
   'params' | 'query' | 'headers' | 'body' | 'method'
@@ -69,11 +69,22 @@ type MediaTypes<T, Status extends keyof any> = {
 export type OpenApiResponse<T> = MediaTypes<T, OkStatus>
 export type OpenApiError<T> = MediaTypes<T, ErrorStatus>
 
-export type AllPaths<Paths extends Record<string, PathItemObject>> =
+export type AllPaths<Paths> =
   RemovePrefix<keyof Paths & string, '/'>
-export type GETPlainPaths<Paths extends Record<string, PathItemObject>> = {
-  [P in keyof Paths]: Paths[P] extends { get: { parameters: infer P } }
-    ? P extends { query: any } | { header: any } | { path: any }
+
+/**
+ * All endpoints that don't require a `method` property
+ */
+export type GETPaths<Paths> = {
+  [P in keyof Paths]: Paths[P] extends { get: any } ? RemovePrefix<P & string, '/'> : never;
+}[keyof Paths]
+
+/**
+ * All endpoints that don't require additional options
+ */
+export type GETPlainPaths<Paths> = {
+  [P in keyof Paths]: Paths[P] extends { get: infer O }
+    ? O extends { parameters: { query: any } | { header: any } | { path: any } }
       ? never
       : RemovePrefix<P & string, '/'>
     : never;

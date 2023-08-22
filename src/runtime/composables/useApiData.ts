@@ -8,7 +8,7 @@ import type { ModuleOptions } from '../../module'
 import { headersToObject, resolvePath, serializeMaybeEncodedBody, toValue } from '../utils'
 import { isFormData } from '../formData'
 import type { EndpointFetchOptions, MaybeRef, MaybeRefOrGetter } from '../utils'
-import type { AllPaths, GETPlainPaths, HttpMethod, IgnoreCase, OpenApiError, OpenApiRequestOptions, OpenApiResponse, PathItemObject } from '../types'
+import type { AllPaths, GETPaths, GETPlainPaths, HttpMethod, IgnoreCase, OpenApiError, OpenApiRequestOptions, OpenApiResponse, PathItemObject } from '../types'
 import { useAsyncData, useRequestHeaders, useRuntimeConfig } from '#imports'
 
 type ComputedOptions<T extends Record<string, any>> = {
@@ -57,22 +57,27 @@ export type UseApiDataOptions<T> = Pick<
 
 export type UseOpenApiDataOptions<
   P extends PathItemObject,
-  M extends IgnoreCase<keyof P & HttpMethod>,
+  M extends IgnoreCase<keyof P & HttpMethod> = IgnoreCase<keyof P & 'get'>,
 > = BaseUseApiDataOptions<OpenApiResponse<P[Lowercase<M>]>> & ComputedOptions<OpenApiRequestOptions<P, M>>
 
 export type UseApiData = <T = any>(
   path: MaybeRefOrGetter<string>,
   opts?: UseApiDataOptions<T>,
-) => AsyncData<T, FetchError>
+) => AsyncData<T | undefined, FetchError>
 
 export interface UseOpenApiData<Paths extends Record<string, PathItemObject>> {
   <P extends GETPlainPaths<Paths>>(
-    path: MaybeRefOrGetter<P>
-  ): AsyncData<OpenApiResponse<Paths[`/${P}`]['get']>, OpenApiError<Paths[`/${P}`]['get']>>
+    path: MaybeRefOrGetter<P>,
+    opts?: Omit<UseOpenApiDataOptions<Paths[`/${P}`]>, 'method'>,
+  ): AsyncData<OpenApiResponse<Paths[`/${P}`]['get']> | undefined, OpenApiError<Paths[`/${P}`]['get']>>
+  <P extends GETPaths<Paths>>(
+    path: MaybeRefOrGetter<P>,
+    opts: Omit<UseOpenApiDataOptions<Paths[`/${P}`]>, 'method'>,
+  ): AsyncData<OpenApiResponse<Paths[`/${P}`]['get']> | undefined, OpenApiError<Paths[`/${P}`]['get']>>
 <P extends AllPaths<Paths>, M extends IgnoreCase<keyof Paths[`/${P}`] & HttpMethod>>(
     path: MaybeRefOrGetter<P>,
-    opts?: UseOpenApiDataOptions<Paths[`/${P}`], M>,
-  ): AsyncData<OpenApiResponse<Paths[`/${P}`][Lowercase<M>]>, OpenApiError<Paths[`/${P}`][Lowercase<M>]>>
+    opts: UseOpenApiDataOptions<Paths[`/${P}`], M> & { method: M },
+  ): AsyncData<OpenApiResponse<Paths[`/${P}`][Lowercase<M>]> | undefined, OpenApiError<Paths[`/${P}`][Lowercase<M>]>>
 }
 
 export function _useApiData<T = any>(
