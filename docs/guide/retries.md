@@ -5,15 +5,12 @@ From time to time, fetch requests may fail. This can happen for a variety of rea
 You can configure retries for a single request by passing a `retry` option to the `useMyApiData` and `$myApi` composables. It can be a number, `false` or `undefined`, either reactive or not:
 
 ```ts
-const retry: MaybeRef<number | false | undefined>
-```
+const retry = ref(3)
 
-Example:
-
-```ts
 // Retry failed requests 3 times
 const { data } = await useJsonPlaceholderData('posts/1', {
-  retry: 3
+  retry: retry.value,
+  retryDelay: 500 // ms
 })
 ```
 
@@ -38,3 +35,14 @@ export default defineNuxtConfig({
 ```
 
 :::
+
+## Timeout
+
+You can specify `timeout` in milliseconds to automatically abort request after a timeout. This option is useful when you want to limit the time spent waiting for a response. It is disabled by default.
+
+```ts
+const { data } = await useJsonPlaceholderData('posts/1', {
+  // Timeout after 3 seconds
+  timeout: 3000
+})
+```

@@ -48,6 +48,8 @@ export type UseApiDataOptions<T> = Pick<
   | 'headers'
   | 'method'
   | 'retry'
+  | 'retryDelay'
+  | 'timeout'
 > & {
   pathParams?: MaybeRef<Record<string, string>>
   body?: MaybeRef<string | Record<string, any> | FormData | null | undefined>
