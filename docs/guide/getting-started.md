@@ -88,7 +88,7 @@ export default defineNuxtConfig({
 
 Leveraging automatically [replaced public runtime config values](https://nuxt.com/docs/api/configuration/nuxt-config#runtimeconfig) by matching environment variables at runtime, set your desired option in your project's `.env` file:
 
-```
+```ini
 NUXT_API_PARTY_ENDPOINTS_JSON_PLACEHOLDER_URL=https://jsonplaceholder.typicode.com
 NUXT_API_PARTY_ENDPOINTS_JSON_PLACEHOLDER_TOKEN=
 ```
