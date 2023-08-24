@@ -7,6 +7,27 @@ type Pet = components['schemas']['Pet']
 const availableStatus = ['pending', 'sold'] as const
 const status = ref<'pending' | 'sold'>()
 
+const { data: user, execute } = usePetStoreData('user/{username}', {
+  pathParams: { username: 'user1' },
+})
+
+async function updateUser() {
+  try {
+    // will error because of authentication
+    await $petStore('user/{username}', {
+      method: 'put',
+      pathParams: { username: 'user1' },
+      body: {
+        firstName: 'first name 2',
+      },
+    })
+    await execute()
+  }
+  catch (e) {
+    console.error(e)
+  }
+}
+
 const { data, error } = usePetStoreData('pet/findByStatus', {
   query: computed(() => ({
     status: status.value ?? 'pending',
@@ -67,6 +88,13 @@ async function abandonGarfield() {
 
 <template>
   <div>
+    <h2>User</h2>
+    <p v-if="user" class="name">
+      {{ user.firstName }} {{ user.lastName }}
+      <button @click="updateUser">
+        Update
+      </button>
+    </p>
     <h2>usePetStoreData</h2>
     <p>Status: {{ status }}</p>
     <p>
@@ -91,3 +119,9 @@ async function abandonGarfield() {
     </p>
   </div>
 </template>
+
+<style scoped>
+.name {
+  text-transform: capitalize;
+}
+</style>

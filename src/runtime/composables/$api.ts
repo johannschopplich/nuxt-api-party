@@ -4,7 +4,7 @@ import { headersToObject, resolvePath, serializeMaybeEncodedBody } from '../util
 import { isFormData } from '../formData'
 import type { ModuleOptions } from '../../module'
 import type { EndpointFetchOptions } from '../utils'
-import type { AllPaths, GETPlainPaths, HttpMethod, IgnoreCase, OpenApiRequestOptions, OpenApiResponse, PathItemObject } from '../types'
+import type { AllPaths, GETPaths, GETPlainPaths, HttpMethod, IgnoreCase, OpenApiRequestOptions, OpenApiResponse, PathItemObject } from '../types'
 import { useNuxtApp, useRequestHeaders, useRuntimeConfig } from '#imports'
 
 export interface BaseApiFetchOptions {
@@ -33,11 +33,16 @@ export type $Api = <T = any>(
 
 export interface $OpenApi<Paths extends Record<string, PathItemObject>> {
   <P extends GETPlainPaths<Paths>>(
-    path: P
+    path: P,
+    opts?: BaseApiFetchOptions & Omit<OpenApiRequestOptions<Paths[`/${P}`]>, 'method'>
+  ): Promise<OpenApiResponse<Paths[`/${P}`]['get']>>
+  <P extends GETPaths<Paths>>(
+    path: P,
+    opts: BaseApiFetchOptions & Omit<OpenApiRequestOptions<Paths[`/${P}`]>, 'method'>
   ): Promise<OpenApiResponse<Paths[`/${P}`]['get']>>
  <P extends AllPaths<Paths>, M extends IgnoreCase<keyof Paths[`/${P}`] & HttpMethod>>(
     path: P,
-    opts?: BaseApiFetchOptions & OpenApiRequestOptions<Paths[`/${P}`], M>
+    opts?: BaseApiFetchOptions & OpenApiRequestOptions<Paths[`/${P}`], M> & { method: M }
   ): Promise<OpenApiResponse<Paths[`/${P}`][Lowercase<M>]>>
 }
 
