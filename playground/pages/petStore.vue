@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { components } from '#nuxt-api-party/petStore'
 import type { FetchError } from '#nuxt-api-party'
+import type { components } from '#nuxt-api-party/petStore'
 
 type Pet = components['schemas']['Pet']
 

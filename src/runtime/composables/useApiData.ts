@@ -1,5 +1,6 @@
 import { computed, reactive } from 'vue'
 import { hash } from 'ohash'
+import type { IFetchError } from 'ofetch'
 import type { NitroFetchOptions } from 'nitropack'
 import type { WatchSource } from 'vue'
 import type { AsyncData, AsyncDataOptions } from 'nuxt/app'
@@ -7,7 +8,7 @@ import type { ModuleOptions } from '../../module'
 import { headersToObject, resolvePath, serializeMaybeEncodedBody, toValue } from '../utils'
 import { isFormData } from '../formData'
 import type { EndpointFetchOptions, MaybeRef, MaybeRefOrGetter } from '../utils'
-import type { AllPaths, FetchError, GETPaths, GETPlainPaths, HttpMethod, IgnoreCase, OpenApiError, OpenApiRequestOptions, OpenApiResponse, PathItemObject } from '../types'
+import type { AllPaths, GETPaths, GETPlainPaths, HttpMethod, IgnoreCase, OpenApiError, OpenApiRequestOptions, OpenApiResponse, PathItemObject } from '../types'
 import { useAsyncData, useRequestHeaders, useRuntimeConfig } from '#imports'
 
 type ComputedOptions<T extends Record<string, any>> = {
@@ -62,7 +63,7 @@ export type UseOpenApiDataOptions<
 export type UseApiData = <T = any>(
   path: MaybeRefOrGetter<string>,
   opts?: UseApiDataOptions<T>,
-) => AsyncData<T | undefined, FetchError>
+) => AsyncData<T | undefined, IFetchError>
 
 export interface UseOpenApiData<Paths extends Record<string, PathItemObject>> {
   <P extends GETPlainPaths<Paths>>(
@@ -147,7 +148,7 @@ export function _useApiData<T = any>(
     ...(isFormData(toValue(body)) ? [] : [toValue(body)]),
   ])}`)
 
-  return useAsyncData<T, FetchError>(
+  return useAsyncData<T, IFetchError>(
     key.value,
     async (nuxt) => {
       controller?.abort?.()
@@ -208,5 +209,5 @@ export function _useApiData<T = any>(
       return result
     },
     _asyncDataOptions,
-  ) as AsyncData<T | undefined, FetchError>
+  ) as AsyncData<T | undefined, IFetchError>
 }

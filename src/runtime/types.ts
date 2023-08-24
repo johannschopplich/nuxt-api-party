@@ -1,11 +1,4 @@
-import type { IFetchError } from 'ofetch'
 import type { NitroFetchOptions } from 'nitropack'
-
-// --- General purpose types ---
-
-export type FetchError<T = any> = IFetchError<T>
-
-// --- OpenAPI types ---
 
 export type IgnoreCase<T extends string> = Lowercase<T> | Uppercase<T>
 export type RemovePrefix<T extends string, P extends string> = T extends `${P}${infer S}` ? S : never

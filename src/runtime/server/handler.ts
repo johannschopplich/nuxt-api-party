@@ -1,8 +1,8 @@
 import { createError, defineEventHandler, getRequestHeader, getRouterParam, readBody } from 'h3'
+import type { IFetchError } from 'ofetch'
 import { deserializeMaybeEncodedBody } from '../utils'
 import type { ModuleOptions } from '../../module'
 import type { EndpointFetchOptions } from '../utils'
-import type { FetchError } from '../types'
 import { useRuntimeConfig } from '#imports'
 
 export default defineEventHandler(async (event): Promise<any> => {
@@ -72,7 +72,7 @@ export default defineEventHandler(async (event): Promise<any> => {
     )
   }
   catch (error) {
-    const { response } = error as FetchError
+    const { response } = error as IFetchError
 
     throw createError({
       statusCode: response?.status,
