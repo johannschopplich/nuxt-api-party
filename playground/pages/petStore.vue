@@ -9,6 +9,7 @@ const status = ref<'pending' | 'sold'>()
 
 const { data: user, execute } = usePetStoreData('user/{username}', {
   pathParams: { username: 'user1' },
+  cache: true,
 })
 
 async function updateUser() {
@@ -20,6 +21,7 @@ async function updateUser() {
       body: {
         firstName: 'first name 2',
       },
+      cache: false,
     })
     await execute()
   }
