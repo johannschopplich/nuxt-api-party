@@ -167,5 +167,5 @@ type UseApiDataOptions<T> = Pick<
 type UseApiData = <T = any>(
   path: MaybeRefOrGetter<string>,
   opts?: UseApiDataOptions<T>
-) => AsyncData<T, FetchError>
+) => AsyncData<T | undefined, FetchError>
 ```

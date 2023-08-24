@@ -160,7 +160,7 @@ export function _useApiData<T = any>(
 
       controller = new AbortController()
 
-      let result: T
+      let result: T | undefined
 
       try {
         if (client) {
@@ -209,5 +209,5 @@ export function _useApiData<T = any>(
       return result
     },
     _asyncDataOptions,
-  ) as AsyncData<T, FetchError>
+  ) as AsyncData<T | undefined, FetchError>
 }
