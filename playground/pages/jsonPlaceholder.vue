@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { FetchError } from 'ofetch'
 import type { JsonPlaceholderComment } from '../types'
+import type { FetchError } from '#nuxt-api-party'
 
 const route = useRoute()
 
@@ -38,7 +38,7 @@ const formResponse = ref()
 // Intended for similar use cases as `$fetch`
 async function onSubmit() {
   try {
-    formResponse.value = await $jsonPlaceholder('posts', {
+    formResponse.value = await $jsonPlaceholder('possssts', {
       method: 'POST',
       body: {
         title: 'foo',
@@ -50,10 +50,10 @@ async function onSubmit() {
     // eslint-disable-next-line no-console
     console.log('formResponse:', formResponse.value)
   }
-  catch (e) {
-    console.error('statusCode:', (e as FetchError).statusCode)
-    console.error('statusMessage:', (e as FetchError).statusMessage)
-    console.error('data:', (e as FetchError).data)
+  catch (error) {
+    console.error(error as FetchError)
+    // Log the API response body
+    console.error('Error response body:', (error as FetchError).data)
   }
 }
 </script>

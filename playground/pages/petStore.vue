@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { FetchError } from 'ofetch'
 import type { components } from '#nuxt-api-party/petStore'
+import type { FetchError } from '#nuxt-api-party'
 
 type Pet = components['schemas']['Pet']
 
@@ -13,7 +13,7 @@ const { data: user, execute } = usePetStoreData('user/{username}', {
 
 async function updateUser() {
   try {
-    // will error because of authentication
+    // Will error because of authentication
     await $petStore('user/{username}', {
       method: 'put',
       pathParams: { username: 'user1' },
@@ -73,15 +73,11 @@ async function abandonGarfield() {
       } satisfies Pet,
     })
   }
-  catch (e) {
-    if (e instanceof FetchError) {
-      console.error('statusCode:', e.statusCode)
-      console.error('statusMessage:', e.statusMessage)
-      console.error('data:', e.data)
-    }
-    else {
-      console.error(e)
-    }
+  catch (error) {
+    const _error = error as FetchError
+    console.error(error as FetchError)
+    // Log the API response body
+    console.error('Error response body:', (error as FetchError).data)
   }
 }
 </script>

@@ -1,6 +1,5 @@
 import { computed, reactive } from 'vue'
 import { hash } from 'ohash'
-import type { FetchError } from 'ofetch'
 import type { NitroFetchOptions } from 'nitropack'
 import type { WatchSource } from 'vue'
 import type { AsyncData, AsyncDataOptions } from 'nuxt/app'
@@ -8,7 +7,7 @@ import type { ModuleOptions } from '../../module'
 import { headersToObject, resolvePath, serializeMaybeEncodedBody, toValue } from '../utils'
 import { isFormData } from '../formData'
 import type { EndpointFetchOptions, MaybeRef, MaybeRefOrGetter } from '../utils'
-import type { AllPaths, GETPaths, GETPlainPaths, HttpMethod, IgnoreCase, OpenApiError, OpenApiRequestOptions, OpenApiResponse, PathItemObject } from '../types'
+import type { AllPaths, FetchError, GETPaths, GETPlainPaths, HttpMethod, IgnoreCase, OpenApiError, OpenApiRequestOptions, OpenApiResponse, PathItemObject } from '../types'
 import { useAsyncData, useRequestHeaders, useRuntimeConfig } from '#imports'
 
 type ComputedOptions<T extends Record<string, any>> = {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { FetchError } from 'ofetch'
+import type { FetchError } from '#nuxt-api-party'
 
 try {
   await $testApi('not-found', {
