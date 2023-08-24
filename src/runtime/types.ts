@@ -1,9 +1,9 @@
-import type { IFetchError, FetchError as _FetchError } from 'ofetch'
+import type { IFetchError } from 'ofetch'
 import type { NitroFetchOptions } from 'nitropack'
 
 // --- General purpose types ---
 
-export type FetchError = _FetchError & IFetchError
+export type FetchError<T = any> = IFetchError<T>
 
 // --- OpenAPI types ---
 
