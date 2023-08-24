@@ -58,7 +58,7 @@ exports[`nuxt-api-party > throws error for invalid response 1`] = `
     "statusMessage": "Not Found",
     "url": "/api/not-found",
   },
-  "message": "[GET] \\"/api/not-found\\": 404 Not Found",
+  "message": "Not Found",
   "stack": "",
   "statusCode": 404,
   "statusMessage": "Not Found",
