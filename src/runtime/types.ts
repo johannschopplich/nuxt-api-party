@@ -48,7 +48,7 @@ export type OpenApiRequestOptions<
   M extends IgnoreCase<keyof P & HttpMethod> = IgnoreCase<keyof P & 'get'>,
 > = Omit<
   NitroFetchOptions<any, Lowercase<M>>,
-  'params' | 'query' | 'headers' | 'method' | 'body'
+  'params' | 'query' | 'headers' | 'method' | 'body' | 'cache'
 > & RequestBody<P[Lowercase<M>]> & PathParameters<P[Lowercase<M>]> & QueryParameters<P[Lowercase<M>]> & Method<M>
 
 type MediaTypes<T, Status extends keyof any> = {
