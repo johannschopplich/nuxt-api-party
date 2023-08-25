@@ -219,7 +219,6 @@ import type { UseApiData, UseOpenApiData, UseApiDataOptions } from '${relativeTo
 
 ${schemaEndpointIds.map(i => `import type { paths as ${pascalCase(i)}Paths } from '#${moduleName}/${i}'`).join('')}
 
-export type { IFetchError as FetchError } from 'ofetch'
 export type { $Api, $OpenApi, ApiFetchOptions, UseApiData, UseOpenApiData, UseApiDataOptions }
 
 ${endpointKeys.map(i => `

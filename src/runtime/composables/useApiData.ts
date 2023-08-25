@@ -1,6 +1,6 @@
 import { computed, reactive } from 'vue'
 import { hash } from 'ohash'
-import type { IFetchError } from 'ofetch'
+import type { FetchError } from 'ofetch'
 import type { NitroFetchOptions } from 'nitropack'
 import type { WatchSource } from 'vue'
 import type { AsyncData, AsyncDataOptions } from 'nuxt/app'
@@ -63,7 +63,7 @@ export type UseOpenApiDataOptions<
 export type UseApiData = <T = any>(
   path: MaybeRefOrGetter<string>,
   opts?: UseApiDataOptions<T>,
-) => AsyncData<T | undefined, IFetchError>
+) => AsyncData<T | undefined, FetchError>
 
 export interface UseOpenApiData<Paths extends Record<string, PathItemObject>> {
   <P extends GETPlainPaths<Paths>>(
@@ -148,7 +148,7 @@ export function _useApiData<T = any>(
     ...(isFormData(toValue(body)) ? [] : [toValue(body)]),
   ])}`)
 
-  return useAsyncData<T, IFetchError>(
+  return useAsyncData<T, FetchError>(
     key.value,
     async (nuxt) => {
       controller?.abort?.()
@@ -209,5 +209,5 @@ export function _useApiData<T = any>(
       return result
     },
     _asyncDataOptions,
-  ) as AsyncData<T | undefined, IFetchError>
+  ) as AsyncData<T | undefined, FetchError>
 }

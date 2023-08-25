@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { FetchError } from '#nuxt-api-party'
+import type { FetchError } from 'ofetch'
 import type { components } from '#nuxt-api-party/petStore'
 
 type Pet = components['schemas']['Pet']
@@ -76,7 +76,6 @@ async function abandonGarfield() {
     })
   }
   catch (error) {
-    const _error = error as FetchError
     console.error(error as FetchError)
     // Log the API response body
     console.error('Error response body:', (error as FetchError).data)

@@ -1,6 +1,6 @@
 <script setup lang="ts">
+import type { FetchError } from 'ofetch'
 import type { JsonPlaceholderComment } from '../types'
-import type { FetchError } from '#nuxt-api-party'
 
 const route = useRoute()
 

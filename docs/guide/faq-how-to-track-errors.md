@@ -11,7 +11,7 @@ This ensures you can still track errors in your client-side code.
 With the latter property `data`, you can access the **error response body** returned from your API:
 
 ```ts
-import type { FetchError } from '#nuxt-api-party'
+import type { FetchError } from 'ofetch'
 
 // Log your API's error response
 console.error('Error response body:', (error as FetchError).data)
@@ -57,7 +57,7 @@ watchEffect(() => {
 ### Usage with `$jsonPlaceholder`
 
 ```ts
-import type { FetchError } from '#nuxt-api-party'
+import type { FetchError } from 'ofetch'
 
 function onSubmit() {
   try {
