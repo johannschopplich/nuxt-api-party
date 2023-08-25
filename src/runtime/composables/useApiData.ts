@@ -69,15 +69,15 @@ export interface UseOpenApiData<Paths extends Record<string, PathItemObject>> {
   <P extends GETPlainPaths<Paths>>(
     path: MaybeRefOrGetter<P>,
     opts?: Omit<UseOpenApiDataOptions<Paths[`/${P}`]>, 'method'>,
-  ): AsyncData<OpenApiResponse<Paths[`/${P}`]['get']> | undefined, OpenApiError<Paths[`/${P}`]['get']>>
+  ): AsyncData<OpenApiResponse<Paths[`/${P}`]['get']> | undefined, FetchError<OpenApiError<Paths[`/${P}`]['get']>>>
   <P extends GETPaths<Paths>>(
     path: MaybeRefOrGetter<P>,
     opts: Omit<UseOpenApiDataOptions<Paths[`/${P}`]>, 'method'>,
-  ): AsyncData<OpenApiResponse<Paths[`/${P}`]['get']> | undefined, OpenApiError<Paths[`/${P}`]['get']>>
+  ): AsyncData<OpenApiResponse<Paths[`/${P}`]['get']> | undefined, FetchError<OpenApiError<Paths[`/${P}`]['get']>>>
 <P extends AllPaths<Paths>, M extends IgnoreCase<keyof Paths[`/${P}`] & HttpMethod>>(
     path: MaybeRefOrGetter<P>,
     opts: UseOpenApiDataOptions<Paths[`/${P}`], M> & { method: M },
-  ): AsyncData<OpenApiResponse<Paths[`/${P}`][Lowercase<M>]> | undefined, OpenApiError<Paths[`/${P}`][Lowercase<M>]>>
+  ): AsyncData<OpenApiResponse<Paths[`/${P}`][Lowercase<M>]> | undefined, FetchError<OpenApiError<Paths[`/${P}`][Lowercase<M>]>>>
 }
 
 export function _useApiData<T = any>(
