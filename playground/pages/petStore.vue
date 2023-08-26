@@ -25,8 +25,8 @@ async function updateUser() {
     })
     await execute()
   }
-  catch (e) {
-    console.error(e)
+  catch (error) {
+    console.error(error)
   }
 }
 
@@ -50,8 +50,8 @@ async function fetchPetData(petId: number) {
       },
     })
   }
-  catch (e) {
-    console.error(e)
+  catch (error) {
+    console.error(error)
   }
 }
 

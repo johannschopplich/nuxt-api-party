@@ -145,6 +145,18 @@ const data = await $myApi('foo/{id}', {
 })
 ```
 
+For reactive `pathParams`, pass a ref or getter function instead of a plain object.
+
+```ts
+const id = ref(10)
+
+const data = await $myApi('foo/{id}', {
+  pathParams: () => ({
+    id: id.value
+  })
+})
+```
+
 ::: warning
 Issues will **NOT** be reported at runtime by `nuxt-api-party` if the wrong parameters are used. The **incomplete** path will be sent to the backend **AS IS**.
 :::
