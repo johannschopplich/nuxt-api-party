@@ -68,11 +68,7 @@ async function resolveSchema({ schema }: Endpoint): Promise<string | URL | OpenA
   return schema!
 }
 
-function resolveOpenAPIImports() {
-  return import('openapi-typescript').then((openapiTS) => {
-    // Interop default export
-    return typeof openapiTS === 'object' && openapiTS !== null && 'default' in openapiTS
-      ? openapiTS.default
-      : openapiTS
-  })
+async function resolveOpenAPIImports() {
+  const openapiTS = await import('openapi-typescript')
+  return openapiTS.default || openapiTS
 }
