@@ -1,14 +1,12 @@
 /**
  * Colors Theme
  * -------------------------------------------------------------------------- */
-
 :root {
   --vp-c-accent: #6389C3;
-  --vp-c-brand: #C39D63;
-  --vp-c-brand-light: #CEB080;
-  --vp-c-brand-lighter: #DAC29E;
-  --vp-c-brand-dark: #AC8242;
-  --vp-c-brand-darker: #836333;
+  --vp-c-brand-1: #C39D63;
+  --vp-c-brand-2: #C39D63;
+  --vp-c-brand-3: #AC8242;
+  --vp-c-brand-soft: #C39D6314;
 }
 
 /**
