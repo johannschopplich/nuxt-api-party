@@ -1,4 +1,4 @@
-import { createError, defineEventHandler, getRequestHeader, getRouterParam, readBody } from 'h3'
+import { createError, defineEventHandler, getRequestHeader, getRouterParam, readBody, removeResponseHeader, send, setResponseHeaders, setResponseStatus } from 'h3'
 import { deserializeMaybeEncodedBody } from '../utils'
 import type { ModuleOptions } from '../../module'
 import type { EndpointFetchOptions } from '../utils'
