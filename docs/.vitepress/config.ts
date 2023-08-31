@@ -31,6 +31,8 @@ export default defineConfig({
     ['script', { 'src': 'https://plausible.io/js/script.js', 'defer': '', 'data-domain': url.hostname }],
   ],
 
+  appearance: 'dark',
+
   themeConfig: {
     logo: '/logo.svg',
 
