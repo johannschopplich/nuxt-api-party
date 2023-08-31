@@ -14,13 +14,13 @@ describe('nuxt-api-party', async () => {
     expect(getTestResult(html)).toMatchSnapshot()
   })
 
-  it('fetches data with useTestApiData', async () => {
-    const html = await $fetch('/useTestApiData')
+  it('throws error for invalid response with $testApi', async () => {
+    const html = await $fetch('/$testApi-error')
     expect(getTestResult(html)).toMatchSnapshot()
   })
 
-  it('throws error for invalid response', async () => {
-    const html = await $fetch('/invalid')
+  it('fetches data with useTestApiData', async () => {
+    const html = await $fetch('/useTestApiData')
     expect(getTestResult(html)).toMatchSnapshot()
   })
 })
