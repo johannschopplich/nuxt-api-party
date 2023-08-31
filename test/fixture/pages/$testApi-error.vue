@@ -2,7 +2,7 @@
 import type { FetchError } from 'ofetch'
 
 try {
-  await $testApi('not-found', {
+  await $testApi('foo/bar', {
     headers: {
       accept: 'application/json',
     },

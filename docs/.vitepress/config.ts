@@ -128,6 +128,7 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
       items: [
         { text: 'Getting Started', link: '/guide/getting-started' },
         { text: 'How It Works', link: '/guide/how-it-works' },
+        { text: 'Error Handling', link: '/guide/error-handling' },
       ],
     },
     {
@@ -145,12 +146,6 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
         { text: 'Retries', link: '/guide/retries' },
         { text: 'Dynamic Backend URL', link: '/guide/dynamic-backend-url' },
         { text: 'OpenAPI Types', link: '/guide/openapi-types' },
-      ],
-    },
-    {
-      text: 'FAQ',
-      items: [
-        { text: 'How to Track Errors', link: '/guide/faq-how-to-track-errors' },
       ],
     },
     { text: 'Migration', link: '/guide/migration' },
