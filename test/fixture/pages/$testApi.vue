@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import type { TestApiTodo } from '~/types'
 
-const data = await $testApi<TestApiTodo>('todos')
+const json = await $testApi<TestApiTodo>('todos')
+const blob = await $testApi('blob')
 
-useTestResult(data)
+useTestResult({
+  json,
+  blob,
+})
 </script>

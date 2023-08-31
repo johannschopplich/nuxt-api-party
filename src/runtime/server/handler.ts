@@ -1,5 +1,4 @@
-import { createError, defineEventHandler, getRequestHeader, getRouterParam, readBody } from 'h3'
-import type { FetchError } from 'ofetch'
+import { createError, defineEventHandler, getRequestHeader, getRouterParam, readBody, removeResponseHeader, send, setResponseHeaders, setResponseStatus } from 'h3'
 import { deserializeMaybeEncodedBody } from '../utils'
 import type { ModuleOptions } from '../../module'
 import type { EndpointFetchOptions } from '../utils'
@@ -52,7 +51,7 @@ export default defineEventHandler(async (event): Promise<any> => {
   }
 
   try {
-    return await globalThis.$fetch(
+    const response = await globalThis.$fetch.raw<ArrayBuffer>(
       path,
       {
         ...fetchOptions,
@@ -68,16 +67,26 @@ export default defineEventHandler(async (event): Promise<any> => {
           ...headers,
         },
         ...(body && { body: await deserializeMaybeEncodedBody(body) }),
+        ignoreResponseError: true,
+        responseType: 'arrayBuffer',
       },
     )
+    setResponseStatus(event, response.status, response.statusText)
+    setResponseHeaders(event, Object.fromEntries(response.headers.entries()))
+
+    // ofetch has already decoded the response. Leaving this header can cause the
+    // client issues when decoding and may create a conflict if a compression
+    // middleware is used
+    removeResponseHeader(event, 'content-encoding')
+
+    await send(event, new Uint8Array(response._data ?? []))
   }
   catch (error) {
-    const { response } = error as FetchError
+    console.error(error)
 
     throw createError({
-      statusCode: response?.status,
-      statusMessage: response?.statusText,
-      data: response?._data,
+      statusCode: 503,
+      statusMessage: 'Service Unavailable',
     })
   }
 })

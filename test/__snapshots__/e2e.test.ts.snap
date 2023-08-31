@@ -1,26 +1,29 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`nuxt-api-party > fetches data with $testApi 1`] = `
-[
-  {
-    "completed": false,
-    "id": 1,
-    "title": "delectus aut autem",
-    "userId": 1,
-  },
-  {
-    "completed": false,
-    "id": 2,
-    "title": "quis ut nam facilis et officia qui",
-    "userId": 1,
-  },
-  {
-    "completed": false,
-    "id": 3,
-    "title": "fugiat veniam minus",
-    "userId": 1,
-  },
-]
+{
+  "blob": "Foo",
+  "json": [
+    {
+      "completed": false,
+      "id": 1,
+      "title": "delectus aut autem",
+      "userId": 1,
+    },
+    {
+      "completed": false,
+      "id": 2,
+      "title": "quis ut nam facilis et officia qui",
+      "userId": 1,
+    },
+    {
+      "completed": false,
+      "id": 3,
+      "title": "fugiat veniam minus",
+      "userId": 1,
+    },
+  ],
+}
 `;
 
 exports[`nuxt-api-party > fetches data with useTestApiData 1`] = `
@@ -49,19 +52,15 @@ exports[`nuxt-api-party > fetches data with useTestApiData 1`] = `
 ]
 `;
 
-exports[`nuxt-api-party > throws error for invalid response 1`] = `
+exports[`nuxt-api-party > throws error for invalid response with $testApi 1`] = `
 {
   "data": {
-    "message": "Not Found",
-    "stack": "",
-    "statusCode": 404,
-    "statusMessage": "Not Found",
-    "url": "/api/not-found",
+    "reason": "anything",
   },
   "message": "Not Found",
   "stack": "",
   "statusCode": 404,
   "statusMessage": "Not Found",
-  "url": "/api/__api_party/testApi",
+  "url": "/api/foo/bar",
 }
 `;
