@@ -11,15 +11,12 @@ Thus, if your API fails to deliver, you can still handle the error response in y
 
 Both [generated composables](/api/) per endpoint will throw an [ofetch](https://github.com/unjs/ofetch) `FetchError` if your API fails to deliver.
 
-Logging the `error.data` property will provide you with the response body, like:
+Logging the available error properties will provide you insights on what went wrong:
 
-```json
-{
-  "message": "Not Found",
-  "statusCode": 404,
-  "statusMessage": "Not Found",
-  "url": "/api/foo/bar"
-}
+```ts
+console.log(error.statusCode) // `404`
+console.log(error.statusMessage) // `Not Found`
+console.log(error.data) // Whatever your API returned
 ```
 
 See all available examples below.
@@ -71,7 +68,7 @@ const { data, error } = await useJsonPlaceholderData('not/available')
 
 watchEffect(() => {
   if (error.value)
-    console.error(error.data)
+    console.error(error.value.data)
 })
 ```
 
