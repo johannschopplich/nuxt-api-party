@@ -192,7 +192,7 @@ export const ${getRawComposableName(i)} = (...args) => _$api('${i}', ...args)
     })
 
     // Add `#nuxt-api-party` module alias for generated composables
-    nuxt.options.alias[`#${moduleName}`] = resolve(nuxt.options.buildDir, `module/${moduleName}.mjs`)
+    nuxt.options.alias[`#${moduleName}`] = resolve(nuxt.options.buildDir, `module/${moduleName}`)
 
     // Add module template for generated composables
     addTemplate({
