@@ -25,22 +25,22 @@ hero:
 
 features:
   - title: Dynamic composable names
-    icon: 🪅
+    icon: <span class="i-carbon:list-dropdown"></span>
     details: Auto-generated composables for each API endpoint.
     link: /api/
     linkText: API Reference
   - title: Protected API credentials
-    icon: 🔒
+    icon: <span class="i-carbon:ibm-cloud-hyper-protect-dbaas"></span>
     details: A Nuxt server route proxies your requests. No CORS issues!
     link: /guide/how-it-works
     linkText: How It Works
   - title: Familiar Data Handling
-    icon: 🍱
+    icon: <span class="i-carbon:noodle-bowl"></span>
     details: Handle requests just like useFetch or $fetch.
     link: /api/use-my-api-data
     linkText: useMyApiData
   - title: Connect multiple APIs
-    icon: 🧇
+    icon: <span class="i-carbon:ibm-watson-query"></span>
     details: Use multiple APIs in your app with one module.
     link: /guide/getting-started.html#step-3-set-up-api-endpoints
     linkText: Set Up API Endpoints
