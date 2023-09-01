@@ -1,6 +1,6 @@
 # Error Handling
 
-While the idea of this Nuxt module is to mask your real API (and credentials) by creating a server proxy, `nuxt-api-party` will minimize the hassle of handling errors by passing the following properties to the client:
+While the idea of this Nuxt module is to mask your real API (and credentials) by creating a server proxy, `nuxt-api-party` will minimize the hassle of handling errors by passing through the following properties to the response on the client:
 
 - Response body
 - HTTP status code

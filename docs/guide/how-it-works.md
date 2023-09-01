@@ -5,7 +5,7 @@
 The internal `/api/__api_party` server route will proxy your API request.
 
 ::: tip
-The proxy layer will not only pass your API's response body, but also HTTP status code, HTTP status message and headers to the client. This way, you can handle errors just like you would with a direct API call.
+The proxy layer will not only pass-through your API's response body to the response on the client, but also HTTP status code, HTTP status message and headers. This way, you can handle errors just like you would with a direct API call.
 :::
 
 ## Detailed Answer
