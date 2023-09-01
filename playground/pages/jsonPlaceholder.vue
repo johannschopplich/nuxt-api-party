@@ -53,7 +53,7 @@ async function onSubmit() {
   catch (error) {
     console.error(error as FetchError)
     // Log the API response body
-    console.error('Error response body:', (error as FetchError).data)
+    console.error('Response body:', (error as FetchError).data)
   }
 }
 </script>
