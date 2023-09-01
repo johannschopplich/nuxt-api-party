@@ -4,6 +4,10 @@
 
 The internal `/api/__api_party` server route will proxy your API request.
 
+::: tip
+The proxy layer will not only pass your API's response body, but also HTTP status code, HTTP status message and headers to the client. This way, you can handle errors just like you would with a direct API call.
+:::
+
 ## Detailed Answer
 
 The generated composables will initiate a POST request to the Nuxt server route `/api/__api_party`, which then initiates the actual request for a given route to your API and passes the response back to the client. This proxy behavior has the benefit of keeping your API credentials safe from the client and omitting CORS issues, since data is sent from server to server.
