@@ -12,6 +12,7 @@ Both [generated composables](/api/#dynamic-composables) will calculate a cache k
 
 - API endpoint ID
 - Path
+- Path Parameters (if [OpenAPI type generation](/guide/openapi-types) is enabled)
 - Query
 - HTTP method
 - Body
