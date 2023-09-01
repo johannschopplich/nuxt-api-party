@@ -1,4 +1,4 @@
-[![nuxt-api-party](./docs/public/og.png)](https://nuxt-api-party.byjohann.dev)
+[![nuxt-api-party](./docs/public/og.jpg)](https://nuxt-api-party.byjohann.dev)
 
 # nuxt-api-party
 
@@ -87,8 +87,8 @@ const { data, pending, refresh, error } = await useJsonPlaceholderData('posts/1'
 ## Special Thanks
 
 - [Dennis Baum](https://github.com/dennisbaum) for sponsoring the initial version of this package.
-- [SVGBackgrounds.com](https://www.svgbackgrounds.com) for the OpenGraph image background pattern.
+- [Maronbeere](https://maronbeere.carrd.co) for his Chameleon pixel art.
 
 ## License
 
-[MIT](./LICENSE) License © 2022-2023 [Johann Schopplich](https://github.com/johannschopplich)
+[MIT](./LICENSE) License © 2022-PRESENT [Johann Schopplich](https://github.com/johannschopplich)
