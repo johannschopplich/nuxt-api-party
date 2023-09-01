@@ -75,6 +75,8 @@ function nav(): DefaultTheme.NavItem[] {
           items: [
             { text: 'Getting Started', link: '/guide/getting-started' },
             { text: 'How It Works', link: '/guide/how-it-works' },
+            { text: 'Error Handling', link: '/guide/error-handling' },
+            { text: 'OpenAPI Types', link: '/guide/openapi-types' },
           ],
         },
         {
@@ -85,7 +87,6 @@ function nav(): DefaultTheme.NavItem[] {
             { text: 'Cookies', link: '/guide/cookies' },
             { text: 'Retries', link: '/guide/retries' },
             { text: 'Dynamic Backend URL', link: '/guide/dynamic-backend-url' },
-            { text: 'OpenAPI Types', link: '/guide/openapi-types' },
           ],
         },
       ],
@@ -131,6 +132,7 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
         { text: 'Getting Started', link: '/guide/getting-started' },
         { text: 'How It Works', link: '/guide/how-it-works' },
         { text: 'Error Handling', link: '/guide/error-handling' },
+        { text: 'OpenAPI Types', link: '/guide/openapi-types' },
       ],
     },
     {
@@ -147,7 +149,6 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
         { text: 'Cookies', link: '/guide/cookies' },
         { text: 'Retries', link: '/guide/retries' },
         { text: 'Dynamic Backend URL', link: '/guide/dynamic-backend-url' },
-        { text: 'OpenAPI Types', link: '/guide/openapi-types' },
       ],
     },
     { text: 'Migration', link: '/guide/migration' },
