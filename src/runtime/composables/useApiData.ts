@@ -74,7 +74,7 @@ export interface UseOpenApiData<Paths extends Record<string, PathItemObject>> {
     path: MaybeRefOrGetter<P>,
     opts: Omit<UseOpenApiDataOptions<Paths[`/${P}`]>, 'method'>,
   ): AsyncData<OpenApiResponse<Paths[`/${P}`]['get']> | undefined, FetchError<OpenApiError<Paths[`/${P}`]['get']>>>
-<P extends AllPaths<Paths>, M extends IgnoreCase<keyof Paths[`/${P}`] & HttpMethod>>(
+  <P extends AllPaths<Paths>, M extends IgnoreCase<keyof Paths[`/${P}`] & HttpMethod>>(
     path: MaybeRefOrGetter<P>,
     opts: UseOpenApiDataOptions<Paths[`/${P}`], M> & { method: M },
   ): AsyncData<OpenApiResponse<Paths[`/${P}`][Lowercase<M>]> | undefined, FetchError<OpenApiError<Paths[`/${P}`][Lowercase<M>]>>>

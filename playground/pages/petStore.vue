@@ -12,6 +12,14 @@ const { data: user, execute } = usePetStoreData('user/{username}', {
   cache: true,
 })
 
+const { data, error } = usePetStoreData('pet/findByStatus', {
+  query: computed(() => ({
+    status: status.value ?? 'pending',
+  })),
+})
+
+watch(error, value => console.error(value))
+
 async function updateUser() {
   try {
     // Will error because of authentication
@@ -30,16 +38,7 @@ async function updateUser() {
   }
 }
 
-const { data, error } = usePetStoreData('pet/findByStatus', {
-  query: computed(() => ({
-    status: status.value ?? 'pending',
-  })),
-})
-
-// eslint-disable-next-line no-console
-watch(error, value => console.log(value))
-
-const petData = ref<Pet>()
+const petData = ref<Pet | undefined>()
 
 async function fetchPetData(petId: number) {
   try {
@@ -58,7 +57,7 @@ async function fetchPetData(petId: number) {
 const createdPet = ref<Pet>()
 
 async function abandonGarfield() {
-  // put the fat lazy cat up for adoption
+  // Put the fat lazy cat up for adoption
   try {
     createdPet.value = await $petStore('pet', {
       method: 'POST',
