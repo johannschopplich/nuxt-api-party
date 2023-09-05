@@ -217,7 +217,9 @@ export const ${getDataComposableName(i)} = (...args) => _useApiData('${i}', ...a
 import type { $Api, $OpenApi, ApiFetchOptions } from '${relativeTo('runtime/composables/$api')}'
 import type { UseApiData, UseOpenApiData, UseApiDataOptions } from '${relativeTo('runtime/composables/useApiData')}'
 
-${schemaEndpointIds.map(i => `import type { paths as ${pascalCase(i)}Paths } from '#${moduleName}/${i}'`).join('')}
+${schemaEndpointIds.map(i => `
+import type { paths as ${pascalCase(i)}Paths } from '#${moduleName}/${i}'
+`.trimStart()).join('').trimEnd()}
 
 export type { $Api, $OpenApi, ApiFetchOptions, UseApiData, UseOpenApiData, UseApiDataOptions }
 
