@@ -87,7 +87,7 @@ const { data, pending, refresh, error } = await useJsonPlaceholderData('posts/1'
 ## Special Thanks
 
 - [Dennis Baum](https://github.com/dennisbaum) for sponsoring the initial version of this package.
-- [Maronbeere](https://maronbeere.carrd.co) for his Chameleon pixel art.
+- [Maronbeere](https://maronbeere.carrd.co) for his logo pixel art.
 
 ## License
 
