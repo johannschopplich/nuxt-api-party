@@ -180,7 +180,7 @@ export const ${getRawComposableName(i)} = (...args) => _$api('${i}', ...args)
       config.imports = defu(config.imports, {
         presets: [{
           from: `#${moduleName}/server`,
-          imports: endpointKeys.map(i => ({ name: getRawComposableName(i) })),
+          imports: endpointKeys.map(i => getRawComposableName(i)),
         }],
       })
     })
