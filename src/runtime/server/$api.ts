@@ -8,7 +8,7 @@ export function _$api<T = any>(
   path: string,
   opts: ApiFetchOptions = {},
 ): Promise<T> {
-  const { pathParams, query, headers, method, body, ...fetchOptions } = opts
+  const { pathParams, query, headers, ...fetchOptions } = opts
   const { apiParty } = useRuntimeConfig()
   const endpoints = (apiParty as unknown as ModuleOptions).endpoints || {}
   const endpoint = endpoints[endpointId]
@@ -16,7 +16,6 @@ export function _$api<T = any>(
   return globalThis.$fetch<T>(resolvePath(path, pathParams), {
     ...fetchOptions,
     baseURL: endpoint.url,
-    method,
     query: {
       ...endpoint.query,
       ...query,
@@ -26,6 +25,5 @@ export function _$api<T = any>(
       ...endpoint.headers,
       ...headersToObject(headers),
     },
-    body,
   }) as Promise<T>
 }
