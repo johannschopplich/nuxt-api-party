@@ -12,10 +12,10 @@ const { data, pending, error } = await useJsonPlaceholderData<JsonPlaceholderCom
       postId: `${route.query.postId || 1}`,
     })),
     onResponse({ response }) {
-      if (process.server)
-        return
-      // eslint-disable-next-line no-console
-      console.log(response._data)
+      if (import.meta.client) {
+        // eslint-disable-next-line no-console
+        console.log(response._data)
+      }
     },
   },
 )

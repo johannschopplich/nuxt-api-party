@@ -4,7 +4,7 @@
 
 [![npm version](https://img.shields.io/npm/v/nuxt-api-party?color=a1b858&label=)](https://www.npmjs.com/package/nuxt-api-party)
 
-> [Nuxt 3](https://nuxt.com) module to securely connect with any API.
+> [Nuxt](https://nuxt.com) module to securely connect with any API.
 
 - [✨ &nbsp;Release Notes](https://github.com/johannschopplich/nuxt-api-party/releases)
 - [📖 &nbsp;Read the documentation](https://nuxt-api-party.byjohann.dev)
