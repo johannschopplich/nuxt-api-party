@@ -40,11 +40,11 @@ export type BaseUseApiDataOptions<T> = Omit<AsyncDataOptions<T>, 'watch'> & {
    * Customize the hash function used to generate the cache key.
    */
   hashFn?: (options: {
-    endpointId: string,
-    path: string,
-    query?: Record<string, any>,
-    method?: string,
-    body?: string | Record<string, any> | null,
+    endpointId: string
+    path: string
+    query?: Record<string, any>
+    method?: string
+    body?: string | Record<string, any> | null
   }) => string
 }
 
