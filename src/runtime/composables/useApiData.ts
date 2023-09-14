@@ -38,6 +38,13 @@ export type BaseUseApiDataOptions<T> = Omit<AsyncDataOptions<T>, 'watch'> & {
   watch?: (WatchSource<unknown> | object)[] | false
   /**
    * Customize the hash function used to generate the cache key.
+   * You can use this to ignore certain fetch options from the cache key.
+   * @example
+   * // Only use the endpoint ID and path to generate the cache key
+   * hashFn: ({ endpointId, path }) => hash([
+   *   endpointId,
+   *   path,
+   * ])
    */
   hashFn?: (options: {
     endpointId: string
@@ -111,9 +118,16 @@ export function _useApiData<T = any>(
     body,
     client = false,
     cache = true,
-    hashFn,
+    hashFn = ({ endpointId, path, query, method, body }) => hash([
+      endpointId,
+      path,
+      query,
+      method,
+      body,
+    ]),
     ...fetchOptions
   } = opts
+
   const _path = computed(() => resolvePath(toValue(path), toValue(pathParams)))
 
   if (client && !apiParty.allowClient)
@@ -150,23 +164,14 @@ export function _useApiData<T = any>(
     immediate,
   }
 
-  const _hashFn = hashFn || (({ endpointId, path, query, method, body }) => hash([
-    endpointId,
-    path,
-    query,
-    method,
-    body,
-  ]))
-
-  const key = computed(() => `$party${_hashFn({
+  let controller: AbortController | undefined
+  const key = computed(() => `$party${hashFn({
     endpointId,
     path: _path.value,
     query: toValue(query),
     method: toValue(method),
     ...(!isFormData(toValue(body)) && { body: toValue(body) }),
   })}`)
-
-  let controller: AbortController | undefined
 
   return useAsyncData<T, FetchError>(
     key.value,
