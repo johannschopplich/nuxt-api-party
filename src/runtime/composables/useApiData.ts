@@ -36,6 +36,16 @@ export type BaseUseApiDataOptions<T> = Omit<AsyncDataOptions<T>, 'watch'> & {
    * Fetch options and URL are watched by default. You can completely ignore reactive sources by using `watch: false`.
    */
   watch?: (WatchSource<unknown> | object)[] | false
+  /**
+   * Customize the hash function used to generate the cache key.
+   */
+  hashFn?: (options: {
+    endpointId: string,
+    path: string,
+    query?: Record<string, any>,
+    method?: string,
+    body?: string | Record<string, any> | null,
+  }) => string
 }
 
 export type UseApiDataOptions<T> = Pick<
@@ -101,6 +111,7 @@ export function _useApiData<T = any>(
     body,
     client = false,
     cache = true,
+    hashFn,
     ...fetchOptions
   } = opts
   const _path = computed(() => resolvePath(toValue(path), toValue(pathParams)))
@@ -139,14 +150,23 @@ export function _useApiData<T = any>(
     immediate,
   }
 
-  let controller: AbortController | undefined
-  const key = computed(() => `$party${hash([
+  const _hashFn = hashFn || (({ endpointId, path, query, method, body }) => hash([
     endpointId,
-    _path.value,
-    toValue(query),
-    toValue(method),
-    ...(isFormData(toValue(body)) ? [] : [toValue(body)]),
-  ])}`)
+    path,
+    query,
+    method,
+    body,
+  ]))
+
+  const key = computed(() => `$party${_hashFn({
+    endpointId,
+    path: _path.value,
+    query: toValue(query),
+    method: toValue(method),
+    ...(!isFormData(toValue(body)) && { body: toValue(body) }),
+  })}`)
+
+  let controller: AbortController | undefined
 
   return useAsyncData<T, FetchError>(
     key.value,

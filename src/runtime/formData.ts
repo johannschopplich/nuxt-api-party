@@ -11,7 +11,7 @@ export type SerializedFormData = Record<
 >
 
 export function isFormData(obj: unknown): obj is FormData {
-  return typeof FormData !== 'undefined' && obj instanceof FormData
+  return obj instanceof FormData
 }
 
 export function isSerializedFormData(obj: unknown): obj is SerializedFormData {
