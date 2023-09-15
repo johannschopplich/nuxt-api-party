@@ -3,8 +3,8 @@ import type { NitroFetchOptions } from 'nitropack'
 import { headersToObject, resolvePath, serializeMaybeEncodedBody } from '../utils'
 import { isFormData } from '../formData'
 import type { ModuleOptions } from '../../module'
-import type { EndpointFetchOptions } from '../utils'
-import type { AllPaths, GETPaths, GETPlainPaths, HttpMethod, IgnoreCase, OpenApiRequestOptions, OpenApiResponse, PathItemObject } from '../types'
+import { CACHE_KEY_PREFIX } from '../constants'
+import type { AllPaths, EndpointFetchOptions, GETPaths, GETPlainPaths, HttpMethod, IgnoreCase, OpenApiRequestOptions, OpenApiResponse, PathItemObject } from '../types'
 import { useNuxtApp, useRequestHeaders, useRuntimeConfig } from '#imports'
 
 export interface BaseApiFetchOptions {
@@ -69,8 +69,8 @@ export function _$api<T = any>(
   } = opts
 
   const _key = typeof cache === 'string'
-    ? cache
-    : `$party${hash([
+    ? `${CACHE_KEY_PREFIX}${cache}`
+    : `${CACHE_KEY_PREFIX}${hash([
       endpointId,
       path,
       pathParams,

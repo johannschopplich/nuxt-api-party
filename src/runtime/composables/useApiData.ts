@@ -5,10 +5,10 @@ import type { NitroFetchOptions } from 'nitropack'
 import type { WatchSource } from 'vue'
 import type { AsyncData, AsyncDataOptions } from 'nuxt/app'
 import type { ModuleOptions } from '../../module'
+import { CACHE_KEY_PREFIX } from '../constants'
 import { headersToObject, resolvePath, serializeMaybeEncodedBody, toValue } from '../utils'
 import { isFormData } from '../formData'
-import type { EndpointFetchOptions, MaybeRef, MaybeRefOrGetter } from '../utils'
-import type { AllPaths, GETPaths, GETPlainPaths, HttpMethod, IgnoreCase, OpenApiError, OpenApiRequestOptions, OpenApiResponse, PathItemObject } from '../types'
+import type { AllPaths, EndpointFetchOptions, GETPaths, GETPlainPaths, HttpMethod, IgnoreCase, MaybeRef, MaybeRefOrGetter, OpenApiError, OpenApiRequestOptions, OpenApiResponse, PathItemObject } from '../types'
 import { useAsyncData, useRequestHeaders, useRuntimeConfig } from '#imports'
 
 type ComputedOptions<T extends Record<string, any>> = {
@@ -141,9 +141,9 @@ export function _useApiData<T = any>(
   } = opts
 
   const _path = computed(() => resolvePath(toValue(path), toValue(pathParams)))
-  const _key = computed(() => `$party${
+  const _key = computed(() => `${CACHE_KEY_PREFIX}${
     key
-      ? toValue(key)
+      ? `${CACHE_KEY_PREFIX}${toValue(key)}`
       : hash([
           endpointId,
           _path.value,

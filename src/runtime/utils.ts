@@ -1,15 +1,7 @@
 import { unref } from 'vue'
-import type { NitroFetchOptions } from 'nitropack'
-import type { Ref } from 'vue'
-import type { ApiFetchOptions } from './composables/$api'
 import { formDataToObject, isFormData, isSerializedFormData, objectToFormData } from './formData'
-
-export type EndpointFetchOptions = NitroFetchOptions<string> & {
-  path: string
-}
-
-export type MaybeRef<T> = T | Ref<T>
-export type MaybeRefOrGetter<T> = MaybeRef<T> | (() => T)
+import type { MaybeRefOrGetter } from './types'
+import type { ApiFetchOptions } from './composables/$api'
 
 export function toValue<T>(r: MaybeRefOrGetter<T>): T {
   return typeof r === 'function'
