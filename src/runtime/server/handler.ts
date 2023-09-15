@@ -1,7 +1,7 @@
 import { createError, defineEventHandler, getRequestHeader, getRouterParam, readBody, removeResponseHeader, send, setResponseHeaders, setResponseStatus } from 'h3'
 import { deserializeMaybeEncodedBody } from '../utils'
 import type { ModuleOptions } from '../../module'
-import type { EndpointFetchOptions } from '../utils'
+import type { EndpointFetchOptions } from '../types'
 import { useRuntimeConfig } from '#imports'
 
 export default defineEventHandler(async (event): Promise<any> => {
