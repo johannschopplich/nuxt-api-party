@@ -15,10 +15,11 @@ export interface BaseApiFetchOptions {
    */
   client?: boolean
   /**
-   * Cache the response for the same request
+   * Cache the response for the same request.
+   * If set to `true`, the cache key will be generated from the request options.
    * @default false
    */
-  cache?: boolean
+  cache?: string | boolean
 }
 
 export type ApiFetchOptions = Omit<NitroFetchOptions<string>, 'body' | 'cache'> & {
@@ -26,17 +27,10 @@ export type ApiFetchOptions = Omit<NitroFetchOptions<string>, 'body' | 'cache'> 
   body?: string | Record<string, any> | FormData | null
 }
 
-export interface $Api {
-  <T = any>(
-    path: string,
-    opts?: ApiFetchOptions & BaseApiFetchOptions,
-  ): Promise<T>
-  <T = any>(
-    key: string,
-    path: string,
-    opts?: ApiFetchOptions & BaseApiFetchOptions,
-  ): Promise<T>
-}
+export type $Api = <T = any>(
+  path: string,
+  opts?: ApiFetchOptions & BaseApiFetchOptions,
+) => Promise<T>
 
 export interface $OpenApi<Paths extends Record<string, PathItemObject>> {
   <P extends GETPlainPaths<Paths>>(
@@ -51,42 +45,13 @@ export interface $OpenApi<Paths extends Record<string, PathItemObject>> {
     path: P,
     opts?: BaseApiFetchOptions & OpenApiRequestOptions<Paths[`/${P}`], M> & { method: M }
   ): Promise<OpenApiResponse<Paths[`/${P}`][Lowercase<M>]>>
-  // Support for custom unique key
-  <P extends GETPlainPaths<Paths>>(
-    key: string,
-    path: P,
-    opts?: BaseApiFetchOptions & Omit<OpenApiRequestOptions<Paths[`/${P}`]>, 'method'>
-  ): Promise<OpenApiResponse<Paths[`/${P}`]['get']>>
-  <P extends GETPaths<Paths>>(
-    key: string,
-    path: P,
-    opts: BaseApiFetchOptions & Omit<OpenApiRequestOptions<Paths[`/${P}`]>, 'method'>
-  ): Promise<OpenApiResponse<Paths[`/${P}`]['get']>>
- <P extends AllPaths<Paths>, M extends IgnoreCase<keyof Paths[`/${P}`] & HttpMethod>>(
-    key: string,
-    path: P,
-    opts?: BaseApiFetchOptions & OpenApiRequestOptions<Paths[`/${P}`], M> & { method: M }
-  ): Promise<OpenApiResponse<Paths[`/${P}`][Lowercase<M>]>>
 }
 
 export function _$api<T = any>(
   endpointId: string,
   path: string,
-  opts: ApiFetchOptions & BaseApiFetchOptions,
-): Promise<T>
-export function _$api<T = any>(
-  endpointId: string,
-  key: string,
-  path: string,
-  opts: ApiFetchOptions & BaseApiFetchOptions,
-): Promise<T>
-export function _$api<T = any>(
-  endpointId: string,
-  ...args: [string, ApiFetchOptions & BaseApiFetchOptions] | [string, string, ApiFetchOptions & BaseApiFetchOptions]
+  opts: ApiFetchOptions & BaseApiFetchOptions = {},
 ): Promise<T> {
-  const [key = undefined] = args.length === 3 ? [args[0]] : []
-  const [path, opts = {}] = args.length === 3 ? [args[1], args[2]] : args
-
   const nuxt = useNuxtApp()
   const { apiParty } = useRuntimeConfig().public
   const promiseMap = (nuxt._promiseMap = nuxt._promiseMap || new Map()) as Map<string, Promise<T>>
@@ -102,14 +67,16 @@ export function _$api<T = any>(
     ...fetchOptions
   } = opts
 
-  const _key = key || `$party${hash([
-    endpointId,
-    path,
-    pathParams,
-    query,
-    method,
-    ...(isFormData(body) ? [] : [body]),
-  ])}`
+  const _key = typeof cache === 'string'
+    ? cache
+    : `$party${hash([
+      endpointId,
+      path,
+      pathParams,
+      query,
+      method,
+      ...(isFormData(body) ? [] : [body]),
+    ])}`
 
   if (client && !apiParty.allowClient)
     throw new Error('Client-side API requests are disabled. Set "allowClient: true" in the module options to enable them.')

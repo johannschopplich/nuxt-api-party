@@ -30,7 +30,7 @@ type BaseUseApiDataOptions<T> = Omit<AsyncDataOptions<T>, 'watch'> & {
    */
   client?: boolean
   /**
-   * Cache the response for the same request
+   * Cache the response for the same request.
    * @default true
    */
   cache?: boolean
@@ -71,15 +71,13 @@ function UseApiData<T = any>(
 
 ## Caching
 
-By default, a [unique key for each request is generated](/guide/caching) to ensure that data fetching can be properly de-duplicated across requests. You can provide a custom key by passing a string as the first argument, just like the native [`useAsyncData`](https://nuxt.com/docs/api/composables/use-async-data):
+By default, a [unique key is generated](/guide/caching) based in input parameters for each request to ensure that data fetching can be properly de-duplicated across requests. You can provide a custom key by passing a string as the first argument, just like the native [`useAsyncData`](https://nuxt.com/docs/api/composables/use-async-data):
 
 ```ts
-const key = 'all-posts'
+const route = useRoute()
+const key = computed(() => `posts-${route.params.id}`)
 
-const { data } = await useMyApiData(
-  key,
-  'posts'
-)
+const { data } = await useMyApiData(key, 'posts')
 ```
 
 ::: tip

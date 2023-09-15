@@ -27,7 +27,7 @@ export type BaseUseApiDataOptions<T> = Omit<AsyncDataOptions<T>, 'watch'> & {
    */
   client?: boolean
   /**
-   * Cache the response for the same request
+   * Cache the response for the same request.
    * @default true
    */
   cache?: boolean

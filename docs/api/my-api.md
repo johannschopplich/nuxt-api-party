@@ -17,10 +17,11 @@ interface BaseApiFetchOptions {
    */
   client?: boolean
   /**
-   * Cache the response for the same request
+   * Cache the response for the same request.
+   * If set to `true`, the cache key will be generated from the request options.
    * @default false
    */
-  cache?: boolean
+  cache?: string | boolean
 }
 
 type ApiFetchOptions = Omit<NitroFetchOptions<string>, 'body' | 'cache'> & {
@@ -32,24 +33,18 @@ function $Api<T = any>(
   path: string,
   opts?: ApiFetchOptions & BaseApiFetchOptions
 ): Promise<T>
-function $Api<T = any>(
-  key: string,
-  path: string,
-  opts?: ApiFetchOptions & BaseApiFetchOptions
-): Promise<T>
 ```
 
 ## Caching
 
-By default, a [unique key for each request is generated](/guide/caching) to ensure that data fetching can be properly de-duplicated across requests. You can provide a custom key by passing a string as the first argument:
+By default, a [unique key is generated](/guide/caching) based in input parameters for each request to ensure that data fetching can be properly de-duplicated across requests. You can provide a custom key by passing a string as the `cache` option:
 
 ```ts
-const key = 'all-posts'
+const route = useRoute()
 
-const data = await $myApi(
-  key,
-  'posts'
-)
+const data = await $myApi('posts', {
+  cache: `posts-${route.params.id}`
+})
 ```
 
 ## Example
