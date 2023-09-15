@@ -60,10 +60,17 @@ export type UseOpenApiDataOptions<
   M extends IgnoreCase<keyof P & HttpMethod> = IgnoreCase<keyof P & 'get'>,
 > = BaseUseApiDataOptions<OpenApiResponse<P[Lowercase<M>]>> & ComputedOptions<OpenApiRequestOptions<P, M>>
 
-export type UseApiData = <T = any>(
-  path: MaybeRefOrGetter<string>,
-  opts?: UseApiDataOptions<T>,
-) => AsyncData<T | undefined, FetchError>
+export interface UseApiData {
+  <T = any>(
+    path: MaybeRefOrGetter<string>,
+    opts?: UseApiDataOptions<T>,
+  ): AsyncData<T | undefined, FetchError>
+  <T = any>(
+    key: MaybeRefOrGetter<string>,
+    path: MaybeRefOrGetter<string>,
+    opts?: UseApiDataOptions<T>,
+  ): AsyncData<T | undefined, FetchError>
+}
 
 export interface UseOpenApiData<Paths extends Record<string, PathItemObject>> {
   <P extends GETPlainPaths<Paths>>(
@@ -78,13 +85,42 @@ export interface UseOpenApiData<Paths extends Record<string, PathItemObject>> {
     path: MaybeRefOrGetter<P>,
     opts: UseOpenApiDataOptions<Paths[`/${P}`], M> & { method: M },
   ): AsyncData<OpenApiResponse<Paths[`/${P}`][Lowercase<M>]> | undefined, FetchError<OpenApiError<Paths[`/${P}`][Lowercase<M>]>>>
+  // Support for custom unique key
+  <P extends GETPlainPaths<Paths>>(
+    key: MaybeRefOrGetter<string>,
+    path: MaybeRefOrGetter<P>,
+    opts?: Omit<UseOpenApiDataOptions<Paths[`/${P}`]>, 'method'>,
+  ): AsyncData<OpenApiResponse<Paths[`/${P}`]['get']> | undefined, FetchError<OpenApiError<Paths[`/${P}`]['get']>>>
+  <P extends GETPaths<Paths>>(
+    key: MaybeRefOrGetter<string>,
+    path: MaybeRefOrGetter<P>,
+    opts: Omit<UseOpenApiDataOptions<Paths[`/${P}`]>, 'method'>,
+  ): AsyncData<OpenApiResponse<Paths[`/${P}`]['get']> | undefined, FetchError<OpenApiError<Paths[`/${P}`]['get']>>>
+  <P extends AllPaths<Paths>, M extends IgnoreCase<keyof Paths[`/${P}`] & HttpMethod>>(
+    key: MaybeRefOrGetter<string>,
+    path: MaybeRefOrGetter<P>,
+    opts: UseOpenApiDataOptions<Paths[`/${P}`], M> & { method: M },
+  ): AsyncData<OpenApiResponse<Paths[`/${P}`][Lowercase<M>]> | undefined, FetchError<OpenApiError<Paths[`/${P}`][Lowercase<M>]>>>
 }
 
 export function _useApiData<T = any>(
   endpointId: string,
+  key: MaybeRefOrGetter<string>,
   path: MaybeRefOrGetter<string>,
-  opts: UseApiDataOptions<T> = {},
+  opts: UseApiDataOptions<T>,
+): AsyncData<T | undefined, FetchError>
+export function _useApiData<T = any>(
+  endpointId: string,
+  path: MaybeRefOrGetter<string>,
+  opts: UseApiDataOptions<T>,
+): AsyncData<T | undefined, FetchError>
+export function _useApiData<T = any>(
+  endpointId: string,
+  ...args: [MaybeRefOrGetter<string>, UseApiDataOptions<T>] | [MaybeRefOrGetter<string>, MaybeRefOrGetter<string>, UseApiDataOptions<T>]
 ) {
+  const [key = undefined] = args.length === 3 ? [args[0]] : []
+  const [path, opts = {}] = args.length === 3 ? [args[1], args[2]] : args
+
   const { apiParty } = useRuntimeConfig().public
   const {
     server,
@@ -103,7 +139,20 @@ export function _useApiData<T = any>(
     cache = true,
     ...fetchOptions
   } = opts
+
   const _path = computed(() => resolvePath(toValue(path), toValue(pathParams)))
+  const _key = computed(() => `$party${
+    key
+      ? toValue(key)
+      : hash([
+          endpointId,
+          _path.value,
+          toValue(query),
+          toValue(method),
+          ...(isFormData(toValue(body)) ? [] : [toValue(body)]),
+        ])
+    }`,
+  )
 
   if (client && !apiParty.allowClient)
     throw new Error('Client-side API requests are disabled. Set "allowClient: true" in the module options to enable them.')
@@ -140,23 +189,16 @@ export function _useApiData<T = any>(
   }
 
   let controller: AbortController | undefined
-  const key = computed(() => `$party${hash([
-    endpointId,
-    _path.value,
-    toValue(query),
-    toValue(method),
-    ...(isFormData(toValue(body)) ? [] : [toValue(body)]),
-  ])}`)
 
   return useAsyncData<T, FetchError>(
-    key.value,
+    _key.value,
     async (nuxt) => {
       controller?.abort?.()
 
       // Workaround to persist response client-side
       // https://github.com/nuxt/nuxt/issues/15445
-      if ((nuxt!.isHydrating || cache) && key.value in nuxt!.payload.data)
-        return nuxt!.payload.data[key.value]
+      if ((nuxt!.isHydrating || cache) && _key.value in nuxt!.payload.data)
+        return nuxt!.payload.data[_key.value]
 
       controller = new AbortController()
 
@@ -197,14 +239,14 @@ export function _useApiData<T = any>(
       }
       catch (error) {
         // Invalidate cache if request fails
-        if (key.value in nuxt!.payload.data)
-          delete nuxt!.payload.data[key.value]
+        if (_key.value in nuxt!.payload.data)
+          delete nuxt!.payload.data[_key.value]
 
         throw error
       }
 
       if (cache)
-        nuxt!.payload.data[key.value] = result
+        nuxt!.payload.data[_key.value] = result
 
       return result
     },

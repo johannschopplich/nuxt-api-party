@@ -52,7 +52,9 @@ export function _$api<T = any>(
   opts: ApiFetchOptions & BaseApiFetchOptions = {},
 ): Promise<T> {
   const nuxt = useNuxtApp()
+  const { apiParty } = useRuntimeConfig().public
   const promiseMap = (nuxt._promiseMap = nuxt._promiseMap || new Map()) as Map<string, Promise<T>>
+
   const {
     pathParams,
     query,
@@ -63,7 +65,7 @@ export function _$api<T = any>(
     cache = false,
     ...fetchOptions
   } = opts
-  const { apiParty } = useRuntimeConfig().public
+
   const key = `$party${hash([
     endpointId,
     path,
