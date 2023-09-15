@@ -17,6 +17,7 @@ export interface BaseApiFetchOptions {
   /**
    * Cache the response for the same request.
    * If set to `true`, the cache key will be generated from the request options.
+   * Alternatively, a custom cache key can be provided.
    * @default false
    */
   cache?: string | boolean
