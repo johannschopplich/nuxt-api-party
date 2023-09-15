@@ -19,6 +19,73 @@ The composable supports every [`useAsyncData` option](https://nuxt.com/docs/api/
 
 By default, Nuxt waits until a `refresh` is finished before it can be executed again. Passing `true` as parameter skips that wait.
 
+## Type Declarations
+
+```ts
+type BaseUseApiDataOptions<T> = Omit<AsyncDataOptions<T>, 'watch'> & {
+  /**
+   * Skip the Nuxt server proxy and fetch directly from the API.
+   * Requires `allowClient` to be enabled in the module options as well.
+   * @default false
+   */
+  client?: boolean
+  /**
+   * Cache the response for the same request
+   * @default true
+   */
+  cache?: boolean
+  /**
+   * Watch an array of reactive sources and auto-refresh the fetch result when they change.
+   * Fetch options and URL are watched by default. You can completely ignore reactive sources by using `watch: false`.
+   */
+  watch?: (WatchSource<unknown> | object)[] | false
+}
+
+type UseApiDataOptions<T> = Pick<
+  ComputedOptions<NitroFetchOptions<string>>,
+  | 'onRequest'
+  | 'onRequestError'
+  | 'onResponse'
+  | 'onResponseError'
+  | 'query'
+  | 'headers'
+  | 'method'
+  | 'retry'
+  | 'retryDelay'
+  | 'timeout'
+> & {
+  pathParams?: MaybeRef<Record<string, string>>
+  body?: MaybeRef<string | Record<string, any> | FormData | null | undefined>
+} & BaseUseApiDataOptions<T>
+
+function UseApiData<T = any>(
+  path: MaybeRefOrGetter<string>,
+  opts?: UseApiDataOptions<T>
+): AsyncData<T | undefined, FetchError>
+function UseApiData<T = any>(
+  key: MaybeRefOrGetter<string>,
+  path: MaybeRefOrGetter<string>,
+  opts?: UseApiDataOptions<T>
+): AsyncData<T | undefined, FetchError>
+```
+
+## Caching
+
+By default, a [unique key for each request is generated](/guide/caching) to ensure that data fetching can be properly de-duplicated across requests. You can provide a custom key by passing a string as the first argument, just like the native [`useAsyncData`](https://nuxt.com/docs/api/composables/use-async-data):
+
+```ts
+const key = 'all-posts'
+
+const { data } = await useMyApiData(
+  key,
+  'posts'
+)
+```
+
+::: tip
+The key can be a reactive value, e.g. a computed property.
+:::
+
 ## Examples
 
 ::: info
@@ -123,49 +190,4 @@ export default defineNuxtConfig({
     allowClient: true
   }
 })
-```
-
-## Type Declarations
-
-```ts
-type BaseUseApiDataOptions<T> = Omit<AsyncDataOptions<T>, 'watch'> & {
-  /**
-   * Skip the Nuxt server proxy and fetch directly from the API.
-   * Requires `allowClient` to be enabled in the module options as well.
-   * @default false
-   */
-  client?: boolean
-  /**
-   * Cache the response for the same request
-   * @default true
-   */
-  cache?: boolean
-  /**
-   * Watch an array of reactive sources and auto-refresh the fetch result when they change.
-   * Fetch options and URL are watched by default. You can completely ignore reactive sources by using `watch: false`.
-   */
-  watch?: (WatchSource<unknown> | object)[] | false
-}
-
-type UseApiDataOptions<T> = Pick<
-  ComputedOptions<NitroFetchOptions<string>>,
-  | 'onRequest'
-  | 'onRequestError'
-  | 'onResponse'
-  | 'onResponseError'
-  | 'query'
-  | 'headers'
-  | 'method'
-  | 'retry'
-  | 'retryDelay'
-  | 'timeout'
-> & {
-  pathParams?: MaybeRef<Record<string, string>>
-  body?: MaybeRef<string | Record<string, any> | FormData | null | undefined>
-} & BaseUseApiDataOptions<T>
-
-type UseApiData = <T = any>(
-  path: MaybeRefOrGetter<string>,
-  opts?: UseApiDataOptions<T>
-) => AsyncData<T | undefined, FetchError>
 ```

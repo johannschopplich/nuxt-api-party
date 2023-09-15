@@ -26,10 +26,17 @@ export type ApiFetchOptions = Omit<NitroFetchOptions<string>, 'body' | 'cache'> 
   body?: string | Record<string, any> | FormData | null
 }
 
-export type $Api = <T = any>(
-  path: string,
-  opts?: ApiFetchOptions & BaseApiFetchOptions,
-) => Promise<T>
+export interface $Api {
+  <T = any>(
+    path: string,
+    opts?: ApiFetchOptions & BaseApiFetchOptions,
+  ): Promise<T>
+  <T = any>(
+    key: string,
+    path: string,
+    opts?: ApiFetchOptions & BaseApiFetchOptions,
+  ): Promise<T>
+}
 
 export interface $OpenApi<Paths extends Record<string, PathItemObject>> {
   <P extends GETPlainPaths<Paths>>(
@@ -40,7 +47,23 @@ export interface $OpenApi<Paths extends Record<string, PathItemObject>> {
     path: P,
     opts: BaseApiFetchOptions & Omit<OpenApiRequestOptions<Paths[`/${P}`]>, 'method'>
   ): Promise<OpenApiResponse<Paths[`/${P}`]['get']>>
+  <P extends AllPaths<Paths>, M extends IgnoreCase<keyof Paths[`/${P}`] & HttpMethod>>(
+    path: P,
+    opts?: BaseApiFetchOptions & OpenApiRequestOptions<Paths[`/${P}`], M> & { method: M }
+  ): Promise<OpenApiResponse<Paths[`/${P}`][Lowercase<M>]>>
+  // Support for custom unique key
+  <P extends GETPlainPaths<Paths>>(
+    key: string,
+    path: P,
+    opts?: BaseApiFetchOptions & Omit<OpenApiRequestOptions<Paths[`/${P}`]>, 'method'>
+  ): Promise<OpenApiResponse<Paths[`/${P}`]['get']>>
+  <P extends GETPaths<Paths>>(
+    key: string,
+    path: P,
+    opts: BaseApiFetchOptions & Omit<OpenApiRequestOptions<Paths[`/${P}`]>, 'method'>
+  ): Promise<OpenApiResponse<Paths[`/${P}`]['get']>>
  <P extends AllPaths<Paths>, M extends IgnoreCase<keyof Paths[`/${P}`] & HttpMethod>>(
+    key: string,
     path: P,
     opts?: BaseApiFetchOptions & OpenApiRequestOptions<Paths[`/${P}`], M> & { method: M }
   ): Promise<OpenApiResponse<Paths[`/${P}`][Lowercase<M>]>>
@@ -49,8 +72,21 @@ export interface $OpenApi<Paths extends Record<string, PathItemObject>> {
 export function _$api<T = any>(
   endpointId: string,
   path: string,
-  opts: ApiFetchOptions & BaseApiFetchOptions = {},
+  opts: ApiFetchOptions & BaseApiFetchOptions,
+): Promise<T>
+export function _$api<T = any>(
+  endpointId: string,
+  key: string,
+  path: string,
+  opts: ApiFetchOptions & BaseApiFetchOptions,
+): Promise<T>
+export function _$api<T = any>(
+  endpointId: string,
+  ...args: [string, ApiFetchOptions & BaseApiFetchOptions] | [string, string, ApiFetchOptions & BaseApiFetchOptions]
 ): Promise<T> {
+  const [key = undefined] = args.length === 3 ? [args[0]] : []
+  const [path, opts = {}] = args.length === 3 ? [args[1], args[2]] : args
+
   const nuxt = useNuxtApp()
   const { apiParty } = useRuntimeConfig().public
   const promiseMap = (nuxt._promiseMap = nuxt._promiseMap || new Map()) as Map<string, Promise<T>>
@@ -66,7 +102,7 @@ export function _$api<T = any>(
     ...fetchOptions
   } = opts
 
-  const key = `$party${hash([
+  const _key = key || `$party${hash([
     endpointId,
     path,
     pathParams,
@@ -78,11 +114,11 @@ export function _$api<T = any>(
   if (client && !apiParty.allowClient)
     throw new Error('Client-side API requests are disabled. Set "allowClient: true" in the module options to enable them.')
 
-  if ((nuxt.isHydrating || cache) && key in nuxt.payload.data)
-    return Promise.resolve(nuxt.payload.data[key])
+  if ((nuxt.isHydrating || cache) && _key in nuxt.payload.data)
+    return Promise.resolve(nuxt.payload.data[_key])
 
-  if (promiseMap.has(key))
-    return promiseMap.get(key)!
+  if (promiseMap.has(_key))
+    return promiseMap.get(_key)!
 
   const endpoints = (apiParty as unknown as ModuleOptions).endpoints || {}
   const endpoint = endpoints[endpointId]
@@ -122,19 +158,19 @@ export function _$api<T = any>(
   const request = (client ? clientFetcher() : serverFetcher())
     .then((response) => {
       if (process.server || cache)
-        nuxt.payload.data[key] = response
-      promiseMap.delete(key)
+        nuxt.payload.data[_key] = response
+      promiseMap.delete(_key)
       return response
     })
     // Invalidate cache if request fails
     .catch((error) => {
-      if (key in nuxt.payload.data)
-        delete nuxt.payload.data[key]
-      promiseMap.delete(key)
+      if (_key in nuxt.payload.data)
+        delete nuxt.payload.data[_key]
+      promiseMap.delete(_key)
       throw error
     }) as Promise<T>
 
-  promiseMap.set(key, request)
+  promiseMap.set(_key, request)
 
   return request
 }
