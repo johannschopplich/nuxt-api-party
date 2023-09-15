@@ -15,10 +15,12 @@ export interface BaseApiFetchOptions {
    */
   client?: boolean
   /**
-   * Cache the response for the same request
+   * Cache the response for the same request.
+   * If set to `true`, the cache key will be generated from the request options.
+   * Alternatively, a custom cache key can be provided.
    * @default false
    */
-  cache?: boolean
+  cache?: string | boolean
 }
 
 export type ApiFetchOptions = Omit<NitroFetchOptions<string>, 'body' | 'cache'> & {
@@ -40,7 +42,7 @@ export interface $OpenApi<Paths extends Record<string, PathItemObject>> {
     path: P,
     opts: BaseApiFetchOptions & Omit<OpenApiRequestOptions<Paths[`/${P}`]>, 'method'>
   ): Promise<OpenApiResponse<Paths[`/${P}`]['get']>>
- <P extends AllPaths<Paths>, M extends IgnoreCase<keyof Paths[`/${P}`] & HttpMethod>>(
+  <P extends AllPaths<Paths>, M extends IgnoreCase<keyof Paths[`/${P}`] & HttpMethod>>(
     path: P,
     opts?: BaseApiFetchOptions & OpenApiRequestOptions<Paths[`/${P}`], M> & { method: M }
   ): Promise<OpenApiResponse<Paths[`/${P}`][Lowercase<M>]>>
@@ -52,7 +54,9 @@ export function _$api<T = any>(
   opts: ApiFetchOptions & BaseApiFetchOptions = {},
 ): Promise<T> {
   const nuxt = useNuxtApp()
+  const { apiParty } = useRuntimeConfig().public
   const promiseMap = (nuxt._promiseMap = nuxt._promiseMap || new Map()) as Map<string, Promise<T>>
+
   const {
     pathParams,
     query,
@@ -63,24 +67,26 @@ export function _$api<T = any>(
     cache = false,
     ...fetchOptions
   } = opts
-  const { apiParty } = useRuntimeConfig().public
-  const key = `$party${hash([
-    endpointId,
-    path,
-    pathParams,
-    query,
-    method,
-    ...(isFormData(body) ? [] : [body]),
-  ])}`
+
+  const _key = typeof cache === 'string'
+    ? cache
+    : `$party${hash([
+      endpointId,
+      path,
+      pathParams,
+      query,
+      method,
+      ...(isFormData(body) ? [] : [body]),
+    ])}`
 
   if (client && !apiParty.allowClient)
     throw new Error('Client-side API requests are disabled. Set "allowClient: true" in the module options to enable them.')
 
-  if ((nuxt.isHydrating || cache) && key in nuxt.payload.data)
-    return Promise.resolve(nuxt.payload.data[key])
+  if ((nuxt.isHydrating || cache) && _key in nuxt.payload.data)
+    return Promise.resolve(nuxt.payload.data[_key])
 
-  if (promiseMap.has(key))
-    return promiseMap.get(key)!
+  if (promiseMap.has(_key))
+    return promiseMap.get(_key)!
 
   const endpoints = (apiParty as unknown as ModuleOptions).endpoints || {}
   const endpoint = endpoints[endpointId]
@@ -120,19 +126,19 @@ export function _$api<T = any>(
   const request = (client ? clientFetcher() : serverFetcher())
     .then((response) => {
       if (process.server || cache)
-        nuxt.payload.data[key] = response
-      promiseMap.delete(key)
+        nuxt.payload.data[_key] = response
+      promiseMap.delete(_key)
       return response
     })
     // Invalidate cache if request fails
     .catch((error) => {
-      if (key in nuxt.payload.data)
-        delete nuxt.payload.data[key]
-      promiseMap.delete(key)
+      if (_key in nuxt.payload.data)
+        delete nuxt.payload.data[_key]
+      promiseMap.delete(_key)
       throw error
     }) as Promise<T>
 
-  promiseMap.set(key, request)
+  promiseMap.set(_key, request)
 
   return request
 }

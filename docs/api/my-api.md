@@ -6,6 +6,48 @@
 
 Returns the raw response of the API endpoint. Intended for actions inside methods, e.g. when sending form data to the API when clicking a submit button.
 
+## Type Declarations
+
+```ts
+interface BaseApiFetchOptions {
+  /**
+   * Skip the Nuxt server proxy and fetch directly from the API.
+   * Requires `allowClient` to be enabled in the module options as well.
+   * @default false
+   */
+  client?: boolean
+  /**
+   * Cache the response for the same request.
+   * If set to `true`, the cache key will be generated from the request options.
+   * Alternatively, a custom cache key can be provided.
+   * @default false
+   */
+  cache?: string | boolean
+}
+
+type ApiFetchOptions = Omit<NitroFetchOptions<string>, 'body' | 'cache'> & {
+  pathParams?: Record<string, string>
+  body?: string | Record<string, any> | FormData | null
+}
+
+function $Api<T = any>(
+  path: string,
+  opts?: ApiFetchOptions & BaseApiFetchOptions
+): Promise<T>
+```
+
+## Caching
+
+By default, a [unique key is generated](/guide/caching) based in input parameters for each request to ensure that data fetching can be properly de-duplicated across requests. You can provide a custom key by passing a string as the `cache` option:
+
+```ts
+const route = useRoute()
+
+const data = await $myApi('posts', {
+  cache: `posts-${route.params.id}`
+})
+```
+
 ## Example
 
 ::: info
@@ -89,32 +131,4 @@ export default defineNuxtConfig({
     allowClient: true
   }
 })
-```
-
-## Type Declarations
-
-```ts
-interface BaseApiFetchOptions {
-  /**
-   * Skip the Nuxt server proxy and fetch directly from the API.
-   * Requires `allowClient` to be enabled in the module options as well.
-   * @default false
-   */
-  client?: boolean
-  /**
-   * Cache the response for the same request
-   * @default false
-   */
-  cache?: boolean
-}
-
-type ApiFetchOptions = Omit<NitroFetchOptions<string>, 'body' | 'cache'> & {
-  pathParams?: Record<string, string>
-  body?: string | Record<string, any> | FormData | null
-}
-
-type $Api = <T = any>(
-  path: string,
-  opts?: ApiFetchOptions & BaseApiFetchOptions
-) => Promise<T>
 ```
