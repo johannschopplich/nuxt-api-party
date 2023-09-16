@@ -8,7 +8,7 @@ Responses from `useMyApiData` are cached by default. On the other hand, you have
 
 ## Caching Strategy
 
-Both [generated composables](/api/#dynamic-composables) will calculate a cache key based on the following properties:
+Both [generated composables](/api/#dynamic-composables) will calculate a cache key (if no custom one is provided) based on the following properties:
 
 - API endpoint ID
 - Path
@@ -22,6 +22,13 @@ If the cache key is already present in the cache, the cached response will be re
 ::: tip
 The cache key is reactive when using `useMyApiData`. This means that the cache key will be recalculated when any of the properties change.
 :::
+
+## Custom Cache Key
+
+For more control over when the cache should be invalidated, you can provide a custom cache key. Please head to the API references for more information:
+
+- [Customize the cache key for `useMyApiData`](/api/use-my-api-data#caching)
+- [Customize the cache key for `$myApi`](/api/my-api#caching)
 
 ## Cache Options
 
