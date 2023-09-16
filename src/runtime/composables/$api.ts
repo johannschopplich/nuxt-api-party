@@ -68,25 +68,25 @@ export function _$api<T = any>(
     ...fetchOptions
   } = opts
 
-  const _key = typeof cache === 'boolean'
-    ? `${CACHE_KEY_PREFIX}${hash([
-        endpointId,
-        path,
-        pathParams,
-        query,
-        method,
-        ...(isFormData(body) ? [] : [body]),
-      ])}`
-    : `${CACHE_KEY_PREFIX}${cache}`
+  const key = typeof cache === 'boolean'
+    ? CACHE_KEY_PREFIX + hash([
+      endpointId,
+      path,
+      pathParams,
+      query,
+      method,
+      ...(isFormData(body) ? [] : [body]),
+    ])
+    : CACHE_KEY_PREFIX + cache
 
   if (client && !apiParty.allowClient)
     throw new Error('Client-side API requests are disabled. Set "allowClient: true" in the module options to enable them.')
 
-  if ((nuxt.isHydrating || cache) && _key in nuxt.payload.data)
-    return Promise.resolve(nuxt.payload.data[_key])
+  if ((nuxt.isHydrating || cache) && key in nuxt.payload.data)
+    return Promise.resolve(nuxt.payload.data[key])
 
-  if (promiseMap.has(_key))
-    return promiseMap.get(_key)!
+  if (promiseMap.has(key))
+    return promiseMap.get(key)!
 
   const endpoints = (apiParty as unknown as ModuleOptions).endpoints || {}
   const endpoint = endpoints[endpointId]
@@ -126,19 +126,19 @@ export function _$api<T = any>(
   const request = (client ? clientFetcher() : serverFetcher())
     .then((response) => {
       if (process.server || cache)
-        nuxt.payload.data[_key] = response
-      promiseMap.delete(_key)
+        nuxt.payload.data[key] = response
+      promiseMap.delete(key)
       return response
     })
     // Invalidate cache if request fails
     .catch((error) => {
-      if (_key in nuxt.payload.data)
-        delete nuxt.payload.data[_key]
-      promiseMap.delete(_key)
+      if (key in nuxt.payload.data)
+        delete nuxt.payload.data[key]
+      promiseMap.delete(key)
       throw error
     }) as Promise<T>
 
-  promiseMap.set(_key, request)
+  promiseMap.set(key, request)
 
   return request
 }

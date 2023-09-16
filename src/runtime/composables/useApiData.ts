@@ -108,14 +108,14 @@ export function _useApiData<T = any>(
 
   const _path = computed(() => resolvePath(toValue(path), toValue(pathParams)))
   const _key = computed(typeof cache === 'boolean'
-    ? () => `${CACHE_KEY_PREFIX}${hash([
+    ? () => CACHE_KEY_PREFIX + hash([
         endpointId,
         _path.value,
         toValue(query),
         toValue(method),
         ...(isFormData(toValue(body)) ? [] : [toValue(body)]),
-      ])}`
-    : () => `${CACHE_KEY_PREFIX}${toValue(cache)}`,
+      ])
+    : () => CACHE_KEY_PREFIX + toValue(cache),
   )
 
   if (client && !apiParty.allowClient)

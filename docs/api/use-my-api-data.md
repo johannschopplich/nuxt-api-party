@@ -64,11 +64,6 @@ function UseApiData<T = any>(
   path: MaybeRefOrGetter<string>,
   opts?: UseApiDataOptions<T>
 ): AsyncData<T | undefined, FetchError>
-function UseApiData<T = any>(
-  key: MaybeRefOrGetter<string>,
-  path: MaybeRefOrGetter<string>,
-  opts?: UseApiDataOptions<T>
-): AsyncData<T | undefined, FetchError>
 ```
 
 ## Caching
