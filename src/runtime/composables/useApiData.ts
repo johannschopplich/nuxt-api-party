@@ -28,9 +28,11 @@ export type BaseUseApiDataOptions<T> = Omit<AsyncDataOptions<T>, 'watch'> & {
   client?: boolean
   /**
    * Cache the response for the same request.
+   * If set to `true`, the cache key will be generated from the request options.
+   * Alternatively, a custom cache key can be provided.
    * @default true
    */
-  cache?: boolean
+  cache?: boolean | MaybeRefOrGetter<string>
   /**
    * Watch an array of reactive sources and auto-refresh the fetch result when they change.
    * Fetch options and URL are watched by default. You can completely ignore reactive sources by using `watch: false`.
@@ -60,17 +62,10 @@ export type UseOpenApiDataOptions<
   M extends IgnoreCase<keyof P & HttpMethod> = IgnoreCase<keyof P & 'get'>,
 > = BaseUseApiDataOptions<OpenApiResponse<P[Lowercase<M>]>> & ComputedOptions<OpenApiRequestOptions<P, M>>
 
-export interface UseApiData {
-  <T = any>(
-    path: MaybeRefOrGetter<string>,
-    opts?: UseApiDataOptions<T>,
-  ): AsyncData<T | undefined, FetchError>
-  <T = any>(
-    key: MaybeRefOrGetter<string>,
-    path: MaybeRefOrGetter<string>,
-    opts?: UseApiDataOptions<T>,
-  ): AsyncData<T | undefined, FetchError>
-}
+export type UseApiData = <T = any>(
+  path: MaybeRefOrGetter<string>,
+  opts?: UseApiDataOptions<T>,
+) => AsyncData<T | undefined, FetchError>
 
 export interface UseOpenApiData<Paths extends Record<string, PathItemObject>> {
   <P extends GETPlainPaths<Paths>>(
@@ -85,42 +80,13 @@ export interface UseOpenApiData<Paths extends Record<string, PathItemObject>> {
     path: MaybeRefOrGetter<P>,
     opts: UseOpenApiDataOptions<Paths[`/${P}`], M> & { method: M },
   ): AsyncData<OpenApiResponse<Paths[`/${P}`][Lowercase<M>]> | undefined, FetchError<OpenApiError<Paths[`/${P}`][Lowercase<M>]>>>
-  // Support for custom unique key
-  <P extends GETPlainPaths<Paths>>(
-    key: MaybeRefOrGetter<string>,
-    path: MaybeRefOrGetter<P>,
-    opts?: Omit<UseOpenApiDataOptions<Paths[`/${P}`]>, 'method'>,
-  ): AsyncData<OpenApiResponse<Paths[`/${P}`]['get']> | undefined, FetchError<OpenApiError<Paths[`/${P}`]['get']>>>
-  <P extends GETPaths<Paths>>(
-    key: MaybeRefOrGetter<string>,
-    path: MaybeRefOrGetter<P>,
-    opts: Omit<UseOpenApiDataOptions<Paths[`/${P}`]>, 'method'>,
-  ): AsyncData<OpenApiResponse<Paths[`/${P}`]['get']> | undefined, FetchError<OpenApiError<Paths[`/${P}`]['get']>>>
-  <P extends AllPaths<Paths>, M extends IgnoreCase<keyof Paths[`/${P}`] & HttpMethod>>(
-    key: MaybeRefOrGetter<string>,
-    path: MaybeRefOrGetter<P>,
-    opts: UseOpenApiDataOptions<Paths[`/${P}`], M> & { method: M },
-  ): AsyncData<OpenApiResponse<Paths[`/${P}`][Lowercase<M>]> | undefined, FetchError<OpenApiError<Paths[`/${P}`][Lowercase<M>]>>>
 }
 
 export function _useApiData<T = any>(
   endpointId: string,
-  key: MaybeRefOrGetter<string>,
   path: MaybeRefOrGetter<string>,
-  opts: UseApiDataOptions<T>,
-): AsyncData<T | undefined, FetchError>
-export function _useApiData<T = any>(
-  endpointId: string,
-  path: MaybeRefOrGetter<string>,
-  opts: UseApiDataOptions<T>,
-): AsyncData<T | undefined, FetchError>
-export function _useApiData<T = any>(
-  endpointId: string,
-  ...args: [MaybeRefOrGetter<string>, UseApiDataOptions<T>] | [MaybeRefOrGetter<string>, MaybeRefOrGetter<string>, UseApiDataOptions<T>]
+  opts: UseApiDataOptions<T> = {},
 ) {
-  const [key = undefined] = args.length === 3 ? [args[0]] : []
-  const [path, opts = {}] = args.length === 3 ? [args[1], args[2]] : args
-
   const { apiParty } = useRuntimeConfig().public
   const {
     server,
@@ -141,17 +107,15 @@ export function _useApiData<T = any>(
   } = opts
 
   const _path = computed(() => resolvePath(toValue(path), toValue(pathParams)))
-  const _key = computed(() => `${CACHE_KEY_PREFIX}${
-    key
-      ? `${CACHE_KEY_PREFIX}${toValue(key)}`
-      : hash([
-          endpointId,
-          _path.value,
-          toValue(query),
-          toValue(method),
-          ...(isFormData(toValue(body)) ? [] : [toValue(body)]),
-        ])
-    }`,
+  const _key = computed(typeof cache === 'boolean'
+    ? () => `${CACHE_KEY_PREFIX}${hash([
+        endpointId,
+        _path.value,
+        toValue(query),
+        toValue(method),
+        ...(isFormData(toValue(body)) ? [] : [toValue(body)]),
+      ])}`
+    : () => `${CACHE_KEY_PREFIX}${toValue(cache)}`,
   )
 
   if (client && !apiParty.allowClient)

@@ -25,7 +25,7 @@ The cache key is reactive when using `useMyApiData`. This means that the cache k
 
 ## Custom Cache Key
 
-For more control over when the cache should be invalidated, you can provide a custom cache key. Please head to the API references for more information:
+For more control over when the cache should be invalidated, you can provide a custom cache key to de-duplicate requests. Please head to the API references for more information:
 
 - [Customize the cache key for `useMyApiData`](/api/use-my-api-data#caching)
 - [Customize the cache key for `$myApi`](/api/my-api#caching)

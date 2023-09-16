@@ -52,7 +52,7 @@ export function _$api<T = any>(
   endpointId: string,
   path: string,
   opts: ApiFetchOptions & BaseApiFetchOptions = {},
-): Promise<T> {
+) {
   const nuxt = useNuxtApp()
   const { apiParty } = useRuntimeConfig().public
   const promiseMap = (nuxt._promiseMap = nuxt._promiseMap || new Map()) as Map<string, Promise<T>>
@@ -68,16 +68,16 @@ export function _$api<T = any>(
     ...fetchOptions
   } = opts
 
-  const _key = typeof cache === 'string'
-    ? `${CACHE_KEY_PREFIX}${cache}`
-    : `${CACHE_KEY_PREFIX}${hash([
-      endpointId,
-      path,
-      pathParams,
-      query,
-      method,
-      ...(isFormData(body) ? [] : [body]),
-    ])}`
+  const _key = typeof cache === 'boolean'
+    ? `${CACHE_KEY_PREFIX}${hash([
+        endpointId,
+        path,
+        pathParams,
+        query,
+        method,
+        ...(isFormData(body) ? [] : [body]),
+      ])}`
+    : `${CACHE_KEY_PREFIX}${cache}`
 
   if (client && !apiParty.allowClient)
     throw new Error('Client-side API requests are disabled. Set "allowClient: true" in the module options to enable them.')
