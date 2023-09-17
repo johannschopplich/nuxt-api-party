@@ -19,7 +19,7 @@ type ComputedOptions<T extends Record<string, any>> = {
       : MaybeRef<T[K]>;
 }
 
-export type BaseUseApiDataOptions<T> = Omit<AsyncDataOptions<T>, 'watch'> & {
+export type BaseUseApiDataOptions<ResT, DataT = ResT> = Omit<AsyncDataOptions<ResT, DataT>, 'watch'> & {
   /**
    * Skip the Nuxt server proxy and fetch directly from the API.
    * Requires `allowClient` to be enabled in the module options as well.
@@ -60,7 +60,9 @@ export type UseApiDataOptions<T> = Pick<
 export type UseOpenApiDataOptions<
   P extends PathItemObject,
   M extends IgnoreCase<keyof P & HttpMethod> = IgnoreCase<keyof P & 'get'>,
-> = BaseUseApiDataOptions<OpenApiResponse<P[Lowercase<M>]>> & ComputedOptions<OpenApiRequestOptions<P, M>>
+  ResT = OpenApiResponse<P[Lowercase<M>]>,
+  DataT = ResT,
+> = BaseUseApiDataOptions<ResT, DataT> & ComputedOptions<OpenApiRequestOptions<P, M>>
 
 export type UseApiData = <T = any>(
   path: MaybeRefOrGetter<string>,
@@ -68,18 +70,18 @@ export type UseApiData = <T = any>(
 ) => AsyncData<T | undefined, FetchError>
 
 export interface UseOpenApiData<Paths extends Record<string, PathItemObject>> {
-  <P extends GETPlainPaths<Paths>>(
+  <P extends GETPlainPaths<Paths>, ResT = OpenApiResponse<Paths[`/${P}`]['get']>, DataT = ResT>(
     path: MaybeRefOrGetter<P>,
-    opts?: Omit<UseOpenApiDataOptions<Paths[`/${P}`]>, 'method'>,
-  ): AsyncData<OpenApiResponse<Paths[`/${P}`]['get']> | undefined, FetchError<OpenApiError<Paths[`/${P}`]['get']>>>
-  <P extends GETPaths<Paths>>(
+    opts?: Omit<UseOpenApiDataOptions<Paths[`/${P}`], IgnoreCase<keyof Paths[`/${P}`] & HttpMethod>, ResT, DataT>, 'method'>,
+  ): AsyncData<DataT, FetchError<OpenApiError<Paths[`/${P}`]['get']>>>
+  <P extends GETPaths<Paths>, ResT = OpenApiResponse<Paths[`/${P}`]['get']>, DataT = ResT>(
     path: MaybeRefOrGetter<P>,
-    opts: Omit<UseOpenApiDataOptions<Paths[`/${P}`]>, 'method'>,
-  ): AsyncData<OpenApiResponse<Paths[`/${P}`]['get']> | undefined, FetchError<OpenApiError<Paths[`/${P}`]['get']>>>
-  <P extends AllPaths<Paths>, M extends IgnoreCase<keyof Paths[`/${P}`] & HttpMethod>>(
+    opts: Omit<UseOpenApiDataOptions<Paths[`/${P}`], IgnoreCase<keyof Paths[`/${P}`] & HttpMethod>, ResT, DataT>, 'method'>,
+  ): AsyncData<DataT, FetchError<OpenApiError<Paths[`/${P}`]['get']>>>
+  <P extends AllPaths<Paths>, M extends IgnoreCase<keyof Paths[`/${P}`] & HttpMethod>, ResT = OpenApiResponse<Paths[`/${P}`][Lowercase<M>]>, DataT = ResT>(
     path: MaybeRefOrGetter<P>,
-    opts: UseOpenApiDataOptions<Paths[`/${P}`], M> & { method: M },
-  ): AsyncData<OpenApiResponse<Paths[`/${P}`][Lowercase<M>]> | undefined, FetchError<OpenApiError<Paths[`/${P}`][Lowercase<M>]>>>
+    opts: UseOpenApiDataOptions<Paths[`/${P}`], M, ResT, DataT> & { method: M },
+  ): AsyncData<DataT, FetchError<OpenApiError<Paths[`/${P}`][Lowercase<M>]>>>
 }
 
 export function _useApiData<T = any>(
