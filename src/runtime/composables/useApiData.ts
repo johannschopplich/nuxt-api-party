@@ -28,14 +28,20 @@ export type BaseUseApiDataOptions<T> = Omit<AsyncDataOptions<T>, 'watch'> & {
   client?: boolean
   /**
    * Cache the response for the same request.
-   * If set to `true`, the cache key will be generated from the request options.
-   * Alternatively, a custom cache key can be provided.
+   * You can customize the cache key with the `key` option.
    * @default true
    */
-  cache?: boolean | MaybeRefOrGetter<string>
+  cache?: boolean
+  /**
+   * By default, a cache key will be generated from the request options.
+   * With this option, you can provide a custom cache key.
+   * @default undefined
+   */
+  key?: MaybeRefOrGetter<string>
   /**
    * Watch an array of reactive sources and auto-refresh the fetch result when they change.
    * Fetch options and URL are watched by default. You can completely ignore reactive sources by using `watch: false`.
+   * @default undefined
    */
   watch?: (WatchSource<unknown> | object)[] | false
 }
@@ -103,11 +109,12 @@ export function _useApiData<T = any>(
     body,
     client = false,
     cache = true,
+    key,
     ...fetchOptions
   } = opts
 
   const _path = computed(() => resolvePath(toValue(path), toValue(pathParams)))
-  const _key = computed(typeof cache === 'boolean'
+  const _key = computed(key === undefined
     ? () => CACHE_KEY_PREFIX + hash([
         endpointId,
         _path.value,
