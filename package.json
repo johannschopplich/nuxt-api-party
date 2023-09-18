@@ -2,7 +2,7 @@
   "name": "nuxt-api-party",
   "type": "module",
   "version": "0.19.0",
-  "packageManager": "pnpm@8.7.5",
+  "packageManager": "pnpm@8.7.6",
   "description": "Nuxt 3 module to securely connect with any API",
   "author": "Johann Schopplich <pkg@johannschopplich.com>",
   "license": "MIT",
@@ -60,10 +60,10 @@
     "openapi-typescript": "^5 || ^6"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^0.42.0",
+    "@antfu/eslint-config": "^0.42.1",
     "@nuxt/module-builder": "^0.5.1",
     "@nuxt/test-utils": "^3.7.3",
-    "@types/node": "^20.6.0",
+    "@types/node": "^20.6.2",
     "bumpp": "^9.2.0",
     "eslint": "^8.49.0",
     "nuxt": "^3.7.3",
