@@ -179,6 +179,7 @@ export function _useApiData<T = any>(
         if (client) {
           result = (await globalThis.$fetch<T>(_path.value, {
             ..._fetchOptions,
+            signal: controller.signal,
             baseURL: endpoint.url,
             method: _endpointFetchOptions.method,
             query: {
