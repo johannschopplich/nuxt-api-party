@@ -16,6 +16,12 @@ const { data, error } = usePetStoreData('pet/findByStatus', {
   query: computed(() => ({
     status: status.value ?? 'pending',
   })),
+  transform(response) {
+    return response.map(({ id, name }) => ({
+      id,
+      name,
+    }))
+  },
 })
 
 watch(error, value => console.error(value))
