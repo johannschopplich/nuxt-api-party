@@ -122,7 +122,7 @@ export function _useApiData<T = any>(
         toValue(method),
         ...(isFormData(toValue(body)) ? [] : [toValue(body)]),
       ])
-    : () => CACHE_KEY_PREFIX + toValue(cache),
+    : () => CACHE_KEY_PREFIX + toValue(key),
   )
 
   if (client && !apiParty.allowClient)

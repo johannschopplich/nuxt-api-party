@@ -83,7 +83,7 @@ export function _$api<T = any>(
       method,
       ...(isFormData(body) ? [] : [body]),
     ])
-    : CACHE_KEY_PREFIX + cache
+    : CACHE_KEY_PREFIX + key
 
   if (client && !apiParty.allowClient)
     throw new Error('Client-side API requests are disabled. Set "allowClient: true" in the module options to enable them.')
