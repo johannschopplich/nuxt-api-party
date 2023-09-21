@@ -60,7 +60,7 @@ export type UseApiDataOptions<T> = Pick<
   | 'timeout'
 > & {
   pathParams?: MaybeRefOrGetter<Record<string, string>>
-  body?: MaybeRef<string | Record<string, any> | FormData | null | undefined>
+  body?: MaybeRef<string | Record<string, any> | FormData | null>
 } & BaseUseApiDataOptions<T>
 
 export type UseOpenApiDataOptions<

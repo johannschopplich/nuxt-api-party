@@ -22,7 +22,7 @@ By default, Nuxt waits until a `refresh` is finished before it can be executed a
 ## Type Declarations
 
 ```ts
-type BaseUseApiDataOptions<T> = Omit<AsyncDataOptions<T>, 'watch'> & {
+type BaseUseApiDataOptions<ResT, DataT = ResT> = Omit<AsyncDataOptions<ResT, DataT>, 'watch'> & {
   /**
    * Skip the Nuxt server proxy and fetch directly from the API.
    * Requires `allowClient` to be enabled in the module options as well.
@@ -62,8 +62,8 @@ type UseApiDataOptions<T> = Pick<
   | 'retryDelay'
   | 'timeout'
 > & {
-  pathParams?: MaybeRef<Record<string, string>>
-  body?: MaybeRef<string | Record<string, any> | FormData | null | undefined>
+  pathParams?: MaybeRefOrGetter<Record<string, string>>
+  body?: MaybeRef<string | Record<string, any> | FormData | null>
 } & BaseUseApiDataOptions<T>
 
 function UseApiData<T = any>(
