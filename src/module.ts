@@ -93,7 +93,7 @@ export default defineNuxtModule<ModuleOptions>({
       Object.keys(options.endpoints!).length === 0
       && !nuxt.options.runtimeConfig.apiParty
     )
-      logger.error('Missing any API endpoint configuration. Please set `apiParty` module options in `nuxt.config.ts`.')
+      logger.error('Missing any API endpoint configuration. Please the `apiParty` module configuration in `nuxt.config.ts`.')
 
     // Private runtime config
     nuxt.options.runtimeConfig.apiParty = defu(
@@ -102,7 +102,7 @@ export default defineNuxtModule<ModuleOptions>({
     )
 
     if (!nuxt.options.ssr) {
-      logger.info('SSR is disabled, enabling Nuxt API Party client requests by default.')
+      logger.info('Enabling Nuxt API Party client requests by default, because `ssr: false` is set.')
       options.client = 'always'
     }
 
