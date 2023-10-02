@@ -10,7 +10,9 @@ import { useNuxtApp, useRequestHeaders, useRuntimeConfig } from '#imports'
 export interface BaseApiFetchOptions {
   /**
    * Skip the Nuxt server proxy and fetch directly from the API.
-   * Requires `allowClient` to be enabled in the module options as well.
+   * Requires `client` set to `true` in the module options.
+   * @remarks
+   * If Nuxt SSR is disabled, client-side requests are enabled by default.
    * @default false
    */
   client?: boolean
@@ -59,7 +61,7 @@ export function _$api<T = any>(
   opts: ApiFetchOptions & BaseApiFetchOptions = {},
 ) {
   const nuxt = useNuxtApp()
-  const { apiParty } = useRuntimeConfig().public
+  const apiParty = useRuntimeConfig().public.apiParty as unknown as Required<ModuleOptions>
   const promiseMap = (nuxt._promiseMap = nuxt._promiseMap || new Map()) as Map<string, Promise<T>>
 
   const {
@@ -68,7 +70,7 @@ export function _$api<T = any>(
     headers,
     method,
     body,
-    client = false,
+    client = apiParty.client === 'always',
     cache = false,
     key,
     ...fetchOptions
@@ -85,8 +87,8 @@ export function _$api<T = any>(
     ])
     : CACHE_KEY_PREFIX + key
 
-  if (client && !apiParty.allowClient)
-    throw new Error('Client-side API requests are disabled. Set "allowClient: true" in the module options to enable them.')
+  if (client && !apiParty.client)
+    throw new Error('Client-side API requests are disabled. Set "client: true" in the module options to enable them.')
 
   if ((nuxt.isHydrating || cache) && _key in nuxt.payload.data)
     return Promise.resolve(nuxt.payload.data[_key])
@@ -94,8 +96,7 @@ export function _$api<T = any>(
   if (promiseMap.has(_key))
     return promiseMap.get(_key)!
 
-  const endpoints = (apiParty as unknown as ModuleOptions).endpoints || {}
-  const endpoint = endpoints[endpointId]
+  const endpoint = (apiParty.endpoints || {})[endpointId]
 
   const clientFetcher = () => globalThis.$fetch<T>(resolvePath(path, pathParams), {
     ...fetchOptions,

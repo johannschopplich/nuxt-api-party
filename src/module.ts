@@ -55,13 +55,14 @@ export interface ModuleOptions {
    *
    * @remarks
    * By default, API requests are only made on the server-side. This option allows you to make requests on the client-side as well. Keep in mind that this will expose your API credentials to the client.
+   * Note: If Nuxt SSR is disabled, all requests are made on the client-side by default.
    *
    * @example
    * useJsonPlaceholderData('/posts/1', { client: true })
    *
    * @default false
    */
-  allowClient?: boolean
+  client?: boolean | 'allow' | 'always'
 
   /**
    * Global options for openapi-typescript
@@ -79,7 +80,7 @@ export default defineNuxtModule<ModuleOptions>({
   },
   defaults: {
     endpoints: {},
-    allowClient: false,
+    client: false,
     openAPITS: {},
   },
   async setup(options, nuxt) {
@@ -100,12 +101,18 @@ export default defineNuxtModule<ModuleOptions>({
       options,
     )
 
+    if (!nuxt.options.ssr) {
+      logger.info('SSR is disabled, enabling Nuxt API Party client requests by default.')
+      options.client = 'always'
+    }
+
     const resolvedOptions = nuxt.options.runtimeConfig.apiParty as Required<ModuleOptions>
 
     // Write options to public runtime config if client requests are enabled
+    // @ts-expect-error: `client` types are not compatible
     nuxt.options.runtimeConfig.public.apiParty = defu(
       nuxt.options.runtimeConfig.public.apiParty,
-      resolvedOptions.allowClient
+      resolvedOptions.client
         ? resolvedOptions
         : {
             // Only expose cookies endpoint option to the client
@@ -114,7 +121,7 @@ export default defineNuxtModule<ModuleOptions>({
                 ([endpointId, endpoint]) => [endpointId, { cookies: endpoint.cookies }],
               ),
             ),
-            allowClient: false,
+            client: false,
           },
     )
 

@@ -22,7 +22,9 @@ type ComputedOptions<T extends Record<string, any>> = {
 export type BaseUseApiDataOptions<ResT, DataT = ResT> = Omit<AsyncDataOptions<ResT, DataT>, 'watch'> & {
   /**
    * Skip the Nuxt server proxy and fetch directly from the API.
-   * Requires `allowClient` to be enabled in the module options as well.
+   * Requires `client` set to `true` in the module options.
+   * @remarks
+   * If Nuxt SSR is disabled, client-side requests are enabled by default.
    * @default false
    */
   client?: boolean
@@ -95,7 +97,7 @@ export function _useApiData<T = any>(
   path: MaybeRefOrGetter<string>,
   opts: UseApiDataOptions<T> = {},
 ) {
-  const { apiParty } = useRuntimeConfig().public
+  const apiParty = useRuntimeConfig().public.apiParty as unknown as Required<ModuleOptions>
   const {
     server,
     lazy,
@@ -109,7 +111,7 @@ export function _useApiData<T = any>(
     headers,
     method,
     body,
-    client = false,
+    client = apiParty.client === 'always',
     cache = true,
     key,
     ...fetchOptions
@@ -127,11 +129,10 @@ export function _useApiData<T = any>(
     : () => CACHE_KEY_PREFIX + toValue(key),
   )
 
-  if (client && !apiParty.allowClient)
-    throw new Error('Client-side API requests are disabled. Set "allowClient: true" in the module options to enable them.')
+  if (client && !apiParty.client)
+    throw new Error('Client-side API requests are disabled. Set "client: true" in the module options to enable them.')
 
-  const endpoints = (apiParty as unknown as ModuleOptions).endpoints || {}
-  const endpoint = endpoints[endpointId]
+  const endpoint = (apiParty.endpoints || {})[endpointId]
 
   const _fetchOptions = reactive(fetchOptions)
 

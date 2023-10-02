@@ -82,3 +82,71 @@ export default defineNuxtConfig({
 ## `apiParty.openAPITS`
 
 The global [configuration options](https://openapi-ts.pages.dev/node/#options) for `openapi-typescript`. Options set here will be applied to every endpoint schema, but can be overridden by individual endpoint options.
+
+## Type Declaration
+
+```ts
+interface Endpoint {
+  url: string
+  token?: string
+  query?: QueryObject
+  headers?: Record<string, string>
+  cookies?: boolean
+  allowedUrls?: string[]
+  schema?: string | URL | OpenAPI3 | (() => Promise<OpenAPI3>)
+  openAPITS?: OpenAPITSOptions
+}
+
+interface ModuleOptions {
+  /**
+   * API endpoints
+   *
+   * @remarks
+   * Each key represents an endpoint ID, which is used to generate the composables. The value is an object with the following properties:
+   * - `url`: The URL of the API endpoint
+   * - `token`: The API token to use for the endpoint (optional)
+   * - `query`: Query parameters to send with each request (optional)
+   * - `headers`: Headers to send with each request (optional)
+   * - `cookies`: Whether to send cookies with each request (optional)
+   * - `allowedUrls`: A list of allowed URLs to change the [backend URL at runtime](https://nuxt-api-party.byjohann.dev/guide/dynamic-backend-url) (optional)
+   * - `schema`: A URL, file path, object, or async function pointing to an [OpenAPI Schema](https://swagger.io/resources/open-api) used to [generate types](/guide/openapi-types) (optional)
+   * - `openAPITS`: [Configuration options](https://openapi-ts.pages.dev/node/#options) for `openapi-typescript`. Options defined here will override the global `openAPITS`
+   *
+   * @example
+   * export default defineNuxtConfig({
+   *   apiParty: {
+   *     endpoints: {
+   *       jsonPlaceholder: {
+   *         url: 'https://jsonplaceholder.typicode.com'
+   *         headers: {
+   *           Authorization: `Basic ${Buffer.from('foo:bar').toString('base64')}`
+   *         }
+   *       }
+   *     }
+   *   }
+   * })
+   *
+   * @default {}
+   */
+  endpoints?: Record<string, Endpoint>
+
+  /**
+   * Allow client-side requests besides server-side ones
+   *
+   * @remarks
+   * By default, API requests are only made on the server-side. This option allows you to make requests on the client-side as well. Keep in mind that this will expose your API credentials to the client.
+   * Note: If Nuxt SSR is disabled, all requests are made on the client-side by default.
+   *
+   * @example
+   * useJsonPlaceholderData('/posts/1', { client: true })
+   *
+   * @default false
+   */
+  client?: boolean | 'allow' | 'always'
+
+  /**
+   * Global options for openapi-typescript
+   */
+  openAPITS?: OpenAPITSOptions
+}
+```

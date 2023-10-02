@@ -12,8 +12,9 @@ Returns the raw response of the API endpoint. Intended for actions inside method
 interface BaseApiFetchOptions {
   /**
    * Skip the Nuxt server proxy and fetch directly from the API.
-   * Requires `allowClient` to be enabled in the module options as well.
-   * @default false
+   * Requires `client` set to `true` in the module options.
+   * @remarks
+   * If Nuxt SSR is disabled, client-side requests are enabled by default.
    */
   client?: boolean
   /**
@@ -113,16 +114,11 @@ const data = await $jsonPlaceholder(
 Authorization credentials will be publicly visible. Also, possible CORS issues ahead if the backend is not configured properly.
 :::
 
-To fetch data directly from your API, without the Nuxt proxy, set the option `client` to `true`:
+::: info
+Note: If Nuxt SSR is disabled, all requests are made on the client-side by default.
+:::
 
-```ts{3}
-const data = await $jsonPlaceholder(
-  'posts',
-  { client: true }
-)
-```
-
-Requires the `allowClient` option to be `true` in your `apiParty` module configuration:
+To fetch data directly from your API and skip the Nuxt server proxy, set the `apiParty` module option `client` to `true`:
 
 ```ts{9}
 // `nuxt.config.ts`
@@ -133,7 +129,20 @@ export default defineNuxtConfig({
     endpoints: {
       // ...
     },
-    allowClient: true
+    client: true
   }
 })
 ```
+
+Now you can make client-side requests by setting the `client` option to `true` in the composable.
+
+```ts{3}
+const data = await $jsonPlaceholder(
+  'posts',
+  { client: true }
+)
+```
+
+::: info
+Set the `client` module option to `always` to make all requests on the client-side.
+:::
