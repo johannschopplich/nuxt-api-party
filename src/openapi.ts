@@ -31,13 +31,12 @@ export async function generateTypes(
         })
       }
       catch {
-        // TODO: Use `Record<string, never>`?
         types = `
-export type paths = Record<string, any>
-export type webhooks = Record<string, any>
-export type components = Record<string, any>
-export type external = Record<string, any>
-export type operations = Record<string, any>
+export type paths = Record<string, never>
+export type webhooks = Record<string, never>
+export type components = Record<string, never>
+export type external = Record<string, never>
+export type operations = Record<string, never>
         `.trimStart()
       }
       finally {
