@@ -6,7 +6,7 @@ import type { WatchSource } from 'vue'
 import type { AsyncData, AsyncDataOptions } from 'nuxt/app'
 import type { ModuleOptions } from '../../module'
 import { CACHE_KEY_PREFIX } from '../constants'
-import { headersToObject, resolvePath, serializeMaybeEncodedBody, toValue } from '../utils'
+import { headersToObject, resolvePathParams, serializeMaybeEncodedBody, toValue } from '../utils'
 import { isFormData } from '../formData'
 import type { EndpointFetchOptions, MaybeRef, MaybeRefOrGetter } from '../types'
 import type { AllPaths, GETPaths, GETPlainPaths, HttpMethod, IgnoreCase, OpenApiError, OpenApiRequestOptions, OpenApiResponse, PathItemObject } from '../openapi'
@@ -118,7 +118,7 @@ export function _useApiData<T = any>(
     ...fetchOptions
   } = opts
 
-  const _path = computed(() => resolvePath(toValue(path), toValue(pathParams)))
+  const _path = computed(() => resolvePathParams(toValue(path), toValue(pathParams)))
   const _key = computed(key === undefined
     ? () => CACHE_KEY_PREFIX + hash([
         endpointId,
@@ -172,7 +172,7 @@ export function _useApiData<T = any>(
 
       // Workaround to persist response client-side
       // https://github.com/nuxt/nuxt/issues/15445
-      if ((nuxt!.isHydrating || cache) && _key.value in nuxt!.payload.data)
+      if ((nuxt!.isHydrating || cache) && nuxt!.payload.data[_key.value])
         return nuxt!.payload.data[_key.value]
 
       controller = new AbortController()
@@ -215,8 +215,7 @@ export function _useApiData<T = any>(
       }
       catch (error) {
         // Invalidate cache if request fails
-        if (_key.value in nuxt!.payload.data)
-          delete nuxt!.payload.data[_key.value]
+        nuxt!.payload.data[_key.value] = undefined
 
         throw error
       }

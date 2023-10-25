@@ -1,4 +1,4 @@
-import { headersToObject, resolvePath } from '../utils'
+import { headersToObject, resolvePathParams } from '../utils'
 import type { ModuleOptions } from '../../module'
 import type { ApiFetchOptions } from '../composables/$api'
 import { useRuntimeConfig } from '#imports'
@@ -13,7 +13,7 @@ export function _$api<T = any>(
   const endpoints = (apiParty as unknown as ModuleOptions).endpoints || {}
   const endpoint = endpoints[endpointId]
 
-  return globalThis.$fetch<T>(resolvePath(path, pathParams), {
+  return globalThis.$fetch<T>(resolvePathParams(path, pathParams), {
     ...fetchOptions,
     baseURL: endpoint.url,
     query: {

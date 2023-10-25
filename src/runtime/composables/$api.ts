@@ -1,6 +1,6 @@
 import { hash } from 'ohash'
 import type { NitroFetchOptions } from 'nitropack'
-import { headersToObject, resolvePath, serializeMaybeEncodedBody } from '../utils'
+import { headersToObject, resolvePathParams, serializeMaybeEncodedBody } from '../utils'
 import { isFormData } from '../formData'
 import type { ModuleOptions } from '../../module'
 import { CACHE_KEY_PREFIX } from '../constants'
@@ -91,7 +91,7 @@ export function _$api<T = any>(
   if (client && !apiParty.client)
     throw new Error('Client-side API requests are disabled. Set "client: true" in the module options to enable them.')
 
-  if ((nuxt.isHydrating || cache) && _key in nuxt.payload.data)
+  if ((nuxt.isHydrating || cache) && nuxt.payload.data[_key])
     return Promise.resolve(nuxt.payload.data[_key])
 
   if (promiseMap.has(_key))
@@ -99,7 +99,7 @@ export function _$api<T = any>(
 
   const endpoint = (apiParty.endpoints || {})[endpointId]
 
-  const clientFetcher = () => globalThis.$fetch<T>(resolvePath(path, pathParams), {
+  const clientFetcher = () => globalThis.$fetch<T>(resolvePathParams(path, pathParams), {
     ...fetchOptions,
     baseURL: endpoint.url,
     method,
@@ -120,7 +120,7 @@ export function _$api<T = any>(
       ...fetchOptions,
       method: 'POST',
       body: {
-        path: resolvePath(path, pathParams),
+        path: resolvePathParams(path, pathParams),
         query,
         headers: {
           ...headersToObject(headers),
@@ -140,8 +140,7 @@ export function _$api<T = any>(
     })
     // Invalidate cache if request fails
     .catch((error) => {
-      if (_key in nuxt.payload.data)
-        delete nuxt.payload.data[_key]
+      nuxt.payload.data[_key] = undefined
       promiseMap.delete(_key)
       throw error
     }) as Promise<T>

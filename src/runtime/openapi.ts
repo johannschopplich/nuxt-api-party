@@ -61,8 +61,8 @@ type MediaTypes<T, Status extends keyof any> = {
 }[Status]
 
 // Fetch types
-export type OpenApiResponse<T> = MediaTypes<T, OkStatus>
-export type OpenApiError<T> = MediaTypes<T, ErrorStatus>
+export type OpenApiResponse<T> = MediaTypes<T, HttpSuccessStatus>
+export type OpenApiError<T> = MediaTypes<T, HttpErrorStatus>
 
 // Path types
 export type AllPaths<Paths> = RemovePrefix<keyof Paths & string, '/'>
@@ -83,5 +83,5 @@ export type GETPlainPaths<Paths> = {
 
 // HTTP status codes and methods
 export type HttpMethod = 'get' | 'put' | 'post' | 'delete' | 'options' | 'head' | 'patch' | 'trace'
-export type OkStatus = 200 | 201 | 202 | 203 | 204 | 206 | 207 | '2XX' | 'default'
-export type ErrorStatus = 500 | '5XX' | 400 | 401 | 402 | 403 | 404 | 405 | 406 | 407 | 408 | 409 | 410 | 411 | 412 | 413 | 414 | 415 | 416 | 417 | 418 | 420 | 421 | 422 | 423 | 424 | 425 | 426 | 429 | 431 | 444 | 450 | 451 | 497 | 498 | 499 | '4XX'
+export type HttpSuccessStatus = 200 | 201 | 202 | 203 | 204 | 206 | 207 | '2XX' | 'default'
+export type HttpErrorStatus = 500 | '5XX' | 400 | 401 | 402 | 403 | 404 | 405 | 406 | 407 | 408 | 409 | 410 | 411 | 412 | 413 | 414 | 415 | 416 | 417 | 418 | 420 | 421 | 422 | 423 | 424 | 425 | 426 | 429 | 431 | 444 | 450 | 451 | 497 | 498 | 499 | '4XX'

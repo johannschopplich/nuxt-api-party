@@ -30,7 +30,7 @@ async function updateUser() {
   try {
     // Will error because of authentication
     await $petStore('user/{username}', {
-      method: 'put',
+      method: 'PUT',
       pathParams: { username: 'user1' },
       body: {
         firstName: 'first name 2',
