@@ -8,7 +8,8 @@ import type { ModuleOptions } from '../../module'
 import { CACHE_KEY_PREFIX } from '../constants'
 import { headersToObject, resolvePath, serializeMaybeEncodedBody, toValue } from '../utils'
 import { isFormData } from '../formData'
-import type { AllPaths, EndpointFetchOptions, GETPaths, GETPlainPaths, HttpMethod, IgnoreCase, MaybeRef, MaybeRefOrGetter, OpenApiError, OpenApiRequestOptions, OpenApiResponse, PathItemObject } from '../types'
+import type { EndpointFetchOptions, MaybeRef, MaybeRefOrGetter } from '../types'
+import type { AllPaths, GETPaths, GETPlainPaths, HttpMethod, IgnoreCase, OpenApiError, OpenApiRequestOptions, OpenApiResponse, PathItemObject } from '../openapi'
 import { useAsyncData, useRequestHeaders, useRuntimeConfig } from '#imports'
 
 type ComputedOptions<T extends Record<string, any>> = {

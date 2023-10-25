@@ -4,7 +4,8 @@ import { headersToObject, resolvePath, serializeMaybeEncodedBody } from '../util
 import { isFormData } from '../formData'
 import type { ModuleOptions } from '../../module'
 import { CACHE_KEY_PREFIX } from '../constants'
-import type { AllPaths, EndpointFetchOptions, GETPaths, GETPlainPaths, HttpMethod, IgnoreCase, OpenApiRequestOptions, OpenApiResponse, PathItemObject } from '../types'
+import type { EndpointFetchOptions } from '../types'
+import type { AllPaths, GETPaths, GETPlainPaths, HttpMethod, IgnoreCase, OpenApiRequestOptions, OpenApiResponse, PathItemObject } from '../openapi'
 import { useNuxtApp, useRequestHeaders, useRuntimeConfig } from '#imports'
 
 export interface BaseApiFetchOptions {
