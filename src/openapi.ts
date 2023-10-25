@@ -15,20 +15,19 @@ export async function generateTypes(
       throw new Error('Failed to generate OpenAPI types')
   })
 
-  const openapiTS = await resolveOpenAPIImports()
+  const openAPITS = await resolveOpenAPIImports()
   const schemas = await Promise.all(
-    Object.keys(endpoints).map(async (id) => {
+    Object.entries(endpoints).map(async ([id, endpoint]) => {
       let types = ''
 
-      const { openAPITS: openAPIOptions = {} } = endpoints[id]
-      const schema = await resolveSchema(endpoints[id])
+      const schema = await resolveSchema(endpoint)
       runningCount++
 
       try {
-        types = await openapiTS(schema, {
+        types = await openAPITS(schema, {
           commentHeader: '',
           ...globalOpenAPIOptions,
-          ...openAPIOptions,
+          ...endpoint.openAPITS,
         })
       }
       catch {
@@ -61,7 +60,6 @@ async function resolveSchema({ schema }: Endpoint): Promise<string | URL | OpenA
   if (typeof schema === 'function')
     return await schema()
 
-  // Parse file path and fix it
   if (typeof schema === 'string' && !schema.match(/^https?:\/\//))
     schema = resolve(nuxt.options.rootDir, schema)
 
@@ -69,6 +67,6 @@ async function resolveSchema({ schema }: Endpoint): Promise<string | URL | OpenA
 }
 
 async function resolveOpenAPIImports() {
-  const openapiTS = await import('openapi-typescript')
-  return openapiTS.default || openapiTS
+  const openAPITS = await import('openapi-typescript')
+  return openAPITS.default || openAPITS
 }
