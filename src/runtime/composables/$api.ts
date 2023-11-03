@@ -5,7 +5,7 @@ import { isFormData } from '../formData'
 import type { ModuleOptions } from '../../module'
 import { CACHE_KEY_PREFIX } from '../constants'
 import type { EndpointFetchOptions } from '../types'
-import type { AllPaths, GETPaths, GETPlainPaths, HttpMethod, IgnoreCase, OpenApiRequestOptions, OpenApiResponse, PathItemObject } from '../openapi'
+import type { AllPaths, ApiResponse, CaseVariants, GetPaths, GetPlainPaths, HttpMethod, RequestOptions, SchemaPath } from '../openapi'
 import { useNuxtApp, useRequestHeaders, useRuntimeConfig } from '#imports'
 
 export interface BaseApiFetchOptions {
@@ -41,19 +41,19 @@ export type $Api = <T = any>(
   opts?: ApiFetchOptions & BaseApiFetchOptions,
 ) => Promise<T>
 
-export interface $OpenApi<Paths extends Record<string, PathItemObject>> {
-  <P extends GETPlainPaths<Paths>>(
+export interface $OpenAPI<Paths extends Record<string, SchemaPath>> {
+  <P extends GetPlainPaths<Paths>>(
     path: P,
-    opts?: BaseApiFetchOptions & Omit<OpenApiRequestOptions<Paths[`/${P}`]>, 'method'>
-  ): Promise<OpenApiResponse<Paths[`/${P}`]['get']>>
-  <P extends GETPaths<Paths>>(
+    opts?: BaseApiFetchOptions & Omit<RequestOptions<Paths[`/${P}`]>, 'method'>
+  ): Promise<ApiResponse<Paths[`/${P}`]['get']>>
+  <P extends GetPaths<Paths>>(
     path: P,
-    opts: BaseApiFetchOptions & Omit<OpenApiRequestOptions<Paths[`/${P}`]>, 'method'>
-  ): Promise<OpenApiResponse<Paths[`/${P}`]['get']>>
-  <P extends AllPaths<Paths>, M extends IgnoreCase<keyof Paths[`/${P}`] & HttpMethod>>(
+    opts: BaseApiFetchOptions & Omit<RequestOptions<Paths[`/${P}`]>, 'method'>
+  ): Promise<ApiResponse<Paths[`/${P}`]['get']>>
+  <P extends AllPaths<Paths>, M extends CaseVariants<keyof Paths[`/${P}`] & HttpMethod>>(
     path: P,
-    opts?: BaseApiFetchOptions & OpenApiRequestOptions<Paths[`/${P}`], M> & { method: M }
-  ): Promise<OpenApiResponse<Paths[`/${P}`][Lowercase<M>]>>
+    opts?: BaseApiFetchOptions & RequestOptions<Paths[`/${P}`], M> & { method: M }
+  ): Promise<ApiResponse<Paths[`/${P}`][Lowercase<M>]>>
 }
 
 export function _$api<T = any>(

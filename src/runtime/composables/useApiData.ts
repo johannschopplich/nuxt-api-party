@@ -9,7 +9,7 @@ import { CACHE_KEY_PREFIX } from '../constants'
 import { headersToObject, resolvePathParams, serializeMaybeEncodedBody, toValue } from '../utils'
 import { isFormData } from '../formData'
 import type { EndpointFetchOptions, MaybeRef, MaybeRefOrGetter } from '../types'
-import type { AllPaths, GETPaths, GETPlainPaths, HttpMethod, IgnoreCase, OpenApiError, OpenApiRequestOptions, OpenApiResponse, PathItemObject } from '../openapi'
+import type { AllPaths, ApiError, ApiResponse, CaseVariants, GetPaths, GetPlainPaths, HttpMethod, RequestOptions, SchemaPath } from '../openapi'
 import { useAsyncData, useRequestHeaders, useRuntimeConfig } from '#imports'
 
 type ComputedOptions<T extends Record<string, any>> = {
@@ -66,31 +66,31 @@ export type UseApiDataOptions<T> = Pick<
   body?: MaybeRef<string | Record<string, any> | FormData | null>
 } & BaseUseApiDataOptions<T>
 
-export type UseOpenApiDataOptions<
-  P extends PathItemObject,
-  M extends IgnoreCase<keyof P & HttpMethod> = IgnoreCase<keyof P & 'get'>,
-  ResT = OpenApiResponse<P[Lowercase<M>]>,
+export type UseOpenAPIDataOptions<
+  P extends SchemaPath,
+  M extends CaseVariants<keyof P & HttpMethod> = CaseVariants<keyof P & 'get'>,
+  ResT = ApiResponse<P[Lowercase<M>]>,
   DataT = ResT,
-> = BaseUseApiDataOptions<ResT, DataT> & ComputedOptions<OpenApiRequestOptions<P, M>>
+> = BaseUseApiDataOptions<ResT, DataT> & ComputedOptions<RequestOptions<P, M>>
 
 export type UseApiData = <T = any>(
   path: MaybeRefOrGetter<string>,
   opts?: UseApiDataOptions<T>,
 ) => AsyncData<T | undefined, FetchError>
 
-export interface UseOpenApiData<Paths extends Record<string, PathItemObject>> {
-  <P extends GETPlainPaths<Paths>, ResT = OpenApiResponse<Paths[`/${P}`]['get']>, DataT = ResT>(
+export interface UseOpenAPIData<Paths extends Record<string, SchemaPath>> {
+  <P extends GetPlainPaths<Paths>, ResT = ApiResponse<Paths[`/${P}`]['get']>, DataT = ResT>(
     path: MaybeRefOrGetter<P>,
-    opts?: Omit<UseOpenApiDataOptions<Paths[`/${P}`], IgnoreCase<keyof Paths[`/${P}`] & HttpMethod>, ResT, DataT>, 'method'>,
-  ): AsyncData<DataT, FetchError<OpenApiError<Paths[`/${P}`]['get']>>>
-  <P extends GETPaths<Paths>, ResT = OpenApiResponse<Paths[`/${P}`]['get']>, DataT = ResT>(
+    opts?: Omit<UseOpenAPIDataOptions<Paths[`/${P}`], CaseVariants<keyof Paths[`/${P}`] & HttpMethod>, ResT, DataT>, 'method'>,
+  ): AsyncData<DataT, FetchError<ApiError<Paths[`/${P}`]['get']>>>
+  <P extends GetPaths<Paths>, ResT = ApiResponse<Paths[`/${P}`]['get']>, DataT = ResT>(
     path: MaybeRefOrGetter<P>,
-    opts: Omit<UseOpenApiDataOptions<Paths[`/${P}`], IgnoreCase<keyof Paths[`/${P}`] & HttpMethod>, ResT, DataT>, 'method'>,
-  ): AsyncData<DataT, FetchError<OpenApiError<Paths[`/${P}`]['get']>>>
-  <P extends AllPaths<Paths>, M extends IgnoreCase<keyof Paths[`/${P}`] & HttpMethod>, ResT = OpenApiResponse<Paths[`/${P}`][Lowercase<M>]>, DataT = ResT>(
+    opts: Omit<UseOpenAPIDataOptions<Paths[`/${P}`], CaseVariants<keyof Paths[`/${P}`] & HttpMethod>, ResT, DataT>, 'method'>,
+  ): AsyncData<DataT, FetchError<ApiError<Paths[`/${P}`]['get']>>>
+  <P extends AllPaths<Paths>, M extends CaseVariants<keyof Paths[`/${P}`] & HttpMethod>, ResT = ApiResponse<Paths[`/${P}`][Lowercase<M>]>, DataT = ResT>(
     path: MaybeRefOrGetter<P>,
-    opts: UseOpenApiDataOptions<Paths[`/${P}`], M, ResT, DataT> & { method: M },
-  ): AsyncData<DataT, FetchError<OpenApiError<Paths[`/${P}`][Lowercase<M>]>>>
+    opts: UseOpenAPIDataOptions<Paths[`/${P}`], M, ResT, DataT> & { method: M },
+  ): AsyncData<DataT, FetchError<ApiError<Paths[`/${P}`][Lowercase<M>]>>>
 }
 
 export function _useApiData<T = any>(

@@ -1,11 +1,26 @@
 import type { NitroFetchOptions } from 'nitropack'
 
-export type IgnoreCase<T extends string> = Lowercase<T> | Uppercase<T>
-export type RemovePrefix<T extends string, P extends string> = T extends `${P}${infer S}` ? S : never
+// --------------------------
+// OpenAPI Schema
+// --------------------------
+export type SchemaPath = { [M in HttpMethod]?: any } & { parameters?: any }
 
-export type PathItemObject = { [M in HttpMethod]?: any } & { parameters?: any }
+// --------------------------
+// Requests
+// --------------------------
+type RequestMethod<M extends CaseVariants<HttpMethod>> =
+  'get' extends Lowercase<M> ? { method?: M } : { method: M }
 
-// General purpose types
+type ParameterFromSchema<T, N extends string, K extends string = N> = T extends {
+  parameters: { [_ in N]?: any }
+}
+  ? { [_ in keyof Pick<T['parameters'], N> as K]: T['parameters'][N] }
+  : unknown
+
+export type PathParameters<T> = ParameterFromSchema<T, 'path', 'pathParams'>
+export type QueryParameters<T> = ParameterFromSchema<T, 'query'>
+export type HeaderParameters<T> = ParameterFromSchema<T, 'header', 'headers'>
+
 export type RequestBody<T> = T extends { requestBody?: { content: infer Body } }
   ?
     | (Body extends { 'application/octet-stream': any }
@@ -25,28 +40,18 @@ export type RequestBody<T> = T extends { requestBody?: { content: infer Body } }
       : Record<string, any>)
   : unknown
 
-export type Method<M extends IgnoreCase<HttpMethod>> =
-  'get' extends Lowercase<M> ? { method?: M } : { method: M }
-
-export type Param<T, N extends string, K extends string = N> = T extends {
-  parameters: { [_ in N]?: any }
-}
-  ? { [_ in keyof Pick<T['parameters'], N> as K]: T['parameters'][N] }
-  : unknown
-
-export type PathParameters<T> = Param<T, 'path', 'pathParams'>
-export type QueryParameters<T> = Param<T, 'query'>
-export type HeaderParameters<T> = Param<T, 'header', 'headers'>
-
-export type OpenApiRequestOptions<
-  P extends PathItemObject,
-  M extends IgnoreCase<keyof P & HttpMethod> = IgnoreCase<keyof P & 'get'>,
+export type RequestOptions<
+  P extends SchemaPath,
+  M extends CaseVariants<keyof P & HttpMethod> = CaseVariants<keyof P & 'get'>,
 > = Omit<
   NitroFetchOptions<any, Lowercase<M>>,
   'params' | 'query' | 'headers' | 'method' | 'body' | 'cache'
-> & RequestBody<P[Lowercase<M>]> & PathParameters<P[Lowercase<M>]> & QueryParameters<P[Lowercase<M>]> & Method<M>
+> & RequestBody<P[Lowercase<M>]> & PathParameters<P[Lowercase<M>]> & QueryParameters<P[Lowercase<M>]> & RequestMethod<M>
 
-type MediaTypes<T, Status extends keyof any> = {
+// --------------------------
+// Responses
+// --------------------------
+type ResponseContentTypes<T, Status extends keyof any> = {
   [S in Status]: T extends {
     responses: {
       [_ in S]: {
@@ -60,20 +65,21 @@ type MediaTypes<T, Status extends keyof any> = {
     : never;
 }[Status]
 
-// Fetch types
-export type OpenApiResponse<T> = MediaTypes<T, HttpSuccessStatus>
-export type OpenApiError<T> = MediaTypes<T, HttpErrorStatus>
+export type ApiResponse<T> = ResponseContentTypes<T, HttpSuccessStatus>
+export type ApiError<T> = ResponseContentTypes<T, HttpErrorStatus>
 
-// Path types
+// --------------------------
+// Paths
+// --------------------------
 export type AllPaths<Paths> = RemovePrefix<keyof Paths & string, '/'>
 
 /** All endpoints that don't require a `method` property */
-export type GETPaths<Paths> = {
+export type GetPaths<Paths> = {
   [P in keyof Paths]: Paths[P] extends { get: any } ? RemovePrefix<P & string, '/'> : never;
 }[keyof Paths]
 
 /** All endpoints that don't require additional options */
-export type GETPlainPaths<Paths> = {
+export type GetPlainPaths<Paths> = {
   [P in keyof Paths]: Paths[P] extends { get: infer O }
     ? O extends { parameters: { query: any } | { header: any } | { path: any } }
       ? never
@@ -81,7 +87,18 @@ export type GETPlainPaths<Paths> = {
     : never;
 }[keyof Paths]
 
-// HTTP status codes and methods
+// --------------------------
+// Utilities
+// --------------------------
+export type CaseVariants<T extends string> = Lowercase<T> | Uppercase<T>
+export type RemovePrefix<
+  T extends string,
+  P extends string,
+> = T extends `${P}${infer S}` ? S : never
+
+// --------------------------
+// HTTP status codes
+// --------------------------
 export type HttpMethod = 'get' | 'put' | 'post' | 'delete' | 'options' | 'head' | 'patch' | 'trace'
 export type HttpSuccessStatus = 200 | 201 | 202 | 203 | 204 | 206 | 207 | '2XX' | 'default'
 export type HttpErrorStatus = 500 | '5XX' | 400 | 401 | 402 | 403 | 404 | 405 | 406 | 407 | 408 | 409 | 410 | 411 | 412 | 413 | 414 | 415 | 416 | 417 | 418 | 420 | 421 | 422 | 423 | 424 | 425 | 426 | 429 | 431 | 444 | 450 | 451 | 497 | 498 | 499 | '4XX'
