@@ -28,7 +28,7 @@ export default defineEventHandler(async (event): Promise<any> => {
   } = _body
 
   // Check if the path is an absolute URL
-  if (new URL(path, 'http://localhost').origin !== 'http://localhost') {
+  if (/^https?:\/\//.test(path)) {
     throw createError({
       statusCode: 400,
       statusMessage: 'Absolute URLs are not allowed',
