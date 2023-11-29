@@ -29,15 +29,15 @@ export type RequestBody<T> = T extends { requestBody?: { content: infer Body } }
           headers: { 'content-type': 'application/octet-stream' }
         }
       : Record<string, any>)
-    | (Body extends { 'application/json': infer Schema }
-      ? { body: Schema; headers?: { 'content-type'?: 'application/json' } }
-      : Record<string, any>)
-    | (Body extends { 'application/x-www-form-urlencoded': any }
-      ? {
-          body: FormData
-          headers: { 'content-type': 'application/x-www-form-urlencoded' }
-        }
-      : Record<string, any>)
+      | (Body extends { 'application/json': infer Schema }
+        ? { body: Schema, headers?: { 'content-type'?: 'application/json' } }
+        : Record<string, any>)
+        | (Body extends { 'application/x-www-form-urlencoded': any }
+          ? {
+              body: FormData
+              headers: { 'content-type': 'application/x-www-form-urlencoded' }
+            }
+          : Record<string, any>)
   : unknown
 
 export type RequestOptions<

@@ -17,9 +17,9 @@ export function isFormData(obj: unknown): obj is FormData {
 export function isSerializedFormData(obj: unknown): obj is SerializedFormData {
   return (
     typeof obj === 'object'
-    && obj !== null
-    && '__type' in obj
-    && obj.__type === 'form-data'
+      && obj !== null
+      && '__type' in obj
+      && obj.__type === 'form-data'
   )
 }
 
@@ -65,9 +65,9 @@ export async function objectToFormData(obj: SerializedFormData) {
 function isSerializedBlob(obj: unknown): obj is SerializedBlob {
   return (
     typeof obj === 'object'
-    && obj !== null
-    && '__type' in obj
-    && obj.__type === 'blob'
+      && obj !== null
+      && '__type' in obj
+      && obj.__type === 'blob'
   )
 }
 

@@ -15,7 +15,7 @@ export async function generateTypes(
       throw new Error('Failed to generate OpenAPI types')
   })
 
-  const openAPITS = await resolveOpenAPIImports()
+  const openAPITS = await interopDefault(import('openapi-typescript'))
   const schemas = await Promise.all(
     Object.entries(endpoints).map(async ([id, endpoint]) => {
       let types = ''
@@ -65,7 +65,9 @@ async function resolveSchema({ schema }: Endpoint): Promise<string | URL | OpenA
   return schema!
 }
 
-async function resolveOpenAPIImports() {
-  const openAPITS = await import('openapi-typescript')
-  return openAPITS.default || openAPITS
+async function interopDefault<T>(
+  m: T | Promise<T>,
+): Promise<T extends { default: infer U } ? U : T> {
+  const resolved = await m
+  return (resolved as any).default || resolved
 }
