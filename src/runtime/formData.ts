@@ -3,12 +3,15 @@ export interface SerializedBlob {
   type: string
   size: number
   name?: string
+  __type: 'blob'
 }
 
-export type SerializedFormData = Record<
-  string,
-  string | (SerializedBlob & { __type: 'blob' })
->
+export type SerializedFormDataValue = string | SerializedBlob | (string | SerializedBlob)[]
+
+export interface SerializedFormData {
+  [key: string]: SerializedFormDataValue
+  __type: 'form-data'
+}
 
 export function isFormData(obj: unknown): obj is FormData {
   return obj instanceof FormData
@@ -30,14 +33,26 @@ export async function formDataToObject(formData: FormData) {
 
   for (const [key, value] of formData.entries()) {
     if (value instanceof Blob) {
-      obj[key] = {
-        __type: 'blob',
+      const serializedBlob: SerializedBlob = {
         ...(await serializeBlob(value)),
         name: value.name,
+        __type: 'blob',
       }
+
+      if (Array.isArray(obj[key]))
+        (obj[key] as SerializedBlob[]).push(serializedBlob)
+      else if (obj[key])
+        obj[key] = [obj[key] as SerializedBlob, serializedBlob]
+      else
+        obj[key] = serializedBlob
     }
     else {
-      obj[key] = value
+      if (Array.isArray(obj[key]))
+        (obj[key] as string[]).push(value)
+      else if (obj[key])
+        obj[key] = [obj[key] as string, value]
+      else
+        obj[key] = value
     }
   }
 
@@ -49,9 +64,19 @@ export async function objectToFormData(obj: SerializedFormData) {
   const entries = Object.entries(obj).filter(([key]) => key !== '__type')
 
   for (const [key, value] of entries) {
-    if (isSerializedBlob(value)) {
-      const arrayBuffer = Uint8Array.from(atob(value.data), c => c.charCodeAt(0))
-      const blob = new Blob([arrayBuffer], { type: value.type })
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        if (isSerializedBlob(item)) {
+          const blob = await deserializeBlob(item)
+          formData.append(key, blob, item.name)
+        }
+        else {
+          formData.append(key, item)
+        }
+      }
+    }
+    else if (isSerializedBlob(value)) {
+      const blob = await deserializeBlob(value)
       formData.append(key, blob, value.name)
     }
     else {
@@ -82,4 +107,9 @@ async function serializeBlob(blob: Blob) {
     type: blob.type,
     size: blob.size,
   }
+}
+
+async function deserializeBlob(serializedBlob: SerializedBlob) {
+  const arrayBuffer = Uint8Array.from(atob(serializedBlob.data), c => c.charCodeAt(0))
+  return new Blob([arrayBuffer], { type: serializedBlob.type })
 }
