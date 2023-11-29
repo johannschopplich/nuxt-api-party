@@ -74,7 +74,7 @@ const { data, pending, refresh, error } = await useJsonPlaceholderData('posts/1'
 </template>
 ```
 
-> [!NOTE]
+> [!TIP]
 > You can connect as many APIs as you want, just add them to the `endpoints` object.
 
 ## 💻 Development
