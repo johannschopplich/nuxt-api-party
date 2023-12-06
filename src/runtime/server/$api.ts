@@ -13,8 +13,6 @@ export function _$api<T = any>(
   const endpoints = apiParty.endpoints || {}
   const endpoint = endpoints[endpointId]
 
-  // @ts-expect-error: Why does the generic type not work here after
-  // upgrading to `@nuxt/module-builder`?
   return globalThis.$fetch<T>(resolvePathParams(path, pathParams), {
     ...fetchOptions,
     baseURL: endpoint.url,

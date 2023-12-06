@@ -51,8 +51,6 @@ export default defineEventHandler(async (event): Promise<any> => {
   }
 
   try {
-    // @ts-expect-error: Why does the generic type not work here after
-    // upgrading to `@nuxt/module-builder`?
     const response = await globalThis.$fetch.raw<ArrayBuffer>(
       path,
       {
