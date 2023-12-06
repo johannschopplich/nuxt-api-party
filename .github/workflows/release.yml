@@ -27,7 +27,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install
-        run: pnpm i
+        run: pnpm install
+
+      - name: Build type stubs
+        run: pnpm dev:prepare
 
       - name: Publish to npm
         run: npm publish --access public

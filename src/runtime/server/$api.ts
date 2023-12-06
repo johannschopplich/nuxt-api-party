@@ -9,10 +9,12 @@ export function _$api<T = any>(
   opts: ApiFetchOptions = {},
 ): Promise<T> {
   const { pathParams, query, headers, ...fetchOptions } = opts
-  const { apiParty } = useRuntimeConfig()
-  const endpoints = (apiParty as unknown as ModuleOptions).endpoints || {}
+  const apiParty = useRuntimeConfig().apiParty as Required<ModuleOptions>
+  const endpoints = apiParty.endpoints || {}
   const endpoint = endpoints[endpointId]
 
+  // @ts-expect-error: Why does the generic type not work here after
+  // upgrading to `@nuxt/module-builder`?
   return globalThis.$fetch<T>(resolvePathParams(path, pathParams), {
     ...fetchOptions,
     baseURL: endpoint.url,

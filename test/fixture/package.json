@@ -1,5 +1,6 @@
 {
   "name": "test",
+  "type": "module",
   "private": true,
   "scripts": {
     "dev": "nuxi dev",

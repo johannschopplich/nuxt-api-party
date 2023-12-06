@@ -62,7 +62,7 @@ export function _$api<T = any>(
   opts: ApiFetchOptions & BaseApiFetchOptions = {},
 ) {
   const nuxt = useNuxtApp()
-  const apiParty = useRuntimeConfig().public.apiParty as unknown as Required<ModuleOptions>
+  const apiParty = useRuntimeConfig().public.apiParty as Required<ModuleOptions>
   const promiseMap = (nuxt._promiseMap = nuxt._promiseMap || new Map()) as Map<string, Promise<T>>
 
   const {
@@ -99,6 +99,8 @@ export function _$api<T = any>(
 
   const endpoint = (apiParty.endpoints || {})[endpointId]
 
+  // @ts-expect-error: Why does the generic type not work here after
+  // upgrading to `@nuxt/module-builder`?
   const clientFetcher = () => globalThis.$fetch<T>(resolvePathParams(path, pathParams), {
     ...fetchOptions,
     baseURL: endpoint.url,
@@ -116,6 +118,8 @@ export function _$api<T = any>(
   }) as Promise<T>
 
   const serverFetcher = async () =>
+    // @ts-expect-error: Why does the generic type not work here after
+    // upgrading to `@nuxt/module-builder`?
     (await globalThis.$fetch<T>(`/api/__api_party/${endpointId}`, {
       ...fetchOptions,
       method: 'POST',

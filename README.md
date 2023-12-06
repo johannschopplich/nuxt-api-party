@@ -4,7 +4,7 @@
 
 [![npm version](https://img.shields.io/npm/v/nuxt-api-party?color=a1b858&label=)](https://www.npmjs.com/package/nuxt-api-party)
 
-> [Nuxt](https://nuxt.com) module to securely connect with any API.
+[Nuxt](https://nuxt.com) module to securely connect with any API.
 
 - [✨ &nbsp;Release Notes](https://github.com/johannschopplich/nuxt-api-party/releases)
 - [📖 &nbsp;Read the documentation](https://nuxt-api-party.byjohann.dev)
@@ -21,6 +21,7 @@
 
 ## Setup
 
+> [!TIP]
 > [📖 Read the documentation](https://nuxt-api-party.byjohann.dev)
 
 ```bash
@@ -33,6 +34,7 @@ npm i -D nuxt-api-party
 
 ## Basic Usage
 
+> [!TIP]
 > [📖 Read the documentation](https://nuxt-api-party.byjohann.dev)
 
 Add this module `nuxt-api-party` to your Nuxt config and prepare your first API connection by setting an endpoint object with the following properties for the `apiParty` module option:

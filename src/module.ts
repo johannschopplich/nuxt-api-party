@@ -90,14 +90,15 @@ export default defineNuxtModule<ModuleOptions>({
     const getDataComposableName = (endpointId: string) => `use${pascalCase(endpointId)}Data`
 
     if (
-      Object.keys(options.endpoints!).length === 0
+      !Object.keys(options.endpoints!).length
       && !nuxt.options.runtimeConfig.apiParty
     )
       logger.error('Missing any API endpoint configuration. Please the `apiParty` module configuration in `nuxt.config.ts`.')
 
     // Private runtime config
+    // @ts-expect-error: `client` types are not compatible
     nuxt.options.runtimeConfig.apiParty = defu(
-      nuxt.options.runtimeConfig.apiParty,
+      nuxt.options.runtimeConfig.apiParty as Required<ModuleOptions>,
       options,
     )
 
@@ -111,7 +112,7 @@ export default defineNuxtModule<ModuleOptions>({
     // Write options to public runtime config if client requests are enabled
     // @ts-expect-error: `client` types are not compatible
     nuxt.options.runtimeConfig.public.apiParty = defu(
-      nuxt.options.runtimeConfig.public.apiParty,
+      nuxt.options.runtimeConfig.public.apiParty as Required<ModuleOptions>,
       resolvedOptions.client
         ? resolvedOptions
         : {

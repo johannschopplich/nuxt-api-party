@@ -98,7 +98,7 @@ export function _useApiData<T = any>(
   path: MaybeRefOrGetter<string>,
   opts: UseApiDataOptions<T> = {},
 ) {
-  const apiParty = useRuntimeConfig().public.apiParty as unknown as Required<ModuleOptions>
+  const apiParty = useRuntimeConfig().public.apiParty as Required<ModuleOptions>
   const {
     server,
     lazy,
@@ -181,6 +181,8 @@ export function _useApiData<T = any>(
 
       try {
         if (client) {
+          // @ts-expect-error: Why does the generic type not work here after
+          // upgrading to `@nuxt/module-builder`?
           result = (await globalThis.$fetch<T>(_path.value, {
             ..._fetchOptions,
             signal: controller.signal,
@@ -199,6 +201,8 @@ export function _useApiData<T = any>(
           })) as T
         }
         else {
+          // @ts-expect-error: Why does the generic type not work here after
+          // upgrading to `@nuxt/module-builder`?
           result = (await globalThis.$fetch<T>(
             `/api/__api_party/${endpointId}`,
             {

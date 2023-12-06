@@ -6,8 +6,8 @@ import { useRuntimeConfig } from '#imports'
 
 export default defineEventHandler(async (event): Promise<any> => {
   const endpointId = getRouterParam(event, 'endpointId')!
-  const { apiParty } = useRuntimeConfig()
-  const endpoints = (apiParty as unknown as ModuleOptions).endpoints || {}
+  const apiParty = useRuntimeConfig().apiParty as Required<ModuleOptions>
+  const endpoints = apiParty.endpoints || {}
   const endpoint = endpoints[endpointId]
 
   if (!endpoint) {
@@ -51,6 +51,8 @@ export default defineEventHandler(async (event): Promise<any> => {
   }
 
   try {
+    // @ts-expect-error: Why does the generic type not work here after
+    // upgrading to `@nuxt/module-builder`?
     const response = await globalThis.$fetch.raw<ArrayBuffer>(
       path,
       {
