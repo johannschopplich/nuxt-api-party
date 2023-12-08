@@ -23,8 +23,8 @@ export default defineEventHandler(async (event): Promise<any> => {
     path,
     query,
     headers,
+    method,
     body,
-    ...fetchOptions
   } = _body
 
   // Check if the path is an absolute URL
@@ -54,7 +54,7 @@ export default defineEventHandler(async (event): Promise<any> => {
     const response = await globalThis.$fetch.raw<ArrayBuffer>(
       path,
       {
-        ...fetchOptions,
+        method,
         baseURL,
         query: {
           ...endpoint.query,
