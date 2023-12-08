@@ -18,4 +18,5 @@
 
 ## Reporting a Vulnerability
 
-To report a vulnerability, please email [pkg@johannschopplich.com](mailto:pkg@johannschopplich.com) and include the word "SECURITY" in the subject line.
+To report a vulnerability, please [draft a new security advisory](https://github.com/johannschopplich/nuxt-api-party/security/advisories/new).
+Alternatively, you can send an email to [pkg@johannschopplich.com](mailto:pkg@johannschopplich.com) with the word "SECURITY" in the subject line.
