@@ -2,7 +2,7 @@
   "name": "nuxt-api-party",
   "type": "module",
   "version": "0.22.1",
-  "packageManager": "pnpm@8.11.0",
+  "packageManager": "pnpm@8.12.0",
   "description": "Nuxt 3 module to securely connect with any API",
   "author": "Johann Schopplich <pkg@johannschopplich.com>",
   "license": "MIT",
@@ -68,7 +68,7 @@
     "nuxt": "^3.8.2",
     "nuxt-api-party": "workspace:*",
     "typescript": "^5.3.3",
-    "vitest": "^0.34.6",
+    "vitest": "^1.0.2",
     "vue-tsc": "^1.8.25"
   }
 }
