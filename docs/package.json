@@ -8,8 +8,8 @@
     "serve": "vitepress serve"
   },
   "devDependencies": {
-    "@iconify-json/carbon": "^1.1.24",
+    "@iconify-json/carbon": "^1.1.27",
     "unocss": "^0.58.0",
-    "vitepress": "1.0.0-rc.31"
+    "vitepress": "1.0.0-rc.32"
   }
 }
