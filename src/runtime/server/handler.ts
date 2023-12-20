@@ -67,8 +67,8 @@ export default defineEventHandler(async (event): Promise<any> => {
           ...headers,
         },
         ...(body && { body: await deserializeMaybeEncodedBody(body) }),
-        ignoreResponseError: true,
         responseType: 'arrayBuffer',
+        ignoreResponseError: true,
       },
     )
     setResponseStatus(event, response.status, response.statusText)
@@ -79,7 +79,7 @@ export default defineEventHandler(async (event): Promise<any> => {
     // middleware is used
     removeResponseHeader(event, 'content-encoding')
 
-    await send(event, new Uint8Array(response._data ?? []))
+    return send(event, new Uint8Array(response._data ?? []))
   }
   catch (error) {
     console.error(error)
