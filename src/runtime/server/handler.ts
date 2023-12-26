@@ -1,4 +1,14 @@
-import { createError, defineEventHandler, getRequestHeader, getRouterParam, readBody, removeResponseHeader, send, setResponseHeaders, setResponseStatus } from 'h3'
+import {
+  createError,
+  defineEventHandler,
+  getRequestHeader,
+  getRouterParam,
+  readBody,
+  send,
+  setResponseHeader,
+  setResponseStatus,
+  splitCookiesString,
+} from 'h3'
 import { deserializeMaybeEncodedBody } from '../utils'
 import type { ModuleOptions } from '../../module'
 import type { EndpointFetchOptions } from '../types'
@@ -71,13 +81,28 @@ export default defineEventHandler(async (event): Promise<any> => {
         ignoreResponseError: true,
       },
     )
-    setResponseStatus(event, response.status, response.statusText)
-    setResponseHeaders(event, Object.fromEntries(response.headers.entries()))
 
-    // ofetch has already decoded the response. Leaving this header can cause the
-    // client issues when decoding and may create a conflict if a compression
-    // middleware is used
-    removeResponseHeader(event, 'content-encoding')
+    setResponseStatus(event, response.status, response.statusText)
+
+    const cookies: string[] = []
+
+    for (const [key, value] of response.headers.entries()) {
+      if (key === 'content-encoding')
+        continue
+
+      if (key === 'content-length')
+        continue
+
+      if (key === 'set-cookie') {
+        cookies.push(...splitCookiesString(value))
+        continue
+      }
+
+      setResponseHeader(event, key, value)
+    }
+
+    if (cookies.length > 0)
+      setResponseHeader(event, 'set-cookie', cookies)
 
     return send(event, new Uint8Array(response._data ?? []))
   }
