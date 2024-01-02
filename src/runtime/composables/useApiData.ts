@@ -1,5 +1,6 @@
 import { computed, reactive } from 'vue'
 import { hash } from 'ohash'
+import { joinURL } from 'ufo'
 import type { FetchError } from 'ofetch'
 import type { NitroFetchOptions } from 'nitropack'
 import type { WatchSource } from 'vue'
@@ -200,7 +201,7 @@ export function _useApiData<T = any>(
         }
         else {
           result = (await globalThis.$fetch<T>(
-            `/api/__api_party/${endpointId}`,
+            joinURL('/api', apiParty.server.basePath!, endpointId),
             {
               ..._fetchOptions,
               signal: controller.signal,

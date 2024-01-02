@@ -1,5 +1,6 @@
 import { relative } from 'pathe'
 import { defu } from 'defu'
+import { joinURL } from 'ufo'
 import { camelCase, pascalCase } from 'scule'
 import { addImportsSources, addServerHandler, addTemplate, createResolver, defineNuxtModule, tryResolveModule, useLogger } from '@nuxt/kit'
 import type { OpenAPI3, OpenAPITSOptions } from 'openapi-typescript'
@@ -68,6 +69,15 @@ export interface ModuleOptions {
    * Global options for openapi-typescript
    */
   openAPITS?: OpenAPITSOptions
+
+  server?: {
+    /**
+     * The API base route for the Nuxt server handler
+     *
+     * @default '__api_party'
+     */
+    basePath?: string
+  }
 }
 
 export default defineNuxtModule<ModuleOptions>({
@@ -82,6 +92,9 @@ export default defineNuxtModule<ModuleOptions>({
     endpoints: {},
     client: false,
     openAPITS: {},
+    server: {
+      basePath: '__api_party',
+    },
   },
   async setup(options, nuxt) {
     const moduleName = 'nuxt-api-party'
@@ -125,6 +138,7 @@ export default defineNuxtModule<ModuleOptions>({
               ),
             ),
             client: false,
+            server: resolvedOptions.server,
           },
     )
 
@@ -152,7 +166,7 @@ export default defineNuxtModule<ModuleOptions>({
 
     // Add Nuxt server route to proxy the API request server-side
     addServerHandler({
-      route: '/api/__api_party/:endpointId',
+      route: joinURL('/api', options.server!.basePath!, ':endpointId'),
       method: 'post',
       handler: resolve('runtime/server/handler'),
     })

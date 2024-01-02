@@ -1,4 +1,5 @@
 import { hash } from 'ohash'
+import { joinURL } from 'ufo'
 import type { NitroFetchOptions } from 'nitropack'
 import { headersToObject, resolvePathParams, serializeMaybeEncodedBody } from '../utils'
 import { isFormData } from '../formData'
@@ -116,7 +117,7 @@ export function _$api<T = any>(
   }) as Promise<T>
 
   const serverFetcher = async () =>
-    (await globalThis.$fetch<T>(`/api/__api_party/${endpointId}`, {
+    (await globalThis.$fetch<T>(joinURL('/api', apiParty.server.basePath!, endpointId), {
       ...fetchOptions,
       method: 'POST',
       body: {

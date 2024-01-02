@@ -148,5 +148,14 @@ interface ModuleOptions {
    * Global options for openapi-typescript
    */
   openAPITS?: OpenAPITSOptions
+
+  server?: {
+    /**
+     * The API base path for the Nuxt server handler
+     *
+     * @default '__api_party'
+     */
+    basePath?: string
+  }
 }
 ```
