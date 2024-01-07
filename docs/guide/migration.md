@@ -9,9 +9,16 @@ This change also affects the error handling for API Party composables. The error
 ```ts
 import type { NuxtError } from '#app'
 
+// The error is now typed as `NuxtError<unknown> | null`
 const { data, error } = await useMyApiData('posts')
 
-console.error(error.data as NuxtError)
+// For dollar API calls, the error has to be typed as `NuxtError`
+try {
+  await $myApi('posts')
+}
+catch (error) {
+  console.error(error as NuxtError)
+}
 ```
 
 ## v0.17.0
