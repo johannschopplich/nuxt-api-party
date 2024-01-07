@@ -10,7 +10,7 @@ const retry = ref(3)
 // Retry failed requests 3 times
 const { data } = await useJsonPlaceholderData('posts/1', {
   retry: retry.value,
-  retryDelay: 500 // ms
+  retryDelay: 500 // Milliseconds
 })
 ```
 

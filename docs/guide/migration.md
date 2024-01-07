@@ -1,5 +1,19 @@
 # Migration
 
+## v1.0.0
+
+Following the release of Nuxt [3.9](https://github.com/nuxt/nuxt/releases/tag/v3.9.0), type possibilities for errors returned by `useAsyncData` and `useFetch` have been significantly improved to make them more accurate in terms of what they actually contain. See the [refactor PR](https://github.com/nuxt/nuxt/pull/24396) for more information.
+
+This change also affects the error handling for API Party composables. The error types have been updated to reflect the changes in Nuxt 3.9. As such, you may need to update your code to make use of the new type possibilities:
+
+```ts
+import type { NuxtError } from '#app'
+
+const { data, error } = await useMyApiData('posts')
+
+console.error(error.data as NuxtError)
+```
+
 ## v0.17.0
 
 ::: tip
