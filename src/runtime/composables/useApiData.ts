@@ -1,10 +1,9 @@
 import { computed, reactive } from 'vue'
 import { hash } from 'ohash'
 import { joinURL } from 'ufo'
-import type { FetchError } from 'ofetch'
 import type { NitroFetchOptions } from 'nitropack'
 import type { WatchSource } from 'vue'
-import type { AsyncData, AsyncDataOptions } from 'nuxt/app'
+import type { AsyncData, AsyncDataOptions, NuxtError } from 'nuxt/app'
 import type { ModuleOptions } from '../../module'
 import { CACHE_KEY_PREFIX } from '../constants'
 import { headersToObject, resolvePathParams, serializeMaybeEncodedBody, toValue } from '../utils'
@@ -77,21 +76,21 @@ export type UseOpenAPIDataOptions<
 export type UseApiData = <T = any>(
   path: MaybeRefOrGetter<string>,
   opts?: UseApiDataOptions<T>,
-) => AsyncData<T | undefined, FetchError>
+) => AsyncData<T | undefined, NuxtError>
 
 export interface UseOpenAPIData<Paths extends Record<string, SchemaPath>> {
   <P extends GetPlainPaths<Paths>, ResT = ApiResponse<Paths[`/${P}`]['get']>, DataT = ResT>(
     path: MaybeRefOrGetter<P>,
     opts?: Omit<UseOpenAPIDataOptions<Paths[`/${P}`], CaseVariants<keyof Paths[`/${P}`] & HttpMethod>, ResT, DataT>, 'method'>,
-  ): AsyncData<DataT, FetchError<ApiError<Paths[`/${P}`]['get']>>>
+  ): AsyncData<DataT, NuxtError<ApiError<Paths[`/${P}`]['get']>>>
   <P extends GetPaths<Paths>, ResT = ApiResponse<Paths[`/${P}`]['get']>, DataT = ResT>(
     path: MaybeRefOrGetter<P>,
     opts: Omit<UseOpenAPIDataOptions<Paths[`/${P}`], CaseVariants<keyof Paths[`/${P}`] & HttpMethod>, ResT, DataT>, 'method'>,
-  ): AsyncData<DataT, FetchError<ApiError<Paths[`/${P}`]['get']>>>
+  ): AsyncData<DataT, NuxtError<ApiError<Paths[`/${P}`]['get']>>>
   <P extends AllPaths<Paths>, M extends CaseVariants<keyof Paths[`/${P}`] & HttpMethod>, ResT = ApiResponse<Paths[`/${P}`][Lowercase<M>]>, DataT = ResT>(
     path: MaybeRefOrGetter<P>,
     opts: UseOpenAPIDataOptions<Paths[`/${P}`], M, ResT, DataT> & { method: M },
-  ): AsyncData<DataT, FetchError<ApiError<Paths[`/${P}`][Lowercase<M>]>>>
+  ): AsyncData<DataT, NuxtError<ApiError<Paths[`/${P}`][Lowercase<M>]>>>
 }
 
 export function _useApiData<T = any>(
@@ -166,7 +165,7 @@ export function _useApiData<T = any>(
 
   let controller: AbortController | undefined
 
-  return useAsyncData<T, FetchError>(
+  return useAsyncData<T, NuxtError>(
     _key.value,
     async (nuxt) => {
       controller?.abort?.()
@@ -227,5 +226,5 @@ export function _useApiData<T = any>(
       return result
     },
     _asyncDataOptions,
-  ) as AsyncData<T | undefined, FetchError>
+  ) as AsyncData<T | undefined, NuxtError>
 }

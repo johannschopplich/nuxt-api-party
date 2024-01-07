@@ -9,7 +9,7 @@ While the idea of this Nuxt module is to mask your real API (and credentials) by
 
 Thus, if your API fails to deliver, you can still handle the error response in your Nuxt app just like you would with a direct API call.
 
-Both [generated composables](/api/) per endpoint will throw an [ofetch](https://github.com/unjs/ofetch) `FetchError` if your API fails to deliver.
+Both [generated composables](/api/) per endpoint will throw a `NuxtError` if your API fails to deliver.
 
 Logging the available error properties will provide you insights on what went wrong:
 
@@ -21,19 +21,24 @@ console.log(error.data) // Whatever your API returned
 
 See all available examples below.
 
-## `FetchError` Type Declaration
+## `NuxtError` Type Declaration
 
 ```ts
-// See https://github.com/unjs/ofetch
-interface FetchError<T = any> extends Error {
-  request?: FetchRequest
-  options?: FetchOptions
-  response?: FetchResponse<T>
-  data?: T
-  status?: number
-  statusText?: string
-  statusCode?: number
+export interface NuxtError<DataT = unknown> extends H3Error<DataT> {}
+
+// See https://github.com/unjs/h3
+declare class H3Error<DataT = unknown> extends Error {
+  static __h3_error__: boolean
+  statusCode: number
+  fatal: boolean
+  unhandled: boolean
   statusMessage?: string
+  data?: DataT
+  cause?: unknown
+  constructor(message: string, opts?: {
+    cause?: unknown
+  })
+  toJSON(): Pick<H3Error<DataT>, 'data' | 'statusCode' | 'statusMessage' | 'message'>
 }
 ```
 
@@ -61,7 +66,7 @@ export default defineNuxtConfig({
 
 ### Usage with `useJsonPlaceholderData`
 
-When using the `useMyApiData` composable, the `error` is already typed as a `FetchError`.
+When using the `useMyApiData` composable, the `error` is already typed as a `NuxtError`.
 
 ```ts
 const { data, error } = await useJsonPlaceholderData('not/available')
@@ -75,7 +80,7 @@ watchEffect(() => {
 ### Usage with `$jsonPlaceholder`
 
 ```ts
-import type { FetchError } from 'ofetch'
+import type { NuxtError } from '#app'
 
 function onSubmit() {
   try {
@@ -85,7 +90,7 @@ function onSubmit() {
     })
   }
   catch (error) {
-    console.error((error as FetchError).data)
+    console.error((error as NuxtError).data)
   }
 }
 ```

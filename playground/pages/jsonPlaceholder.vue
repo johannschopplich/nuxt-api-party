@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { FetchError } from 'ofetch'
 import type { JsonPlaceholderComment } from '../types'
+import type { NuxtError } from '#app'
 
 const route = useRoute()
 
@@ -51,9 +51,9 @@ async function onSubmit() {
     console.log('formResponse:', formResponse.value)
   }
   catch (error) {
-    console.error(error as FetchError)
+    console.error(error as NuxtError)
     // Log the API response body
-    console.error('Response body:', (error as FetchError).data)
+    console.error('Response body:', (error as NuxtError).data)
   }
 }
 </script>

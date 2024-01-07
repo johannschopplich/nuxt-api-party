@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { FetchError } from 'ofetch'
+import type { NuxtError } from '#app'
 
 try {
   await $testApi('foo/bar', {
@@ -9,6 +9,6 @@ try {
   })
 }
 catch (error) {
-  useTestResult((error as FetchError).data)
+  useTestResult((error as NuxtError).data)
 }
 </script>
