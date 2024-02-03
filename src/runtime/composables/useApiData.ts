@@ -165,7 +165,7 @@ export function _useApiData<T = any>(
 
   let controller: AbortController | undefined
 
-  return useAsyncData<T, NuxtError>(
+  return useAsyncData<T, unknown>(
     _key.value,
     async (nuxt) => {
       controller?.abort?.()
