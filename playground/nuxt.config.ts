@@ -13,10 +13,6 @@ export default defineNuxtConfig({
     },
   },
 
-  future: {
-    typescriptBundlerResolution: true,
-  },
-
   typescript: {
     // TODO: Re-enable when test directory can be excluded from type checking
     // typeCheck: 'build,
