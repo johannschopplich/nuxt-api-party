@@ -76,7 +76,7 @@ export type UseOpenAPIDataOptions<
 export type UseApiData = <T = any>(
   path: MaybeRefOrGetter<string>,
   opts?: UseApiDataOptions<T>,
-) => AsyncData<T | undefined, NuxtError>
+) => AsyncData<T | null, NuxtError>
 
 export interface UseOpenAPIData<Paths extends Record<string, SchemaPath>> {
   <P extends GetPlainPaths<Paths>, ResT = ApiResponse<Paths[`/${P}`]['get']>, DataT = ResT>(
@@ -226,5 +226,5 @@ export function _useApiData<T = any>(
       return result
     },
     _asyncDataOptions,
-  ) as AsyncData<T | undefined, NuxtError>
+  ) as AsyncData<T | null, NuxtError>
 }

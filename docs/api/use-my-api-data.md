@@ -70,7 +70,7 @@ type UseApiDataOptions<T> = Pick<
 function UseApiData<T = any>(
   path: MaybeRefOrGetter<string>,
   opts?: UseApiDataOptions<T>
-): AsyncData<T | undefined, NuxtError>
+): AsyncData<T | null, NuxtError>
 ```
 
 ## Caching
