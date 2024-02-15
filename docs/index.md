@@ -3,12 +3,12 @@ layout: home
 sidebar: false
 
 title: nuxt-api-party
-titleTemplate: Connect with any API securely
+titleTemplate: Connect to any API securely
 
 hero:
   name: nuxt-api-party
-  text: Connect with any API securely
-  tagline: Server proxy & dynamic composable names
+  text: Connect to any API securely
+  tagline: Server proxy and dynamic composables
   image:
     src: /logo-shadow.svg
     alt: nuxt-api-party

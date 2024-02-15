@@ -13,7 +13,7 @@ const url = new URL(ogUrl)
 export default defineConfig({
   lang: 'en-US',
   title: name,
-  description: 'Connect with any API securely',
+  description: 'Connect to any API securely',
   head: [
     ['link', { rel: 'icon', href: '/logo.svg', type: 'image/svg+xml' }],
     ['meta', { name: 'author', content: 'Johann Schopplich' }],
