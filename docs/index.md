@@ -1,10 +1,6 @@
 ---
 layout: home
-sidebar: false
-
-title: nuxt-api-party
 titleTemplate: Connect to any API securely
-
 hero:
   name: nuxt-api-party
   text: Connect to any API securely
