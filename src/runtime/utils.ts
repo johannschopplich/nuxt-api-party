@@ -1,13 +1,7 @@
-import { unref } from 'vue'
+import { toValue } from 'vue'
 import { formDataToObject, isFormData, isSerializedFormData, objectToFormData } from './formData'
 import type { MaybeRefOrGetter } from './types'
 import type { ApiFetchOptions } from './composables/$api'
-
-export function toValue<T>(r: MaybeRefOrGetter<T>): T {
-  return typeof r === 'function'
-    ? (r as (...args: any[]) => any)()
-    : unref(r)
-}
 
 export function headersToObject(headers: HeadersInit = {}): Record<string, string> {
   if (headers instanceof Headers || Array.isArray(headers))
