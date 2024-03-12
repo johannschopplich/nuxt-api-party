@@ -1,6 +1,6 @@
 import { toValue } from 'vue'
+import type { MaybeRefOrGetter } from 'vue'
 import { formDataToObject, isFormData, isSerializedFormData, objectToFormData } from './formData'
-import type { MaybeRefOrGetter } from './types'
 import type { ApiFetchOptions } from './composables/$api'
 
 export function headersToObject(headers: HeadersInit = {}): Record<string, string> {
