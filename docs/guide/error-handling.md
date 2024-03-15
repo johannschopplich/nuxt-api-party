@@ -1,15 +1,13 @@
 # Error Handling
 
-While the idea of this Nuxt module is to mask your real API (and credentials) by creating a server proxy, `nuxt-api-party` will minimize the hassle of handling errors by passing through the following properties to the response on the client:
+While the idea of this Nuxt module is to mask your real API (and credentials) within the server proxy, `nuxt-api-party` will minimize the hassle of handling errors by passing through the following properties to the response on the client:
 
 - Response body
 - HTTP status code
 - HTTP status message
 - Headers
 
-Thus, if your API fails to deliver, you can still handle the error response in your Nuxt app just like you would with a direct API call.
-
-Both [generated composables](/api/) per endpoint will throw a `NuxtError` if your API fails to deliver.
+Thus, if the request to your API fails, you can still handle the error response in your Nuxt app just like you would with a direct API call. In this case, both [generated composables](/api/) per endpoint will throw a `NuxtError` if your API fails to deliver.
 
 Logging the available error properties will provide you insights on what went wrong:
 
