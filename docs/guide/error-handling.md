@@ -22,10 +22,10 @@ See all available examples below.
 ## `NuxtError` Type Declaration
 
 ```ts
-export interface NuxtError<DataT = unknown> extends H3Error<DataT> {}
+interface NuxtError<DataT = unknown> extends H3Error<DataT> {}
 
 // See https://github.com/unjs/h3
-declare class H3Error<DataT = unknown> extends Error {
+class H3Error<DataT = unknown> extends Error {
   static __h3_error__: boolean
   statusCode: number
   fatal: boolean
