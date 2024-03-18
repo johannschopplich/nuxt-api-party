@@ -211,7 +211,7 @@ export const ${getRawComposableName(i)} = (...args) => _$api('${i}', ...args)
 
     // Add Nuxt auto-imports for generated composables
     addImportsSources({
-      from: resolve(nuxt.options.buildDir, `module/${moduleName}.mjs`),
+      from: resolve(nuxt.options.buildDir, `module/${moduleName}`),
       imports: endpointKeys.flatMap(i => [getRawComposableName(i), getDataComposableName(i)]),
     })
 
