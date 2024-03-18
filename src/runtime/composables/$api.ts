@@ -134,7 +134,7 @@ export function _$api<T = any>(
 
   const request = (client ? clientFetcher() : serverFetcher())
     .then((response) => {
-      if (process.server || cache)
+      if (import.meta.server || cache)
         nuxt.payload.data[_key] = response
       promiseMap.delete(_key)
       return response
