@@ -25,11 +25,7 @@
 > [📖 Read the documentation](https://nuxt-api-party.byjohann.dev)
 
 ```bash
-# pnpm
-pnpm add -D nuxt-api-party
-
-# npm
-npm i -D nuxt-api-party
+npx nuxi@latest module add api-party
 ```
 
 ## Basic Usage
