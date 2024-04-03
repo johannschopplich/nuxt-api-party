@@ -3,6 +3,7 @@
 This guide will walk you through the steps to get started with `nuxt-api-party`.
 
 ## Step 1: Install `nuxt-api-party`
+
 ```bash
 npx nuxi@latest module add api-party
 ```
