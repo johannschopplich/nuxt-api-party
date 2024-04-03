@@ -4,17 +4,9 @@ This guide will walk you through the steps to get started with `nuxt-api-party`.
 
 ## Step 1: Install `nuxt-api-party`
 
-::: code-group
-  ```bash [pnpm]
-  pnpm add -D nuxt-api-party
-  ```
-  ```bash [yarn]
-  yarn add -D nuxt-api-party
-  ```
-  ```bash [npm]
-  npm install -D nuxt-api-party
-  ```
-:::
+```bash
+npx nuxi@latest module add api-party
+```
 
 ## Step 2: Use `nuxt-api-party`
 
