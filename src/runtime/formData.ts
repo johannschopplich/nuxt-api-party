@@ -98,9 +98,9 @@ function isSerializedBlob(obj: unknown): obj is SerializedBlob {
 
 async function serializeBlob(blob: Blob) {
   const arrayBuffer = await blob.arrayBuffer()
-  const bytes = new Uint8Array(arrayBuffer)
-  const binary = bytes.reduce((acc, byte) => acc + String.fromCharCode(byte), '')
-  const base64 = btoa(binary)
+  const byteArray = new Uint8Array(arrayBuffer)
+  const binary = byteArray.reduce((acc, byte) => acc + String.fromCharCode(byte), '')
+  const base64 = globalThis.btoa(binary)
 
   return {
     data: base64,
@@ -110,6 +110,6 @@ async function serializeBlob(blob: Blob) {
 }
 
 async function deserializeBlob(serializedBlob: SerializedBlob) {
-  const arrayBuffer = Uint8Array.from(atob(serializedBlob.data), c => c.charCodeAt(0))
-  return new Blob([arrayBuffer], { type: serializedBlob.type })
+  const byteArray = Uint8Array.from(globalThis.atob(serializedBlob.data), x => x.charCodeAt(0))
+  return new Blob([byteArray], { type: serializedBlob.type })
 }
