@@ -9,18 +9,20 @@ import { CACHE_KEY_PREFIX } from '../constants'
 import { headersToObject, resolvePathParams, serializeMaybeEncodedBody } from '../utils'
 import { isFormData } from '../formData'
 import type { EndpointFetchOptions } from '../types'
-import type { AllPaths, ApiError, ApiResponse, CaseVariants, GetPaths, GetPlainPaths, HttpMethod, RequestOptions, SchemaPath } from '../openapi'
+import type { FetchResponseData, FetchResponseError, FilterMethods, ParamsOption, RequestBodyOption } from '../openapi'
 import { useAsyncData, useRequestHeaders, useRuntimeConfig } from '#imports'
 
-type ComputedOptions<T extends Record<string, any>> = {
-  [K in keyof T]: T[K] extends (...args: any[]) => any
+type ComputedOptions<T> = {
+  [K in keyof T]: T[K] extends Function
     ? T[K]
     : T[K] extends Record<string, any>
       ? ComputedOptions<T[K]> | MaybeRef<T[K]>
       : MaybeRef<T[K]>;
 }
 
-export type BaseUseApiDataOptions<ResT, DataT = ResT> = Omit<AsyncDataOptions<ResT, DataT>, 'watch'> & {
+type ComputedMethodOption<M, P> = 'get' extends keyof P ? ComputedOptions<{ method?: M }> : ComputedOptions<{ method: M }>
+
+export type SharedAsyncDataOptions<ResT, DataT = ResT> = Omit<AsyncDataOptions<ResT, DataT>, 'watch'> & {
   /**
    * Skip the Nuxt server proxy and fetch directly from the API.
    * Requires `client` set to `true` in the module options.
@@ -62,36 +64,43 @@ export type UseApiDataOptions<T> = Pick<
   | 'retryDelay'
   | 'timeout'
 > & {
-  pathParams?: MaybeRefOrGetter<Record<string, string>>
+  path?: MaybeRefOrGetter<Record<string, string>>
   body?: MaybeRef<string | Record<string, any> | FormData | null>
-} & BaseUseApiDataOptions<T>
-
-export type UseOpenAPIDataOptions<
-  P extends SchemaPath,
-  M extends CaseVariants<keyof P & HttpMethod> = CaseVariants<keyof P & 'get'>,
-  ResT = ApiResponse<P[Lowercase<M>]>,
-  DataT = ResT,
-> = BaseUseApiDataOptions<ResT, DataT> & ComputedOptions<RequestOptions<P, M>>
+} & SharedAsyncDataOptions<T>
 
 export type UseApiData = <T = any>(
   path: MaybeRefOrGetter<string>,
   opts?: UseApiDataOptions<T>,
 ) => AsyncData<T | null, NuxtError>
 
-export interface UseOpenAPIData<Paths extends Record<string, SchemaPath>> {
-  <P extends GetPlainPaths<Paths>, ResT = ApiResponse<Paths[`/${P}`]['get']>, DataT = ResT>(
-    path: MaybeRefOrGetter<P>,
-    opts?: Omit<UseOpenAPIDataOptions<Paths[`/${P}`], CaseVariants<keyof Paths[`/${P}`] & HttpMethod>, ResT, DataT>, 'method'>,
-  ): AsyncData<DataT, NuxtError<ApiError<Paths[`/${P}`]['get']>>>
-  <P extends GetPaths<Paths>, ResT = ApiResponse<Paths[`/${P}`]['get']>, DataT = ResT>(
-    path: MaybeRefOrGetter<P>,
-    opts: Omit<UseOpenAPIDataOptions<Paths[`/${P}`], CaseVariants<keyof Paths[`/${P}`] & HttpMethod>, ResT, DataT>, 'method'>,
-  ): AsyncData<DataT, NuxtError<ApiError<Paths[`/${P}`]['get']>>>
-  <P extends AllPaths<Paths>, M extends CaseVariants<keyof Paths[`/${P}`] & HttpMethod>, ResT = ApiResponse<Paths[`/${P}`][Lowercase<M>]>, DataT = ResT>(
-    path: MaybeRefOrGetter<P>,
-    opts: UseOpenAPIDataOptions<Paths[`/${P}`], M, ResT, DataT> & { method: M },
-  ): AsyncData<DataT, NuxtError<ApiError<Paths[`/${P}`][Lowercase<M>]>>>
-}
+export type UseOpenAPIDataOptions<
+  Method,
+  LowercasedMethod,
+  Params,
+  ResT,
+  DataT = ResT,
+  Operation = 'get' extends LowercasedMethod ? ('get' extends keyof Params ? Params['get'] : never) : LowercasedMethod extends keyof Params ? Params[LowercasedMethod] : never,
+> =
+  ComputedMethodOption<Method, Params>
+  & ComputedOptions<ParamsOption<Operation>>
+  & ComputedOptions<RequestBodyOption<Operation>>
+  & Omit<AsyncDataOptions<ResT, DataT>, 'query' | 'body' | 'method'>
+  & SharedAsyncDataOptions<ResT, DataT>
+
+export type UseOpenAPIData<Paths> = <
+  ReqT extends Extract<keyof Paths, string>,
+  Methods extends FilterMethods<Paths[ReqT]>,
+  Method extends Extract<keyof Methods, string> | Uppercase<Extract<keyof Methods, string>>,
+  LowercasedMethod extends Lowercase<Method> extends keyof Methods ? Lowercase<Method> : never,
+  DefaultMethod extends 'get' extends LowercasedMethod ? 'get' : LowercasedMethod,
+  ResT = FetchResponseData<Methods[DefaultMethod]>,
+  ErrorT = FetchResponseError<Methods[DefaultMethod]>,
+  DataT = ResT,
+>(
+  path: MaybeRefOrGetter<ReqT>,
+  options?: UseOpenAPIDataOptions<Method, LowercasedMethod, Methods, ResT, DataT>,
+  autoKey?: string
+) => AsyncData<DataT | null, ErrorT | null>
 
 export function _useApiData<T = any>(
   endpointId: string,
@@ -107,7 +116,7 @@ export function _useApiData<T = any>(
     pick,
     watch,
     immediate,
-    pathParams,
+    path: pathParams,
     query,
     headers,
     method,

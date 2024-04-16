@@ -6,10 +6,10 @@ import { isFormData } from '../formData'
 import type { ModuleOptions } from '../../module'
 import { CACHE_KEY_PREFIX } from '../constants'
 import type { EndpointFetchOptions } from '../types'
-import type { AllPaths, ApiResponse, CaseVariants, GetPaths, GetPlainPaths, HttpMethod, RequestOptions, SchemaPath } from '../openapi'
+import type { FetchResponseData, FilterMethods, MethodOption, ParamsOption, RequestBodyOption } from '../openapi'
 import { useNuxtApp, useRequestHeaders, useRuntimeConfig } from '#imports'
 
-export interface BaseApiFetchOptions {
+export interface SharedFetchOptions {
   /**
    * Skip the Nuxt server proxy and fetch directly from the API.
    * Requires `client` set to `true` in the module options.
@@ -32,42 +32,54 @@ export interface BaseApiFetchOptions {
   key?: string
 }
 
-export type ApiFetchOptions = Omit<NitroFetchOptions<string>, 'body' | 'cache'> & {
-  pathParams?: Record<string, string>
-  body?: string | Record<string, any> | FormData | null
-}
+export type ApiClientFetchOptions =
+  Omit<NitroFetchOptions<string>, 'body' | 'cache'>
+  & {
+    body?: string | Record<string, any> | FormData | null
+    path?: Record<string, string>
+  }
+  & SharedFetchOptions
 
-export type $Api = <T = any>(
+export type OpenAPIClientFetchOptions<
+  Method,
+  LowercasedMethod,
+  Params,
+  Operation = 'get' extends LowercasedMethod ? ('get' extends keyof Params ? Params['get'] : never) : LowercasedMethod extends keyof Params ? Params[LowercasedMethod] : never,
+> =
+  MethodOption<Method, Params>
+  & ParamsOption<Operation>
+  & RequestBodyOption<Operation>
+  & Omit<NitroFetchOptions<string>, 'query' | 'body' | 'method' | 'cache'>
+  & SharedFetchOptions
+
+export type ApiClient = <T = any>(
   path: string,
-  opts?: ApiFetchOptions & BaseApiFetchOptions,
+  opts?: ApiClientFetchOptions,
 ) => Promise<T>
 
-export interface $OpenAPI<Paths extends Record<string, SchemaPath>> {
-  <P extends GetPlainPaths<Paths>>(
-    path: P,
-    opts?: BaseApiFetchOptions & Omit<RequestOptions<Paths[`/${P}`]>, 'method'>
-  ): Promise<ApiResponse<Paths[`/${P}`]['get']>>
-  <P extends GetPaths<Paths>>(
-    path: P,
-    opts: BaseApiFetchOptions & Omit<RequestOptions<Paths[`/${P}`]>, 'method'>
-  ): Promise<ApiResponse<Paths[`/${P}`]['get']>>
-  <P extends AllPaths<Paths>, M extends CaseVariants<keyof Paths[`/${P}`] & HttpMethod>>(
-    path: P,
-    opts?: BaseApiFetchOptions & RequestOptions<Paths[`/${P}`], M> & { method: M }
-  ): Promise<ApiResponse<Paths[`/${P}`][Lowercase<M>]>>
-}
+export type OpenAPIClient<Paths> = <
+  ReqT extends Extract<keyof Paths, string>,
+  Methods extends FilterMethods<Paths[ReqT]>,
+  Method extends Extract<keyof Methods, string> | Uppercase<Extract<keyof Methods, string>>,
+  LowercasedMethod extends Lowercase<Method> extends keyof FilterMethods<Paths[ReqT]> ? Lowercase<Method> : never,
+  DefaultMethod extends 'get' extends LowercasedMethod ? 'get' : LowercasedMethod,
+  ResT = FetchResponseData<Paths[ReqT][DefaultMethod]>,
+>(
+  url: ReqT,
+  options?: OpenAPIClientFetchOptions<Method, LowercasedMethod, Methods>
+) => Promise<ResT>
 
 export function _$api<T = any>(
   endpointId: string,
   path: string,
-  opts: ApiFetchOptions & BaseApiFetchOptions = {},
+  opts: ApiClientFetchOptions = {},
 ) {
   const nuxt = useNuxtApp()
   const apiParty = useRuntimeConfig().public.apiParty as Required<ModuleOptions>
   const promiseMap = (nuxt._promiseMap = nuxt._promiseMap || new Map()) as Map<string, Promise<T>>
 
   const {
-    pathParams,
+    path: pathParams,
     query,
     headers,
     method,
