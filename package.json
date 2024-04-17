@@ -13,12 +13,12 @@
   },
   "bugs": "https://github.com/johannschopplich/nuxt-api-party/issues",
   "keywords": [
-    "nuxt-api",
-    "nuxt",
     "api",
-    "composable",
-    "query",
-    "fetch"
+    "fetch",
+    "nuxt",
+    "open-api",
+    "openapi",
+    "query"
   ],
   "exports": {
     ".": {
