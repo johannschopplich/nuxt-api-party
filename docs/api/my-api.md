@@ -9,12 +9,13 @@ Returns the raw response of the API endpoint. Intended for actions inside method
 ## Type Declarations
 
 ```ts
-interface BaseApiFetchOptions {
+interface SharedFetchOptions {
   /**
    * Skip the Nuxt server proxy and fetch directly from the API.
    * Requires `client` set to `true` in the module options.
    * @remarks
    * If Nuxt SSR is disabled, client-side requests are enabled by default.
+   * @default false
    */
   client?: boolean
   /**
@@ -31,14 +32,16 @@ interface BaseApiFetchOptions {
   key?: string
 }
 
-type ApiFetchOptions = Omit<NitroFetchOptions<string>, 'body' | 'cache'> & {
-  pathParams?: Record<string, string>
-  body?: string | Record<string, any> | FormData | null
-}
+type ApiClientFetchOptions =
+  Omit<NitroFetchOptions<string>, 'body' | 'cache'>
+  & {
+    path?: Record<string, string>
+    body?: string | Record<string, any> | FormData | null
+  }
 
 function $Api<T = any>(
   path: string,
-  opts?: ApiFetchOptions & BaseApiFetchOptions
+  opts?: ApiClientFetchOptions & SharedFetchOptions
 ): Promise<T>
 ```
 

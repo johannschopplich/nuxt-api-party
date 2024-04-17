@@ -1,18 +1,19 @@
 <script setup lang="ts">
 import type { NuxtError } from '#app'
 import type { components } from '#nuxt-api-party/petStore'
+import { $petStore, computed, ref, usePetStoreData, watch } from '#imports'
 
 type Pet = components['schemas']['Pet']
 
 const availableStatus = ['pending', 'sold'] as const
 const status = ref<'pending' | 'sold'>()
 
-const { data: user, execute } = usePetStoreData('user/{username}', {
-  pathParams: { username: 'user1' },
+const { data: user, execute } = usePetStoreData('/user/{username}', {
+  path: { username: 'user1' },
   cache: true,
 })
 
-const { data, error } = usePetStoreData('pet/findByStatus', {
+const { data, error } = usePetStoreData('/pet/findByStatus', {
   query: computed(() => ({
     status: status.value ?? 'pending',
   })),
@@ -29,9 +30,9 @@ watch(error, value => console.error(value))
 async function updateUser() {
   try {
     // Will error because of authentication
-    await $petStore('user/{username}', {
+    await $petStore('/user/{username}', {
       method: 'PUT',
-      pathParams: { username: 'user1' },
+      path: { username: 'user1' },
       body: {
         firstName: 'first name 2',
       },
@@ -48,9 +49,9 @@ const petData = ref<Pet | undefined>()
 
 async function fetchPetData(petId: number) {
   try {
-    petData.value = await $petStore('pet/{petId}', {
+    petData.value = await $petStore('/pet/{petId}', {
       method: 'GET',
-      pathParams: {
+      path: {
         petId,
       },
     })
@@ -65,7 +66,7 @@ const createdPet = ref<Pet>()
 async function abandonGarfield() {
   // Put the fat lazy cat up for adoption
   try {
-    createdPet.value = await $petStore('pet', {
+    createdPet.value = await $petStore('/pet', {
       method: 'POST',
       body: {
         id: 123,

@@ -80,7 +80,7 @@ function nav(): DefaultTheme.NavItem[] {
           ],
         },
         {
-          text: 'In-Depth',
+          text: 'Advanced',
           items: [
             { text: 'Hydration', link: '/guide/hydration' },
             { text: 'Caching', link: '/guide/caching' },
@@ -142,7 +142,7 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
       ],
     },
     {
-      text: 'In-Depth',
+      text: 'Advanced',
       items: [
         { text: 'Hydration', link: '/guide/hydration' },
         { text: 'Caching', link: '/guide/caching' },

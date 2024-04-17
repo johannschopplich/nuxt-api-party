@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { $testApi, useTestResult } from '#imports'
 import type { NuxtError } from '#app'
 
 try {

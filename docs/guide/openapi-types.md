@@ -2,20 +2,8 @@
 
 If your API has an [OpenAPI](https://swagger.io/resources/open-api/) schema, `nuxt-api-party` can use it to generate types for you. These include path names, supported HTTP methods, request body, response body, query parameters, and headers.
 
-Usage of this feature requires [`openapi-typescript`](https://www.npmjs.com/package/openapi-typescript) to be installed. This library generates TypeScript definitions from your OpenAPI schema file.
-
-Install it before proceeding:
-
-::: code-group
-```bash [pnpm]
-pnpm add -D openapi-typescript
-```
-```bash [yarn]
-yarn add -D openapi-typescript
-```
-```bash [npm]
-npm install -D openapi-typescript
-```
+::: info
+Usage of this feature requires [`openapi-typescript`](https://www.npmjs.com/package/openapi-typescript) to generate TypeScript definitions from your OpenAPI schema file. It is installed alongside `nuxt-api-party`.
 :::
 
 ## Schema Generation
@@ -30,10 +18,6 @@ Some web frameworks can generate an OpenAPI schema for you based on your configu
 - [Utopia](https://docs.rs/utoipa/latest/utoipa/)
 
 If your framework doesn't directly support it, there may also be an additional library that does.
-
-::: info
-If your API or framework uses the older OpenAPI 2.0 (aka Swagger) specification, you will need to install `openapi-typescript@5`, which is the latest version that supports it.
-:::
 
 ## Configuring the schema
 
@@ -135,30 +119,30 @@ type Foo = components['schemas']['Foo']
 
 OpenAPI can define path parameters on some endpoints. They are declared as `/foo/{id}`. Unfortunately, the endpoint is not defined as `/foo/10`, so using that as the path will break type inference.
 
-To get around this, set an object of the parameters to the property `pathParams`. You can then use the declared path for type inference, and the type checker will ensure you provide all required path parameters. The parameters will be interpolated into the path before the request is made.
+To get around this, set an object of the parameters to the property `path`. You can then use the declared path for type inference, and the type checker will ensure you provide all required path parameters. The parameters will be interpolated into the path before the request is made.
 
 ```ts
-const data = await $myApi('foo/{id}', {
-  pathParams: {
+const data = await $myApi('/foo/{id}', {
+  path: {
     id: 10
   }
 })
 ```
 
-For reactive `pathParams`, pass a ref or getter function instead of a plain object.
+For reactive `path` parameters, pass a ref or getter function instead of a plain object.
 
 ```ts
 const id = ref(10)
 
-const data = await $myApi('foo/{id}', {
-  pathParams: () => ({
+const data = await $myApi('/foo/{id}', {
+  path: () => ({
     id: id.value
   })
 })
 ```
 
 ::: warning
-Issues will **NOT** be reported at runtime by `nuxt-api-party` if the wrong parameters are used. The **incomplete** path will be sent to the backend **AS IS**.
+Issues will **NOT** be reported at runtime by `nuxt-api-party` if the wrong parameters are used. The **incomplete** path will be sent to the backend **as-is**.
 :::
 
 ### Route Method Overloading
@@ -169,10 +153,10 @@ In the example schema, `GET /foo` will return a `Foo[]` array, but `POST /foo` w
 
 ```ts
 // resolved type: `{ id?: number; bar: string }[]`
-const resultGet = await $myApi('foo')
+const resultGet = await $myApi('/foo')
 
 // resolved type: `{ id?: number; bar: string }`
-const resultPost = await $myApi('foo', {
+const resultPost = await $myApi('/foo', {
   method: 'POST',
   body: {
     bar: 'string'

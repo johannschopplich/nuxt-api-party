@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { JsonPlaceholderComment } from '../types'
+import { $jsonPlaceholder, computed, navigateTo, ref, useJsonPlaceholderData, useRoute, watch } from '#imports'
 import type { NuxtError } from '#app'
 
 const route = useRoute()

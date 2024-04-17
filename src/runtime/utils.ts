@@ -1,23 +1,20 @@
 import { toValue } from 'vue'
 import type { MaybeRefOrGetter } from 'vue'
 import { formDataToObject, isFormData, isSerializedFormData, objectToFormData } from './formData'
-import type { ApiFetchOptions } from './composables/$api'
+import type { ApiClientFetchOptions } from './composables/$api'
 
 export function headersToObject(headers: HeadersInit = {}): Record<string, string> {
-  if (headers instanceof Headers || Array.isArray(headers))
-    return Object.fromEntries(headers)
-
-  return headers
+  return Object.fromEntries(new Headers(headers))
 }
 
-export async function serializeMaybeEncodedBody(value: ApiFetchOptions['body']) {
+export async function serializeMaybeEncodedBody(value: ApiClientFetchOptions['body']) {
   if (isFormData(value))
     return await formDataToObject(value)
 
   return value
 }
 
-export async function deserializeMaybeEncodedBody(value: ApiFetchOptions['body']) {
+export async function deserializeMaybeEncodedBody(value: ApiClientFetchOptions['body']) {
   if (isSerializedFormData(value))
     return await objectToFormData(value)
 
