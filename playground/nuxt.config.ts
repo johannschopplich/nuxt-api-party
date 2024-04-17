@@ -1,5 +1,10 @@
+import { existsSync } from 'node:fs'
+import { resolve } from 'pathe'
+
 export default defineNuxtConfig({
-  modules: ['../src/module.ts'],
+  modules: [
+    existsSync(resolve(__dirname, '../dist/module.mjs')) ? 'nuxt-api-party' : '../src/module',
+  ],
 
   apiParty: {
     endpoints: {

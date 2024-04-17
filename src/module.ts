@@ -2,10 +2,9 @@ import { relative } from 'pathe'
 import { defu } from 'defu'
 import { joinURL } from 'ufo'
 import { camelCase, pascalCase } from 'scule'
-import { addImportsSources, addServerHandler, addTemplate, createResolver, defineNuxtModule, tryResolveModule } from '@nuxt/kit'
+import { addImportsSources, addServerHandler, addTemplate, createResolver, defineNuxtModule, tryResolveModule, useLogger } from '@nuxt/kit'
 import type { OpenAPI3, OpenAPITSOptions } from 'openapi-typescript'
 import type { QueryObject } from 'ufo'
-import { logger } from './kit'
 import { generateDeclarationTypes } from './openapi'
 
 export interface ApiEndpoint {
@@ -99,6 +98,7 @@ export default defineNuxtModule<ModuleOptions>({
   },
   async setup(options, nuxt) {
     const moduleName = 'nuxt-api-party'
+    const logger = useLogger(moduleName)
     const getRawComposableName = (endpointId: string) => `$${camelCase(endpointId)}`
     const getDataComposableName = (endpointId: string) => `use${pascalCase(endpointId)}Data`
 

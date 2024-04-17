@@ -1,41 +1,29 @@
 import { resolve } from 'pathe'
 import { useNuxt } from '@nuxt/kit'
 import type { OpenAPI3, OpenAPITSOptions } from 'openapi-typescript'
-import { logger } from './kit'
 import type { ApiEndpoint } from './module'
 
 export async function generateDeclarationTypes(
   endpoints: Record<string, ApiEndpoint>,
   globalOpenAPIOptions: OpenAPITSOptions,
 ) {
-  const schemas = await generateSchemas(endpoints, globalOpenAPIOptions)
-
-  return `
-${Object.entries(schemas).map(([id, types]) => `
-declare module '#nuxt-api-party/${id}' {
-  ${types.replace(/^/gm, '  ').trimEnd()}
-}`.trimStart(),
-).join('\n\n')}
-`.trimStart()
-}
-
-async function generateSchemas(
-  endpoints: Record<string, ApiEndpoint>,
-  openAPITSOptions?: OpenAPITSOptions,
-) {
-  const schemas = await Promise.all(
+  const resolvedSchemaEntries = await Promise.all(
     Object.entries(endpoints)
       .filter(([, endpoint]) => Boolean(endpoint.schema))
       .map(async ([id, endpoint]) => {
-        const types = await generateTypes({ id, endpoint, openAPITSOptions })
+        const types = await generateSchemaTypes({ id, endpoint, openAPITSOptions: globalOpenAPIOptions })
         return [id, types] as const
       }),
   )
 
-  return Object.fromEntries(schemas)
+  return resolvedSchemaEntries.map(([id, types]) => `
+declare module '#nuxt-api-party/${id}' {
+  ${types.replace(/^/gm, '  ').trimEnd()}
+}`.trimStart(),
+  ).join('\n\n').trimStart()
 }
 
-async function generateTypes(options: {
+async function generateSchemaTypes(options: {
   id: string
   endpoint: ApiEndpoint
   openAPITSOptions?: OpenAPITSOptions
@@ -52,7 +40,7 @@ async function generateTypes(options: {
     return astToString(ast)
   }
   catch (error) {
-    logger.error(`Failed to generate types for ${options.id}`)
+    console.error(`Failed to generate types for ${options.id}`)
     console.error(error)
     return `
 export type paths = Record<string, never>

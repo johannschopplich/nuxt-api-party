@@ -68,5 +68,8 @@
     "typescript": "^5.4.5",
     "vitest": "^1.5.0",
     "vue-tsc": "^2.0.13"
+  },
+  "resolutions": {
+    "nuxt-api-party": "link:."
   }
 }
