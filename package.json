@@ -13,8 +13,8 @@
   },
   "bugs": "https://github.com/johannschopplich/nuxt-api-party/issues",
   "keywords": [
+    "nuxt-api",
     "nuxt",
-    "nuxt3",
     "api",
     "composable",
     "query",
