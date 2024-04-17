@@ -1,6 +1,7 @@
 import { resolve } from 'pathe'
 import { useNuxt } from '@nuxt/kit'
 import type { OpenAPI3, OpenAPITSOptions } from 'openapi-typescript'
+import { logger } from './kit'
 import type { ApiEndpoint } from './module'
 
 export async function generateDeclarationTypes(
@@ -51,7 +52,7 @@ async function generateTypes(options: {
     return astToString(ast)
   }
   catch (error) {
-    console.error(`Failed to generate types for ${options.id}`)
+    logger.error(`Failed to generate types for ${options.id}`)
     console.error(error)
     return `
 export type paths = Record<string, never>

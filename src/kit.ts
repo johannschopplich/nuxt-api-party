@@ -1,5 +1,8 @@
 import { relative } from 'pathe'
-import { addTemplate, createResolver, useNuxt } from '@nuxt/kit'
+import { addTemplate, createResolver, useLogger, useNuxt } from '@nuxt/kit'
+import type { ConsolaInstance } from 'consola'
+
+export const logger: ConsolaInstance = useLogger('nuxt-api-party')
 
 export function extendTypes(
   module: string,
