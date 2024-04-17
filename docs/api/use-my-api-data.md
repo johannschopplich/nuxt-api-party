@@ -22,12 +22,13 @@ By default, Nuxt waits until a `refresh` is finished before it can be executed a
 ## Type Declarations
 
 ```ts
-type BaseUseApiDataOptions<ResT, DataT = ResT> = Omit<AsyncDataOptions<ResT, DataT>, 'watch'> & {
+type SharedAsyncDataOptions<ResT, DataT = ResT> = Omit<AsyncDataOptions<ResT, DataT>, 'watch'> & {
   /**
    * Skip the Nuxt server proxy and fetch directly from the API.
    * Requires `client` set to `true` in the module options.
    * @remarks
    * If Nuxt SSR is disabled, client-side requests are enabled by default.
+   * @default false
    */
   client?: boolean
   /**
@@ -63,9 +64,9 @@ type UseApiDataOptions<T> = Pick<
   | 'retryDelay'
   | 'timeout'
 > & {
-  pathParams?: MaybeRefOrGetter<Record<string, string>>
+  path?: MaybeRefOrGetter<Record<string, string>>
   body?: MaybeRef<string | Record<string, any> | FormData | null>
-} & BaseUseApiDataOptions<T>
+} & SharedAsyncDataOptions<T>
 
 function UseApiData<T = any>(
   path: MaybeRefOrGetter<string>,

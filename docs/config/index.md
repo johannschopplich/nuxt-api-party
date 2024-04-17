@@ -86,7 +86,7 @@ The global [configuration options](https://openapi-ts.pages.dev/node/#options) f
 ## Type Declaration
 
 ```ts
-interface Endpoint {
+interface ApiEndpoint {
   url: string
   token?: string
   query?: QueryObject
@@ -128,7 +128,7 @@ interface ModuleOptions {
    *
    * @default {}
    */
-  endpoints?: Record<string, Endpoint>
+  endpoints?: Record<string, ApiEndpoint>
 
   /**
    * Allow client-side requests besides server-side ones

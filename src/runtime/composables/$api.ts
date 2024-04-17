@@ -35,10 +35,9 @@ export interface SharedFetchOptions {
 export type ApiClientFetchOptions =
   Omit<NitroFetchOptions<string>, 'body' | 'cache'>
   & {
-    body?: string | Record<string, any> | FormData | null
     path?: Record<string, string>
+    body?: string | Record<string, any> | FormData | null
   }
-  & SharedFetchOptions
 
 export type OpenAPIClientFetchOptions<
   Method,
@@ -54,7 +53,7 @@ export type OpenAPIClientFetchOptions<
 
 export type ApiClient = <T = any>(
   path: string,
-  opts?: ApiClientFetchOptions,
+  opts?: ApiClientFetchOptions & SharedFetchOptions,
 ) => Promise<T>
 
 export type OpenAPIClient<Paths> = <
@@ -72,7 +71,7 @@ export type OpenAPIClient<Paths> = <
 export function _$api<T = any>(
   endpointId: string,
   path: string,
-  opts: ApiClientFetchOptions = {},
+  opts: ApiClientFetchOptions & SharedFetchOptions = {},
 ) {
   const nuxt = useNuxtApp()
   const apiParty = useRuntimeConfig().public.apiParty as Required<ModuleOptions>

@@ -1,10 +1,10 @@
 import { resolve } from 'pathe'
 import { useNuxt } from '@nuxt/kit'
 import type { OpenAPI3, OpenAPITSOptions } from 'openapi-typescript'
-import type { Endpoint } from './module'
+import type { ApiEndpoint } from './module'
 
 export async function generateDeclarationTypes(
-  endpoints: Record<string, Endpoint>,
+  endpoints: Record<string, ApiEndpoint>,
   globalOpenAPIOptions: OpenAPITSOptions,
 ) {
   const schemas = await generateSchemas(endpoints, globalOpenAPIOptions)
@@ -19,7 +19,7 @@ declare module '#nuxt-api-party/${id}' {
 }
 
 async function generateSchemas(
-  endpoints: Record<string, Endpoint>,
+  endpoints: Record<string, ApiEndpoint>,
   openAPITSOptions?: OpenAPITSOptions,
 ) {
   const schemas = await Promise.all(
@@ -36,7 +36,7 @@ async function generateSchemas(
 
 async function generateTypes(options: {
   id: string
-  endpoint: Endpoint
+  endpoint: ApiEndpoint
   openAPITSOptions?: OpenAPITSOptions
 },
 ) {
@@ -70,7 +70,7 @@ export type operations = Record<string, never>
   }
 }
 
-async function resolveSchema({ schema }: Endpoint): Promise<string | URL | OpenAPI3> {
+async function resolveSchema({ schema }: ApiEndpoint): Promise<string | URL | OpenAPI3> {
   const nuxt = useNuxt()
 
   if (typeof schema === 'function')

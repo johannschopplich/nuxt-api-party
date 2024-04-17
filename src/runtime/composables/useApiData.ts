@@ -100,7 +100,7 @@ export type UseOpenAPIData<Paths> = <
   path: MaybeRefOrGetter<ReqT>,
   options?: UseOpenAPIDataOptions<Method, LowercasedMethod, Methods, ResT, DataT>,
   autoKey?: string
-) => AsyncData<DataT | null, ErrorT | null>
+) => AsyncData<DataT | null, ErrorT>
 
 export function _useApiData<T = any>(
   endpointId: string,
