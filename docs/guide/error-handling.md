@@ -62,9 +62,9 @@ export default defineNuxtConfig({
 
 :::
 
-### Usage with `useJsonPlaceholderData`
+### Usage With `useFetch`-Like Composable
 
-When using the `useMyApiData` composable, the `error` is already typed as a `NuxtError`.
+When using the [`useFetch`-like composable](/api/use-fetch-like) composable, the `error` is already typed as a `NuxtError`.
 
 ```ts
 const { data, error } = await useJsonPlaceholderData('not/available')
@@ -75,7 +75,9 @@ watchEffect(() => {
 })
 ```
 
-### Usage with `$jsonPlaceholder`
+### Usage With `$fetch`-Like Composable
+
+When using the [`$fetch`-like composable](/api/dollarfetch-like) composable, you need to cast the `error` to a `NuxtError`.
 
 ```ts
 import type { NuxtError } from '#app'

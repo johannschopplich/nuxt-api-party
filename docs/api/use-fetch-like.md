@@ -1,4 +1,4 @@
-# Nuxt `useFetch` Substitute
+# `useFetch`-Like Composable
 
 ::: info
 `useMyApiData` is a placeholder used as an example in the documentation. The composable is generated based on your API endpoint ID. For example, if you were to call an endpoint `jsonPlaceholder`, the composable will be called `useJsonPlaceholderData`.

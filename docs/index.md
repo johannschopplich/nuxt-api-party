@@ -32,8 +32,8 @@ features:
     linkText: How It Works
   - title: Familiar Data Handling
     icon: <span class="i-carbon:noodle-bowl"></span>
-    details: Handle requests just like Nuxt `useFetch` and `$fetch`.
-    link: /api/use-my-api-data
+    details: Handle requests just like Nuxt <code>useFetch</code> and <code>$fetch</code>.
+    link: /api/use-fetch-like
     linkText: Async Data Composable
   - title: Connect Multiple APIs
     icon: <span class="i-carbon:ibm-watson-query"></span>

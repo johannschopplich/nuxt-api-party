@@ -87,7 +87,6 @@ function nav(): DefaultTheme.NavItem[] {
             { text: 'Interceptors', link: '/guide/interceptors' },
             { text: 'Cookies', link: '/guide/cookies' },
             { text: 'Retries', link: '/guide/retries' },
-            { text: 'Hydration', link: '/guide/hydration' },
             { text: 'Dynamic Backend URL', link: '/guide/dynamic-backend-url' },
           ],
         },
@@ -108,8 +107,8 @@ function nav(): DefaultTheme.NavItem[] {
         {
           text: 'Composables',
           items: [
-            { text: 'useFetch Substitute', link: '/api/use-my-api-data' },
-            { text: '$fetch Substitute', link: '/api/my-api' },
+            { text: 'useFetch-like', link: '/api/use-fetch-like' },
+            { text: '$fetch-like', link: '/api/dollarfetch-like' },
           ],
         },
       ],
@@ -150,7 +149,6 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
         { text: 'Interceptors', link: '/guide/interceptors' },
         { text: 'Cookies', link: '/guide/cookies' },
         { text: 'Retries', link: '/guide/retries' },
-        { text: 'Hydration', link: '/guide/hydration' },
         { text: 'Dynamic Backend URL', link: '/guide/dynamic-backend-url' },
       ],
     },
@@ -169,8 +167,8 @@ function sidebarApi(): DefaultTheme.SidebarItem[] {
     {
       text: 'Composables',
       items: [
-        { text: 'useFetch Substitute', link: '/api/use-my-api-data' },
-        { text: '$fetch Substitute', link: '/api/my-api' },
+        { text: 'useFetch-like', link: '/api/use-fetch-like' },
+        { text: '$fetch-like', link: '/api/dollarfetch-like' },
       ],
     },
   ]

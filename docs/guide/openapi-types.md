@@ -23,7 +23,9 @@ If your framework doesn't directly support it, there may also be an additional l
 
 To take advantage of these type features, add the `schema` property to your endpoint config. It should be set to a file path or URL of the OpenAPI schema or an async function returning the parsed OpenAPI schema. The file can be in either JSON or YAML format.
 
-The following schema will be used for the code examples on this page.
+The following schema will be used for the code examples on this page:
+
+::: details
 
 ```yaml
 # `schemas/myApi.yaml`
@@ -82,6 +84,8 @@ components:
         - bar
 ```
 
+:::
+
 Reference the schema file in your endpoint config:
 
 ```ts
@@ -98,7 +102,7 @@ export default defineNuxtConfig({
 
 ## Using the Types
 
-For most usages, no further intervention is needed. Nuxt API Party will use the types generated from this config to infer the correct types automatically when `$myApi` and `useMyApiData` is used.
+For most usages, no further intervention is needed. Nuxt API Party will use the types generated from this configuration to infer the correct types automatically when [`useFetch`-like](/api/use-fetch-like) and [`$fetch`-like](/api/dollarfetch-like) composables are used.
 
 However, there may be a few things you may want to do now that you have type information.
 

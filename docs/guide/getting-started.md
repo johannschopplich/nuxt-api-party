@@ -8,7 +8,7 @@ This guide will walk you through the steps to get started with Nuxt API Party.
 npx nuxi@latest module add api-party
 ```
 
-## Step 2: Use the `nuxt-api-party` module
+## Step 2: Use the `nuxt-api-party` Module
 
 Add `nuxt-api-party` to your Nuxt configuration:
 
@@ -19,7 +19,7 @@ export default defineNuxtConfig({
 })
 ```
 
-## Step 3: Set Up API Endpoints
+## Step 3: Set up API Endpoints
 
 Prepare your first API connection by setting an endpoint object. Each key represents an endpoint ID, which is used to generate the composables. The value is an object with the following properties:
 
@@ -50,7 +50,7 @@ export default defineNuxtConfig({
 For the API endpoint `jsonPlaceholder` above, the following composables are generated:
 
 - `$jsonPlaceholder` – Returns the response data, similar to [`$fetch`](https://nuxt.com/docs/api/utils/dollarfetch#fetch)
-- `useJsonPlaceholderData` – Returns [multiple values](/api/use-my-api-data.html#return-values) similar to [`useFetch`](https://nuxt.com/docs/api/composables/use-fetch)
+- `useJsonPlaceholderData` – Returns [multiple values](/api/use-fetch-like.html#return-values) similar to [`useFetch`](https://nuxt.com/docs/api/composables/use-fetch)
 
 ::: tip
 Connect to as many API endpoints as you like. Each endpoint will generate two composables.
@@ -100,6 +100,6 @@ const { data, pending, refresh, error } = await useJsonPlaceholderData('posts/1'
 </template>
 ```
 
-## Step. 5: Your Turn
+## Step 5: Your Turn
 
 Create something awesome! I'm eager to find out what you have built. [Drop me a line](mailto:mail@johannschopplich.com), if you want.

@@ -3,7 +3,7 @@
 You can cache your API responses to improve performance between multiple calls like for page navigation.
 
 ::: info
-Responses from `useMyApiData` are cached by default. On the other hand, you have to enable caching for `$myApi` manually.
+Responses from the [`useFetch`-like composable](/api/use-fetch-like) are cached by default. On the other hand, you have to enable caching for [`$fetch` composable](/api/dollarfetch-like) manually.
 :::
 
 ## Caching Strategy
@@ -20,19 +20,19 @@ Both [generated composables](/api/#dynamic-composables) will calculate a cache k
 If the cache key is already present in the cache, the cached response will be returned instead of making a new API call.
 
 ::: tip
-The cache key is reactive when using `useMyApiData`. This means that the cache key will be recalculated when any of the properties change.
+The cache key is reactive when using the [`useFetch`-like composable](/api/use-fetch-like). This means that the cache key will be recalculated when any of the properties change.
 :::
 
 ## Custom Cache Key
 
 For more control over when the cache should be invalidated, you can provide a custom cache key to de-duplicate requests. Please head to the API references for more information:
 
-- [Customize the cache key for `useMyApiData`](/api/use-my-api-data#caching)
-- [Customize the cache key for `$myApi`](/api/my-api#caching)
+- [Customize the cache key](/api/use-fetch-like#caching) for the `useFetch`-like composable.
+- [Customize the cache](/api/dollarfetch-like#caching) for the `$fetch`-like composable.
 
 ## Cache Options
 
-You can disable the cache for each request by setting the `cache` option to `false`. This is necessary for the `useMyApiData` composable:
+You can disable the cache for each request by setting the `cache` option to `false`. This is necessary for the `useFetch`-like composable:
 
 ```ts
 // Disable caching for a single request
