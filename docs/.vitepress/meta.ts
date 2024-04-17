@@ -1,4 +1,5 @@
 /* VitePress head */
+export const name = 'Nuxt API Party'
 export const ogUrl = 'https://nuxt-api-party.byjohann.dev/'
 export const ogImage = `${ogUrl}og.jpg`
 

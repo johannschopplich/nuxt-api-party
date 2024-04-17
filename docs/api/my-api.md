@@ -1,4 +1,4 @@
-# `$myApi`
+# Nuxt `$fetch` Substitute
 
 ::: info
 `$myApi` is a placeholder used as an example in the documentation. The composable is generated based on your API endpoint ID. For example, if you were to call an endpoint `jsonPlaceholder`, the composable will be called `$jsonPlaceholder`.

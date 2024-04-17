@@ -1,6 +1,6 @@
 # Module Configuration
 
-Adapt `nuxt-api-party` to your needs with the following options in your `nuxt.config.ts` file:
+Adapt Nuxt API Party to your needs with the following options in your `nuxt.config.ts` file:
 
 ```ts
 // `nuxt.config.ts`

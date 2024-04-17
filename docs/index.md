@@ -1,13 +1,13 @@
 ---
 layout: home
-titleTemplate: Connect to any API securely
+titleTemplate: Server Proxy and Generated API Composables
 hero:
-  name: nuxt-api-party
-  text: Connect to any API securely
-  tagline: Server proxy and dynamic composables
+  name: Nuxt API Party
+  text: Server Proxy and Generated API Composables
+  tagline: Connect to all your APIs securely
   image:
     src: /logo-shadow.svg
-    alt: nuxt-api-party
+    alt: Nuxt API Party Logo
   actions:
     - theme: brand
       text: Get Started
@@ -20,24 +20,24 @@ hero:
       link: https://github.com/johannschopplich/nuxt-api-party
 
 features:
-  - title: Dynamic composable names
+  - title: Dynamic composables
     icon: <span class="i-carbon:list-dropdown"></span>
     details: Auto-generated composables for each API endpoint.
     link: /api/
     linkText: API Reference
-  - title: Protected API credentials
+  - title: Protected API Credentials
     icon: <span class="i-carbon:ibm-cloud-hyper-protect-dbaas"></span>
     details: A Nuxt server route proxies your requests. No CORS issues!
     link: /guide/how-it-works
     linkText: How It Works
   - title: Familiar Data Handling
     icon: <span class="i-carbon:noodle-bowl"></span>
-    details: Handle requests just like useFetch or $fetch.
+    details: Handle requests just like Nuxt `useFetch` and `$fetch`.
     link: /api/use-my-api-data
-    linkText: useMyApiData
-  - title: Connect multiple APIs
+    linkText: Async Data Composable
+  - title: Connect Multiple APIs
     icon: <span class="i-carbon:ibm-watson-query"></span>
-    details: Use multiple APIs in your app with one module.
+    details: Configure all your APIs once and use them throughout your app.
     link: /guide/getting-started.html#step-3-set-up-api-endpoints
     linkText: Set Up API Endpoints
 ---

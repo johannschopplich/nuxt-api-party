@@ -1,14 +1,14 @@
 # Getting Started
 
-This guide will walk you through the steps to get started with `nuxt-api-party`.
+This guide will walk you through the steps to get started with Nuxt API Party.
 
-## Step 1: Install `nuxt-api-party`
+## Step 1: Install Nuxt API Party
 
 ```bash
 npx nuxi@latest module add api-party
 ```
 
-## Step 2: Use `nuxt-api-party`
+## Step 2: Use the `nuxt-api-party` module
 
 Add `nuxt-api-party` to your Nuxt configuration:
 

@@ -1,6 +1,6 @@
 [![nuxt-api-party](./docs/public/og.jpg)](https://nuxt-api-party.byjohann.dev)
 
-# nuxt-api-party
+# Nuxt API Party
 
 [![npm version](https://img.shields.io/npm/v/nuxt-api-party?color=a1b858&label=)](https://www.npmjs.com/package/nuxt-api-party)
 
@@ -33,7 +33,7 @@ npx nuxi@latest module add api-party
 > [!TIP]
 > [📖 Read the documentation](https://nuxt-api-party.byjohann.dev)
 
-Add this module `nuxt-api-party` to your Nuxt config and prepare your first API connection by setting an endpoint object with the following properties for the `apiParty` module option:
+Add the Nuxt API Party to your Nuxt config and prepare your first API connection by setting an endpoint object with the following properties for the `apiParty` module option:
 
 ```ts
 // `nuxt.config.ts`

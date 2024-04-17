@@ -1,8 +1,9 @@
 import { defineConfig } from 'vitepress'
 import type { DefaultTheme } from 'vitepress'
-import { description, name, version } from '../../package.json'
+import { description, version } from '../../package.json'
 import {
   github,
+  name,
   ogImage,
   ogUrl,
   releases,
@@ -13,7 +14,7 @@ const url = new URL(ogUrl)
 export default defineConfig({
   lang: 'en-US',
   title: name,
-  description: 'Connect to any API securely',
+  description: 'Server proxy and generated API composables',
   head: [
     ['link', { rel: 'icon', href: '/logo.svg', type: 'image/svg+xml' }],
     ['meta', { name: 'author', content: 'Johann Schopplich' }],
@@ -82,10 +83,11 @@ function nav(): DefaultTheme.NavItem[] {
         {
           text: 'Advanced',
           items: [
-            { text: 'Hydration', link: '/guide/hydration' },
             { text: 'Caching', link: '/guide/caching' },
+            { text: 'Interceptors', link: '/guide/interceptors' },
             { text: 'Cookies', link: '/guide/cookies' },
             { text: 'Retries', link: '/guide/retries' },
+            { text: 'Hydration', link: '/guide/hydration' },
             { text: 'Dynamic Backend URL', link: '/guide/dynamic-backend-url' },
           ],
         },
@@ -106,8 +108,8 @@ function nav(): DefaultTheme.NavItem[] {
         {
           text: 'Composables',
           items: [
-            { text: 'useMyApiData', link: '/api/use-my-api-data' },
-            { text: '$myApi', link: '/api/my-api' },
+            { text: 'useFetch Substitute', link: '/api/use-my-api-data' },
+            { text: '$fetch Substitute', link: '/api/my-api' },
           ],
         },
       ],
@@ -144,10 +146,11 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
     {
       text: 'Advanced',
       items: [
-        { text: 'Hydration', link: '/guide/hydration' },
         { text: 'Caching', link: '/guide/caching' },
+        { text: 'Interceptors', link: '/guide/interceptors' },
         { text: 'Cookies', link: '/guide/cookies' },
         { text: 'Retries', link: '/guide/retries' },
+        { text: 'Hydration', link: '/guide/hydration' },
         { text: 'Dynamic Backend URL', link: '/guide/dynamic-backend-url' },
       ],
     },
@@ -166,8 +169,8 @@ function sidebarApi(): DefaultTheme.SidebarItem[] {
     {
       text: 'Composables',
       items: [
-        { text: 'useMyApiData', link: '/api/use-my-api-data' },
-        { text: '$myApi', link: '/api/my-api' },
+        { text: 'useFetch Substitute', link: '/api/use-my-api-data' },
+        { text: '$fetch Substitute', link: '/api/my-api' },
       ],
     },
   ]
