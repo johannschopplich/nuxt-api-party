@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { NuxtError } from '#app'
 import type { components } from '#nuxt-api-party/petStore'
+import { $petStore, computed, ref, usePetStoreData, watch } from '#imports'
 
 type Pet = components['schemas']['Pet']
 
