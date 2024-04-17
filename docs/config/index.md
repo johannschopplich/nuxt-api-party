@@ -37,7 +37,7 @@ Default value: `{}`
 **Type**
 
 ```ts
-interface Endpoint {
+interface ApiEndpoint {
   url: string
   token?: string
   query?: QueryObject
@@ -48,7 +48,7 @@ interface Endpoint {
   openAPITS?: OpenAPITSOptions
 }
 
-type ApiPartyEndpoints = Record<string, Endpoint> | undefined
+type ApiPartyEndpoints = Record<string, ApiEndpoint> | undefined
 ```
 
 **Example**
@@ -66,7 +66,7 @@ export default defineNuxtConfig({
       cms: {
         url: process.env.CMS_API_BASE_URL!,
         headers: {
-          Authorization: `Basic ${Buffer.from(`${process.env.CMS_API_USERNAME}:${process.env.CMS_API_PASSWORD}`).toString('base64')}`
+          Authorization: `Basic ${globalThis.btoa(`${process.env.CMS_API_USERNAME}:${process.env.CMS_API_PASSWORD}`)}`
         }
       },
       // Will generate `$petStore` and `usePetStore` as well as types for each path
@@ -119,7 +119,7 @@ interface ModuleOptions {
    *       jsonPlaceholder: {
    *         url: 'https://jsonplaceholder.typicode.com'
    *         headers: {
-   *           Authorization: `Basic ${Buffer.from('foo:bar').toString('base64')}`
+   *           Authorization: `Basic ${globalThis.btoa('username:password')}`
    *         }
    *       }
    *     }
