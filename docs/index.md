@@ -4,7 +4,7 @@ titleTemplate: Server Proxy and Generated API Composables
 hero:
   name: Nuxt API Party
   text: Server Proxy and Generated API Composables
-  tagline: Connect to all your APIs securely
+  tagline: Like useFetch and $fetch, but for each API
   image:
     src: /logo-shadow.svg
     alt: Nuxt API Party Logo
@@ -20,7 +20,7 @@ hero:
       link: https://github.com/johannschopplich/nuxt-api-party
 
 features:
-  - title: Dynamic composables
+  - title: Generated composables
     icon: <span class="i-carbon:list-dropdown"></span>
     details: Auto-generated composables for each API endpoint.
     link: /api/

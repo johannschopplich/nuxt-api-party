@@ -11,7 +11,7 @@
 
 ## Features
 
-- 🪅 [Dynamic composables](https://nuxt-api-party.byjohann.dev/api/#dynamic-composables)
+- 🪅 [Generated composables](https://nuxt-api-party.byjohann.dev/api/#generated-composables)
 - 🔒 Protected API credentials in the client
 - 🪢 Token-based authentication built-in or bring your own headers
 - 🧇 [Connect multiple API endpoints](#basic-usage)

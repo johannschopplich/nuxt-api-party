@@ -8,17 +8,17 @@ Breaking changes are limited to using typed OpenAPI clients. If you don't requir
 
 With Nuxt API Party v2, the OpenAPI support has been refactored to conform to the upcoming version of the `openapi-types` package (v7). This change introduces a few breaking changes to the API Party OpenAPI client:
 
+- Dropped support for OpenAPI 2.0 (Swagger).
 - Previously, you could omit the leading slash in the API path. This is no longer possible. You must now include the leading slash in the path, just like in the OpenAPI specification.
 - The `pathParams` fetch option has been renamed to `path` to better align with the OpenAPI specification and allow for more flexibility in the future.
 
 ```ts
-const { data: user, execute } = usePetStoreData(
+const { data } = await usePetStoreData(
   'user/{username}', // [!code --]
   '/user/{username}', // [!code ++]
   {
     pathParams: { username: 'user1' }, // [!code --]
     path: { username: 'user1' }, // [!code ++]
-    cache: true
   }
 )
 ```

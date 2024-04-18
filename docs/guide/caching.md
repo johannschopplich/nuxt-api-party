@@ -8,7 +8,7 @@ Responses from the [`useFetch`-like composable](/api/use-fetch-like) are cached 
 
 ## Caching Strategy
 
-Both [generated composables](/api/#dynamic-composables) will calculate a cache key (if no custom one is provided) based on the following properties:
+Both [generated composables](/api/#generated-composables) will calculate a cache key (if no custom one is provided) based on the following properties:
 
 - API endpoint ID
 - Path
