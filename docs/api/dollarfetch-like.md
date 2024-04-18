@@ -39,7 +39,7 @@ type ApiClientFetchOptions =
     body?: string | Record<string, any> | FormData | null
   }
 
-function $Api<T = any>(
+function $Api<T = unknown>(
   path: string,
   opts?: ApiClientFetchOptions & SharedFetchOptions
 ): Promise<T>

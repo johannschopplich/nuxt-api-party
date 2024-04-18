@@ -68,7 +68,7 @@ type UseApiDataOptions<T> = Pick<
   body?: MaybeRef<string | Record<string, any> | FormData | null>
 } & SharedAsyncDataOptions<T>
 
-function UseApiData<T = any>(
+function UseApiData<T = unknown>(
   path: MaybeRefOrGetter<string>,
   opts?: UseApiDataOptions<T>
 ): AsyncData<T | null, NuxtError>
