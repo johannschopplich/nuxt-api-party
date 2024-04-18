@@ -1,14 +1,14 @@
 # `useFetch`-Like Composable
 
-::: info
-`useMyApiData` is a placeholder used as an example in the documentation. The composable is generated based on your API endpoint ID. For example, if you were to call an endpoint `jsonPlaceholder`, the composable will be called `useJsonPlaceholderData`.
-:::
-
 Returns the raw response of the API endpoint. Intended for data which requires reactive updates, e.g. when using the data in a template.
 
 Responses are **cached** between function calls for the same path based on a calculated hash. You can disable this behavior by setting `cache` to `false`.
 
 The composable supports every [`useAsyncData` option](https://nuxt.com/docs/api/composables/use-async-data/#params).
+
+::: info
+`useMyApiData` is a placeholder used as an example in the documentation. The composable is generated based on your API endpoint ID. For example, if you were to call an endpoint `jsonPlaceholder`, the composable will be called `useJsonPlaceholderData`.
+:::
 
 ## Return Values
 
