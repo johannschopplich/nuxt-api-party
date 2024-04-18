@@ -109,6 +109,8 @@ export default defineNuxtModule<ModuleOptions>({
       logger.error('Missing any API endpoint configuration. Please check the `apiParty` module configuration in `nuxt.config.ts`.')
 
     // Private runtime config
+    // eslint-disable-next-line @typescript-eslint/prefer-ts-expect-error, @typescript-eslint/ban-ts-comment
+    // @ts-ignore: `client` types are not compatible
     nuxt.options.runtimeConfig.apiParty = defu(
       nuxt.options.runtimeConfig.apiParty as Required<ModuleOptions>,
       options,
@@ -122,6 +124,8 @@ export default defineNuxtModule<ModuleOptions>({
     const resolvedOptions = nuxt.options.runtimeConfig.apiParty as Required<ModuleOptions>
 
     // Write options to public runtime config if client requests are enabled
+    // eslint-disable-next-line @typescript-eslint/prefer-ts-expect-error, @typescript-eslint/ban-ts-comment
+    // @ts-ignore: `client` types are not compatible
     nuxt.options.runtimeConfig.public.apiParty = defu(
       nuxt.options.runtimeConfig.public.apiParty as Required<ModuleOptions>,
       resolvedOptions.client
