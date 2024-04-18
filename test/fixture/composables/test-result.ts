@@ -1,6 +1,6 @@
 import { useHead } from '#imports'
 
-export function useTestResult(data: any) {
+export function useTestResult(data: unknown) {
   useHead({
     script: [
       {

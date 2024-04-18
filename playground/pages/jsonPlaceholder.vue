@@ -14,14 +14,12 @@ const { data, pending, error } = await useJsonPlaceholderData<JsonPlaceholderCom
     })),
     onResponse({ response }) {
       if (import.meta.client) {
-        // eslint-disable-next-line no-console
         console.log(response._data)
       }
     },
   },
 )
 
-// eslint-disable-next-line no-console
 watch(error, value => console.log(value))
 
 async function incrementPostId() {
@@ -30,7 +28,7 @@ async function incrementPostId() {
       postId: `${Number(route.query.postId || 1) + 1}`,
     },
   })
-  // eslint-disable-next-line no-console
+
   console.log('Post ID:', route.query.postId)
 }
 
@@ -48,7 +46,6 @@ async function onSubmit() {
       },
     })
 
-    // eslint-disable-next-line no-console
     console.log('formResponse:', formResponse.value)
   }
   catch (error) {

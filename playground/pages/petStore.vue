@@ -92,7 +92,10 @@ async function abandonGarfield() {
 <template>
   <div>
     <h2>User</h2>
-    <p v-if="user" class="name">
+    <p
+      v-if="user"
+      class="name"
+    >
       {{ user.firstName }} {{ user.lastName }}
       <button @click="updateUser">
         Update
@@ -106,7 +109,11 @@ async function abandonGarfield() {
       </button>
     </p>
     <p>
-      <button v-for="pet in data" :key="pet.id" @click="fetchPetData(pet.id!)">
+      <button
+        v-for="pet in data"
+        :key="pet.id"
+        @click="fetchPetData(pet.id!)"
+      >
         {{ pet.name }}
       </button>
     </p>
