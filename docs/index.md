@@ -39,5 +39,5 @@ features:
     icon: <span class="i-carbon:ibm-watson-query"></span>
     details: Configure all your APIs once and use them throughout your app.
     link: /guide/getting-started.html#step-3-set-up-api-endpoints
-    linkText: Set Up API Endpoints
+    linkText: Set up API Endpoints
 ---
