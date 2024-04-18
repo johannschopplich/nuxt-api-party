@@ -1,4 +1,5 @@
-import { headersToObject, resolvePathParams } from '../utils'
+import { headersToObject } from '../utils'
+import { resolvePathParams } from '../openapi'
 import type { ModuleOptions } from '../../module'
 import type { ApiClientFetchOptions } from '../composables/$api'
 import { useRuntimeConfig } from '#imports'

@@ -1,3 +1,5 @@
+import { toValue } from 'vue'
+import type { MaybeRefOrGetter } from 'vue'
 import type { NuxtError } from 'nuxt/app'
 import type {
   ErrorResponse,
@@ -23,4 +25,14 @@ export type RequestBodyOption<T> = OperationRequestBodyContent<T> extends never
 
 export type FilterMethods<T> = {
   [K in keyof Omit<T, 'parameters'> as T[K] extends never | undefined ? never : K]: T[K]
+}
+
+export function resolvePathParams(path: string, params?: Record<string, MaybeRefOrGetter<unknown>>) {
+  // To simplify typings, OpenAPI path parameters can be expanded here
+  if (params) {
+    for (const [key, value] of Object.entries(params))
+      path = path.replace(`{${key}}`, encodeURIComponent(String(toValue(value))))
+  }
+
+  return path
 }

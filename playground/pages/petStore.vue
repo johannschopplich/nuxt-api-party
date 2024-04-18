@@ -8,12 +8,12 @@ type Pet = components['schemas']['Pet']
 const availableStatus = ['pending', 'sold'] as const
 const status = ref<'pending' | 'sold'>()
 
-const { data: user, execute } = usePetStoreData('/user/{username}', {
+const { data: user, execute } = await usePetStoreData('/user/{username}', {
   path: { username: 'user1' },
   cache: true,
 })
 
-const { data, error } = usePetStoreData('/pet/findByStatus', {
+const { data, error } = await usePetStoreData('/pet/findByStatus', {
   query: computed(() => ({
     status: status.value ?? 'pending',
   })),

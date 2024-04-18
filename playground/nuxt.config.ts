@@ -14,7 +14,7 @@ export default defineNuxtConfig({
       },
       petStore: {
         url: process.env.PET_STORE_BASE_URL!,
-        schema: './schemas/petStore.json',
+        schema: './schemas/petStore.yaml',
       },
     },
   },

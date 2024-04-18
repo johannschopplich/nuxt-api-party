@@ -1,5 +1,3 @@
-import { toValue } from 'vue'
-import type { MaybeRefOrGetter } from 'vue'
 import { formDataToObject, isFormData, isSerializedFormData, objectToFormData } from './formData'
 import type { ApiClientFetchOptions } from './composables/$api'
 
@@ -19,14 +17,4 @@ export async function deserializeMaybeEncodedBody(value: ApiClientFetchOptions['
     return await objectToFormData(value)
 
   return value
-}
-
-export function resolvePathParams(path: string, params?: Record<string, MaybeRefOrGetter<unknown>>) {
-  // To simplify typings, OpenAPI path parameters can be expanded here
-  if (params) {
-    for (const [key, value] of Object.entries(params))
-      path = path.replace(`{${key}}`, encodeURIComponent(String(toValue(value))))
-  }
-
-  return path
 }
