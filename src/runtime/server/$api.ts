@@ -4,7 +4,7 @@ import type { ModuleOptions } from '../../module'
 import type { ApiClientFetchOptions } from '../composables/$api'
 import { useRuntimeConfig } from '#imports'
 
-export function _$api<T = any>(
+export function _$api<T = unknown>(
   endpointId: string,
   path: string,
   opts: ApiClientFetchOptions = {},

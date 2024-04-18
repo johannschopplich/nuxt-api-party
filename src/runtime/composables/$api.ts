@@ -37,6 +37,7 @@ export type ApiClientFetchOptions =
   Omit<NitroFetchOptions<string>, 'body' | 'cache'>
   & {
     path?: Record<string, string>
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     body?: string | Record<string, any> | FormData | null
   }
 
@@ -52,7 +53,7 @@ export type OpenAPIClientFetchOptions<
   & Omit<NitroFetchOptions<string>, 'query' | 'body' | 'method' | 'cache'>
   & SharedFetchOptions
 
-export type ApiClient = <T = any>(
+export type ApiClient = <T = unknown>(
   path: string,
   opts?: ApiClientFetchOptions & SharedFetchOptions,
 ) => Promise<T>
@@ -69,7 +70,7 @@ export type OpenAPIClient<Paths> = <
   options?: OpenAPIClientFetchOptions<Method, LowercasedMethod, Methods>
 ) => Promise<ResT>
 
-export function _$api<T = any>(
+export function _$api<T = unknown>(
   endpointId: string,
   path: string,
   opts: ApiClientFetchOptions & SharedFetchOptions = {},

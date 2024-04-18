@@ -14,8 +14,10 @@ import type { FetchResponseData, FetchResponseError, FilterMethods, ParamsOption
 import { useAsyncData, useRequestHeaders, useRuntimeConfig } from '#imports'
 
 type ComputedOptions<T> = {
+  // eslint-disable-next-line @typescript-eslint/ban-types
   [K in keyof T]: T[K] extends Function
     ? T[K]
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     : T[K] extends Record<string, any>
       ? ComputedOptions<T[K]> | MaybeRef<T[K]>
       : MaybeRef<T[K]>;
@@ -66,10 +68,11 @@ export type UseApiDataOptions<T> = Pick<
   | 'timeout'
 > & {
   path?: MaybeRefOrGetter<Record<string, string>>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   body?: MaybeRef<string | Record<string, any> | FormData | null>
 } & SharedAsyncDataOptions<T>
 
-export type UseApiData = <T = any>(
+export type UseApiData = <T = unknown>(
   path: MaybeRefOrGetter<string>,
   opts?: UseApiDataOptions<T>,
 ) => AsyncData<T | null, NuxtError>
@@ -103,7 +106,7 @@ export type UseOpenAPIData<Paths> = <
   autoKey?: string
 ) => AsyncData<DataT | null, ErrorT>
 
-export function _useApiData<T = any>(
+export function _useApiData<T = unknown>(
   endpointId: string,
   path: MaybeRefOrGetter<string>,
   opts: UseApiDataOptions<T> = {},
