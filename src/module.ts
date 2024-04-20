@@ -106,7 +106,7 @@ export default defineNuxtModule<ModuleOptions>({
       !Object.keys(options.endpoints!).length
       && !nuxt.options.runtimeConfig.apiParty
     )
-      logger.error('Missing any API endpoint configuration. Please check the `apiParty` module configuration in `nuxt.config.ts`.')
+      logger.error('Missing API endpoints configuration. Please check the `apiParty` module configuration in `nuxt.config.ts`.')
 
     // Private runtime config
     // eslint-disable-next-line @typescript-eslint/prefer-ts-expect-error, @typescript-eslint/ban-ts-comment

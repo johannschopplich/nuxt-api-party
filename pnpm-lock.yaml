@@ -4,9 +4,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-overrides:
-  nuxt-api-party: link:.
-
 importers:
 
   .:
@@ -82,7 +79,11 @@ importers:
         specifier: ^1.1.0
         version: 1.1.0(@algolia/client-search@4.23.3)(@types/node@20.12.7)(postcss@8.4.38)(search-insights@2.13.0)(typescript@5.4.5)
 
-  playground: {}
+  playground:
+    dependencies:
+      nuxt-api-party:
+        specifier: 'workspace:'
+        version: link:..
 
 packages:
 
