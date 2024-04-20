@@ -80,12 +80,6 @@ export interface ModuleOptions {
   }
 }
 
-declare module 'nuxt/schema' {
-  interface RuntimeConfig {
-    apiParty: ModuleOptions
-  }
-}
-
 export default defineNuxtModule<ModuleOptions>({
   meta: {
     name: 'nuxt-api-party',
@@ -115,8 +109,10 @@ export default defineNuxtModule<ModuleOptions>({
       logger.error('Missing any API endpoint configuration. Please check the `apiParty` module configuration in `nuxt.config.ts`.')
 
     // Private runtime config
+    // eslint-disable-next-line @typescript-eslint/prefer-ts-expect-error, @typescript-eslint/ban-ts-comment
+    // @ts-ignore: `client` types are not compatible
     nuxt.options.runtimeConfig.apiParty = defu(
-      nuxt.options.runtimeConfig.apiParty,
+      nuxt.options.runtimeConfig.apiParty as Required<ModuleOptions>,
       options,
     )
 
