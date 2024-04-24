@@ -3,29 +3,42 @@ import type { MaybeRefOrGetter } from 'vue'
 import type { NuxtError } from 'nuxt/app'
 import type {
   ErrorResponse,
-  FilterKeys,
+  GetValueWithDefault,
   MediaType,
   OperationRequestBodyContent,
   ResponseObjectMap,
   SuccessResponse,
 } from 'openapi-typescript-helpers'
 
-export type FetchResponseData<T> = FilterKeys<SuccessResponse<ResponseObjectMap<T>>, MediaType>
-export type FetchResponseError<T> = NuxtError<FilterKeys<ErrorResponse<ResponseObjectMap<T>>, MediaType>>
+export type FetchResponseData<T> = GetValueWithDefault<
+  SuccessResponse<ResponseObjectMap<T>>,
+  MediaType,
+  Record<string, never>
+>
+export type FetchResponseError<T> = NuxtError<
+  GetValueWithDefault<
+    ErrorResponse<ResponseObjectMap<T>>,
+    MediaType,
+    Record<string, never>
+  >
+>
 
 export type MethodOption<M, P> = 'get' extends keyof P ? { method?: M } : { method: M }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ParamsOption<T> = T extends { parameters?: any, query?: any } ? T['parameters'] : Record<string, never>
 
-export type RequestBodyOption<T> = OperationRequestBodyContent<T> extends never
-  ? { body?: never }
-  : undefined extends OperationRequestBodyContent<T>
-    ? { body?: OperationRequestBodyContent<T> }
-    : { body: OperationRequestBodyContent<T> }
+export type RequestBodyOption<T> =
+  OperationRequestBodyContent<T> extends never
+    ? { body?: never }
+    : undefined extends OperationRequestBodyContent<T>
+      ? { body?: OperationRequestBodyContent<T> }
+      : { body: OperationRequestBodyContent<T> }
 
 export type FilterMethods<T> = {
-  [K in keyof Omit<T, 'parameters'> as T[K] extends never | undefined ? never : K]: T[K]
+  [K in keyof Omit<T, 'parameters'> as T[K] extends never | undefined
+    ? never
+    : K]: T[K];
 }
 
 export function resolvePathParams(path: string, params?: Record<string, MaybeRefOrGetter<unknown>>) {
