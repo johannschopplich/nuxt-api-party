@@ -3,23 +3,21 @@ import type { MaybeRefOrGetter } from 'vue'
 import type { NuxtError } from 'nuxt/app'
 import type {
   ErrorResponse,
-  GetValueWithDefault,
+  FilterKeys,
   MediaType,
   OperationRequestBodyContent,
   ResponseObjectMap,
   SuccessResponse,
 } from 'openapi-typescript-helpers'
 
-export type FetchResponseData<T> = GetValueWithDefault<
+export type FetchResponseData<T> = FilterKeys<
   SuccessResponse<ResponseObjectMap<T>>,
-  MediaType,
-  Record<string, never>
+  MediaType
 >
 export type FetchResponseError<T> = NuxtError<
-  GetValueWithDefault<
+  FilterKeys<
     ErrorResponse<ResponseObjectMap<T>>,
-    MediaType,
-    Record<string, never>
+    MediaType
   >
 >
 
