@@ -1,7 +1,14 @@
 import { resolve } from 'pathe'
 import { useNuxt } from '@nuxt/kit'
 import type { OpenAPI3, OpenAPITSOptions } from 'openapi-typescript'
+import openAPITS, { astToString } from 'openapi-typescript'
 import type { ApiEndpoint } from './module'
+
+declare module 'openapi-typescript' {
+  // exists in openapi-typescript@7
+  function _astToString(ast: unknown): string
+  export const astToString: typeof _astToString | undefined
+}
 
 export async function generateDeclarationTypes(
   endpoints: Record<string, ApiEndpoint>,
@@ -29,7 +36,6 @@ async function generateSchemaTypes(options: {
   openAPITSOptions?: OpenAPITSOptions
 },
 ) {
-  const { default: openAPITS, astToString } = await import('openapi-typescript')
   const schema = await resolveSchema(options.endpoint)
 
   try {
@@ -37,7 +43,11 @@ async function generateSchemaTypes(options: {
       ...options.openAPITSOptions,
       ...options.endpoint.openAPITS,
     })
-    return astToString(ast)
+    if (typeof ast !== 'string') {
+      // openapi-typescript 7
+      return astToString!(ast)
+    }
+    return ast
   }
   catch (error) {
     console.error(`Failed to generate types for ${options.id}`)
