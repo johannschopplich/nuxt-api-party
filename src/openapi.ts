@@ -1,7 +1,6 @@
 import { resolve } from 'pathe'
 import { useNuxt } from '@nuxt/kit'
 import type { OpenAPI3, OpenAPITSOptions } from 'openapi-typescript'
-import openAPITS, { astToString } from 'openapi-typescript'
 import type { ApiEndpoint } from './module'
 
 declare module 'openapi-typescript' {
@@ -36,6 +35,9 @@ async function generateSchemaTypes(options: {
   openAPITSOptions?: OpenAPITSOptions
 },
 ) {
+  // openapi-typescript < 7 does not have named exports
+  const openAPITS = await interopDefault(import('openapi-typescript'))
+  const { astToString } = await import('openapi-typescript')
   const schema = await resolveSchema(options.endpoint)
 
   try {
@@ -88,4 +90,12 @@ function isValidUrl(url: string) {
   catch (e) {
     return false
   }
+}
+
+async function interopDefault<T>(
+  m: T | Promise<T>,
+): Promise<T extends { default: infer U } ? U : T> {
+  const resolved = await m
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (resolved as any).default || resolved
 }
