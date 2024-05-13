@@ -5,7 +5,7 @@ import openAPITS, { astToString } from 'openapi-typescript'
 import type { ApiEndpoint } from './module'
 
 declare module 'openapi-typescript' {
-  // exists in openapi-typescript@7
+  /** @since openapi-typescript@7 */
   function _astToString(ast: unknown): string
   export const astToString: typeof _astToString | undefined
 }
@@ -44,7 +44,7 @@ async function generateSchemaTypes(options: {
       ...options.endpoint.openAPITS,
     })
     if (typeof ast !== 'string') {
-      // openapi-typescript 7
+      // Required for openapi-typescript v7+
       return astToString!(ast)
     }
     return ast
