@@ -182,7 +182,7 @@ export default defineNuxtModule<ModuleOptions>({
       config.externals.inline ||= []
       config.externals.inline.push(...[
         resolve('runtime/utils'),
-        resolve('runtime/formData'),
+        resolve('runtime/form-data'),
         resolve('runtime/server/$api'),
       ])
 
@@ -249,6 +249,9 @@ ${schemaEndpointIds.map(i => `
 import type { paths as ${pascalCase(i)}Paths } from '#${moduleName}/${i}'
 `.trimStart()).join('').trimEnd()}
 
+// OpenAPI helpers
+export type { FetchResponseData, FetchResponseError, MethodOption, ParamsOption, RequestBodyOption, FilterMethods } from '${relativeTo('runtime/openapi')}'
+// Clients
 export type { ApiClient, OpenAPIClient, ApiClientFetchOptions, OpenAPIClientFetchOptions, UseApiData, UseOpenAPIData, UseApiDataOptions, UseOpenAPIDataOptions }
 
 ${endpointKeys.map(i => `

@@ -1,4 +1,4 @@
-import { formDataToObject, isFormData, isSerializedFormData, objectToFormData } from './formData'
+import { formDataToObject, isFormData, isSerializedFormData, objectToFormData } from './form-data'
 import type { ApiClientFetchOptions } from './composables/$api'
 
 export function headersToObject(headers: HeadersInit = {}): Record<string, string> {
