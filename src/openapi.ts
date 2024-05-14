@@ -43,6 +43,7 @@ async function generateSchemaTypes(options: {
 
   try {
     const ast = await openAPITS(schema, {
+      commentHeader: '',
       ...options.openAPITSOptions,
       ...options.endpoint.openAPITS,
     })
