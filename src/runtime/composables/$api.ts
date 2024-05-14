@@ -66,7 +66,7 @@ export type OpenAPIClient<Paths> = <
   DefaultMethod extends 'get' extends LowercasedMethod ? 'get' : LowercasedMethod,
   ResT = FetchResponseData<Paths[ReqT][DefaultMethod]>,
 >(
-  url: ReqT,
+  path: ReqT,
   options?: OpenAPIClientFetchOptions<Method, LowercasedMethod, Methods>
 ) => Promise<ResT>
 
