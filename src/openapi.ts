@@ -23,9 +23,10 @@ export async function generateDeclarationTypes(
       }),
   )
 
-  return resolvedSchemaEntries.map(([id, types]) => `
-declare module '#nuxt-api-party/${id}' {
-  ${types.replace(/^/gm, '  ').trimEnd()}
+  return resolvedSchemaEntries.map(
+    ([id, types]) => `
+declare module "#nuxt-api-party/${id}" {
+${types.replace(/^/gm, '  ').trimEnd()}
 }`.trimStart(),
   ).join('\n\n').trimStart()
 }
