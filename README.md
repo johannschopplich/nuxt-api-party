@@ -25,7 +25,7 @@
 > [📖 Read the documentation](https://nuxt-api-party.byjohann.dev)
 
 ```bash
-npx nuxi@latest module add api-party
+npx nuxi@latest module add nuxt-api-party
 ```
 
 ## Basic Usage
