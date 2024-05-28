@@ -1,8 +1,6 @@
-[![Nuxt API Party](./docs/public/og.jpg)](https://nuxt-api-party.byjohann.dev)
+[![Nuxt API Party module](./docs/public/og.jpg)](https://nuxt-api-party.byjohann.dev)
 
 # Nuxt API Party
-
-[![npm version](https://img.shields.io/npm/v/nuxt-api-party?color=a1b858&label=)](https://www.npmjs.com/package/nuxt-api-party)
 
 [Nuxt](https://nuxt.com) module to securely connect to any API.
 
