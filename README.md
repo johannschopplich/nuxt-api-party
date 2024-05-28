@@ -1,4 +1,4 @@
-[![nuxt-api-party](./docs/public/og.jpg)](https://nuxt-api-party.byjohann.dev)
+[![Nuxt API Party](./docs/public/og.jpg)](https://nuxt-api-party.byjohann.dev)
 
 # Nuxt API Party
 
