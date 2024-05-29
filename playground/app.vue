@@ -1,12 +1,18 @@
-<template>
-  <Head>
-    <Title>nuxt-api-party</Title>
-    <Link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/@exampledev/new.css@1.1.2/new.min.css"
-    />
-  </Head>
+<script setup lang="ts">
+import { useHead } from '#imports'
 
+useHead({
+  title: 'nuxt-api-party',
+  link: [
+    {
+      rel: 'stylesheet',
+      href: 'https://cdn.jsdelivr.net/npm/@exampledev/new.css@1.1.2/new.min.css',
+    },
+  ],
+})
+</script>
+
+<template>
   <header>
     <NuxtLink to="/">
       <h1>nuxt-api-party</h1>
