@@ -2,7 +2,7 @@
 import { useServerHead } from '#imports'
 
 useServerHead({
-  title: 'nuxt-api-party',
+  title: 'Nuxt API Party',
   link: [
     { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/@exampledev/new.css@1.1.2/new.min.css' },
   ],
@@ -12,7 +12,7 @@ useServerHead({
 <template>
   <header>
     <NuxtLink to="/">
-      <h1>nuxt-api-party</h1>
+      <h1>Nuxt API Party</h1>
     </NuxtLink>
     <p>
       Requests are proxied by a Nuxt server route and passed back to the client.
