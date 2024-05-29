@@ -3,13 +3,6 @@ import { useNuxt } from '@nuxt/kit'
 import type { OpenAPI3, OpenAPITSOptions } from 'openapi-typescript'
 import type { ApiEndpoint } from './module'
 
-// Add types for compatibility between openapi-typescript v6 and v7
-declare module 'openapi-typescript' {
-  /** @since openapi-typescript@7 */
-  function _astToString(ast: unknown): string
-  export const astToString: typeof _astToString | undefined
-}
-
 export async function generateDeclarationTypes(
   endpoints: Record<string, ApiEndpoint>,
   globalOpenAPIOptions: OpenAPITSOptions,
@@ -44,6 +37,7 @@ async function generateSchemaTypes(options: {
 
   try {
     const ast = await openAPITS(schema, {
+      // @ts-expect-error: openapi-typescript >= 7 dropped this option
       commentHeader: '',
       ...options.openAPITSOptions,
       ...options.endpoint.openAPITS,
