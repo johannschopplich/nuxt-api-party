@@ -5,6 +5,7 @@ import { camelCase, pascalCase } from 'scule'
 import { addImportsSources, addServerHandler, addTemplate, createResolver, defineNuxtModule, tryResolveModule, useLogger } from '@nuxt/kit'
 import type { OpenAPI3, OpenAPITSOptions } from 'openapi-typescript'
 import type { QueryObject } from 'ufo'
+import { name } from '../package.json'
 import { generateDeclarationTypes } from './openapi'
 
 export interface ApiEndpoint {
@@ -88,7 +89,7 @@ declare module '@nuxt/schema' {
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {
-    name: 'nuxt-api-party',
+    name,
     configKey: 'apiParty',
     compatibility: {
       nuxt: '^3.7',
@@ -103,7 +104,7 @@ export default defineNuxtModule<ModuleOptions>({
     },
   },
   async setup(options, nuxt) {
-    const moduleName = 'nuxt-api-party'
+    const moduleName = name
     const logger = useLogger(moduleName)
     const getRawComposableName = (endpointId: string) => `$${camelCase(endpointId)}`
     const getDataComposableName = (endpointId: string) => `use${pascalCase(endpointId)}Data`
