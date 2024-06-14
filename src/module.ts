@@ -92,7 +92,7 @@ export default defineNuxtModule<ModuleOptions>({
     name,
     configKey: 'apiParty',
     compatibility: {
-      nuxt: '^3.7',
+      nuxt: '>=3.7',
     },
   },
   defaults: {
