@@ -10,17 +10,17 @@ describe('nuxt-api-party', async () => {
   })
 
   it('fetches data with $testApi', async () => {
-    const html = await $fetch('/$testApi')
+    const html = await $fetch<string>('/$testApi')
     expect(getTestResult(html)).toMatchSnapshot()
   })
 
   it('throws error for invalid response with $testApi', async () => {
-    const html = await $fetch('/$testApi-error')
+    const html = await $fetch<string>('/$testApi-error')
     expect(getTestResult(html)).toMatchSnapshot()
   })
 
   it('fetches data with useTestApiData', async () => {
-    const html = await $fetch('/useTestApiData')
+    const html = await $fetch<string>('/useTestApiData')
     expect(getTestResult(html)).toMatchSnapshot()
   })
 })
