@@ -183,10 +183,8 @@ export function _useApiData<T = unknown>(
     async (nuxt) => {
       controller?.abort?.()
 
-      // Workaround to persist response client-side
-      // https://github.com/nuxt/nuxt/issues/15445
-      if ((nuxt!.isHydrating || cache) && nuxt!.payload.data[_key.value])
-        return nuxt!.payload.data[_key.value]
+      if (nuxt && (nuxt.isHydrating || cache) && nuxt.payload.data[_key.value])
+        return nuxt.payload.data[_key.value]
 
       controller = new AbortController()
 
@@ -228,13 +226,13 @@ export function _useApiData<T = unknown>(
       }
       catch (error) {
         // Invalidate cache if request fails
-        nuxt!.payload.data[_key.value] = undefined
+        if (nuxt) nuxt.payload.data[_key.value] = undefined
 
         throw error
       }
 
-      if (cache)
-        nuxt!.payload.data[_key.value] = result
+      if (nuxt && cache)
+        nuxt.payload.data[_key.value] = result
 
       return result
     },
