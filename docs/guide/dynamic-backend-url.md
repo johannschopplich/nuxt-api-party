@@ -23,7 +23,7 @@ export default defineNuxtConfig({
 ## Example
 
 ::: info
-The examples below assume that you have set up an API endpoint called `jsonPlaceholder`. In this case you can use the `Json-Placeholder-Endpoint-Url` header to change the backend URL at runtime.
+The examples below assume that you have set up an API endpoint called `jsonPlaceholder`. In this case you can use the `jsonPlaceholder-Endpoint-Url` header to change the backend URL at runtime.
 :::
 
 ```ts
@@ -31,7 +31,7 @@ const { data } = await useJsonPlaceholderData(
   'comments',
   {
     headers: {
-      'Json-Placeholder-Endpoint-Url': 'https://jsonplaceholder-v2.typicode.com'
+      'jsonPlaceholder-Endpoint-Url': 'https://jsonplaceholder-v2.typicode.com'
     }
   }
 )
