@@ -129,7 +129,7 @@ export default defineNuxtModule<ModuleOptions>({
     const resolvedOptions = nuxt.options.runtimeConfig.apiParty as Required<ModuleOptions>
 
     // Write options to public runtime config if client requests are enabled
-    // eslint-disable-next-line @typescript-eslint/prefer-ts-expect-error, @typescript-eslint/ban-ts-comment
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore: `client` types are not compatible
     nuxt.options.runtimeConfig.public.apiParty = defu(
       nuxt.options.runtimeConfig.public.apiParty as Required<ModuleOptions>,

@@ -84,7 +84,7 @@ function isValidUrl(url: string) {
   try {
     return Boolean(new URL(url))
   }
-  catch (e) {
+  catch {
     return false
   }
 }

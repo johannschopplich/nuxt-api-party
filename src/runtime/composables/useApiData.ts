@@ -14,7 +14,7 @@ import type { FetchResponseData, FetchResponseError, FilterMethods, ParamsOption
 import { useAsyncData, useRequestHeaders, useRuntimeConfig } from '#imports'
 
 type ComputedOptions<T> = {
-  // eslint-disable-next-line @typescript-eslint/ban-types
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
   [K in keyof T]: T[K] extends Function
     ? T[K]
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
