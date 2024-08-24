@@ -6,6 +6,7 @@ import type {
   MediaType,
   OperationRequestBodyContent,
   ResponseObjectMap,
+  IsOperationRequestBodyOptional,
   SuccessResponse,
 } from 'openapi-typescript-helpers'
 
@@ -15,14 +16,15 @@ export type FetchResponseError<T> = NuxtError<ErrorResponse<ResponseObjectMap<T>
 export type MethodOption<M, P> = 'get' extends keyof P ? { method?: M } : { method: M }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type ParamsOption<T> = T extends { parameters?: any, query?: any } ? T['parameters'] : unknown
+export type ParamsOption<T> = T extends { parameters?: any, query?: any }
+  ? T['parameters']
+  : Record<string, unknown>
 
-export type RequestBodyOption<T> =
-  OperationRequestBodyContent<T> extends never
-    ? { body?: never }
-    : undefined extends OperationRequestBodyContent<T>
-      ? { body?: OperationRequestBodyContent<T> }
-      : { body: OperationRequestBodyContent<T> }
+export type RequestBodyOption<T> = OperationRequestBodyContent<T> extends never
+  ? { body?: never }
+  : IsOperationRequestBodyOptional<T> extends true
+    ? { body?: OperationRequestBodyContent<T> }
+    : { body: OperationRequestBodyContent<T> }
 
 export type FilterMethods<T> = {
   [K in keyof Omit<T, 'parameters'> as T[K] extends never | undefined
