@@ -12,12 +12,13 @@ The composable supports every [`useAsyncData` option](https://nuxt.com/docs/api/
 
 ## Return Values
 
-- **data**: the response of the API request
-- **pending**: a boolean indicating whether the data is still being fetched
-- **refresh**: a function that can be used to refresh the data returned by the handler function
-- **error**: an error object if the data fetching failed
+- `data`: the result of the asynchronous function that is passed in.
+- `refresh`/`execute`: a function that can be used to refresh the data returned by the `handler` function.
+- `error`: an error object if the data fetching failed.
+- `status`: a string indicating the status of the data request (`"idle"`, `"pending"`, `"success"`, `"error"`).
+- `clear`: a function which will set `data` to `undefined`, set `error` to `null`, set `status` to `'idle'`, and mark any currently pending requests as cancelled.
 
-By default, Nuxt waits until a `refresh` is finished before it can be executed again. Passing `true` as parameter skips that wait.
+By default, Nuxt waits until a `refresh` is finished before it can be executed again.
 
 ## Type Declarations
 
