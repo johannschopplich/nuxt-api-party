@@ -6,7 +6,7 @@ import type { NuxtError } from '#app'
 const route = useRoute()
 
 // Intended for similar use cases as `useFetch`
-const { data, pending, error } = await useJsonPlaceholderData<JsonPlaceholderComment>(
+const { data, status, error } = await useJsonPlaceholderData<JsonPlaceholderComment>(
   'comments',
   {
     query: computed(() => ({
@@ -72,9 +72,7 @@ async function onSubmit() {
     <h2>useJsonPlaceholderData</h2>
     <p>Responses are cached by default.</p>
     <p>
-      Status:
-      <mark v-if="pending">pending</mark>
-      <code v-else>fetched</code>
+      Status: <mark>{{ status }}</mark>
     </p>
     <p>
       <button @click="incrementPostId()">

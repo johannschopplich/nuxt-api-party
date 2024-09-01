@@ -61,7 +61,7 @@ Use these composables in your templates or components:
 
 ```vue
 <script setup lang="ts">
-const { data, pending, refresh, error } = await useJsonPlaceholderData('posts/1')
+const { data, refresh, error, status, clear } = await useJsonPlaceholderData('posts/1')
 </script>
 
 <template>

@@ -15,7 +15,7 @@ The composable supports every [`useAsyncData` option](https://nuxt.com/docs/api/
 - `data`: the result of the asynchronous function that is passed in.
 - `refresh`/`execute`: a function that can be used to refresh the data returned by the `handler` function.
 - `error`: an error object if the data fetching failed.
-- `status`: a string indicating the status of the data request (`"idle"`, `"pending"`, `"success"`, `"error"`).
+- `status`: a string indicating the status of the data request (`'idle'`, `'pending'`, `'success'`, `'error'`).
 - `clear`: a function which will set `data` to `undefined`, set `error` to `null`, set `status` to `'idle'`, and mark any currently pending requests as cancelled.
 
 By default, Nuxt waits until a `refresh` is finished before it can be executed again.
@@ -91,6 +91,17 @@ const { data } = await useMyApiData('posts', {
 The key can be a reactive value, e.g. a computed property.
 :::
 
+To clear the cache for a specific request, use the `clear` function. You can then call `refresh` to fetch the data again:
+
+```ts
+const { data, refresh, clear } = await useMyApiData('posts')
+
+async function invalidateAndRefresh() {
+  clear()
+  await refresh()
+}
+```
+
 ## Examples
 
 ::: info
@@ -117,7 +128,7 @@ export default defineNuxtConfig({
 
 ```vue
 <script setup lang="ts">
-const { data, pending, error, refresh } = await useJsonPlaceholderData('posts/1')
+const { data, refresh, error, status, clear } = await useJsonPlaceholderData('posts/1')
 </script>
 
 <template>
