@@ -74,6 +74,21 @@ const response = $jsonPlaceholder('posts/1', {
 })
 ```
 
+## Invalidate Cache
+
+You can clear the cache for a specific query by calling the `clear` function. This will remove the cached data for the query and allow the next request to fetch the data from the server.
+
+For example, use the `refresh` function to make a new API call after clearing the cache:
+
+```ts
+const { data, refresh, clear } = await useMyApiData('posts')
+
+async function invalidateAndRefresh() {
+  clear()
+  await refresh()
+}
+```
+
 ## Invalidate Cache On Error
 
 If a request fails, the cache will be invalidated by default. This means that the next request will not return the cached response, but make a new API call instead.

@@ -91,7 +91,7 @@ const { data } = await useMyApiData('posts', {
 The key can be a reactive value, e.g. a computed property.
 :::
 
-To clear the cache for a specific request, use the `clear` function. You can then call `refresh` to fetch the data again:
+Clear the cache for a specific query by calling the `clear` function. This will remove the cached data for the query and allow the next request to fetch the data from the server:
 
 ```ts
 const { data, refresh, clear } = await useMyApiData('posts')
