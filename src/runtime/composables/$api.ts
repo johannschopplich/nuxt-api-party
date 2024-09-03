@@ -77,7 +77,7 @@ export function _$api<T = unknown>(
 ) {
   const nuxt = useNuxtApp()
   const apiParty = useRuntimeConfig().public.apiParty as Required<ModuleOptions>
-  const promiseMap = (nuxt._apiPartyPromises ||= new Map()) as Map<string, Promise<T>>
+  const promiseMap = (nuxt._pendingRequests ||= new Map()) as Map<string, Promise<T>>
 
   const {
     path: pathParams,
