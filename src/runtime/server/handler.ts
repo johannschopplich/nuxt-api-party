@@ -47,7 +47,7 @@ export default defineEventHandler(async (event) => {
 
   // Allows to overwrite the backend URL with a custom header
   // (e.g. `jsonPlaceholder` endpoint becomes `jsonPlaceholder-Endpoint-Url`)
-  const baseURL = new Headers(headers).get(`${endpointId}-endpoint-url`) || endpoint.url
+  const baseURL = new Headers(headers).get(`${endpointId}-Endpoint-Url`) || endpoint.url
 
   // Check if the base URL is in the allow list
   if (
