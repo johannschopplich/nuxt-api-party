@@ -1,10 +1,10 @@
 <script setup lang="ts">
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { NuxtError } from '#app'
-import type { PetStoreResponse, PetStoreRequestBody, components } from '#nuxt-api-party/petStore'
+import type { components as Components, RequestBody as PetStoreRequestBody, Response as PetStoreResponse } from '#nuxt-api-party/petStore'
 import { $petStore, computed, ref, usePetStoreData, watch } from '#imports'
 
-type Pet = components['schemas']['Pet']
+type Pet = Components['schemas']['Pet']
 
 // For demonstration purposes: How to extract the request body and response types
 type PetIdRequestBody = PetStoreRequestBody<'addPet'>

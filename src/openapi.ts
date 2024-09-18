@@ -1,6 +1,5 @@
 import { resolve } from 'pathe'
 import { useNuxt } from '@nuxt/kit'
-import { pascalCase } from 'scule'
 import type { OpenAPI3, OpenAPITSOptions } from 'openapi-typescript'
 import type { ApiEndpoint } from './module'
 
@@ -23,14 +22,14 @@ declare module "#nuxt-api-party/${id}" {
 ${normalizeIndentation(types).trimEnd()}
 
   // Request and response types
-  export type ${pascalCase(id)}Response<
+  export type Response<
     T extends keyof operations,
     R extends keyof operations[T]['responses'] = 200 extends keyof operations[T]['responses'] ? 200 : never
   > = operations[T]['responses'][R] extends { content: { 'application/json': infer U } } ? U : never
-  export type ${pascalCase(id)}RequestBody<
+  export type RequestBody<
     T extends keyof operations
   > = operations[T]['requestBody'] extends { content: { 'application/json': infer U } } ? U : never
-  export type ${pascalCase(id)}RequestQuery<
+  export type RequestQuery<
     T extends keyof operations
   > = operations[T]['parameters'] extends { query?: infer U } ? U : never
 }`.trimStart(),
