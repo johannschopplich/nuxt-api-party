@@ -1,5 +1,5 @@
-import { hash } from 'ohash'
 import { joinURL } from 'ufo'
+import { hash } from 'ohash'
 import type { NitroFetchOptions } from 'nitropack'
 import { resolvePathParams } from '../openapi'
 import { headersToObject, serializeMaybeEncodedBody } from '../utils'

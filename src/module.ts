@@ -247,7 +247,7 @@ import type { ApiClient, OpenAPIClient, ApiClientFetchOptions, OpenAPIClientFetc
 import type { UseApiData, UseOpenAPIData, UseApiDataOptions, UseOpenAPIDataOptions } from '${relativeTo('runtime/composables/useApiData')}'
 
 ${schemaEndpointIds.map(i => `
-import type { paths as ${pascalCase(i)}Paths } from '#${moduleName}/${i}'
+import type { paths as ${pascalCase(i)}Paths, operations as ${pascalCase(i)}Operations } from '#${moduleName}/${i}'
 `.trimStart()).join('').trimEnd()}
 
 // OpenAPI helpers

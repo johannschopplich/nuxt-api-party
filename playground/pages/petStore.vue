@@ -1,13 +1,17 @@
 <script setup lang="ts">
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import type { NuxtError } from '#app'
-import type { components } from '#nuxt-api-party/petStore'
+import type { PetStoreResponse, PetStoreRequestBody, components } from '#nuxt-api-party/petStore'
 import { $petStore, computed, ref, usePetStoreData, watch } from '#imports'
 
 type Pet = components['schemas']['Pet']
 
-const availableStatus = ['pending', 'sold'] as const
-const status = ref<'pending' | 'sold'>()
+// For demonstration purposes: How to extract the request body and response types
+type PetIdRequestBody = PetStoreRequestBody<'addPet'>
+type PetIdResponse = PetStoreResponse<'getPetById'>
 
+const availableStatus = ['pending', 'sold'] as const
+const status = ref<typeof availableStatus[number] | undefined>()
 const { data: user, execute } = await usePetStoreData('/user/{username}', {
   path: { username: 'user1' },
   cache: true,

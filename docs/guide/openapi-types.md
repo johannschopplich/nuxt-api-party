@@ -1,6 +1,6 @@
 # OpenAPI Types
 
-If your API has an [OpenAPI](https://swagger.io/resources/open-api/) schema, Nuxt API Party can use it to generate types for you. These include path names, supported HTTP methods, request body, response body, query parameters, and headers.
+If your API provides an [OpenAPI](https://swagger.io/resources/open-api/) schema, Nuxt API Party can use it to generate types for you. These include path names, supported HTTP methods, request body, response body, query parameters, and headers.
 
 ::: info
 Usage of this feature requires [`openapi-typescript`](https://www.npmjs.com/package/openapi-typescript) to generate TypeScript definitions from your OpenAPI schema file. It is installed alongside Nuxt API Party.
@@ -8,11 +8,10 @@ Usage of this feature requires [`openapi-typescript`](https://www.npmjs.com/pack
 
 ## Schema Generation
 
-Some web frameworks can generate an OpenAPI schema for you based on your configured routes. Some examples include:
+Based on your configured routes, some web frameworks can generate an OpenAPI schema for you. Some examples include:
 
 - [NestJS](https://docs.nestjs.com/openapi/introduction)
-- [FastAPI](https://fastapi.tiangolo.com/)
-- [Django](https://www.django-rest-framework.org/api-guide/schemas/)
+- [ElysiaJS](https://elysiajs.com/patterns/openapi.html#openapi)
 - [ASP.NET Core](https://learn.microsoft.com/en-us/aspnet/core/tutorials/web-api-help-pages-using-swagger)
 - [Spring](https://springdoc.org/)
 - [Utopia](https://docs.rs/utoipa/latest/utoipa/)
@@ -106,17 +105,28 @@ For most usages, no further intervention is needed. Nuxt API Party will use the 
 
 However, there may be a few things you may want to do now that you have type information.
 
-### Extract the Response Body Type
+### Extract Schema Types
 
-You can get the request and response bodies directly from the exported `components` interface of the virtual module containing the types.
+The exported `components` interface of the virtual module for your API contains all the schema types defined in your OpenAPI schema. Use it to extract models for your API.
 
-Using the schema above:
+Using the schema above, you can extract the `Foo` type like so:
 
 ```ts
 import { components } from '#nuxt-api-party/myApi'
 
-// { id?: number; foo: string }
-type Foo = components['schemas']['Foo']
+type FooModel = components['schemas']['FooModel']
+//   ^? { id?: number; bar: string }
+```
+
+### Extract Request and Response Types
+
+Nuxt API Party provides helper types to extract the request and response types for a given endpoint. The helper type is named based on your endpoint name. For example, `petStre` would result in `PetStoreRequest` and `PetStoreResponse`.
+
+```ts
+import type { MyApiResponse, MyApiRequestBody } from '#nuxt-api-party/myApi'
+
+type FooResponse = MyApiResponse<'getFoo'>
+//   ^? { id?: number; bar: string }[]
 ```
 
 ### Use OpenAPI Defined Path Parameters
@@ -156,14 +166,15 @@ Some routes may be overloaded with multiple HTTP methods. The typing supports th
 In the example schema, `GET /foo` will return a `Foo[]` array, but `POST /foo` will return a `Foo` object.
 
 ```ts
-// resolved type: `{ id?: number; bar: string }[]`
 const resultGet = await $myApi('/foo')
+//    ^? { id?: number; bar: string }[]
 
-// resolved type: `{ id?: number; bar: string }`
 const resultPost = await $myApi('/foo', {
+//    ^? { id?: number; bar: string }
   method: 'POST',
   body: {
     bar: 'string'
   }
 })
+
 ```

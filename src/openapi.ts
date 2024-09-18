@@ -1,5 +1,6 @@
 import { resolve } from 'pathe'
 import { useNuxt } from '@nuxt/kit'
+import { pascalCase } from 'scule'
 import type { OpenAPI3, OpenAPITSOptions } from 'openapi-typescript'
 import type { ApiEndpoint } from './module'
 
@@ -19,7 +20,19 @@ export async function generateDeclarationTypes(
   return resolvedSchemaEntries.map(
     ([id, types]) => `
 declare module "#nuxt-api-party/${id}" {
-${types.replace(/^/gm, '  ').trimEnd()}
+${normalizeIndentation(types).trimEnd()}
+
+  // Request and response types
+  export type ${pascalCase(id)}Response<
+    T extends keyof operations,
+    R extends keyof operations[T]['responses'] = 200 extends keyof operations[T]['responses'] ? 200 : never
+  > = operations[T]['responses'][R] extends { content: { 'application/json': infer U } } ? U : never
+  export type ${pascalCase(id)}RequestBody<
+    T extends keyof operations
+  > = operations[T]['requestBody'] extends { content: { 'application/json': infer U } } ? U : never
+  export type ${pascalCase(id)}RequestQuery<
+    T extends keyof operations
+  > = operations[T]['parameters'] extends { query?: infer U } ? U : never
 }`.trimStart(),
   ).join('\n\n').trimStart()
 }
@@ -95,4 +108,14 @@ async function interopDefault<T>(
   const resolved = await m
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (resolved as any).default || resolved
+}
+
+function normalizeIndentation(code: string): string {
+  // Replace each cluster of four spaces with two spaces
+  const replacedCode = code.replace(/^( {4})+/gm, match => '  '.repeat(match.length / 4))
+
+  // Ensure each line starts with exactly two spaces
+  const normalizedCode = replacedCode.replace(/^/gm, '  ')
+
+  return normalizedCode
 }
