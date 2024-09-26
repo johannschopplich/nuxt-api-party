@@ -2,7 +2,7 @@ import { computed, reactive, toValue } from 'vue'
 import { hash } from 'ohash'
 import { joinURL } from 'ufo'
 import type { NitroFetchOptions } from 'nitropack'
-import type { MaybeRef, MaybeRefOrGetter, WatchSource } from 'vue'
+import type { MaybeRef, MaybeRefOrGetter, MultiWatchSources } from 'vue'
 import type { AsyncData, AsyncDataOptions, NuxtError } from 'nuxt/app'
 import type { ModuleOptions } from '../../module'
 import { CACHE_KEY_PREFIX } from '../constants'
@@ -51,7 +51,7 @@ export type SharedAsyncDataOptions<ResT, DataT = ResT> = Omit<AsyncDataOptions<R
    * Fetch options and URL are watched by default. You can completely ignore reactive sources by using `watch: false`.
    * @default undefined
    */
-  watch?: (WatchSource<unknown> | object)[] | false
+  watch?: MultiWatchSources | false
 }
 
 export type UseApiDataOptions<T> = Pick<
@@ -65,6 +65,7 @@ export type UseApiDataOptions<T> = Pick<
   | 'method'
   | 'retry'
   | 'retryDelay'
+  | 'retryStatusCodes'
   | 'timeout'
 > & {
   path?: MaybeRefOrGetter<Record<string, string>>
@@ -89,6 +90,7 @@ export type UseOpenAPIDataOptions<
   & ComputedOptions<ParamsOption<Operation>>
   & ComputedOptions<RequestBodyOption<Operation>>
   & Omit<AsyncDataOptions<ResT, DataT>, 'query' | 'body' | 'method'>
+  & Pick<NitroFetchOptions<string>, 'onRequest' | 'onRequestError' | 'onResponse' | 'onResponseError'>
   & SharedAsyncDataOptions<ResT, DataT>
 
 export type UseOpenAPIData<Paths> = <

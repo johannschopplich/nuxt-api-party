@@ -49,7 +49,7 @@ type SharedAsyncDataOptions<ResT, DataT = ResT> = Omit<AsyncDataOptions<ResT, Da
    * Fetch options and URL are watched by default. You can completely ignore reactive sources by using `watch: false`.
    * @default undefined
    */
-  watch?: (WatchSource<unknown> | object)[] | false
+  watch?: MultiWatchSources | false
 }
 
 type UseApiDataOptions<T> = Pick<
