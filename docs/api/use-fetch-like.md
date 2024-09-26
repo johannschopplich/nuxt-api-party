@@ -63,6 +63,7 @@ type UseApiDataOptions<T> = Pick<
   | 'method'
   | 'retry'
   | 'retryDelay'
+  | 'retryStatusCodes'
   | 'timeout'
 > & {
   path?: MaybeRefOrGetter<Record<string, string>>
