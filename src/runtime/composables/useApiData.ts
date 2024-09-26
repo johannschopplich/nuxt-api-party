@@ -90,6 +90,19 @@ export type UseOpenAPIDataOptions<
   & ComputedOptions<RequestBodyOption<Operation>>
   & Omit<AsyncDataOptions<ResT, DataT>, 'query' | 'body' | 'method'>
   & SharedAsyncDataOptions<ResT, DataT>
+  & Pick<
+    ComputedOptions<NitroFetchOptions<string>>,
+    | 'onRequest'
+    | 'onRequestError'
+    | 'onResponse'
+    | 'onResponseError'
+    | 'query'
+    | 'headers'
+    | 'method'
+    | 'retry'
+    | 'retryDelay'
+    | 'timeout'
+  >
 
 export type UseOpenAPIData<Paths> = <
   ReqT extends Extract<keyof Paths, string>,
