@@ -49,6 +49,7 @@
   "dependencies": {
     "@nuxt/kit": "^3.13.2",
     "defu": "^6.1.4",
+    "jiti": "^2.1.0",
     "ofetch": "^1.4.0",
     "ohash": "^1.1.4",
     "openapi-typescript-helpers": "0.0.13",

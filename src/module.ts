@@ -2,7 +2,8 @@ import { relative } from 'pathe'
 import { defu } from 'defu'
 import { joinURL } from 'ufo'
 import { camelCase, pascalCase } from 'scule'
-import { addImportsSources, addServerHandler, addTemplate, createResolver, defineNuxtModule, tryResolveModule, useLogger } from '@nuxt/kit'
+import { createJiti } from 'jiti'
+import { addImportsSources, addServerHandler, addTemplate, createResolver, defineNuxtModule, useLogger } from '@nuxt/kit'
 import type { OpenAPI3, OpenAPITSOptions } from 'openapi-typescript'
 import type { QueryObject } from 'ufo'
 import { name } from '../package.json'
@@ -162,9 +163,13 @@ export default defineNuxtModule<ModuleOptions>({
         .filter(([, endpoint]) => 'schema' in endpoint),
     )
     const schemaEndpointIds = Object.keys(schemaEndpoints)
-    const hasOpenAPIPkg = await tryResolveModule('openapi-typescript', [nuxt.options.rootDir])
+    const jiti = createJiti(nuxt.options.rootDir, {
+      interopDefault: true,
+      alias: nuxt.options.alias,
+    })
+    const openAPITSSrc = jiti.esmResolve('openapi-typescript', { try: true })
 
-    if (schemaEndpointIds.length && !hasOpenAPIPkg) {
+    if (schemaEndpointIds.length && !openAPITSSrc) {
       logger.warn('OpenAPI types generation is enabled, but the `openapi-typescript` package is not found. Please install it to enable endpoint types generation.')
       schemaEndpointIds.length = 0
     }
