@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { computed, reactive, toValue } from 'vue'
 import { hash } from 'ohash'
 import { joinURL } from 'ufo'
@@ -17,7 +18,6 @@ type ComputedOptions<T> = {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
   [K in keyof T]: T[K] extends Function
     ? T[K]
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     : T[K] extends Record<string, any>
       ? ComputedOptions<T[K]> | MaybeRef<T[K]>
       : MaybeRef<T[K]>;
@@ -69,7 +69,6 @@ export type UseApiDataOptions<T> = Pick<
   | 'timeout'
 > & {
   path?: MaybeRefOrGetter<Record<string, string>>
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   body?: MaybeRef<string | Record<string, any> | FormData | null>
 } & SharedAsyncDataOptions<T>
 
@@ -99,8 +98,8 @@ export type UseOpenAPIData<Paths> = <
   Method extends Extract<keyof Methods, string> | Uppercase<Extract<keyof Methods, string>>,
   LowercasedMethod extends Lowercase<Method> extends keyof Methods ? Lowercase<Method> : never,
   DefaultMethod extends 'get' extends LowercasedMethod ? 'get' : LowercasedMethod,
-  ResT = FetchResponseData<Methods[DefaultMethod]>,
-  ErrorT = FetchResponseError<Methods[DefaultMethod]>,
+  ResT = Methods[DefaultMethod] extends Record<PropertyKey, any> ? FetchResponseData<Methods[DefaultMethod]> : never,
+  ErrorT = Methods[DefaultMethod] extends Record<PropertyKey, any> ? FetchResponseError<Methods[DefaultMethod]> : never,
   DataT = ResT,
 >(
   path: MaybeRefOrGetter<ReqT>,

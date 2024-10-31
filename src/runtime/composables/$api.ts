@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { joinURL } from 'ufo'
 import { hash } from 'ohash'
 import type { NitroFetchOptions } from 'nitropack'
@@ -37,7 +38,6 @@ export type ApiClientFetchOptions =
   Omit<NitroFetchOptions<string>, 'body' | 'cache'>
   & {
     path?: Record<string, string>
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     body?: string | Record<string, any> | FormData | null
   }
 
@@ -62,9 +62,9 @@ export type OpenAPIClient<Paths> = <
   ReqT extends Extract<keyof Paths, string>,
   Methods extends FilterMethods<Paths[ReqT]>,
   Method extends Extract<keyof Methods, string> | Uppercase<Extract<keyof Methods, string>>,
-  LowercasedMethod extends Lowercase<Method> extends keyof FilterMethods<Paths[ReqT]> ? Lowercase<Method> : never,
+  LowercasedMethod extends Lowercase<Method> extends keyof Methods ? Lowercase<Method> : never,
   DefaultMethod extends 'get' extends LowercasedMethod ? 'get' : LowercasedMethod,
-  ResT = FetchResponseData<Paths[ReqT][DefaultMethod]>,
+  ResT = Methods[DefaultMethod] extends Record<PropertyKey, any> ? FetchResponseData<Methods[DefaultMethod]> : never,
 >(
   path: ReqT,
   options?: OpenAPIClientFetchOptions<Method, LowercasedMethod, Methods>

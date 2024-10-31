@@ -10,8 +10,10 @@ import type {
   SuccessResponse,
 } from 'openapi-typescript-helpers'
 
-export type FetchResponseData<T> = SuccessResponse<ResponseObjectMap<T>, MediaType>
-export type FetchResponseError<T> = NuxtError<ErrorResponse<ResponseObjectMap<T>, MediaType>>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type FetchResponseData<T extends Record<PropertyKey, any>> = SuccessResponse<ResponseObjectMap<T>, MediaType>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type FetchResponseError<T extends Record<PropertyKey, any>> = NuxtError<ErrorResponse<ResponseObjectMap<T>, MediaType>>
 
 export type MethodOption<M, P> = 'get' extends keyof P ? { method?: M } : { method: M }
 
