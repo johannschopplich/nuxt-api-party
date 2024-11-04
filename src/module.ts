@@ -163,11 +163,8 @@ export default defineNuxtModule<ModuleOptions>({
         .filter(([, endpoint]) => 'schema' in endpoint),
     )
     const schemaEndpointIds = Object.keys(schemaEndpoints)
-    const jiti = createJiti(nuxt.options.rootDir, {
-      interopDefault: true,
-      alias: nuxt.options.alias,
-    })
-    const openAPITSSrc = jiti.esmResolve('openapi-typescript', { try: true })
+    const jiti = createJiti(nuxt.options.rootDir, { alias: nuxt.options.alias })
+    const openAPITSSrc = jiti.esmResolve('openapi-typescript', { default: true, try: true })
 
     if (schemaEndpointIds.length && !openAPITSSrc) {
       logger.warn('OpenAPI types generation is enabled, but the `openapi-typescript` package is not found. Please install it to enable endpoint types generation.')
