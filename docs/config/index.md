@@ -25,7 +25,7 @@ Main module configuration for your API endpoints. Each key represents an endpoin
 - `headers`: Headers to send with each request (optional)
 - `cookies`: Whether to send cookies with each request (optional)
 - `allowedUrls`: A list of allowed URLs to change the [backend URL at runtime](/guide/dynamic-backend-url) (optional)
-- `schema`: A URL, file path, object, or async function pointing to an [OpenAPI Schema](https://swagger.io/resources/open-api) used to [generate types](/guide/openapi-types) (optional)
+- `schema`: A URL, file path, or object representing an [OpenAPI Schema](https://swagger.io/resources/open-api) used to [generate types](/guide/openapi-types) (optional)
 - `openAPITS`: [Configuration options](https://openapi-ts.pages.dev/node/#options) for `openapi-typescript`. Options defined here will override the global `openAPITS`
 
 ::: info
@@ -44,7 +44,7 @@ interface ApiEndpoint {
   headers?: Record<string, string>
   cookies?: boolean
   allowedUrls?: string[]
-  schema?: string | URL | OpenAPI3 | (() => Promise<OpenAPI3>)
+  schema?: string | URL | OpenAPI3
   openAPITS?: OpenAPITSOptions
 }
 

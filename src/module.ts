@@ -4,6 +4,7 @@ import { joinURL } from 'ufo'
 import { camelCase, pascalCase } from 'scule'
 import { createJiti } from 'jiti'
 import { addImportsSources, addServerHandler, addTemplate, createResolver, defineNuxtModule, useLogger } from '@nuxt/kit'
+import type { HookResult } from '@nuxt/schema'
 import type { OpenAPI3, OpenAPITSOptions } from 'openapi-typescript'
 import type { QueryObject } from 'ufo'
 import { name } from '../package.json'
@@ -16,7 +17,7 @@ export interface ApiEndpoint {
   headers?: Record<string, string>
   cookies?: boolean
   allowedUrls?: string[]
-  schema?: string | URL | OpenAPI3 | (() => Promise<OpenAPI3>)
+  schema?: string | OpenAPI3
   openAPITS?: OpenAPITSOptions
 }
 
@@ -86,6 +87,9 @@ declare module '@nuxt/schema' {
   interface RuntimeConfig {
     apiParty: ModuleOptions
   }
+  interface NuxtHooks {
+    'api-party:resolve': (id: string, endpoint: ApiEndpoint) => HookResult
+  }
 }
 
 export default defineNuxtModule<ModuleOptions>({
@@ -128,6 +132,10 @@ export default defineNuxtModule<ModuleOptions>({
     }
 
     const resolvedOptions = nuxt.options.runtimeConfig.apiParty as Required<ModuleOptions>
+
+    Object.entries(resolvedOptions.endpoints).forEach(([id, endpoint]) => {
+      nuxt.callHook('api-party:resolve', id, endpoint)
+    })
 
     // Write options to public runtime config if client requests are enabled
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment

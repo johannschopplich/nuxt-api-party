@@ -3,13 +3,20 @@ import { useNuxt } from '@nuxt/kit'
 import type { OpenAPI3, OpenAPITSOptions } from 'openapi-typescript'
 import type { ApiEndpoint } from './module'
 
+/** @deprecated Hooks should be used instead */
+type SchemaFn = () => Promise<NonNullable<ApiEndpoint['schema']>>
+
+type SchemaEndpoint = ApiEndpoint & {
+  schema: NonNullable<ApiEndpoint['schema']> | SchemaFn
+}
+
 export async function generateDeclarationTypes(
   endpoints: Record<string, ApiEndpoint>,
   globalOpenAPIOptions: OpenAPITSOptions,
 ) {
   const resolvedSchemaEntries = await Promise.all(
     Object.entries(endpoints)
-      .filter(([, endpoint]) => Boolean(endpoint.schema))
+      .filter((ep): ep is [string, SchemaEndpoint] => Boolean(ep[1].schema))
       .map(async ([id, endpoint]) => {
         const types = await generateSchemaTypes({ id, endpoint, openAPITSOptions: globalOpenAPIOptions })
         return [id, types] as const
@@ -38,14 +45,14 @@ ${normalizeIndentation(types).trimEnd()}
 
 async function generateSchemaTypes(options: {
   id: string
-  endpoint: ApiEndpoint
+  endpoint: SchemaEndpoint
   openAPITSOptions?: OpenAPITSOptions
 },
 ) {
   // openapi-typescript < 7 does not have named exports
   const openAPITS = await interopDefault(import('openapi-typescript'))
   const { astToString } = await import('openapi-typescript')
-  const schema = await resolveSchema(options.endpoint)
+  const schema = await resolveSchema(options.id, options.endpoint)
 
   try {
     const ast = await openAPITS(schema, {
@@ -80,12 +87,13 @@ export type operations = Record<string, never>
   }
 }
 
-async function resolveSchema({ schema }: ApiEndpoint): Promise<string | URL | OpenAPI3> {
+async function resolveSchema(id: string, { schema }: SchemaEndpoint): Promise<string | URL | OpenAPI3> {
   const nuxt = useNuxt()
 
-  if (typeof schema === 'function')
+  if (typeof schema === 'function') {
+    console.warn(`[nuxt-api-party] Passing a function to 'apiParty.endpoints.${id}.schema' is deprecated. Use a hook instead.`)
     return await schema()
-
+  }
   if (typeof schema === 'string' && !isValidUrl(schema))
     return new URL(resolve(nuxt.options.rootDir, schema), import.meta.url)
 
