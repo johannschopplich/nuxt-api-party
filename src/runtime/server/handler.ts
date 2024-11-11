@@ -12,9 +12,10 @@ import {
 import { deserializeMaybeEncodedBody } from '../utils'
 import type { ModuleOptions } from '../../module'
 import type { EndpointFetchOptions } from '../types'
-import { useRuntimeConfig } from '#imports'
+import { useRuntimeConfig, useNitroApp } from '#imports'
 
 export default defineEventHandler(async (event) => {
+  const nitro = useNitroApp()
   const endpointId = getRouterParam(event, 'endpointId')!
   const apiParty = useRuntimeConfig().apiParty as Required<ModuleOptions>
   const endpoints = apiParty.endpoints || {}
@@ -79,6 +80,13 @@ export default defineEventHandler(async (event) => {
         ...(body && { body: await deserializeMaybeEncodedBody(body) }),
         responseType: 'arrayBuffer',
         ignoreResponseError: true,
+
+        onRequest: async (ctx) => {
+          await nitro.hooks.callHook('api-party:request', ctx, event)
+        },
+        onResponse: async (ctx) => {
+          await nitro.hooks.callHook('api-party:response', ctx, event)
+        },
       },
     )
 

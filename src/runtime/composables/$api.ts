@@ -9,6 +9,7 @@ import type { ModuleOptions } from '../../module'
 import { CACHE_KEY_PREFIX } from '../constants'
 import type { EndpointFetchOptions } from '../types'
 import type { FetchResponseData, FilterMethods, MethodOption, ParamsOption, RequestBodyOption } from '../openapi'
+import { mergeFetchHooks } from '../hooks'
 import { useNuxtApp, useRequestHeaders, useRuntimeConfig } from '#imports'
 
 export interface SharedFetchOptions {
@@ -113,8 +114,18 @@ export function _$api<T = unknown>(
 
   const endpoint = (apiParty.endpoints || {})[endpointId]
 
+  const fetchHooks = mergeFetchHooks(fetchOptions, {
+    onRequest: async (ctx) => {
+      await nuxt.callHook('api-party:request', ctx)
+    },
+    onResponse: async (ctx) => {
+      await nuxt.callHook('api-party:response', ctx)
+    },
+  })
+
   const clientFetcher = () => globalThis.$fetch<T>(resolvePathParams(path, pathParams), {
     ...fetchOptions,
+    ...fetchHooks,
     baseURL: endpoint.url,
     method,
     query: {
@@ -132,6 +143,7 @@ export function _$api<T = unknown>(
   const serverFetcher = async () =>
     (await globalThis.$fetch<T>(joinURL('/api', apiParty.server.basePath!, endpointId), {
       ...fetchOptions,
+      ...fetchHooks,
       method: 'POST',
       body: {
         path: resolvePathParams(path, pathParams),

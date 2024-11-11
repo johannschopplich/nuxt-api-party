@@ -12,6 +12,7 @@ import { headersToObject, serializeMaybeEncodedBody } from '../utils'
 import { isFormData } from '../form-data'
 import type { EndpointFetchOptions } from '../types'
 import type { FetchResponseData, FetchResponseError, FilterMethods, ParamsOption, RequestBodyOption } from '../openapi'
+import { mergeFetchHooks } from '../hooks'
 import { useAsyncData, useRequestHeaders, useRuntimeConfig } from '#imports'
 
 type ComputedOptions<T> = {
@@ -56,10 +57,6 @@ export type SharedAsyncDataOptions<ResT, DataT = ResT> = Omit<AsyncDataOptions<R
 
 export type UseApiDataOptions<T> = Pick<
   ComputedOptions<NitroFetchOptions<string>>,
-  | 'onRequest'
-  | 'onRequestError'
-  | 'onResponse'
-  | 'onResponseError'
   | 'query'
   | 'headers'
   | 'method'
@@ -67,6 +64,12 @@ export type UseApiDataOptions<T> = Pick<
   | 'retryDelay'
   | 'retryStatusCodes'
   | 'timeout'
+> & Pick<
+  NitroFetchOptions<string>,
+  | 'onRequest'
+  | 'onRequestError'
+  | 'onResponse'
+  | 'onResponseError'
 > & {
   path?: MaybeRefOrGetter<Record<string, string>>
   body?: MaybeRef<string | Record<string, any> | FormData | null>
@@ -191,10 +194,20 @@ export function _useApiData<T = unknown>(
 
       let result: T | undefined
 
+      const fetchHooks = mergeFetchHooks(fetchOptions, {
+        onRequest: async (ctx) => {
+          await nuxt?.callHook('api-party:request', ctx)
+        },
+        onResponse: async (ctx) => {
+          await nuxt?.callHook('api-party:response', ctx)
+        },
+      })
+
       try {
         if (client) {
           result = (await globalThis.$fetch<T>(_path.value, {
             ..._fetchOptions,
+            ...fetchHooks,
             signal: controller.signal,
             baseURL: endpoint.url,
             method: _endpointFetchOptions.method,
@@ -215,6 +228,7 @@ export function _useApiData<T = unknown>(
             joinURL('/api', apiParty.server.basePath!, endpointId),
             {
               ..._fetchOptions,
+              ...fetchHooks,
               signal: controller.signal,
               method: 'POST',
               body: {

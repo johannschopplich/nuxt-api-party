@@ -5,8 +5,10 @@ import { camelCase, pascalCase } from 'scule'
 import { createJiti } from 'jiti'
 import { addImportsSources, addServerHandler, addTemplate, createResolver, defineNuxtModule, useLogger } from '@nuxt/kit'
 import type { HookResult } from '@nuxt/schema'
+import type { H3Event } from 'h3'
 import type { OpenAPI3, OpenAPITSOptions } from 'openapi-typescript'
 import type { QueryObject } from 'ufo'
+import type { FetchContext } from 'ofetch'
 import { name } from '../package.json'
 import { generateDeclarationTypes } from './openapi'
 
@@ -90,6 +92,18 @@ declare module '@nuxt/schema' {
 
   interface NuxtHooks {
     'api-party:extend': (options: ModuleOptions) => HookResult
+  }
+}
+declare module '#app' {
+  interface RuntimeNuxtHooks {
+    'api-party:request': (options: FetchContext) => HookResult
+    'api-party:response': (options: FetchContext & { response: Response }) => HookResult
+  }
+}
+declare module 'nitropack' {
+  interface NitroRuntimeHooks {
+    'api-party:request': (options: FetchContext, event?: H3Event) => HookResult
+    'api-party:response': (options: FetchContext & { response: Response }, event?: H3Event) => HookResult
   }
 }
 

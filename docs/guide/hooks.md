@@ -10,7 +10,7 @@ For more information on how to work with hooks, see the [Nuxt documentation](htt
 | ---------- | --------- | ----------- |
 | `api-party:extend` | `options` | Called during module initialization after the options have been resolved. Can be used to modify the endpoint configuration. |
 
-## Usage
+### Usage
 
 To use hooks, define them in the `hooks` property of your `nuxt.config.ts` file. The following example demonstrates how to use the `api-party:extend` hook:
 
@@ -26,3 +26,22 @@ export default defineNuxtConfig({
   },
 })
 ```
+
+## Nuxt Runtime Hooks
+
+Register these hooks with a client plugin.
+
+| Hook name            | Arguments  | Description
+| -------------------- | ---------- | -----------
+| `api-party:request`  | `ctx`      | Called before each request is made. Can be used to log or modify the request.
+| `api-party:response` | `ctx`      | Called after each request is made. Can be used to log or modify the response.
+
+## Nitro Runtime Hooks
+
+Register these hooks with a server plugin.
+
+| Hook name            | Arguments    | Description
+| -------------------- | ------------ | -----------
+| `api-party:request`  | `ctx, event` | Called before each request is made. Can be used to log or modify the request.
+| `api-party:response` | `ctx, event` | Called after each request is made. Can be used to log or modify the response.
+
