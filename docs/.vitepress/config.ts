@@ -1,13 +1,8 @@
 import { defineConfig } from 'vitepress'
 import type { DefaultTheme } from 'vitepress'
+import UnoCSS from 'unocss/vite'
 import { description, version } from '../../package.json'
-import {
-  github,
-  name,
-  ogImage,
-  ogUrl,
-  releases,
-} from './meta'
+import { github, name, ogImage, ogUrl, releases } from './meta'
 
 const url = new URL(ogUrl)
 
@@ -33,6 +28,10 @@ export default defineConfig({
   ],
 
   appearance: 'dark',
+
+  vite: {
+    plugins: [UnoCSS()],
+  },
 
   themeConfig: {
     logo: '/logo.svg',

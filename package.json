@@ -47,7 +47,7 @@
     "release": "bumpp"
   },
   "dependencies": {
-    "@nuxt/kit": "^3.14.0",
+    "@nuxt/kit": "^3.14.159",
     "defu": "^6.1.4",
     "jiti": "^2.4.0",
     "ofetch": "^1.4.1",
@@ -64,11 +64,11 @@
     "@nuxt/eslint-config": "^0.6.1",
     "@nuxt/module-builder": "^0.8.4",
     "@nuxt/test-utils": "^3.14.4",
-    "@types/node": "^22.8.7",
+    "@types/node": "^22.9.0",
     "bumpp": "^9.8.1",
     "eslint": "^9.14.0",
-    "nuxt": "^3.14.0",
-    "openapi-typescript": "^7.4.2",
+    "nuxt": "^3.14.159",
+    "openapi-typescript": "^7.4.3",
     "typescript": "^5.6.3",
     "vitest": "^2.1.4",
     "vue-tsc": "^2.1.10"

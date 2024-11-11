@@ -21,7 +21,7 @@ hero:
 
 features:
   - title: Generated composables
-    icon: <span class="i-carbon:list-dropdown"></span>
+    icon: <span class="i-carbon:magic-wand-filled"></span>
     details: Auto-generated composables for each API endpoint.
     link: /api/
     linkText: API Reference
@@ -40,4 +40,24 @@ features:
     details: Configure all your APIs once and use them throughout your app.
     link: /guide/getting-started.html#step-3-set-up-api-endpoints
     linkText: Set up API Endpoints
+  - title: OpenAPI Support
+    icon: <span class="i-devicon-plain:openapi"></span>
+    details: Create fully typed API clients from OpenAPI specifications.
+    link: /guide/openapi-types
+    linkText: Generate Clients
+  - title: TypeScript
+    icon: <span class="i-devicon-plain:typescript"></span>
+    details: Type-safe parameters, request bodies and responses for OpenAPI endpoints.
+    link: /guide/openapi-types
+    linkText: Leaverage Typings
+  - title: Hooks
+    icon: <span class="i-carbon:tools-alt"></span>
+    details: Customize the module's behavior with hooks.
+    link: /guide/hooks
+    linkText: Customize at Build-Time
+  - title: Proxy Errors
+    icon: <span class="i-carbon:error-outline"></span>
+    details: Pass-through errors from your API to your app.
+    link: /guide/error-handling
+    linkText: Log and Handle Errors
 ---
