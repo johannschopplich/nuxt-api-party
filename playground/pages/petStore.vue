@@ -127,10 +127,10 @@ async function abandonGarfield() {
         Put up Garfield
       </button>
     </p>
-    <p v-if="createdPet">
-      Garfield can now be adopted.
+    <template v-if="createdPet">
+      <p>Garfield can now be adopted.</p>
       <pre>{{ createdPet }}</pre>
-    </p>
+    </template>
   </div>
 </template>
 

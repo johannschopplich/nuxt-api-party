@@ -10,7 +10,7 @@ import type { QueryObject } from 'ufo'
 import { name } from '../package.json'
 import { generateDeclarationTypes } from './openapi'
 
-export interface ApiEndpoint {
+export interface EndpointConfiguration {
   url: string
   token?: string
   query?: QueryObject
@@ -52,7 +52,7 @@ export interface ModuleOptions {
    *
    * @default {}
    */
-  endpoints?: Record<string, ApiEndpoint>
+  endpoints?: Record<string, EndpointConfiguration>
 
   /**
    * Allow client-side requests besides server-side ones

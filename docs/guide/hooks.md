@@ -6,7 +6,7 @@ For more information on how to work with hooks, see the [Nuxt documentation](htt
 
 ## Available Hooks
 
-| Hook name  | Arguments | Description |
+| Hook Name  | Arguments | Description |
 | ---------- | --------- | ----------- |
 | `api-party:extend` | `options` | Called during module initialization after the options have been resolved. Can be used to modify the endpoint configuration. |
 

@@ -37,18 +37,18 @@ Default value: `{}`
 **Type**
 
 ```ts
-interface ApiEndpoint {
+interface EndpointConfiguration {
   url: string
   token?: string
   query?: QueryObject
   headers?: Record<string, string>
   cookies?: boolean
   allowedUrls?: string[]
-  schema?: string | URL | OpenAPI3
+  schema?: string | OpenAPI3
   openAPITS?: OpenAPITSOptions
 }
 
-type ApiPartyEndpoints = Record<string, ApiEndpoint> | undefined
+type ApiPartyEndpoints = Record<string, EndpointConfiguration> | undefined
 ```
 
 **Example**
@@ -86,7 +86,7 @@ The global [configuration options](https://openapi-ts.pages.dev/node/#options) f
 ## Type Declaration
 
 ```ts
-interface ApiEndpoint {
+interface EndpointConfiguration {
   url: string
   token?: string
   query?: QueryObject
@@ -128,7 +128,7 @@ interface ModuleOptions {
    *
    * @default {}
    */
-  endpoints?: Record<string, ApiEndpoint>
+  endpoints?: Record<string, EndpointConfiguration>
 
   /**
    * Allow client-side requests besides server-side ones

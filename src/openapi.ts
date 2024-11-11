@@ -1,17 +1,17 @@
 import { resolve } from 'pathe'
 import { useNuxt } from '@nuxt/kit'
 import type { OpenAPI3, OpenAPITSOptions } from 'openapi-typescript'
-import type { ApiEndpoint } from './module'
+import type { EndpointConfiguration } from './module'
 
 /** @deprecated Hooks should be used instead */
-type SchemaFn = () => Promise<NonNullable<ApiEndpoint['schema']>>
+type SchemaFn = () => Promise<NonNullable<EndpointConfiguration['schema']>>
 
-type SchemaEndpoint = ApiEndpoint & {
-  schema: NonNullable<ApiEndpoint['schema']> | SchemaFn
+type SchemaEndpoint = EndpointConfiguration & {
+  schema: NonNullable<EndpointConfiguration['schema']> | SchemaFn
 }
 
 export async function generateDeclarationTypes(
-  endpoints: Record<string, ApiEndpoint>,
+  endpoints: Record<string, EndpointConfiguration>,
   globalOpenAPIOptions: OpenAPITSOptions,
 ) {
   const resolvedSchemaEntries = await Promise.all(
@@ -91,7 +91,7 @@ async function resolveSchema(id: string, { schema }: SchemaEndpoint): Promise<st
   const nuxt = useNuxt()
 
   if (typeof schema === 'function') {
-    console.warn(`[nuxt-api-party] Passing a function to "apiParty.endpoints.${id}.schema" is deprecated. Use a hook instead.`)
+    console.warn(`[nuxt-api-party] Passing a function to "apiParty.endpoints.${id}.schema" is deprecated. Use the "api-party:extend" hook instead.`)
     return await schema()
   }
   if (typeof schema === 'string' && !isValidUrl(schema))
