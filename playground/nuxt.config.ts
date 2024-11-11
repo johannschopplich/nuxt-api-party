@@ -6,6 +6,12 @@ export default defineNuxtConfig({
 
   compatibilityDate: '2024-04-03',
 
+  hooks: {
+    'api-party:extend': async (options) => {
+      console.log(`[Build] Resolved endpoints:`, options.endpoints)
+    },
+  },
+
   apiParty: {
     endpoints: {
       jsonPlaceholder: {
