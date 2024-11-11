@@ -16,7 +16,7 @@ export async function generateDeclarationTypes(
 ) {
   const resolvedSchemaEntries = await Promise.all(
     Object.entries(endpoints)
-      .filter((ep): ep is [string, SchemaEndpoint] => Boolean(ep[1].schema))
+      .filter((entry): entry is [string, SchemaEndpoint] => Boolean(entry[1].schema))
       .map(async ([id, endpoint]) => {
         const types = await generateSchemaTypes({ id, endpoint, openAPITSOptions: globalOpenAPIOptions })
         return [id, types] as const
@@ -91,7 +91,7 @@ async function resolveSchema(id: string, { schema }: SchemaEndpoint): Promise<st
   const nuxt = useNuxt()
 
   if (typeof schema === 'function') {
-    console.warn(`[nuxt-api-party] Passing a function to 'apiParty.endpoints.${id}.schema' is deprecated. Use a hook instead.`)
+    console.warn(`[nuxt-api-party] Passing a function to "apiParty.endpoints.${id}.schema" is deprecated. Use a hook instead.`)
     return await schema()
   }
   if (typeof schema === 'string' && !isValidUrl(schema))

@@ -87,8 +87,9 @@ declare module '@nuxt/schema' {
   interface RuntimeConfig {
     apiParty: ModuleOptions
   }
+
   interface NuxtHooks {
-    'api-party:resolve': (id: string, endpoint: ApiEndpoint) => HookResult
+    'api-party:extend': (options: ModuleOptions) => HookResult
   }
 }
 
@@ -133,9 +134,7 @@ export default defineNuxtModule<ModuleOptions>({
 
     const resolvedOptions = nuxt.options.runtimeConfig.apiParty as Required<ModuleOptions>
 
-    Object.entries(resolvedOptions.endpoints).forEach(([id, endpoint]) => {
-      nuxt.callHook('api-party:resolve', id, endpoint)
-    })
+    nuxt.callHook('api-party:extend', resolvedOptions)
 
     // Write options to public runtime config if client requests are enabled
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment

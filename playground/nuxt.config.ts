@@ -7,8 +7,8 @@ export default defineNuxtConfig({
   compatibilityDate: '2024-04-03',
 
   hooks: {
-    'api-party:resolve': async (id, endpoint) => {
-      console.log(`[Build] Resolving schemas for ${id} with url ${endpoint.url}`)
+    'api-party:extend': async (options) => {
+      console.log(`[Build] Resolved endpoints:`, options.endpoints)
     },
   },
 
