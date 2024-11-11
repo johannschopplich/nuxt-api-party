@@ -105,6 +105,8 @@ async function abandonGarfield() {
         Update
       </button>
     </p>
+    <hr>
+
     <h2>usePetStoreData</h2>
     <p>Status: {{ status }}</p>
     <p>
@@ -112,16 +114,24 @@ async function abandonGarfield() {
         Next status
       </button>
     </p>
-    <p>
-      <button
+
+    <h3>Pets</h3>
+    <ul>
+      <li
         v-for="pet in data"
         :key="pet.id"
-        @click="fetchPetData(pet.id!)"
       >
-        {{ pet.name }}
-      </button>
-    </p>
+        <button
+          @click="fetchPetData(pet.id!)"
+        >
+          {{ pet.name }}
+        </button>
+      </li>
+    </ul>
     <pre>{{ JSON.stringify(petData, undefined, 2) }}</pre>
+    <hr>
+
+    <h3>Abandon Garfield</h3>
     <p>
       <button @click="abandonGarfield">
         Put up Garfield

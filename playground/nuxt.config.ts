@@ -15,10 +15,10 @@ export default defineNuxtConfig({
   apiParty: {
     endpoints: {
       jsonPlaceholder: {
-        url: process.env.JSON_PLACEHOLDER_BASE_URL!,
+        url: 'https://jsonplaceholder.typicode.com',
       },
       petStore: {
-        url: process.env.PET_STORE_BASE_URL!,
+        url: 'https://petstore3.swagger.io/api/v3',
         schema: './schemas/petStore.yaml',
       },
     },
