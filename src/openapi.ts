@@ -1,7 +1,7 @@
-import { resolve } from 'pathe'
-import { useNuxt } from '@nuxt/kit'
 import type { OpenAPI3, OpenAPITSOptions } from 'openapi-typescript'
 import type { EndpointConfiguration } from './module'
+import { useNuxt } from '@nuxt/kit'
+import { resolve } from 'pathe'
 
 /** @deprecated Hooks should be used instead */
 type SchemaFn = () => Promise<NonNullable<EndpointConfiguration['schema']>>

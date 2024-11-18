@@ -1,12 +1,12 @@
-import { relative } from 'pathe'
-import { defu } from 'defu'
-import { joinURL } from 'ufo'
-import { camelCase, pascalCase } from 'scule'
-import { createJiti } from 'jiti'
-import { addImportsSources, addServerHandler, addTemplate, createResolver, defineNuxtModule, useLogger } from '@nuxt/kit'
 import type { HookResult } from '@nuxt/schema'
 import type { OpenAPI3, OpenAPITSOptions } from 'openapi-typescript'
 import type { QueryObject } from 'ufo'
+import { addImportsSources, addServerHandler, addTemplate, createResolver, defineNuxtModule, useLogger } from '@nuxt/kit'
+import { defu } from 'defu'
+import { createJiti } from 'jiti'
+import { relative } from 'pathe'
+import { camelCase, pascalCase } from 'scule'
+import { joinURL } from 'ufo'
 import { name } from '../package.json'
 import { generateDeclarationTypes } from './openapi'
 
@@ -181,8 +181,8 @@ export default defineNuxtModule<ModuleOptions>({
     // Add Nuxt server route to proxy the API request server-side
     addServerHandler({
       route: joinURL('/api', options.server!.basePath!, ':endpointId'),
-      method: 'post',
       handler: resolve('runtime/server/handler'),
+      method: 'post',
     })
 
     nuxt.hook('nitro:config', (config) => {

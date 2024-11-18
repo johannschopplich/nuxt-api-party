@@ -1,18 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { computed, reactive, toValue } from 'vue'
+import type { NitroFetchOptions } from 'nitropack'
+import type { AsyncData, AsyncDataOptions, NuxtError } from 'nuxt/app'
+import type { MaybeRef, MaybeRefOrGetter, MultiWatchSources } from 'vue'
+import type { ModuleOptions } from '../../module'
+import type { FetchResponseData, FetchResponseError, FilterMethods, ParamsOption, RequestBodyOption } from '../openapi'
+import type { EndpointFetchOptions } from '../types'
+import { useAsyncData, useRequestHeaders, useRuntimeConfig } from '#imports'
 import { hash } from 'ohash'
 import { joinURL } from 'ufo'
-import type { NitroFetchOptions } from 'nitropack'
-import type { MaybeRef, MaybeRefOrGetter, MultiWatchSources } from 'vue'
-import type { AsyncData, AsyncDataOptions, NuxtError } from 'nuxt/app'
-import type { ModuleOptions } from '../../module'
+import { computed, reactive, toValue } from 'vue'
 import { CACHE_KEY_PREFIX } from '../constants'
+import { isFormData } from '../form-data'
 import { resolvePathParams } from '../openapi'
 import { headersToObject, serializeMaybeEncodedBody } from '../utils'
-import { isFormData } from '../form-data'
-import type { EndpointFetchOptions } from '../types'
-import type { FetchResponseData, FetchResponseError, FilterMethods, ParamsOption, RequestBodyOption } from '../openapi'
-import { useAsyncData, useRequestHeaders, useRuntimeConfig } from '#imports'
 
 type ComputedOptions<T> = {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type

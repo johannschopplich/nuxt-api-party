@@ -1,5 +1,5 @@
-import type { NitroFetchOptions } from 'nitropack'
 import type { RouterMethod } from 'h3'
+import type { NitroFetchOptions } from 'nitropack'
 
 export type EndpointFetchOptions = NitroFetchOptions<string> & {
   path: string

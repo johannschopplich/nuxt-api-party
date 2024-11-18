@@ -1,3 +1,6 @@
+import type { ModuleOptions } from '../../module'
+import type { EndpointFetchOptions } from '../types'
+import { useRuntimeConfig } from '#imports'
 import {
   createError,
   defineEventHandler,
@@ -10,9 +13,6 @@ import {
   splitCookiesString,
 } from 'h3'
 import { deserializeMaybeEncodedBody } from '../utils'
-import type { ModuleOptions } from '../../module'
-import type { EndpointFetchOptions } from '../types'
-import { useRuntimeConfig } from '#imports'
 
 export default defineEventHandler(async (event) => {
   const endpointId = getRouterParam(event, 'endpointId')!

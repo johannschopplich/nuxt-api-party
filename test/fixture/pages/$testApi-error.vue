@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { $testApi, useTestResult } from '#imports'
 import type { NuxtError } from '#app'
+import { $testApi, useTestResult } from '#imports'
 
 try {
   await $testApi('foo/bar', {

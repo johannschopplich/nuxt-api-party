@@ -1,14 +1,14 @@
-import { toValue } from 'vue'
-import type { MaybeRefOrGetter } from 'vue'
 import type { NuxtError } from 'nuxt/app'
 import type {
   ErrorResponse,
+  IsOperationRequestBodyOptional,
   MediaType,
   OperationRequestBodyContent,
   ResponseObjectMap,
-  IsOperationRequestBodyOptional,
   SuccessResponse,
 } from 'openapi-typescript-helpers'
+import type { MaybeRefOrGetter } from 'vue'
+import { toValue } from 'vue'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type FetchResponseData<T extends Record<PropertyKey, any>> = SuccessResponse<ResponseObjectMap<T>, MediaType>

@@ -1,7 +1,7 @@
 import { fileURLToPath } from 'node:url'
+import { $fetch, setup } from '@nuxt/test-utils/e2e'
 import destr from 'destr'
 import { describe, expect, it } from 'vitest'
-import { $fetch, setup } from '@nuxt/test-utils/e2e'
 
 describe('nuxt-api-party', async () => {
   await setup({
