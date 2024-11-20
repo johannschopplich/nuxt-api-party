@@ -1,3 +1,4 @@
+// @ts-check
 import { createConfigForNuxt } from '@nuxt/eslint-config/flat'
 import perfectionist from 'eslint-plugin-perfectionist'
 
@@ -12,6 +13,7 @@ export default createConfigForNuxt({
     ],
   },
 })
+  // @ts-ignore
   .append({
     plugins: {
       perfectionist,
