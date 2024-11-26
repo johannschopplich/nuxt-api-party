@@ -185,7 +185,7 @@ export default defineNuxtModule<ModuleOptions>({
       method: 'post',
     })
 
-    nuxt.hook('nitro:config', (config) => {
+    nuxt.hooks.hook('nitro:config', (config) => {
       // Inline local server handler dependencies into Nitro bundle
       // Needed to circumvent "cannot find module" error in `server.ts` for the `utils` import
       config.externals ||= {}
@@ -295,7 +295,7 @@ ${await generateDeclarationTypes(schemaEndpoints, resolvedOptions.openAPITS)}
         },
       })
 
-      nuxt.hook('prepare:types', ({ references }) => {
+      nuxt.hooks.hook('prepare:types', ({ references }) => {
         references.push({ path: resolve(nuxt.options.buildDir, `module/${moduleName}-schema.d.ts`) })
       })
     }
