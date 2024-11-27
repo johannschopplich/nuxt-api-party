@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { NitroFetchOptions } from 'nitropack'
 import type { AsyncData, AsyncDataOptions, NuxtError } from 'nuxt/app'
 import type { MaybeRef, MaybeRefOrGetter, MultiWatchSources } from 'vue'
@@ -15,7 +14,7 @@ import { resolvePathParams } from '../openapi'
 import { headersToObject, serializeMaybeEncodedBody } from '../utils'
 
 type ComputedOptions<T> = {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+  // eslint-disable-next-line ts/no-unsafe-function-type
   [K in keyof T]: T[K] extends Function
     ? T[K]
     : T[K] extends Record<string, any>
@@ -227,7 +226,8 @@ export function _useApiData<T = unknown>(
       }
       catch (error) {
         // Invalidate cache if request fails
-        if (nuxt) nuxt.payload.data[_key.value] = undefined
+        if (nuxt)
+          nuxt.payload.data[_key.value] = undefined
 
         throw error
       }

@@ -10,14 +10,11 @@ import type {
 import type { MaybeRefOrGetter } from 'vue'
 import { toValue } from 'vue'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type FetchResponseData<T extends Record<PropertyKey, any>> = SuccessResponse<ResponseObjectMap<T>, MediaType>
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type FetchResponseError<T extends Record<PropertyKey, any>> = NuxtError<ErrorResponse<ResponseObjectMap<T>, MediaType>>
 
 export type MethodOption<M, P> = 'get' extends keyof P ? { method?: M } : { method: M }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ParamsOption<T> = T extends { parameters?: any, query?: any }
   ? T['parameters']
   : Record<string, unknown>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable unused-imports/no-unused-vars */
 import type { NuxtError } from '#app'
 import type { components as Components, RequestBody as PetStoreRequestBody, Response as PetStoreResponse } from '#nuxt-api-party/petStore'
 import { $petStore, computed, ref, usePetStoreData, watch } from '#imports'
