@@ -2,6 +2,12 @@
 
 You can cache your API responses to improve performance between multiple calls like for page navigation.
 
+In general, if the response is cached, it will be cached indefinitely while your application is running. The cache is only invalidated:
+
+- When the cache is manually cleared with the `clear` function.
+- When the cache is automatically invalidated after an error response.
+- When the cache key changes, e.g. when the query parameters are updated.
+
 ::: info
 Responses from the [`useFetch`-like composable](/api/use-fetch-like) are cached by default. On the other hand, you have to enable caching for [`$fetch` composable](/api/dollarfetch-like) manually.
 :::
