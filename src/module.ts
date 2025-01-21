@@ -115,13 +115,6 @@ export default defineNuxtModule<ModuleOptions>({
     const getRawComposableName = (endpointId: string) => `$${camelCase(endpointId)}`
     const getDataComposableName = (endpointId: string) => `use${pascalCase(endpointId)}Data`
 
-    if (
-      !Object.keys(options.endpoints!).length
-      && !nuxt.options.runtimeConfig.apiParty
-    ) {
-      logger.error('Missing API endpoints configuration. Please check the `apiParty` module configuration in `nuxt.config.ts`.')
-    }
-
     // Private runtime config
     nuxt.options.runtimeConfig.apiParty = defu(
       nuxt.options.runtimeConfig.apiParty,
@@ -136,6 +129,10 @@ export default defineNuxtModule<ModuleOptions>({
     const resolvedOptions = nuxt.options.runtimeConfig.apiParty as Required<ModuleOptions>
 
     await nuxt.callHook('api-party:extend', resolvedOptions)
+
+    if (!Object.keys(resolvedOptions.endpoints).length) {
+      logger.warn('No API endpoints found. Please add at least one endpoint to your configuration.')
+    }
 
     // Write options to public runtime config if client requests are enabled
     // eslint-disable-next-line ts/ban-ts-comment
