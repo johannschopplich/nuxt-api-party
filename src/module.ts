@@ -135,7 +135,7 @@ export default defineNuxtModule<ModuleOptions>({
 
     const resolvedOptions = nuxt.options.runtimeConfig.apiParty as Required<ModuleOptions>
 
-    nuxt.callHook('api-party:extend', resolvedOptions)
+    await nuxt.callHook('api-party:extend', resolvedOptions)
 
     // Write options to public runtime config if client requests are enabled
     // eslint-disable-next-line ts/ban-ts-comment
