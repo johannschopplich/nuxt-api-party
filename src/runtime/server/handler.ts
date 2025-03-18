@@ -1,6 +1,5 @@
 import type { ModuleOptions } from '../../module'
 import type { EndpointFetchOptions } from '../types'
-import { useNitroApp, useRuntimeConfig } from '#imports'
 import {
   createError,
   defineEventHandler,
@@ -13,6 +12,7 @@ import {
   setResponseStatus,
   splitCookiesString,
 } from 'h3'
+import { useNitroApp, useRuntimeConfig } from 'nitropack/runtime'
 import { deserializeMaybeEncodedBody } from '../utils'
 
 const ALLOWED_REQUEST_HEADERS = [
