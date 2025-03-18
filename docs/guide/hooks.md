@@ -14,8 +14,7 @@ For more information on how to work with hooks, see the [Nuxt documentation](htt
 
 To use hooks, define them in the `hooks` property of your `nuxt.config.ts` file. The following example demonstrates how to use the `api-party:extend` hook:
 
-```ts
-// `nuxt.config.ts`
+```ts [nuxt.config.ts]
 export default defineNuxtConfig({
   modules: ['nuxt-api-party'],
 
@@ -31,16 +30,49 @@ export default defineNuxtConfig({
 
 Register these hooks with a client plugin.
 
-| Hook name            | Arguments  | Description
-| -------------------- | ---------- | -----------
-| `api-party:request`  | `ctx`      | Called before each request is made. Can be used to log or modify the request.
-| `api-party:response` | `ctx`      | Called after each request is made. Can be used to log or modify the response.
+| Hook name                        | Arguments  | Description
+| -------------------------------- | ---------- | -----------
+| `api-party:request`              | `ctx`      | Called before each request is made. Can be used to log or modify the request.
+| `api-party:request:${endpoint}`  | `ctx`      | Like `api-party:request`, but for `${endpoint}`.
+| `api-party:response`             | `ctx`      | Called after each request is made. Can be used to log or modify the response.
+| `api-party:response:${endpoint}` | `ctx`      | Like `api-party:response` but for `${endpoint}`.
+
+### Usage
+
+To use runtime hooks, define them in a client plugin. The following example demonstrates how to use the `api-party:request` and `api-party:response` hooks:
+
+```ts
+// plugins/myplugin.ts
+export default defineNuxtPlugin((nuxtApp) => {
+  nuxtApp.hook('api-party:request:myapi', (ctx) => {
+    // Add a unique request ID to each request
+    ctx.request.headers['X-Request-Id'] = Math.random().toString(36).substring(7)
+  })
+})
+```
 
 ## Nitro Runtime Hooks
 
 Register these hooks with a server plugin.
 
-| Hook name            | Arguments    | Description
-| -------------------- | ------------ | -----------
-| `api-party:request`  | `ctx, event` | Called before each request is made. Can be used to log or modify the request.
-| `api-party:response` | `ctx, event` | Called after each request is made. Can be used to log or modify the response.
+| Hook name                        | Arguments    | Description
+| -------------------------------- | ------------ | -----------
+| `api-party:request`              | `ctx, event` | Called before each request is made. Can be used to log or modify the request.
+| `api-party:request:${endpoint}`  | `ctx, event` | Like `api-party:request`, but for `${endpoint}`.
+| `api-party:response`             | `ctx, event` | Called after each request is made. Can be used to log or modify the response.
+| `api-party:response:${endpoint}` | `ctx, event` | Like `api-party:response` but for `${endpoint}`.
+
+### Usage
+
+To use Nitro runtime hooks, define them in a server plugin. The following example demonstrates how to use the `api-party:request` and `api-party:response` hooks:
+
+```ts
+// server/plugins/myplugin.ts
+export default defineNitroPlugin((nitroApp) => {
+  nuxtApp.hook('api-party:request:myapi', async (ctx, event) => {
+    // Fetch a token from a database and attach to the request
+    const token = await useSavedToken(event)
+    ctx.request.headers.Authorization = `Bearer ${token}`
+  })
+})
+```

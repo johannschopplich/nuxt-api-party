@@ -98,8 +98,10 @@ export default defineEventHandler(async (event) => {
 
         onRequest: async (ctx) => {
           await nitro.hooks.callHook('api-party:request', ctx, event)
+          await nitro.hooks.callHook(`api-party:request:${endpointId}` as any, ctx, event)
         },
         onResponse: async (ctx) => {
+          await nitro.hooks.callHook(`api-party:response:${endpointId}` as any, ctx, event)
           await nitro.hooks.callHook('api-party:response', ctx, event)
         },
       },

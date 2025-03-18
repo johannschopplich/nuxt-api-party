@@ -196,8 +196,10 @@ export function _useApiData<T = unknown>(
       const fetchHooks = mergeFetchHooks(fetchOptions, {
         onRequest: async (ctx) => {
           await nuxt?.callHook('api-party:request', ctx)
+          await nuxt?.callHook(`api-party:request:${endpointId}` as any, ctx)
         },
         onResponse: async (ctx) => {
+          await nuxt?.callHook(`api-party:request:${endpointId}` as any, ctx)
           await nuxt?.callHook('api-party:response', ctx)
         },
       })
