@@ -39,7 +39,7 @@ Register these hooks with a client plugin.
 
 ### Usage
 
-To use runtime hooks, define them in a client plugin. The following example demonstrates how to use the `api-party:request` and `api-party:response` hooks:
+To use runtime hooks, define them in a client plugin. The following example demonstrates how to use the `api-party:request` hook.
 
 ```ts
 // plugins/myplugin.ts
@@ -64,7 +64,7 @@ Register these hooks with a server plugin.
 
 ### Usage
 
-To use Nitro runtime hooks, define them in a server plugin. The following example demonstrates how to use the `api-party:request` and `api-party:response` hooks:
+To use Nitro runtime hooks, define them in a server plugin. The following example demonstrates how to use the `api-party:request` hook.
 
 ```ts
 // server/plugins/myplugin.ts
