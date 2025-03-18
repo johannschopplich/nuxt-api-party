@@ -1,14 +1,15 @@
-import { relative } from 'pathe'
-import { defu } from 'defu'
-import { joinURL } from 'ufo'
-import { camelCase, pascalCase } from 'scule'
-import { createJiti } from 'jiti'
-import { addImportsSources, addServerHandler, addTemplate, createResolver, defineNuxtModule, useLogger } from '@nuxt/kit'
 import type { HookResult } from '@nuxt/schema'
 import type { H3Event } from 'h3'
+import type { FetchContext } from 'ofetch'
 import type { OpenAPI3, OpenAPITSOptions } from 'openapi-typescript'
 import type { QueryObject } from 'ufo'
-import type { FetchContext } from 'ofetch'
+
+import { addImportsSources, addServerHandler, addTemplate, createResolver, defineNuxtModule, useLogger } from '@nuxt/kit'
+import { defu } from 'defu'
+import { createJiti } from 'jiti'
+import { relative } from 'pathe'
+import { camelCase, pascalCase } from 'scule'
+import { joinURL } from 'ufo'
 import { name } from '../package.json'
 import { generateDeclarationTypes } from './openapi'
 
@@ -129,12 +130,6 @@ export default defineNuxtModule<ModuleOptions>({
     const getRawComposableName = (endpointId: string) => `$${camelCase(endpointId)}`
     const getDataComposableName = (endpointId: string) => `use${pascalCase(endpointId)}Data`
 
-    if (
-      !Object.keys(options.endpoints!).length
-      && !nuxt.options.runtimeConfig.apiParty
-    )
-      logger.error('Missing API endpoints configuration. Please check the `apiParty` module configuration in `nuxt.config.ts`.')
-
     // Private runtime config
     nuxt.options.runtimeConfig.apiParty = defu(
       nuxt.options.runtimeConfig.apiParty,
@@ -148,10 +143,14 @@ export default defineNuxtModule<ModuleOptions>({
 
     const resolvedOptions = nuxt.options.runtimeConfig.apiParty as Required<ModuleOptions>
 
-    nuxt.callHook('api-party:extend', resolvedOptions)
+    await nuxt.callHook('api-party:extend', resolvedOptions)
+
+    if (!Object.keys(resolvedOptions.endpoints).length) {
+      logger.warn('No API endpoints found. Please add at least one endpoint to your configuration.')
+    }
 
     // Write options to public runtime config if client requests are enabled
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // eslint-disable-next-line ts/ban-ts-comment
     // @ts-ignore: `client` types are not compatible
     nuxt.options.runtimeConfig.public.apiParty = defu(
       nuxt.options.runtimeConfig.public.apiParty as Required<ModuleOptions>,
@@ -195,11 +194,11 @@ export default defineNuxtModule<ModuleOptions>({
     // Add Nuxt server route to proxy the API request server-side
     addServerHandler({
       route: joinURL('/api', options.server!.basePath!, ':endpointId'),
-      method: 'post',
       handler: resolve('runtime/server/handler'),
+      method: 'post',
     })
 
-    nuxt.hook('nitro:config', (config) => {
+    nuxt.hooks.hook('nitro:config', (config) => {
       // Inline local server handler dependencies into Nitro bundle
       // Needed to circumvent "cannot find module" error in `server.ts` for the `utils` import
       config.externals ||= {}
@@ -309,7 +308,7 @@ ${await generateDeclarationTypes(schemaEndpoints, resolvedOptions.openAPITS)}
         },
       })
 
-      nuxt.hook('prepare:types', ({ references }) => {
+      nuxt.hooks.hook('prepare:types', ({ references }) => {
         references.push({ path: resolve(nuxt.options.buildDir, `module/${moduleName}-schema.d.ts`) })
       })
     }

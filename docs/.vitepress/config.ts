@@ -1,6 +1,6 @@
-import { defineConfig } from 'vitepress'
 import type { DefaultTheme } from 'vitepress'
 import UnoCSS from 'unocss/vite'
+import { defineConfig } from 'vitepress'
 import { description, version } from '../../package.json'
 import { github, name, ogImage, ogUrl, releases } from './meta'
 

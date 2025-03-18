@@ -1,14 +1,8 @@
 // @ts-check
-import { createConfigForNuxt } from '@nuxt/eslint-config/flat'
+import antfu from '@antfu/eslint-config'
 
-export default createConfigForNuxt({
-  features: {
-    tooling: true,
-    stylistic: true,
-  },
-  dirs: {
-    src: [
-      './playground',
-    ],
+export default antfu({
+  rules: {
+    'no-console': 'off',
   },
 })

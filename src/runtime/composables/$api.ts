@@ -1,16 +1,15 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { joinURL } from 'ufo'
-import { hash } from 'ohash'
 import type { NitroFetchOptions } from 'nitropack'
+import type { ModuleOptions } from '../../module'
+import type { FetchResponseData, FilterMethods, MethodOption, ParamsOption, RequestBodyOption } from '../openapi'
+import type { EndpointFetchOptions } from '../types'
+import { useNuxtApp, useRequestHeaders, useRuntimeConfig } from '#imports'
+import { hash } from 'ohash'
+import { joinURL } from 'ufo'
+import { CACHE_KEY_PREFIX } from '../constants'
+import { isFormData } from '../form-data'
+import { mergeFetchHooks } from '../hooks'
 import { resolvePathParams } from '../openapi'
 import { headersToObject, serializeMaybeEncodedBody } from '../utils'
-import { isFormData } from '../form-data'
-import type { ModuleOptions } from '../../module'
-import { CACHE_KEY_PREFIX } from '../constants'
-import type { EndpointFetchOptions } from '../types'
-import type { FetchResponseData, FilterMethods, MethodOption, ParamsOption, RequestBodyOption } from '../openapi'
-import { mergeFetchHooks } from '../hooks'
-import { useNuxtApp, useRequestHeaders, useRuntimeConfig } from '#imports'
 
 export interface SharedFetchOptions {
   /**

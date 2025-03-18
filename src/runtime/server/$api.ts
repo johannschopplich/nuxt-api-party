@@ -1,9 +1,9 @@
-import { headersToObject } from '../utils'
-import { resolvePathParams } from '../openapi'
 import type { ModuleOptions } from '../../module'
 import type { ApiClientFetchOptions } from '../composables/$api'
-import { mergeFetchHooks } from '../hooks'
 import { useNitroApp, useRuntimeConfig } from '#imports'
+import { mergeFetchHooks } from '../hooks'
+import { resolvePathParams } from '../openapi'
+import { headersToObject } from '../utils'
 
 export function _$api<T = unknown>(
   endpointId: string,

@@ -1,7 +1,11 @@
+import type { ModuleOptions } from '../../module'
+import type { EndpointFetchOptions } from '../types'
+import { useNitroApp, useRuntimeConfig } from '#imports'
 import {
   createError,
   defineEventHandler,
   getRequestHeader,
+  getRequestIP,
   getRouterParam,
   readBody,
   send,
@@ -10,9 +14,12 @@ import {
   splitCookiesString,
 } from 'h3'
 import { deserializeMaybeEncodedBody } from '../utils'
-import type { ModuleOptions } from '../../module'
-import type { EndpointFetchOptions } from '../types'
-import { useRuntimeConfig, useNitroApp } from '#imports'
+
+const ALLOWED_REQUEST_HEADERS = [
+  'Origin',
+  'Referer',
+  'User-Agent',
+]
 
 export default defineEventHandler(async (event) => {
   const nitro = useNitroApp()
@@ -61,6 +68,10 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  const requestHeaders = Object.fromEntries(
+    ALLOWED_REQUEST_HEADERS.map(header => [header, getRequestHeader(event, header)]),
+  )
+
   try {
     const response = await globalThis.$fetch.raw<ArrayBuffer>(
       path,
@@ -71,12 +82,16 @@ export default defineEventHandler(async (event) => {
           ...endpoint.query,
           ...query,
         },
-        headers: {
-          ...(endpoint.token && { Authorization: `Bearer ${endpoint.token}` }),
-          ...(endpoint.cookies && { cookie: getRequestHeader(event, 'cookie') }),
-          ...endpoint.headers,
-          ...headers,
-        },
+        headers: Object.fromEntries(
+          Object.entries({
+            ...requestHeaders,
+            'X-Forwarded-For': getRequestIP(event, { xForwardedFor: true }),
+            ...(endpoint.token && { Authorization: `Bearer ${endpoint.token}` }),
+            ...(endpoint.cookies && { cookie: getRequestHeader(event, 'cookie') }),
+            ...endpoint.headers,
+            ...headers,
+          }).filter(([, value]) => value !== undefined),
+        ),
         ...(body && { body: await deserializeMaybeEncodedBody(body) }),
         responseType: 'arrayBuffer',
         ignoreResponseError: true,

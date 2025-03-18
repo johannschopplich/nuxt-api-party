@@ -123,7 +123,7 @@ type FooModel = components['schemas']['FooModel']
 Nuxt API Party provides helper types to extract the request and response types for a given endpoint. The helper type is named based on your endpoint name. For example, `petStre` would result in `PetStoreRequest` and `PetStoreResponse`.
 
 ```ts
-import type { MyApiResponse, MyApiRequestBody } from '#nuxt-api-party/myApi'
+import type { MyApiRequestBody, MyApiResponse } from '#nuxt-api-party/myApi'
 
 type FooResponse = MyApiResponse<'getFoo'>
 //   ^? { id?: number; bar: string }[]
@@ -176,5 +176,4 @@ const resultPost = await $myApi('/foo', {
     bar: 'string'
   }
 })
-
 ```

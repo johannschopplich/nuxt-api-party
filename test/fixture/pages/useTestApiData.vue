@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useTestApiData, useTestResult } from '#imports'
 import type { TestApiTodo } from '~/types'
+import { useTestApiData, useTestResult } from '#imports'
 
 const { data } = await useTestApiData<TestApiTodo[]>(
   'todos',

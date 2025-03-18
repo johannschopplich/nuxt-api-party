@@ -44,4 +44,3 @@ Register these hooks with a server plugin.
 | -------------------- | ------------ | -----------
 | `api-party:request`  | `ctx, event` | Called before each request is made. Can be used to log or modify the request.
 | `api-party:response` | `ctx, event` | Called after each request is made. Can be used to log or modify the response.
-

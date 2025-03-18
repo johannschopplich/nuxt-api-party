@@ -1,5 +1,5 @@
-import { relative } from 'pathe'
 import { addTemplate, createResolver, useNuxt } from '@nuxt/kit'
+import { relative } from 'pathe'
 
 export function extendTypes(
   module: string,
