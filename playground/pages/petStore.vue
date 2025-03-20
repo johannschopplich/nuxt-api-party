@@ -17,7 +17,7 @@ const { data: user, execute } = await usePetStoreData('/user/{username}', {
   cache: true,
   headers: {
     'api_key': 'special',
-    'x-testheader': 'test',
+    'x-test-header': 'test',
   },
 })
 
@@ -103,7 +103,7 @@ async function removePet(petId: number) {
       path: { petId },
       headers: {
         'api_key': 'special-key',
-        'x-testheader': 'test',
+        'x-test-header': 'test',
       },
     })
   }
