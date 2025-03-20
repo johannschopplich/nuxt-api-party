@@ -57,10 +57,10 @@ exports[`nuxt-api-party > throws error for invalid response with $testApi 1`] = 
   "data": {
     "reason": "anything",
   },
+  "error": true,
   "message": "Not Found",
-  "stack": "",
   "statusCode": 404,
   "statusMessage": "Not Found",
-  "url": "/api/foo/bar",
+  "url": "http://localhost/api/foo/bar",
 }
 `;
