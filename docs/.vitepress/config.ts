@@ -84,10 +84,10 @@ function nav(): DefaultTheme.NavItem[] {
           items: [
             { text: 'Caching', link: '/guide/caching' },
             { text: 'Interceptors', link: '/guide/interceptors' },
+            { text: 'Hooks', link: '/guide/hooks' },
             { text: 'Cookies', link: '/guide/cookies' },
             { text: 'Retries', link: '/guide/retries' },
             { text: 'Dynamic Backend URL', link: '/guide/dynamic-backend-url' },
-            { text: 'Hooks', link: '/guide/hooks' },
           ],
         },
       ],
@@ -147,10 +147,10 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
       items: [
         { text: 'Caching', link: '/guide/caching' },
         { text: 'Interceptors', link: '/guide/interceptors' },
+        { text: 'Hooks', link: '/guide/hooks' },
         { text: 'Cookies', link: '/guide/cookies' },
         { text: 'Retries', link: '/guide/retries' },
         { text: 'Dynamic Backend URL', link: '/guide/dynamic-backend-url' },
-        { text: 'Hooks', link: '/guide/hooks' },
       ],
     },
     { text: 'Migration', link: '/guide/migration' },
