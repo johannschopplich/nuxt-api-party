@@ -194,12 +194,14 @@ export function _useApiData<T = unknown>(
       let result: T | undefined
 
       const fetchHooks = mergeFetchHooks(fetchOptions, {
-        onRequest: async (ctx) => {
+        async onRequest(ctx) {
           await nuxt?.callHook('api-party:request', ctx)
-          await nuxt?.callHook(`api-party:request:${endpointId}` as any, ctx)
+          // @ts-expect-error: Types will be generated on Nuxt prepare
+          await nuxt?.callHook(`api-party:request:${endpointId}`, ctx)
         },
-        onResponse: async (ctx) => {
-          await nuxt?.callHook(`api-party:request:${endpointId}` as any, ctx)
+        async onResponse(ctx) {
+          // @ts-expect-error: Types will be generated on Nuxt prepare
+          await nuxt?.callHook(`api-party:response:${endpointId}`, ctx)
           await nuxt?.callHook('api-party:response', ctx)
         },
       })

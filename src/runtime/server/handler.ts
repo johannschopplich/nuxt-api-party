@@ -95,13 +95,14 @@ export default defineEventHandler(async (event) => {
         ...(body && { body: await deserializeMaybeEncodedBody(body) }),
         responseType: 'arrayBuffer',
         ignoreResponseError: true,
-
-        onRequest: async (ctx) => {
+        async onRequest(ctx) {
           await nitro.hooks.callHook('api-party:request', ctx, event)
-          await nitro.hooks.callHook(`api-party:request:${endpointId}` as any, ctx, event)
+          // @ts-expect-error: Types will be generated on Nuxt prepare
+          await nitro.hooks.callHook(`api-party:request:${endpointId}`, ctx, event)
         },
-        onResponse: async (ctx) => {
-          await nitro.hooks.callHook(`api-party:response:${endpointId}` as any, ctx, event)
+        async onResponse(ctx) {
+          // @ts-expect-error: Types will be generated on Nuxt prepare
+          await nitro.hooks.callHook(`api-party:response:${endpointId}`, ctx, event)
           await nitro.hooks.callHook('api-party:response', ctx, event)
         },
       },

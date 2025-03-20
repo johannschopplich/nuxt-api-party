@@ -2,7 +2,24 @@ import type { FetchHooks } from 'ofetch'
 
 type Arrayify<T> = { [P in keyof T]-?: Extract<T[P], unknown[]> }
 
-function maybePush<T>(array: T[], values: T | T[] | undefined): void {
+export function mergeFetchHooks(...hooks: FetchHooks[]): FetchHooks {
+  const result: Arrayify<FetchHooks> = {
+    onRequest: [],
+    onResponse: [],
+    onRequestError: [],
+    onResponseError: [],
+  }
+
+  for (const hook of hooks) {
+    for (const [key, value] of Object.entries(hook)) {
+      maybePush(result[key as keyof typeof result], value)
+    }
+  }
+
+  return result
+}
+
+function maybePush<T>(array: T[], values?: T | T[]) {
   if (values) {
     if (Array.isArray(values)) {
       array.push(...values)
@@ -11,21 +28,4 @@ function maybePush<T>(array: T[], values: T | T[] | undefined): void {
       array.push(values)
     }
   }
-}
-
-export function mergeFetchHooks(...hooks: FetchHooks[]): FetchHooks {
-  const result = {
-    onRequest: [],
-    onResponse: [],
-    onRequestError: [],
-    onResponseError: [],
-  } as Arrayify<FetchHooks>
-
-  hooks.forEach((hook) => {
-    Object.entries(hook).forEach(([key, value]) => {
-      maybePush(result[key as keyof typeof result], value)
-    })
-  })
-
-  return result
 }
