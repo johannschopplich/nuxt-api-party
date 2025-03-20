@@ -16,7 +16,9 @@ export type FetchResponseError<T extends Record<PropertyKey, any>> = NuxtError<E
 export type MethodOption<M, P> = 'get' extends keyof P ? { method?: M } : { method: M }
 
 export type ParamsOption<T> = T extends { parameters?: any, query?: any }
-  ? T['parameters']
+  ? Omit<T['parameters'], 'cookie' | 'header'> & {
+    headers?: T['parameters']['header'] | { [key: string]: unknown }
+  }
   : Record<string, unknown>
 
 export type RequestBodyOption<T> = OperationRequestBodyContent<T> extends never

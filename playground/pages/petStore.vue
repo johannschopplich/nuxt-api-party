@@ -15,6 +15,10 @@ const status = ref<typeof availableStatus[number] | undefined>()
 const { data: user, execute } = await usePetStoreData('/user/{username}', {
   path: { username: 'user1' },
   cache: true,
+  headers: {
+    'api_key': 'special',
+    'x-testheader': 'test',
+  },
 })
 
 const { data, error } = await usePetStoreData('/pet/findByStatus', {
@@ -89,6 +93,22 @@ async function abandonGarfield() {
     console.error(error as NuxtError)
     // Log the API response body
     console.error('Response body:', (error as NuxtError).data)
+  }
+}
+
+async function removePet(petId: number) {
+  try {
+    await $petStore('/pet/{petId}', {
+      method: 'DELETE',
+      path: { petId },
+      headers: {
+        'api_key': 'special-key',
+        'x-testheader': 'test',
+      },
+    })
+  }
+  catch (error) {
+    console.error(error)
   }
 }
 </script>
