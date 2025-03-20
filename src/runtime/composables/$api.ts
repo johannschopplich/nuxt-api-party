@@ -7,6 +7,7 @@ import { hash } from 'ohash'
 import { joinURL } from 'ufo'
 import { CACHE_KEY_PREFIX } from '../constants'
 import { isFormData } from '../form-data'
+import { mergeFetchHooks } from '../hooks'
 import { resolvePathParams } from '../openapi'
 import { headersToObject, serializeMaybeEncodedBody } from '../utils'
 
@@ -112,8 +113,22 @@ export function _$api<T = unknown>(
 
   const endpoint = (apiParty.endpoints || {})[endpointId]
 
+  const fetchHooks = mergeFetchHooks(fetchOptions, {
+    async onRequest(ctx) {
+      await nuxt.callHook('api-party:request', ctx)
+      // @ts-expect-error: Types will be generated on Nuxt prepare
+      await nuxt.callHook(`api-party:request:${endpointId}`, ctx)
+    },
+    async onResponse(ctx) {
+      // @ts-expect-error: Types will be generated on Nuxt prepare
+      await nuxt.callHook(`api-party:response:${endpointId}`, ctx)
+      await nuxt.callHook('api-party:response', ctx)
+    },
+  })
+
   const clientFetcher = () => globalThis.$fetch<T>(resolvePathParams(path, pathParams), {
     ...fetchOptions,
+    ...fetchHooks,
     baseURL: endpoint.url,
     method,
     query: {
@@ -131,6 +146,7 @@ export function _$api<T = unknown>(
   const serverFetcher = async () =>
     (await globalThis.$fetch<T>(joinURL('/api', apiParty.server.basePath!, endpointId), {
       ...fetchOptions,
+      ...fetchHooks,
       method: 'POST',
       body: {
         path: resolvePathParams(path, pathParams),

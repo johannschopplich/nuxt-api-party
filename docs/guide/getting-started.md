@@ -28,6 +28,10 @@ Prepare your first API connection by setting an endpoint object. Each key repres
 - `query`: Query parameters to send with each request (optional)
 - `headers`: Headers to send with each request (optional)
 
+::: tip Dynamic Headers
+To set headers dynamically, use [runtime hooks](/guide/hooks.md).
+:::
+
 ```ts
 // `nuxt.config.ts`
 export default defineNuxtConfig({

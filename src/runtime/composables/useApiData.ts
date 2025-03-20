@@ -10,6 +10,7 @@ import { joinURL } from 'ufo'
 import { computed, reactive, toValue } from 'vue'
 import { CACHE_KEY_PREFIX } from '../constants'
 import { isFormData } from '../form-data'
+import { mergeFetchHooks } from '../hooks'
 import { resolvePathParams } from '../openapi'
 import { headersToObject, serializeMaybeEncodedBody } from '../utils'
 
@@ -55,10 +56,6 @@ export type SharedAsyncDataOptions<ResT, DataT = ResT> = Omit<AsyncDataOptions<R
 
 export type UseApiDataOptions<T> = Pick<
   ComputedOptions<NitroFetchOptions<string>>,
-  | 'onRequest'
-  | 'onRequestError'
-  | 'onResponse'
-  | 'onResponseError'
   | 'query'
   | 'headers'
   | 'method'
@@ -66,6 +63,12 @@ export type UseApiDataOptions<T> = Pick<
   | 'retryDelay'
   | 'retryStatusCodes'
   | 'timeout'
+> & Pick<
+  NitroFetchOptions<string>,
+  | 'onRequest'
+  | 'onRequestError'
+  | 'onResponse'
+  | 'onResponseError'
 > & {
   path?: MaybeRefOrGetter<Record<string, string>>
   body?: MaybeRef<string | Record<string, any> | FormData | null>
@@ -190,10 +193,24 @@ export function _useApiData<T = unknown>(
 
       let result: T | undefined
 
+      const fetchHooks = mergeFetchHooks(fetchOptions, {
+        async onRequest(ctx) {
+          await nuxt?.callHook('api-party:request', ctx)
+          // @ts-expect-error: Types will be generated on Nuxt prepare
+          await nuxt?.callHook(`api-party:request:${endpointId}`, ctx)
+        },
+        async onResponse(ctx) {
+          // @ts-expect-error: Types will be generated on Nuxt prepare
+          await nuxt?.callHook(`api-party:response:${endpointId}`, ctx)
+          await nuxt?.callHook('api-party:response', ctx)
+        },
+      })
+
       try {
         if (client) {
           result = (await globalThis.$fetch<T>(_path.value, {
             ..._fetchOptions,
+            ...fetchHooks,
             signal: controller.signal,
             baseURL: endpoint.url,
             method: _endpointFetchOptions.method,
@@ -214,6 +231,7 @@ export function _useApiData<T = unknown>(
             joinURL('/api', apiParty.server.basePath!, endpointId),
             {
               ..._fetchOptions,
+              ...fetchHooks,
               signal: controller.signal,
               method: 'POST',
               body: {

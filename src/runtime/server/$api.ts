@@ -1,6 +1,6 @@
 import type { ModuleOptions } from '../../module'
 import type { ApiClientFetchOptions } from '../composables/$api'
-import { useRuntimeConfig } from '#imports'
+import { useRuntimeConfig } from 'nitropack/runtime'
 import { resolvePathParams } from '../openapi'
 import { headersToObject } from '../utils'
 

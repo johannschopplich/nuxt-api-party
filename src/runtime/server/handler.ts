@@ -1,6 +1,5 @@
 import type { ModuleOptions } from '../../module'
 import type { EndpointFetchOptions } from '../types'
-import { useRuntimeConfig } from '#imports'
 import {
   createError,
   defineEventHandler,
@@ -13,6 +12,7 @@ import {
   setResponseStatus,
   splitCookiesString,
 } from 'h3'
+import { useNitroApp, useRuntimeConfig } from 'nitropack/runtime'
 import { deserializeMaybeEncodedBody } from '../utils'
 
 const ALLOWED_REQUEST_HEADERS = [
@@ -22,6 +22,7 @@ const ALLOWED_REQUEST_HEADERS = [
 ]
 
 export default defineEventHandler(async (event) => {
+  const nitro = useNitroApp()
   const endpointId = getRouterParam(event, 'endpointId')!
   const apiParty = useRuntimeConfig().apiParty as Required<ModuleOptions>
   const endpoints = apiParty.endpoints || {}
@@ -94,6 +95,16 @@ export default defineEventHandler(async (event) => {
         ...(body && { body: await deserializeMaybeEncodedBody(body) }),
         responseType: 'arrayBuffer',
         ignoreResponseError: true,
+        async onRequest(ctx) {
+          await nitro.hooks.callHook('api-party:request', ctx, event)
+          // @ts-expect-error: Types will be generated on Nuxt prepare
+          await nitro.hooks.callHook(`api-party:request:${endpointId}`, ctx, event)
+        },
+        async onResponse(ctx) {
+          // @ts-expect-error: Types will be generated on Nuxt prepare
+          await nitro.hooks.callHook(`api-party:response:${endpointId}`, ctx, event)
+          await nitro.hooks.callHook('api-party:response', ctx, event)
+        },
       },
     )
 
