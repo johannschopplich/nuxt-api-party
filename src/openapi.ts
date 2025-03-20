@@ -47,8 +47,7 @@ async function generateSchemaTypes(options: {
   id: string
   endpoint: SchemaEndpoint
   openAPITSOptions?: OpenAPITSOptions
-},
-) {
+}) {
   // openapi-typescript < 7 does not have named exports
   const openAPITS = await interopDefault(import('openapi-typescript'))
   const { astToString } = await import('openapi-typescript')
