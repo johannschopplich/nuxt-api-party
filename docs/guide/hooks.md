@@ -46,16 +46,20 @@ export default defineNuxtPlugin((nuxtApp) => {
   // Generic hook: executes on every API request
   nuxtApp.hook('api-party:request', (ctx) => {
     // Add a unique request ID to each request
-    ctx.request.headers['X-Request-Id'] = Math.random().toString(36).substring(7)
+    ctx.options.headers.set('X-Request-Id', Math.random().toString(36).substring(7))
   })
 })
 ```
+
+::: warning
+All of the Nuxt hooks are executed on the client side by default. Do not use them for sensitive operations like authentication or authorization. Instead, use Nitro hooks for server-side processing.
+:::
 
 ## Nitro Runtime Hooks
 
 For server-side processing, register these hooks in a server plugin. They are geared for tasks like dynamically fetching tokens or logging responses.
 
-Example: Retrieve a token dynamically and attach it as the Authorization header.
+The most common use case for Nitro hooks is to attach a token to a request before it is sent. For example, you can attach a user token to a specific endpoint request:
 
 ```ts [server/plugins/my-plugin.ts]
 export default defineNitroPlugin((nitroApp) => {
@@ -68,7 +72,7 @@ export default defineNitroPlugin((nitroApp) => {
   nitroApp.hook('api-party:request:myapi', async (ctx, event) => {
     // Fetch a user token and attach it to the request
     const token = await getUserToken(event)
-    ctx.request.headers.Authorization = `Bearer ${token}`
+    ctx.options.headers.set('Authorization', `Bearer ${token}`)
   })
 
   // Example of a response hook to modify or log responses
