@@ -9,8 +9,8 @@
   },
   "devDependencies": {
     "@iconify-json/carbon": "^1.2.8",
-    "@iconify-json/devicon-plain": "^1.2.20",
-    "unocss": "^65.5.0",
+    "@iconify-json/devicon-plain": "^1.2.23",
+    "unocss": "^66.1.2",
     "vitepress": "^1.6.3"
   }
 }
