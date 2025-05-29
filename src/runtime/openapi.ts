@@ -17,7 +17,7 @@ export type MethodOption<M, P> = 'get' extends keyof P ? { method?: M } : { meth
 
 export type ParamsOption<T> = T extends { parameters?: any, query?: any }
   ? Omit<T['parameters'], 'cookie' | 'header'> & {
-    headers?: T['parameters']['header'] | Record<string, unknown>
+    headers?: T['parameters']['header'] | HeadersInit
   }
   : Record<string, unknown>
 
