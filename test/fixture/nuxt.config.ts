@@ -8,6 +8,9 @@ export default defineNuxtConfig({
       testApi: {
         url: '/api',
       },
+      forbidden: {
+        url: '/api',
+      },
     },
   },
 })
