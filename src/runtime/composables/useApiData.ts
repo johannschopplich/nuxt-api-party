@@ -170,19 +170,14 @@ export function _useApiData<T = unknown>(
     default: defaultFn,
     transform,
     pick,
-    watch: watch === false
-      ? []
-      : [
-          _endpointFetchOptions,
-          ...(watch || []),
-        ],
+    watch: watch === false ? [] : [_endpointFetchOptions, ...(watch || [])],
     immediate,
   }
 
   let controller: AbortController | undefined
 
   return useAsyncData<T, unknown>(
-    _key.value,
+    watch === false ? _key.value : _key,
     async (nuxt) => {
       controller?.abort?.()
 

@@ -32,7 +32,6 @@ describe('nuxt-api-party', async () => {
         method: 'GET',
       },
       ignoreResponseError: true,
-
       onResponse: ({ response }) => {
         expect(response.status).toBe(401)
       },
