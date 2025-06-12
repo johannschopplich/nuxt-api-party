@@ -6,6 +6,7 @@ import {
   getRequestHeader,
   getRequestIP,
   getRouterParam,
+  isError,
   readBody,
   send,
   setResponseHeader,
@@ -133,6 +134,9 @@ export default defineEventHandler(async (event) => {
     return send(event, new Uint8Array(response._data ?? []))
   }
   catch (error) {
+    if (isError(error)) {
+      throw error
+    }
     console.error(error)
 
     throw createError({

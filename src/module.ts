@@ -221,7 +221,7 @@ ${endpointKeys.map(i => `
 export const ${getRawComposableName(i)} = (...args) => _$api('${i}', ...args)
 `.trimStart()).join('')}`.trimStart()
 
-      if (schemaEndpointIds.length) {
+      if (endpointKeys.length) {
         config.typescript ||= {}
         config.typescript.tsConfig ||= {}
         config.typescript.tsConfig.include ||= []
