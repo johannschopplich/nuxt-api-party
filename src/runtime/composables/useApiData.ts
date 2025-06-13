@@ -4,8 +4,9 @@ import type { MaybeRef, MaybeRefOrGetter, MultiWatchSources } from 'vue'
 import type { ModuleOptions } from '../../module'
 import type { FetchResponseData, FetchResponseError, FilterMethods, ParamsOption, RequestBodyOption } from '../openapi'
 import type { EndpointFetchOptions } from '../types'
-import { useAsyncData, useRequestHeaders, useRuntimeConfig } from '#imports'
+import { useAsyncData, useNuxtApp, useRequestHeaders, useRuntimeConfig } from '#imports'
 import { hash } from 'ohash'
+import { satisfies } from 'semver'
 import { joinURL } from 'ufo'
 import { computed, reactive, toValue } from 'vue'
 import { CACHE_KEY_PREFIX } from '../constants'
@@ -109,6 +110,11 @@ export type UseOpenAPIData<Paths> = <
   autoKey?: string
 ) => AsyncData<DataT | null, ErrorT>
 
+function checkNuxtVersion(constraint: string) {
+  const nuxtApp = useNuxtApp()
+  return satisfies(nuxtApp.versions.nuxt, constraint)
+}
+
 export function _useApiData<T = unknown>(
   endpointId: string,
   path: MaybeRefOrGetter<string>,
@@ -182,7 +188,7 @@ export function _useApiData<T = unknown>(
   let controller: AbortController | undefined
 
   return useAsyncData<T, unknown>(
-    _key.value,
+    checkNuxtVersion('>=3.17') ? _key : _key.value,
     async (nuxt) => {
       controller?.abort?.()
 
