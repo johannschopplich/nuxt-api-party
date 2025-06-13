@@ -90,6 +90,8 @@ const { data } = await useMyApiData('posts', {
 
 ::: tip
 The key can be a reactive value, e.g. a computed property.
+
+Requires Nuxt >=3.17 for full reactivity support.
 :::
 
 Clear the cache for a specific query by calling the `clear` function. This will remove the cached data for the query and allow the next request to fetch the data from the server:
