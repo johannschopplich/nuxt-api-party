@@ -9,7 +9,7 @@ import { CACHE_KEY_PREFIX } from '../constants'
 import { isFormData } from '../form-data'
 import { mergeFetchHooks } from '../hooks'
 import { resolvePathParams } from '../openapi'
-import { headersToObject, serializeMaybeEncodedBody } from '../utils'
+import { mergeHeaders, serializeMaybeEncodedBody } from '../utils'
 
 export interface SharedFetchOptions {
   /**
@@ -135,11 +135,11 @@ export function _$api<T = unknown>(
       ...endpoint.query,
       ...query,
     },
-    headers: {
-      ...(endpoint.token && { Authorization: `Bearer ${endpoint.token}` }),
-      ...endpoint.headers,
-      ...headersToObject(headers),
-    },
+    headers: mergeHeaders(
+      endpoint.token ? { Authorization: `Bearer ${endpoint.token}` } : undefined,
+      endpoint.headers,
+      headers,
+    ),
     body,
   }) as Promise<T>
 
@@ -151,10 +151,10 @@ export function _$api<T = unknown>(
       body: {
         path: resolvePathParams(path, pathParams),
         query,
-        headers: {
-          ...headersToObject(headers),
-          ...(endpoint.cookies && useRequestHeaders(['cookie'])),
-        },
+        headers: mergeHeaders(
+          headers,
+          endpoint.cookies ? useRequestHeaders(['cookie']) : undefined,
+        ),
         method,
         body: await serializeMaybeEncodedBody(body),
       } satisfies EndpointFetchOptions,

@@ -12,7 +12,7 @@ import { CACHE_KEY_PREFIX } from '../constants'
 import { isFormData } from '../form-data'
 import { mergeFetchHooks } from '../hooks'
 import { resolvePathParams } from '../openapi'
-import { headersToObject, serializeMaybeEncodedBody } from '../utils'
+import { mergeHeaders, serializeMaybeEncodedBody } from '../utils'
 
 type ComputedOptions<T> = {
   // eslint-disable-next-line ts/no-unsafe-function-type
@@ -156,10 +156,10 @@ export function _useApiData<T = unknown>(
   const _endpointFetchOptions: EndpointFetchOptions = reactive({
     path: _path,
     query,
-    headers: computed(() => ({
-      ...headersToObject(toValue(headers)),
-      ...(endpoint.cookies && useRequestHeaders(['cookie'])),
-    })),
+    headers: computed(() => mergeHeaders(
+      toValue(headers),
+      endpoint.cookies ? useRequestHeaders(['cookie']) : undefined,
+    )),
     method,
     body,
   })
