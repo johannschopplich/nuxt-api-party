@@ -32,12 +32,12 @@ interface SharedFetchOptions {
   key?: string
 }
 
-type ApiClientFetchOptions =
-  Omit<NitroFetchOptions<string>, 'body' | 'cache'>
-  & {
-    path?: Record<string, string>
-    body?: string | Record<string, any> | FormData | null
-  }
+type ApiClientFetchOptions
+  = Omit<NitroFetchOptions<string>, 'body' | 'cache'>
+    & {
+      path?: Record<string, string>
+      body?: string | Record<string, any> | FormData | null
+    }
 
 function $Api<T = unknown>(
   path: string,

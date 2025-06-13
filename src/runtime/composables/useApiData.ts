@@ -86,8 +86,8 @@ export type UseOpenAPIDataOptions<
   ResT,
   DataT = ResT,
   Operation = 'get' extends LowercasedMethod ? ('get' extends keyof Params ? Params['get'] : never) : LowercasedMethod extends keyof Params ? Params[LowercasedMethod] : never,
-> =
-  ComputedMethodOption<Method, Params>
+>
+= ComputedMethodOption<Method, Params>
   & ComputedOptions<ParamsOption<Operation>>
   & ComputedOptions<RequestBodyOption<Operation>>
   & Omit<AsyncDataOptions<ResT, DataT>, 'query' | 'body' | 'method'>

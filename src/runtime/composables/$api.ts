@@ -34,20 +34,20 @@ export interface SharedFetchOptions {
   key?: string
 }
 
-export type ApiClientFetchOptions =
-  Omit<NitroFetchOptions<string>, 'body' | 'cache'>
-  & {
-    path?: Record<string, string>
-    body?: string | Record<string, any> | FormData | null
-  }
+export type ApiClientFetchOptions
+  = Omit<NitroFetchOptions<string>, 'body' | 'cache'>
+    & {
+      path?: Record<string, string>
+      body?: string | Record<string, any> | FormData | null
+    }
 
 export type OpenAPIClientFetchOptions<
   Method,
   LowercasedMethod,
   Params,
   Operation = 'get' extends LowercasedMethod ? ('get' extends keyof Params ? Params['get'] : never) : LowercasedMethod extends keyof Params ? Params[LowercasedMethod] : never,
-> =
-  MethodOption<Method, Params>
+>
+= MethodOption<Method, Params>
   & ParamsOption<Operation>
   & RequestBodyOption<Operation>
   & Omit<NitroFetchOptions<string>, 'query' | 'body' | 'method' | 'cache'>
