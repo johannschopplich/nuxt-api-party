@@ -89,3 +89,5 @@ const { data, refresh, error, status, clear } = await useJsonPlaceholderData('po
 ## License
 
 [MIT](./LICENSE) License © 2022-PRESENT [Johann Schopplich](https://github.com/johannschopplich)
+
+[MIT](./LICENSE) License © 2025-PRESENT [Matthew Messinger](https://github.com/mattmess1221)
