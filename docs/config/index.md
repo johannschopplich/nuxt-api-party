@@ -41,7 +41,7 @@ interface EndpointConfiguration {
   url: string
   token?: string
   query?: QueryObject
-  headers?: Record<string, string>
+  headers?: HeadersInit
   cookies?: boolean
   allowedUrls?: string[]
   schema?: string | OpenAPI3
@@ -90,7 +90,7 @@ interface EndpointConfiguration {
   url: string
   token?: string
   query?: QueryObject
-  headers?: Record<string, string>
+  headers?: HeadersInit
   cookies?: boolean
   allowedUrls?: string[]
   schema?: string | URL | OpenAPI3 | (() => Promise<OpenAPI3>)
