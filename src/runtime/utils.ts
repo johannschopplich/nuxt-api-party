@@ -2,13 +2,13 @@ import type { ApiClientFetchOptions } from './composables/$api'
 import { formDataToObject, isFormData, isSerializedFormData, objectToFormData } from './form-data'
 
 /**
- * Losslessly merge all headers, preserving duplicates.
+ * Losslessly merges multiple `HeadersInit` objects, preserving duplicates.
  *
- * @param headers - An array of HeadersInit or undefined values to merge
+ * @param headers - An array of `HeadersInit` or `undefined` values to merge
  * @return A new Headers object containing all merged headers
  */
-export function mergeHeaders(...headers: Array<HeadersInit | undefined>): Headers {
-  return new Headers(headers.flatMap(h => [...new Headers(h)]))
+export function mergeHeaders(...headers: (HeadersInit | undefined)[]) {
+  return new Headers(headers.filter(Boolean).flatMap(h => [...new Headers(h)]))
 }
 
 export async function serializeMaybeEncodedBody(value: ApiClientFetchOptions['body']) {
