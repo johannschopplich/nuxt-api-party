@@ -4,9 +4,8 @@ import type { MaybeRef, MaybeRefOrGetter, MultiWatchSources } from 'vue'
 import type { ModuleOptions } from '../../module'
 import type { FetchResponseData, FetchResponseError, FilterMethods, ParamsOption, RequestBodyOption } from '../openapi'
 import type { EndpointFetchOptions } from '../types'
-import { useAsyncData, useNuxtApp, useRequestHeaders, useRuntimeConfig } from '#imports'
+import { checkNuxtVersion, useAsyncData, useRequestHeaders, useRuntimeConfig } from '#imports'
 import { hash } from 'ohash'
-import { satisfies } from 'semver'
 import { joinURL } from 'ufo'
 import { computed, reactive, toValue } from 'vue'
 import { CACHE_KEY_PREFIX } from '../constants'
@@ -109,11 +108,6 @@ export type UseOpenAPIData<Paths> = <
   options?: UseOpenAPIDataOptions<Method, LowercasedMethod, Methods, ResT, DataT>,
   autoKey?: string
 ) => AsyncData<DataT | null, ErrorT>
-
-function checkNuxtVersion(constraint: string) {
-  const nuxtApp = useNuxtApp()
-  return satisfies(nuxtApp.versions.nuxt, constraint)
-}
 
 export function _useApiData<T = unknown>(
   endpointId: string,
