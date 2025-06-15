@@ -17,6 +17,9 @@ importers:
       jiti:
         specifier: ^2.4.2
         version: 2.4.2
+      nuxt-version-shake:
+        specifier: ^0.0.2
+        version: 0.0.2(magicast@0.3.5)
       ofetch:
         specifier: ^1.4.1
         version: 1.4.1
@@ -3793,6 +3796,9 @@ packages:
 
   nth-check@2.1.1:
     resolution: {integrity: sha512-lqjrjmaOoAnWfMmBPL+XNnynZh2+swxiX3WUE0s4yEHI6m+AwrK2UZOimIRl3X/4QctVqS8AiZjFqyOGrMXb/w==}
+
+  nuxt-version-shake@0.0.2:
+    resolution: {integrity: sha512-YXeMT3nvMOLSETwxsstGPIujGYiyUQjTGdcu9LR232qMmSUN2dmu106f/rz9WCBzKFU95Z8OJaSQ/WC8xgeu7A==}
 
   nuxt@3.17.5:
     resolution: {integrity: sha512-HWTWpM1/RDcCt9DlnzrPcNvUmGqc62IhlZJvr7COSfnJq2lKYiBKIIesEaOF+57Qjw7TfLPc1DQVBNtxfKBxEw==}
@@ -9693,6 +9699,16 @@ snapshots:
   nth-check@2.1.1:
     dependencies:
       boolbase: 1.0.0
+
+  nuxt-version-shake@0.0.2(magicast@0.3.5):
+    dependencies:
+      '@nuxt/kit': 3.17.5(magicast@0.3.5)
+      consola: 3.4.2
+      magic-string: 0.30.17
+      semver: 7.7.2
+      unplugin: 2.3.5
+    transitivePeerDependencies:
+      - magicast
 
   nuxt@3.17.5(@parcel/watcher@2.5.1)(@types/node@22.15.31)(db0@0.3.2)(eslint@9.28.0(jiti@2.4.2))(ioredis@5.6.1)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.43.0)(terser@5.42.0)(typescript@5.8.3)(vite@6.3.5(@types/node@22.15.31)(jiti@2.4.2)(terser@5.42.0)(yaml@2.8.0))(vue-tsc@2.2.10(typescript@5.8.3))(yaml@2.8.0):
     dependencies:

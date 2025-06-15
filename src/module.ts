@@ -3,7 +3,16 @@ import type { H3Event } from 'h3'
 import type { FetchContext, FetchResponse } from 'ofetch'
 import type { OpenAPI3, OpenAPITSOptions } from 'openapi-typescript'
 import type { QueryObject } from 'ufo'
-import { addImportsSources, addServerHandler, addTemplate, addTypeTemplate, createResolver, defineNuxtModule, useLogger } from '@nuxt/kit'
+import {
+  addImportsSources,
+  addServerHandler,
+  addTemplate,
+  addTypeTemplate,
+  createResolver,
+  defineNuxtModule,
+  installModule,
+  useLogger,
+} from '@nuxt/kit'
 import { defu } from 'defu'
 import { createJiti } from 'jiti'
 import { relative } from 'pathe'
@@ -130,6 +139,8 @@ export default defineNuxtModule<ModuleOptions>({
     const logger = useLogger(moduleName)
     const getRawComposableName = (endpointId: string) => `$${camelCase(endpointId)}`
     const getDataComposableName = (endpointId: string) => `use${pascalCase(endpointId)}Data`
+
+    await installModule('nuxt-version-shake')
 
     // Private runtime config
     nuxt.options.runtimeConfig.apiParty = defu(

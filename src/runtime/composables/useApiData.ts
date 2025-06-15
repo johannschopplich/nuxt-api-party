@@ -4,7 +4,7 @@ import type { MaybeRef, MaybeRefOrGetter, MultiWatchSources } from 'vue'
 import type { ModuleOptions } from '../../module'
 import type { FetchResponseData, FetchResponseError, FilterMethods, ParamsOption, RequestBodyOption } from '../openapi'
 import type { EndpointFetchOptions } from '../types'
-import { useAsyncData, useRequestHeaders, useRuntimeConfig } from '#imports'
+import { checkNuxtVersion, useAsyncData, useRequestHeaders, useRuntimeConfig } from '#imports'
 import { hash } from 'ohash'
 import { joinURL } from 'ufo'
 import { computed, reactive, toValue } from 'vue'
@@ -177,9 +177,7 @@ export function _useApiData<T = unknown>(
   let controller: AbortController | undefined
 
   return useAsyncData<T, unknown>(
-    // TODO: Support reactive keys and push Nuxt compatibility to >=3.17.0
-    // watch === false ? _key.value : _key,
-    _key.value,
+    watch !== false && checkNuxtVersion('>=3.17') ? _key : _key.value,
     async (nuxt) => {
       controller?.abort?.()
 
