@@ -16,7 +16,7 @@ export interface EndpointConfiguration {
   url: string
   token?: string
   query?: QueryObject
-  headers?: Record<string, string>
+  headers?: HeadersInit
   cookies?: boolean
   allowedUrls?: string[]
   schema?: string | OpenAPI3

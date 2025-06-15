@@ -13,7 +13,7 @@ import { CACHE_KEY_PREFIX } from '../constants'
 import { isFormData } from '../form-data'
 import { mergeFetchHooks } from '../hooks'
 import { resolvePathParams } from '../openapi'
-import { headersToObject, serializeMaybeEncodedBody } from '../utils'
+import { mergeHeaders, serializeMaybeEncodedBody } from '../utils'
 
 type ComputedOptions<T> = {
   // eslint-disable-next-line ts/no-unsafe-function-type
@@ -87,8 +87,8 @@ export type UseOpenAPIDataOptions<
   ResT,
   DataT = ResT,
   Operation = 'get' extends LowercasedMethod ? ('get' extends keyof Params ? Params['get'] : never) : LowercasedMethod extends keyof Params ? Params[LowercasedMethod] : never,
-> =
-  ComputedMethodOption<Method, Params>
+>
+= ComputedMethodOption<Method, Params>
   & ComputedOptions<ParamsOption<Operation>>
   & ComputedOptions<RequestBodyOption<Operation>>
   & Omit<AsyncDataOptions<ResT, DataT>, 'query' | 'body' | 'method'>
@@ -162,10 +162,10 @@ export function _useApiData<T = unknown>(
   const _endpointFetchOptions: EndpointFetchOptions = reactive({
     path: _path,
     query,
-    headers: computed(() => ({
-      ...headersToObject(toValue(headers)),
-      ...(endpoint.cookies && useRequestHeaders(['cookie'])),
-    })),
+    headers: computed(() => mergeHeaders(
+      toValue(headers),
+      endpoint.cookies ? useRequestHeaders(['cookie']) : undefined,
+    )),
     method,
     body,
   })
@@ -176,19 +176,14 @@ export function _useApiData<T = unknown>(
     default: defaultFn,
     transform,
     pick,
-    watch: watch === false
-      ? []
-      : [
-          _endpointFetchOptions,
-          ...(watch || []),
-        ],
+    watch: watch === false ? [] : [_endpointFetchOptions, ...(watch || [])],
     immediate,
   }
 
   let controller: AbortController | undefined
 
   return useAsyncData<T, unknown>(
-    checkNuxtVersion('>=3.17') ? _key : _key.value,
+    watch !== false && checkNuxtVersion('>=3.17') ? _key : _key.value,
     async (nuxt) => {
       controller?.abort?.()
 
