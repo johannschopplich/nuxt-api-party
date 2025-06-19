@@ -153,7 +153,7 @@ export function _useApiData<T = unknown>(
 
   const _fetchOptions = reactive(fetchOptions)
 
-  const _endpointFetchOptions: EndpointFetchOptions = reactive({
+  const _endpointFetchOptions = reactive({
     path: _path,
     query,
     headers: computed(() => mergeHeaders(
@@ -162,7 +162,7 @@ export function _useApiData<T = unknown>(
     )),
     method,
     body,
-  })
+  }) satisfies EndpointFetchOptions
 
   const _asyncDataOptions: AsyncDataOptions<T> = {
     server,
@@ -215,11 +215,11 @@ export function _useApiData<T = unknown>(
               ...endpoint.query,
               ..._endpointFetchOptions.query,
             },
-            headers: {
-              ...(endpoint.token && { Authorization: `Bearer ${endpoint.token}` }),
-              ...endpoint.headers,
-              ..._endpointFetchOptions.headers,
-            },
+            headers: mergeHeaders(
+              endpoint.token ? { Authorization: `Bearer ${endpoint.token}` } : {},
+              endpoint.headers,
+              _endpointFetchOptions.headers,
+            ),
             body: _endpointFetchOptions.body,
           })) as T
         }
@@ -234,6 +234,7 @@ export function _useApiData<T = unknown>(
               body: {
                 ..._endpointFetchOptions,
                 body: await serializeMaybeEncodedBody(_endpointFetchOptions.body),
+                headers: [..._endpointFetchOptions.headers],
               } satisfies EndpointFetchOptions,
             },
           )) as T

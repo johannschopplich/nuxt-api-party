@@ -44,6 +44,9 @@ async function onSubmit() {
         body: 'bar',
         userId: 1,
       },
+      headers: {
+        'X-Foo': 'bar',
+      },
     })
 
     console.log('formResponse:', formResponse.value)

@@ -151,10 +151,10 @@ export function _$api<T = unknown>(
       body: {
         path: resolvePathParams(path, pathParams),
         query,
-        headers: mergeHeaders(
+        headers: [...mergeHeaders(
           headers,
           endpoint.cookies ? useRequestHeaders(['cookie']) : undefined,
-        ),
+        )],
         method,
         body: await serializeMaybeEncodedBody(body),
       } satisfies EndpointFetchOptions,
