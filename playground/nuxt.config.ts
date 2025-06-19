@@ -16,6 +16,9 @@ export default defineNuxtConfig({
     endpoints: {
       jsonPlaceholder: {
         url: 'https://jsonplaceholder.typicode.com',
+        headers: {
+          'x-api-party': 'nuxt-api-party',
+        },
       },
       petStore: {
         url: 'https://petstore3.swagger.io/api/v3',
