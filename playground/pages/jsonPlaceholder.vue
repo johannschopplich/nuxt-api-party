@@ -45,7 +45,7 @@ async function onSubmit() {
         userId: 1,
       },
       headers: {
-        'x-foo': 'bar',
+        'X-Foo': 'bar',
       },
     })
 

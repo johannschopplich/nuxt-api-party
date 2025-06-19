@@ -4,7 +4,7 @@ import NuxtApiParty from '../src/module'
 export default defineNuxtConfig({
   modules: [NuxtApiParty],
 
-  compatibilityDate: '2024-04-03',
+  compatibilityDate: '2025-06-01',
 
   hooks: {
     'api-party:extend': async (options) => {
@@ -17,7 +17,7 @@ export default defineNuxtConfig({
       jsonPlaceholder: {
         url: 'https://jsonplaceholder.typicode.com',
         headers: {
-          'x-api-party': 'nuxt-api-party',
+          'X-Api-Party': 'nuxt-api-party',
         },
       },
       petStore: {

@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { mergeHeaders } from '../src/runtime/utils'
 
-describe('headers', () => {
-  it('headers are merged correctly', () => {
+describe('mergeHeaders', () => {
+  it('merges headers without duplicates', () => {
     const headers1 = {
       'x-api-party': 'nuxt-api-party',
       'Content-Type': 'application/json',
