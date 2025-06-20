@@ -14,7 +14,7 @@ import {
   splitCookiesString,
 } from 'h3'
 import { useNitroApp, useRuntimeConfig } from 'nitropack/runtime'
-import { deserializeMaybeEncodedBody } from '../utils'
+import { deserializeMaybeEncodedBody, mergeHeaders, omitUndefinedValues } from '../utils'
 
 const ALLOWED_REQUEST_HEADERS = [
   'Origin',
@@ -83,15 +83,15 @@ export default defineEventHandler(async (event) => {
           ...endpoint.query,
           ...query,
         },
-        headers: Object.fromEntries(
-          Object.entries({
+        headers: mergeHeaders(
+          omitUndefinedValues({
             ...requestHeaders,
             'X-Forwarded-For': getRequestIP(event, { xForwardedFor: true }),
             ...(endpoint.token && { Authorization: `Bearer ${endpoint.token}` }),
             ...(endpoint.cookies && { cookie: getRequestHeader(event, 'cookie') }),
-            ...endpoint.headers,
-            ...headers,
-          }).filter(([, value]) => value !== undefined),
+          }),
+          endpoint.headers,
+          headers,
         ),
         ...(body && { body: await deserializeMaybeEncodedBody(body) }),
         responseType: 'arrayBuffer',
