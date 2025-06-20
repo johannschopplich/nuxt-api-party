@@ -29,10 +29,10 @@ type FilteredObject<T extends object> = {
   [K in keyof T]: Exclude<T[K], undefined>
 }
 
-/** Return a copy of `object`, omitting keys whose value is `undefined`.  */
-export function omitUndefinedValues<T extends object>(object: T): FilteredObject<T> {
+/** Returns a copy of `object`, omitting keys whose value is `undefined`.  */
+export function omitUndefinedValues<T extends object>(object: T) {
   return Object.fromEntries(
     Object.entries(object)
-      .filter(([,value]) => value !== undefined),
+      .filter(([, value]) => value !== undefined),
   ) as FilteredObject<T>
 }
