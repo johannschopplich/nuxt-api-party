@@ -24,3 +24,15 @@ export async function deserializeMaybeEncodedBody(value: ApiClientFetchOptions['
 
   return value
 }
+
+type FilteredObject<T extends object> = {
+  [K in keyof T]: Exclude<T[K], undefined>
+}
+
+/** Return a copy of `object`, omitting keys whose value is `undefined`.  */
+export function omitUndefinedValues<T extends object>(object: T): FilteredObject<T> {
+  return Object.fromEntries(
+    Object.entries(object)
+      .filter(([,value]) => value !== undefined),
+  ) as FilteredObject<T>
+}
