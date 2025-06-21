@@ -177,9 +177,7 @@ export function _useApiData<T = unknown>(
   let controller: AbortController | undefined
 
   return useAsyncData<T, unknown>(
-    // TODO: Support reactive keys and push Nuxt compatibility to >=3.17.0
-    // watch === false ? _key.value : _key,
-    _key.value,
+    watch === false ? _key.value : _key,
     async (nuxt) => {
       controller?.abort?.()
 
