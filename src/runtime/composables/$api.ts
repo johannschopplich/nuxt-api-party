@@ -46,8 +46,7 @@ export type OpenAPIClientFetchOptions<
   LowercasedMethod,
   Params,
   Operation = 'get' extends LowercasedMethod ? ('get' extends keyof Params ? Params['get'] : never) : LowercasedMethod extends keyof Params ? Params[LowercasedMethod] : never,
->
-= MethodOption<Method, Params>
+> = MethodOption<Method, Params>
   & ParamsOption<Operation>
   & RequestBodyOption<Operation>
   & Omit<NitroFetchOptions<string>, 'query' | 'body' | 'method' | 'cache'>
