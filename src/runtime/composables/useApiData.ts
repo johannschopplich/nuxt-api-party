@@ -4,7 +4,7 @@ import type { MaybeRef, MaybeRefOrGetter, MultiWatchSources } from 'vue'
 import type { ModuleOptions } from '../../module'
 import type { FetchResponseData, FetchResponseError, FilterMethods, ParamsOption, RequestBodyOption } from '../openapi'
 import type { EndpointFetchOptions } from '../types'
-import { useAsyncData, useRequestHeaders, useRuntimeConfig } from '#imports'
+import { useAsyncData, useRequestFetch, useRequestHeaders, useRuntimeConfig } from '#imports'
 import { hash } from 'ohash'
 import { joinURL } from 'ufo'
 import { computed, reactive, toValue } from 'vue'
@@ -86,8 +86,7 @@ export type UseOpenAPIDataOptions<
   ResT,
   DataT = ResT,
   Operation = 'get' extends LowercasedMethod ? ('get' extends keyof Params ? Params['get'] : never) : LowercasedMethod extends keyof Params ? Params[LowercasedMethod] : never,
->
-= ComputedMethodOption<Method, Params>
+> = ComputedMethodOption<Method, Params>
   & ComputedOptions<ParamsOption<Operation>>
   & ComputedOptions<RequestBodyOption<Operation>>
   & Omit<AsyncDataOptions<ResT, DataT>, 'query' | 'body' | 'method'>
@@ -222,7 +221,7 @@ export function _useApiData<T = unknown>(
           })) as T
         }
         else {
-          result = (await globalThis.$fetch<T>(
+          result = (await useRequestFetch()<T>(
             joinURL('/api', apiParty.server.basePath!, endpointId),
             {
               ..._fetchOptions,
