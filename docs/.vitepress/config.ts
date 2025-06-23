@@ -4,8 +4,6 @@ import { defineConfig } from 'vitepress'
 import { description, version } from '../../package.json'
 import { github, name, ogImage, ogUrl, releases } from './meta'
 
-const url = new URL(ogUrl)
-
 export default defineConfig({
   lang: 'en-US',
   title: name,
