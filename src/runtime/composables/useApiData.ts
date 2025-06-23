@@ -176,7 +176,7 @@ export function _useApiData<T = unknown>(
   let controller: AbortController | undefined
 
   return useAsyncData<T, unknown>(
-    watch === false ? _key.value : _key,
+    _key,
     async (nuxt) => {
       controller?.abort?.()
 
