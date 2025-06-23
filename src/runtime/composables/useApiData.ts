@@ -4,7 +4,7 @@ import type { MaybeRef, MaybeRefOrGetter, MultiWatchSources } from 'vue'
 import type { ModuleOptions } from '../../module'
 import type { FetchResponseData, FetchResponseError, FilterMethods, ParamsOption, RequestBodyOption } from '../openapi'
 import type { EndpointFetchOptions } from '../types'
-import { useAsyncData, useRequestHeaders, useRuntimeConfig } from '#imports'
+import { useAsyncData, useRequestFetch, useRequestHeaders, useRuntimeConfig } from '#imports'
 import { hash } from 'ohash'
 import { joinURL } from 'ufo'
 import { computed, reactive, toValue } from 'vue'
@@ -224,7 +224,7 @@ export function _useApiData<T = unknown>(
           })) as T
         }
         else {
-          result = (await globalThis.$fetch<T>(
+          result = (await useRequestFetch()<T>(
             joinURL('/api', apiParty.server.basePath!, endpointId),
             {
               ..._fetchOptions,

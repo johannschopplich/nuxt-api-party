@@ -2,7 +2,7 @@ import type { NitroFetchOptions } from 'nitropack'
 import type { ModuleOptions } from '../../module'
 import type { FetchResponseData, FilterMethods, MethodOption, ParamsOption, RequestBodyOption } from '../openapi'
 import type { EndpointFetchOptions } from '../types'
-import { useNuxtApp, useRequestHeaders, useRuntimeConfig } from '#imports'
+import { useNuxtApp, useRequestFetch, useRequestHeaders, useRuntimeConfig } from '#imports'
 import { hash } from 'ohash'
 import { joinURL } from 'ufo'
 import { CACHE_KEY_PREFIX } from '../constants'
@@ -144,7 +144,7 @@ export function _$api<T = unknown>(
   }) as Promise<T>
 
   const serverFetcher = async () =>
-    (await globalThis.$fetch<T>(joinURL('/api', apiParty.server.basePath!, endpointId), {
+    (await useRequestFetch()<T>(joinURL('/api', apiParty.server.basePath!, endpointId), {
       ...fetchOptions,
       ...fetchHooks,
       method: 'POST',
