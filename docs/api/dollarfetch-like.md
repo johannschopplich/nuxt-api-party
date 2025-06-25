@@ -149,3 +149,22 @@ const data = await $jsonPlaceholder(
 ::: info
 Set the `client` module option to `always` to make all requests on the client-side.
 :::
+
+::: warning
+Client-side requests are not supported during server-side rendering (SSR). If you enable client requests in a server-side context, it will throw an error.
+
+You should prefer either to use the [`useFetch`-like](./use-fetch-like) composable, or wrap the call in [`useAsyncData`](https://nuxt.com/docs/api/composables/use-async-data) with `{ server: false }` to ensure the request is only made on the client.
+
+```ts
+const { data } = useAsyncData(
+  'posts',
+  () => $jsonPlaceholder(
+    'posts',
+    { client: true }
+  ),
+  {
+    server: false
+  }
+)
+```
+:::

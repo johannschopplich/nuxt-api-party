@@ -216,3 +216,7 @@ const data = await useJsonPlaceholderData(
 ::: info
 Set the `client` module option to `always` to make all requests on the client-side.
 :::
+
+::: warning
+Client-side requests are not supported during server-side rendering (SSR). Enabling client requests will imply `server: false`. Manually setting `server: true` will throw an error during SSR.
+:::
