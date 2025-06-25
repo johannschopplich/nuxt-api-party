@@ -104,6 +104,10 @@ export function _$api<T = unknown>(
   if (client && !apiParty.client)
     throw new Error('Client-side API requests are disabled. Set "client: true" in the module options to enable them.')
 
+  if (import.meta.server && client) {
+    throw new Error('Client-side API requests are not supported in service-side context. Make sure your api call is not executed during SSR. If you are wrapping with `useAsyncData`, include `server: false` in the options.')
+  }
+
   if ((nuxt.isHydrating || cache) && nuxt.payload.data[_key])
     return Promise.resolve(nuxt.payload.data[_key])
 

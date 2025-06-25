@@ -115,7 +115,6 @@ export function _useApiData<T = unknown>(
 ) {
   const apiParty = useRuntimeConfig().public.apiParty as Required<ModuleOptions>
   const {
-    server,
     lazy,
     default: defaultFn,
     transform,
@@ -128,6 +127,7 @@ export function _useApiData<T = unknown>(
     method,
     body,
     client = apiParty.client === 'always',
+    server = !client,
     cache = true,
     key,
     ...fetchOptions
@@ -147,6 +147,17 @@ export function _useApiData<T = unknown>(
 
   if (client && !apiParty.client)
     throw new Error('Client-side API requests are disabled. Set "client: true" in the module options to enable them.')
+
+  if (server && client) {
+    // Throw an error in server context, or log it on the client during development
+    const msg = 'Client-side API requests are not supported in server-side context. Either set "server: false" to execute on the client, or "client: false" to allow the server to execute the api call.'
+    if (import.meta.server) {
+      throw new Error(msg)
+    }
+    if (import.meta.dev) {
+      console.error(msg)
+    }
+  }
 
   const endpoint = (apiParty.endpoints || {})[endpointId]
 
