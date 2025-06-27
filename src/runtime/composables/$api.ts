@@ -3,10 +3,7 @@ import type { ModuleOptions } from '../../module'
 import type { FetchResponseData, FilterMethods, MethodOption, ParamsOption, RequestBodyOption } from '../openapi'
 import type { EndpointFetchOptions } from '../types'
 import { useNuxtApp, useRequestFetch, useRequestHeaders, useRuntimeConfig } from '#imports'
-import { hash } from 'ohash'
 import { joinURL } from 'ufo'
-import { CACHE_KEY_PREFIX } from '../constants'
-import { isFormData } from '../form-data'
 import { mergeFetchHooks } from '../hooks'
 import { resolvePathParams } from '../openapi'
 import { mergeHeaders, serializeMaybeEncodedBody } from '../utils'
@@ -20,20 +17,6 @@ export interface SharedFetchOptions {
    * @default false
    */
   client?: boolean
-  /**
-   * Cache the response for the same request.
-   * You can customize the cache key with the `key` option.
-   * @default false
-   * @deprecated To cache api requests, use the `cache` option in the `useApiData` composable.
-   */
-  cache?: boolean
-  /**
-   * By default, a cache key will be generated from the request options.
-   * With this option, you can provide a custom cache key.
-   * @default undefined
-   * @deprecated To cache api requests, use the `cache` option in the `useApiData` composable.
-   */
-  key?: string
 }
 
 export type ApiClientFetchOptions
@@ -71,14 +54,13 @@ export type OpenAPIClient<Paths> = <
   options?: OpenAPIClientFetchOptions<Method, LowercasedMethod, Methods>
 ) => Promise<ResT>
 
-export function _$api<T = unknown>(
+export async function _$api<T = unknown>(
   endpointId: string,
   path: string,
   opts: ApiClientFetchOptions & SharedFetchOptions = {},
 ) {
   const nuxt = useNuxtApp()
   const apiParty = useRuntimeConfig().public.apiParty as Required<ModuleOptions>
-  const promiseMap = (nuxt._pendingRequests ||= new Map()) as Map<string, Promise<T>>
 
   const {
     path: pathParams,
@@ -87,34 +69,11 @@ export function _$api<T = unknown>(
     method,
     body,
     client = apiParty.client === 'always',
-    cache = false,
-    key,
     ...fetchOptions
   } = opts
 
-  if (cache || key) {
-    console.warn(`[nuxt-api-party] The 'cache' and 'key' options of $${endpointId} are deprecated. Prefer the 'use${endpointId.charAt(0).toUpperCase()}${endpointId.slice(1)}Data' composable instead, which supports native nuxt data caching.`)
-  }
-
-  const _key = key === undefined
-    ? CACHE_KEY_PREFIX + hash([
-      endpointId,
-      path,
-      pathParams,
-      query,
-      method,
-      ...(isFormData(body) ? [] : [body]),
-    ])
-    : CACHE_KEY_PREFIX + key
-
   if (client && !apiParty.client)
     throw new Error('Client-side API requests are disabled. Set "client: true" in the module options to enable them.')
-
-  if ((nuxt.isHydrating || cache) && nuxt.payload.data[_key])
-    return Promise.resolve(nuxt.payload.data[_key])
-
-  if (promiseMap.has(_key))
-    return promiseMap.get(_key)!
 
   const endpoint = (apiParty.endpoints || {})[endpointId]
 
@@ -131,55 +90,38 @@ export function _$api<T = unknown>(
     },
   })
 
-  const clientFetcher = () => globalThis.$fetch<T>(resolvePathParams(path, pathParams), {
-    ...fetchOptions,
-    ...fetchHooks,
-    baseURL: endpoint.url,
-    method,
-    query: {
-      ...endpoint.query,
-      ...query,
-    },
-    headers: mergeHeaders(
-      endpoint.token ? { Authorization: `Bearer ${endpoint.token}` } : undefined,
-      endpoint.headers,
-      headers,
-    ),
-    body,
-  }) as Promise<T>
-
-  const serverFetcher = async () =>
-    (await useRequestFetch()<T>(joinURL('/api', apiParty.server.basePath!, endpointId), {
+  if (client) {
+    return await globalThis.$fetch<T>(resolvePathParams(path, pathParams), {
       ...fetchOptions,
       ...fetchHooks,
-      method: 'POST',
-      body: {
-        path: resolvePathParams(path, pathParams),
-        query,
-        headers: [...mergeHeaders(
-          headers,
-          endpoint.cookies ? useRequestHeaders(['cookie']) : undefined,
-        )],
-        method,
-        body: await serializeMaybeEncodedBody(body),
-      } satisfies EndpointFetchOptions,
-    })) as T
-
-  const request = (client ? clientFetcher() : serverFetcher())
-    .then((response) => {
-      if (import.meta.server || cache)
-        nuxt.payload.data[_key] = response
-      promiseMap.delete(_key)
-      return response
+      baseURL: endpoint.url,
+      method,
+      query: {
+        ...endpoint.query,
+        ...query,
+      },
+      headers: mergeHeaders(
+        endpoint.token ? { Authorization: `Bearer ${endpoint.token}` } : undefined,
+        endpoint.headers,
+        headers,
+      ),
+      body,
     })
-    // Invalidate cache if request fails
-    .catch((error) => {
-      nuxt.payload.data[_key] = undefined
-      promiseMap.delete(_key)
-      throw error
-    }) as Promise<T>
+  }
 
-  promiseMap.set(_key, request)
-
-  return request
+  return await useRequestFetch()<T>(joinURL('/api', apiParty.server.basePath!, endpointId), {
+    ...fetchOptions,
+    ...fetchHooks,
+    method: 'POST',
+    body: {
+      path: resolvePathParams(path, pathParams),
+      query,
+      headers: [...mergeHeaders(
+        headers,
+        endpoint.cookies ? useRequestHeaders(['cookie']) : undefined,
+      )],
+      method,
+      body: await serializeMaybeEncodedBody(body),
+    } satisfies EndpointFetchOptions,
+  })
 }
