@@ -3,16 +3,13 @@ import type { AsyncData, AsyncDataOptions, NuxtError } from 'nuxt/app'
 import type { MaybeRef, MaybeRefOrGetter, MultiWatchSources } from 'vue'
 import type { ModuleOptions } from '../../module'
 import type { FetchResponseData, FetchResponseError, FilterMethods, ParamsOption, RequestBodyOption } from '../openapi'
-import type { EndpointFetchOptions } from '../types'
-import { useAsyncData, useRequestFetch, useRequestHeaders, useRuntimeConfig, useState } from '#imports'
+import { useAsyncData, useRequestHeaders, useRuntimeConfig, useState } from '#imports'
 import { hash } from 'ohash'
-import { joinURL } from 'ufo'
 import { computed, reactive, toValue } from 'vue'
 import { CACHE_KEY_PREFIX } from '../constants'
 import { isFormData } from '../form-data'
-import { mergeFetchHooks } from '../hooks'
-import { resolvePathParams } from '../openapi'
-import { mergeHeaders, serializeMaybeEncodedBody } from '../utils'
+import { mergeHeaders } from '../utils'
+import { _$api } from './$api'
 
 type ComputedOptions<T> = {
   // eslint-disable-next-line ts/no-unsafe-function-type
@@ -149,11 +146,11 @@ export function _useApiData<T = unknown>(
     ...fetchOptions
   } = opts
 
-  const _path = computed(() => resolvePathParams(toValue(path), toValue(pathParams)))
   const _key = computed(key === undefined
     ? () => CACHE_KEY_PREFIX + hash([
         endpointId,
-        _path.value,
+        toValue(path),
+        toValue(pathParams),
         toValue(query),
         toValue(method),
         ...(isFormData(toValue(body)) ? [] : [toValue(body)]),
@@ -168,8 +165,9 @@ export function _useApiData<T = unknown>(
 
   const _fetchOptions = reactive(fetchOptions)
 
-  const _endpointFetchOptions = reactive({
-    path: _path,
+  const watchSources = reactive({
+    path,
+    pathParams,
     query,
     headers: computed(() => mergeHeaders(
       toValue(headers),
@@ -177,7 +175,7 @@ export function _useApiData<T = unknown>(
     )),
     method,
     body,
-  }) satisfies EndpointFetchOptions
+  })
 
   const _asyncDataOptions: AsyncDataOptions<T> = {
     server,
@@ -185,7 +183,7 @@ export function _useApiData<T = unknown>(
     default: defaultFn,
     transform,
     pick,
-    watch: watch === false ? [] : [_endpointFetchOptions, ...(watch || [])],
+    watch: watch === false ? [] : [watchSources, ...(watch || [])],
     immediate,
     getCachedData(key, nuxtApp, ctx) {
       function isCacheValid() {
@@ -230,56 +228,17 @@ export function _useApiData<T = unknown>(
       const timestamp = useTimestampState(_key.value)
 
       let result: T | undefined
-
-      const fetchHooks = mergeFetchHooks(fetchOptions, {
-        async onRequest(ctx) {
-          await nuxt?.callHook('api-party:request', ctx)
-          // @ts-expect-error: Types will be generated on Nuxt prepare
-          await nuxt?.callHook(`api-party:request:${endpointId}`, ctx)
-        },
-        async onResponse(ctx) {
-          // @ts-expect-error: Types will be generated on Nuxt prepare
-          await nuxt?.callHook(`api-party:response:${endpointId}`, ctx)
-          await nuxt?.callHook('api-party:response', ctx)
-        },
-      })
-
       try {
-        if (client) {
-          result = (await globalThis.$fetch<T>(_path.value, {
-            ..._fetchOptions,
-            ...fetchHooks,
-            signal: controller.signal,
-            baseURL: endpoint.url,
-            method: _endpointFetchOptions.method,
-            query: {
-              ...endpoint.query,
-              ..._endpointFetchOptions.query,
-            },
-            headers: mergeHeaders(
-              endpoint.token ? { Authorization: `Bearer ${endpoint.token}` } : {},
-              endpoint.headers,
-              _endpointFetchOptions.headers,
-            ),
-            body: _endpointFetchOptions.body,
-          })) as T
-        }
-        else {
-          result = (await useRequestFetch()<T>(
-            joinURL('/api', apiParty.server.basePath!, endpointId),
-            {
-              ..._fetchOptions,
-              ...fetchHooks,
-              signal: controller.signal,
-              method: 'POST',
-              body: {
-                ..._endpointFetchOptions,
-                body: await serializeMaybeEncodedBody(_endpointFetchOptions.body),
-                headers: [..._endpointFetchOptions.headers],
-              } satisfies EndpointFetchOptions,
-            },
-          )) as T
-        }
+        result = await _$api<T>(endpointId, toValue(path), {
+          path: toValue(opts.path),
+          method: toValue(opts.method),
+          query: toValue(opts.query),
+          headers: toValue(opts.headers),
+          body: toValue(opts.body),
+          client: toValue(opts.client),
+          signal: controller.signal,
+          ..._fetchOptions,
+        })
       }
       catch (error) {
         // Invalidate cache if request fails
