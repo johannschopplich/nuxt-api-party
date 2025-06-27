@@ -3,16 +3,13 @@ import type { AsyncData, AsyncDataOptions, NuxtError } from 'nuxt/app'
 import type { MaybeRef, MaybeRefOrGetter, MultiWatchSources } from 'vue'
 import type { ModuleOptions } from '../../module'
 import type { FetchResponseData, FetchResponseError, FilterMethods, ParamsOption, RequestBodyOption } from '../openapi'
-import type { EndpointFetchOptions } from '../types'
-import { useAsyncData, useRequestFetch, useRequestHeaders, useRuntimeConfig } from '#imports'
+import { useAsyncData, useRequestHeaders, useRuntimeConfig, useState } from '#imports'
 import { hash } from 'ohash'
-import { joinURL } from 'ufo'
 import { computed, reactive, toValue } from 'vue'
 import { CACHE_KEY_PREFIX } from '../constants'
 import { isFormData } from '../form-data'
-import { mergeFetchHooks } from '../hooks'
-import { resolvePathParams } from '../openapi'
-import { mergeHeaders, serializeMaybeEncodedBody } from '../utils'
+import { mergeHeaders } from '../utils'
+import { _$api } from './$api'
 
 type ComputedOptions<T> = {
   // eslint-disable-next-line ts/no-unsafe-function-type
@@ -25,6 +22,7 @@ type ComputedOptions<T> = {
 
 type ComputedMethodOption<M, P> = 'get' extends keyof P ? ComputedOptions<{ method?: M }> : ComputedOptions<{ method: M }>
 
+// #region types
 export type SharedAsyncDataOptions<ResT, DataT = ResT> = Omit<AsyncDataOptions<ResT, DataT>, 'watch'> & {
   /**
    * Skip the Nuxt server proxy and fetch directly from the API.
@@ -37,9 +35,19 @@ export type SharedAsyncDataOptions<ResT, DataT = ResT> = Omit<AsyncDataOptions<R
   /**
    * Cache the response for the same request.
    * You can customize the cache key with the `key` option.
+   * @remarks
+   * To customize how long cached responses are valid, assign an object with the
+   * `ttl` property.
    * @default true
    */
-  cache?: boolean
+  cache?: boolean | {
+    /**
+     * Time to Live for the cache in milliseconds.
+     * If unset, the cache will be stored indefinitely.
+     * @default undefined
+     */
+    ttl?: number
+  }
   /**
    * By default, a cache key will be generated from the request options.
    * With this option, you can provide a custom cache key.
@@ -78,6 +86,7 @@ export type UseApiData = <T = unknown>(
   path: MaybeRefOrGetter<string>,
   opts?: UseApiDataOptions<T>,
 ) => AsyncData<T | null, NuxtError>
+// #endregion types
 
 export type UseOpenAPIDataOptions<
   Method,
@@ -108,6 +117,11 @@ export type UseOpenAPIData<Paths> = <
   autoKey?: string
 ) => AsyncData<DataT | null, ErrorT>
 
+function useTimestampState(key: string) {
+  const stateKey = `${key}$timestamp`
+  return useState<number | undefined>(stateKey)
+}
+
 export function _useApiData<T = unknown>(
   endpointId: string,
   path: MaybeRefOrGetter<string>,
@@ -133,11 +147,11 @@ export function _useApiData<T = unknown>(
     ...fetchOptions
   } = opts
 
-  const _path = computed(() => resolvePathParams(toValue(path), toValue(pathParams)))
   const _key = computed(key === undefined
     ? () => CACHE_KEY_PREFIX + hash([
         endpointId,
-        _path.value,
+        toValue(path),
+        toValue(pathParams),
         toValue(query),
         toValue(method),
         ...(isFormData(toValue(body)) ? [] : [toValue(body)]),
@@ -152,8 +166,9 @@ export function _useApiData<T = unknown>(
 
   const _fetchOptions = reactive(fetchOptions)
 
-  const _endpointFetchOptions = reactive({
-    path: _path,
+  const watchSources = reactive({
+    path,
+    pathParams,
     query,
     headers: computed(() => mergeHeaders(
       toValue(headers),
@@ -161,7 +176,7 @@ export function _useApiData<T = unknown>(
     )),
     method,
     body,
-  }) satisfies EndpointFetchOptions
+  })
 
   const _asyncDataOptions: AsyncDataOptions<T> = {
     server,
@@ -169,8 +184,36 @@ export function _useApiData<T = unknown>(
     default: defaultFn,
     transform,
     pick,
-    watch: watch === false ? [] : [_endpointFetchOptions, ...(watch || [])],
+    watch: watch === false ? [] : [watchSources, ...(watch || [])],
     immediate,
+    getCachedData(key, nuxtApp, ctx) {
+      function isCacheValid() {
+        if (nuxtApp.isHydrating)
+          return true
+
+        if (!cache)
+          return false
+
+        const timestamp = useTimestampState(key)
+
+        if (timestamp.value === undefined)
+          return false
+
+        if (typeof cache === 'object' && cache.ttl !== undefined) {
+          const elapsedTime = Date.now() - timestamp.value
+          return elapsedTime <= cache.ttl
+        }
+        return true
+      }
+
+      // ignore cache if a refresh is requested manually
+      if (ctx.cause === 'refresh:manual' || ctx.cause === 'refresh:hook') {
+        return
+      }
+      if (isCacheValid()) {
+        return nuxtApp.payload.data[key] || nuxtApp.static?.data?.[key]
+      }
+    },
   }
 
   let controller: AbortController | undefined
@@ -181,74 +224,33 @@ export function _useApiData<T = unknown>(
     _key.value,
     async (nuxt) => {
       controller?.abort?.()
-
-      if (nuxt && (nuxt.isHydrating || cache) && nuxt.payload.data[_key.value])
-        return nuxt.payload.data[_key.value]
-
       controller = new AbortController()
 
+      const timestamp = useTimestampState(_key.value)
+
       let result: T | undefined
-
-      const fetchHooks = mergeFetchHooks(fetchOptions, {
-        async onRequest(ctx) {
-          await nuxt?.callHook('api-party:request', ctx)
-          // @ts-expect-error: Types will be generated on Nuxt prepare
-          await nuxt?.callHook(`api-party:request:${endpointId}`, ctx)
-        },
-        async onResponse(ctx) {
-          // @ts-expect-error: Types will be generated on Nuxt prepare
-          await nuxt?.callHook(`api-party:response:${endpointId}`, ctx)
-          await nuxt?.callHook('api-party:response', ctx)
-        },
-      })
-
       try {
-        if (client) {
-          result = (await globalThis.$fetch<T>(_path.value, {
-            ..._fetchOptions,
-            ...fetchHooks,
-            signal: controller.signal,
-            baseURL: endpoint.url,
-            method: _endpointFetchOptions.method,
-            query: {
-              ...endpoint.query,
-              ..._endpointFetchOptions.query,
-            },
-            headers: mergeHeaders(
-              endpoint.token ? { Authorization: `Bearer ${endpoint.token}` } : {},
-              endpoint.headers,
-              _endpointFetchOptions.headers,
-            ),
-            body: _endpointFetchOptions.body,
-          })) as T
-        }
-        else {
-          result = (await useRequestFetch()<T>(
-            joinURL('/api', apiParty.server.basePath!, endpointId),
-            {
-              ..._fetchOptions,
-              ...fetchHooks,
-              signal: controller.signal,
-              method: 'POST',
-              body: {
-                ..._endpointFetchOptions,
-                body: await serializeMaybeEncodedBody(_endpointFetchOptions.body),
-                headers: [..._endpointFetchOptions.headers],
-              } satisfies EndpointFetchOptions,
-            },
-          )) as T
-        }
+        result = await _$api<T>(endpointId, toValue(path), {
+          path: toValue(opts.path),
+          method: toValue(opts.method),
+          query: toValue(opts.query),
+          headers: toValue(opts.headers),
+          body: toValue(opts.body),
+          client: toValue(opts.client),
+          signal: controller.signal,
+          ..._fetchOptions,
+        })
       }
       catch (error) {
         // Invalidate cache if request fails
         if (nuxt)
-          nuxt.payload.data[_key.value] = undefined
+          timestamp.value = undefined
 
         throw error
       }
 
       if (nuxt && cache)
-        nuxt.payload.data[_key.value] = result
+        timestamp.value = Date.now()
 
       return result
     },
