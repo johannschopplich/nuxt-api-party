@@ -22,6 +22,7 @@ type ComputedOptions<T> = {
 
 type ComputedMethodOption<M, P> = 'get' extends keyof P ? ComputedOptions<{ method?: M }> : ComputedOptions<{ method: M }>
 
+// #region types
 export type SharedAsyncDataOptions<ResT, DataT = ResT> = Omit<AsyncDataOptions<ResT, DataT>, 'watch'> & {
   /**
    * Skip the Nuxt server proxy and fetch directly from the API.
@@ -34,18 +35,17 @@ export type SharedAsyncDataOptions<ResT, DataT = ResT> = Omit<AsyncDataOptions<R
   /**
    * Cache the response for the same request.
    * You can customize the cache key with the `key` option.
+   * @remarks
+   * To customize how long cached responses are valid, assign an object with the
+   * `ttl` property.
    * @default true
    */
   cache?: boolean | {
-  /**
-   * Time to Live for the cache in milliseconds.
-   * If unset, the cache will be stored indefinitely.
-   * @default undefined
-   *
-   * @remarks
-   * If you want to cache the response indefinitely, set `cache: true` without
-   * `ttl`. If you want to disable caching, set `cache: false`.
-   */
+    /**
+     * Time to Live for the cache in milliseconds.
+     * If unset, the cache will be stored indefinitely.
+     * @default undefined
+     */
     ttl?: number
   }
   /**
@@ -86,6 +86,7 @@ export type UseApiData = <T = unknown>(
   path: MaybeRefOrGetter<string>,
   opts?: UseApiDataOptions<T>,
 ) => AsyncData<T | null, NuxtError>
+// #endregion types
 
 export type UseOpenAPIDataOptions<
   Method,

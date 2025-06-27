@@ -8,6 +8,7 @@ import { mergeFetchHooks } from '../hooks'
 import { resolvePathParams } from '../openapi'
 import { mergeHeaders, serializeMaybeEncodedBody } from '../utils'
 
+// #region types
 export interface SharedFetchOptions {
   /**
    * Skip the Nuxt server proxy and fetch directly from the API.
@@ -26,6 +27,12 @@ export type ApiClientFetchOptions
       body?: string | Record<string, any> | FormData | null
     }
 
+export type ApiClient = <T = unknown>(
+  path: string,
+  opts?: ApiClientFetchOptions & SharedFetchOptions,
+) => Promise<T>
+// #endregion types
+
 export type OpenAPIClientFetchOptions<
   Method,
   LowercasedMethod,
@@ -36,11 +43,6 @@ export type OpenAPIClientFetchOptions<
   & RequestBodyOption<Operation>
   & Omit<NitroFetchOptions<string>, 'query' | 'body' | 'method' | 'cache'>
   & SharedFetchOptions
-
-export type ApiClient = <T = unknown>(
-  path: string,
-  opts?: ApiClientFetchOptions & SharedFetchOptions,
-) => Promise<T>
 
 export type OpenAPIClient<Paths> = <
   ReqT extends Extract<keyof Paths, string>,
