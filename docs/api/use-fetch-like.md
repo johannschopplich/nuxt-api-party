@@ -47,8 +47,9 @@ You can set a max age or time-to-live (TTL) for the cached data by passing an ob
 ```ts
 const { data } = useMyApiData('posts', {
   cache: {
+    // Cache for 5 minutes
     ttl: 1000 * 60 * 5
-  } // Cache for 5 minutes
+  }
 })
 ```
 
