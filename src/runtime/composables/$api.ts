@@ -24,12 +24,14 @@ export interface SharedFetchOptions {
    * Cache the response for the same request.
    * You can customize the cache key with the `key` option.
    * @default false
+   * @deprecated To cache api requests, use the `cache` option in the `useApiData` composable.
    */
   cache?: boolean
   /**
    * By default, a cache key will be generated from the request options.
    * With this option, you can provide a custom cache key.
    * @default undefined
+   * @deprecated To cache api requests, use the `cache` option in the `useApiData` composable.
    */
   key?: string
 }
@@ -89,6 +91,10 @@ export function _$api<T = unknown>(
     key,
     ...fetchOptions
   } = opts
+
+  if (cache || key) {
+    console.warn(`[nuxt-api-party] The 'cache' and 'key' options of $${endpointId} are deprecated. Prefer the 'use${endpointId.charAt(0).toUpperCase()}${endpointId.slice(1)}Data' composable instead, which supports native nuxt data caching.`)
+  }
 
   const _key = key === undefined
     ? CACHE_KEY_PREFIX + hash([

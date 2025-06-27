@@ -4,7 +4,7 @@ import type { MaybeRef, MaybeRefOrGetter, MultiWatchSources } from 'vue'
 import type { ModuleOptions } from '../../module'
 import type { FetchResponseData, FetchResponseError, FilterMethods, ParamsOption, RequestBodyOption } from '../openapi'
 import type { EndpointFetchOptions } from '../types'
-import { useAsyncData, useRequestFetch, useRequestHeaders, useRuntimeConfig } from '#imports'
+import { useAsyncData, useRequestFetch, useRequestHeaders, useRuntimeConfig, useState } from '#imports'
 import { hash } from 'ohash'
 import { joinURL } from 'ufo'
 import { computed, reactive, toValue } from 'vue'
@@ -39,7 +39,18 @@ export type SharedAsyncDataOptions<ResT, DataT = ResT> = Omit<AsyncDataOptions<R
    * You can customize the cache key with the `key` option.
    * @default true
    */
-  cache?: boolean
+  cache?: boolean | {
+  /**
+   * Time to Live for the cache in milliseconds.
+   * If unset, the cache will be stored indefinitely.
+   * @default undefined
+   *
+   * @remarks
+   * If you want to cache the response indefinitely, set `cache: true` without
+   * `ttl`. If you want to disable caching, set `cache: false`.
+   */
+    ttl?: number
+  }
   /**
    * By default, a cache key will be generated from the request options.
    * With this option, you can provide a custom cache key.
@@ -108,6 +119,11 @@ export type UseOpenAPIData<Paths> = <
   autoKey?: string
 ) => AsyncData<DataT | null, ErrorT>
 
+function useTimestampState(key: string) {
+  const stateKey = `${key}$timestamp`
+  return useState<number | undefined>(stateKey)
+}
+
 export function _useApiData<T = unknown>(
   endpointId: string,
   path: MaybeRefOrGetter<string>,
@@ -171,6 +187,34 @@ export function _useApiData<T = unknown>(
     pick,
     watch: watch === false ? [] : [_endpointFetchOptions, ...(watch || [])],
     immediate,
+    getCachedData(key, nuxtApp, ctx) {
+      function isCacheValid() {
+        if (nuxtApp.isHydrating)
+          return true
+
+        if (!cache)
+          return false
+
+        const timestamp = useTimestampState(key)
+
+        if (timestamp.value === undefined)
+          return false
+
+        if (typeof cache === 'object' && cache.ttl !== undefined) {
+          const elapsedTime = Date.now() - timestamp.value
+          return elapsedTime <= cache.ttl
+        }
+        return true
+      }
+
+      // ignore cache if a refresh is requested manually
+      if (ctx.cause === 'refresh:manual' || ctx.cause === 'refresh:hook') {
+        return
+      }
+      if (isCacheValid()) {
+        return nuxtApp.payload.data[key] || nuxtApp.static?.data?.[key]
+      }
+    },
   }
 
   let controller: AbortController | undefined
@@ -181,11 +225,9 @@ export function _useApiData<T = unknown>(
     _key.value,
     async (nuxt) => {
       controller?.abort?.()
-
-      if (nuxt && (nuxt.isHydrating || cache) && nuxt.payload.data[_key.value])
-        return nuxt.payload.data[_key.value]
-
       controller = new AbortController()
+
+      const timestamp = useTimestampState(_key.value)
 
       let result: T | undefined
 
@@ -242,13 +284,13 @@ export function _useApiData<T = unknown>(
       catch (error) {
         // Invalidate cache if request fails
         if (nuxt)
-          nuxt.payload.data[_key.value] = undefined
+          timestamp.value = undefined
 
         throw error
       }
 
       if (nuxt && cache)
-        nuxt.payload.data[_key.value] = result
+        timestamp.value = Date.now()
 
       return result
     },
