@@ -26,7 +26,7 @@ By default, Nuxt waits until a `refresh` is finished before it can be executed a
 
 ## Caching
 
-[See the `$fetch`-like composable](/docs/api/dollarfetch-like#caching) for more information on caching.
+[See the `$fetch`-like composable](./dollarfetch-like#caching) for more information on caching.
 
 ```ts
 const route = useRoute()
