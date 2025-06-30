@@ -25,12 +25,7 @@ describe('nuxt-api-party', async () => {
   })
 
   it('hook doesn\'t swallow h3 errors', async () => {
-    await $fetch('/api/__api_party/forbidden', {
-      method: 'POST',
-      body: {
-        path: '/',
-        method: 'GET',
-      },
+    await $fetch('/api/__api_party/forbidden/proxy/', {
       ignoreResponseError: true,
       onResponse: ({ response }) => {
         expect(response.status).toBe(401)

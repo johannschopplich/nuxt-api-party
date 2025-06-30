@@ -197,6 +197,11 @@ export default defineNuxtModule<ModuleOptions>({
       route: joinURL('/api', options.server!.basePath!, ':endpointId/proxy/**:path'),
       handler: resolve('runtime/server/proxyHandler'),
     })
+    // duplicated server handler because empty path will respond with 404
+    addServerHandler({
+      route: joinURL('/api', options.server!.basePath!, ':endpointId/proxy/'),
+      handler: resolve('runtime/server/proxyHandler'),
+    })
 
     nuxt.hooks.hook('nitro:config', (config) => {
       // Inline local server handler dependencies into Nitro bundle

@@ -1,5 +1,4 @@
 import type { H3Error } from 'h3'
-import type { FetchOptions } from 'ofetch'
 import type { ModuleOptions } from '../../module'
 import {
   createError,
@@ -10,6 +9,7 @@ import {
   proxyRequest,
 } from 'h3'
 import { useNitroApp, useRuntimeConfig } from 'nitropack/runtime'
+import { joinURL } from 'ufo'
 
 export default defineEventHandler(async (event) => {
   const nitro = useNitroApp()
@@ -51,24 +51,22 @@ export default defineEventHandler(async (event) => {
   }
 
   const hookErrorPromise = createHookErrorPromise()
-
-  const url = new URL(path, baseURL).toString()
+  const url = joinURL(baseURL, path)
   return await Promise.race([
     hookErrorPromise,
     proxyRequest(event, url, {
-      fetch: globalThis.$fetch.raw,
-      fetchOptions: {
+      fetch: globalThis.$fetch.create({
         onRequest: hookErrorPromise.wrap(async (ctx) => {
           await nitro.hooks.callHook('api-party:request', ctx, event)
           // @ts-expect-error: Types will be generated on Nuxt prepare
           await nitro.hooks.callHook(`api-party:request:${endpointId}`, ctx, event)
         }),
         onResponse: hookErrorPromise.wrap(async (ctx) => {
-        // @ts-expect-error: Types will be generated on Nuxt prepare
-          nitro.hooks.callHook(`api-party:response:${endpointId}`, ctx, event)
-          nitro.hooks.callHook('api-party:response', ctx, event)
+          // @ts-expect-error: Types will be generated on Nuxt prepare
+          await nitro.hooks.callHook(`api-party:response:${endpointId}`, ctx, event)
+          await nitro.hooks.callHook('api-party:response', ctx, event)
         }),
-      } satisfies FetchOptions as RequestInit,
+      }).raw,
     }),
   ])
 })
