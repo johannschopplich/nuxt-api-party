@@ -11,9 +11,10 @@ export function mergeFetchHooks(...hooks: FetchHooks[]): FetchHooks {
   }
 
   for (const hook of hooks) {
-    for (const [key, value] of Object.entries(hook)) {
-      maybePush(result[key as keyof typeof result], value)
-    }
+    maybePush(result.onRequest, hook.onRequest)
+    maybePush(result.onResponse, hook.onResponse)
+    maybePush(result.onRequestError, hook.onRequestError)
+    maybePush(result.onResponseError, hook.onResponseError)
   }
 
   return result
