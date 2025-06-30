@@ -64,19 +64,19 @@ The most common use case for Nitro hooks is to attach a token to a request befor
 ```ts [server/plugins/my-plugin.ts]
 export default defineNitroPlugin((nitroApp) => {
   // Generic request hook: runs before any API request on the server
-  nitroApp.hook('api-party:request', async (ctx, event) => {
+  nitroApp.hooks.hook('api-party:request', async (ctx, event) => {
     // Do something before each request
   })
 
   // Endpoint-specific request hook for `myapi`
-  nitroApp.hook('api-party:request:myapi', async (ctx, event) => {
+  nitroApp.hooks.hook('api-party:request:myapi', async (ctx, event) => {
     // Fetch a user token and attach it to the request
     const token = await getUserToken(event)
     ctx.options.headers.set('Authorization', `Bearer ${token}`)
   })
 
   // Example of a response hook to modify or log responses
-  nitroApp.hook('api-party:response:myapi', async (ctx, event) => {
+  nitroApp.hooks.hook('api-party:response:myapi', async (ctx, event) => {
     // Custom response handling
   })
 })
