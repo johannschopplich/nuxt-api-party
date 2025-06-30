@@ -3,7 +3,7 @@ import type { AsyncData, AsyncDataOptions, NuxtError } from 'nuxt/app'
 import type { MaybeRef, MaybeRefOrGetter, MultiWatchSources } from 'vue'
 import type { ModuleOptions } from '../../module'
 import type { FetchResponseData, FetchResponseError, FilterMethods, ParamsOption, RequestBodyOption } from '../openapi'
-import { useAsyncData, useRequestHeaders, useRuntimeConfig, useState } from '#imports'
+import { useAsyncData, useRequestHeaders, useRuntimeConfig } from '#imports'
 import { hash } from 'ohash'
 import { computed, reactive, toValue } from 'vue'
 import { CACHE_KEY_PREFIX } from '../constants'
@@ -33,22 +33,6 @@ export type SharedAsyncDataOptions<ResT, DataT = ResT> = Omit<AsyncDataOptions<R
    */
   client?: boolean
   /**
-   * Cache the response for the same request.
-   * You can customize the cache key with the `key` option.
-   * @remarks
-   * To customize how long cached responses are valid, assign an object with the
-   * `ttl` property.
-   * @default true
-   */
-  cache?: boolean | {
-    /**
-     * Time to Live for the cache in milliseconds.
-     * If unset, the cache will be stored indefinitely.
-     * @default undefined
-     */
-    ttl?: number
-  }
-  /**
    * By default, a cache key will be generated from the request options.
    * With this option, you can provide a custom cache key.
    * @default undefined
@@ -71,6 +55,7 @@ export type UseApiDataOptions<T> = Pick<
   | 'retryDelay'
   | 'retryStatusCodes'
   | 'timeout'
+  | 'cache'
 > & Pick<
   NitroFetchOptions<string>,
   | 'onRequest'
@@ -117,11 +102,6 @@ export type UseOpenAPIData<Paths> = <
   autoKey?: string
 ) => AsyncData<DataT | null, ErrorT>
 
-function useTimestampState(key: string) {
-  const stateKey = `${key}$timestamp`
-  return useState<number | undefined>(stateKey)
-}
-
 export function _useApiData<T = unknown>(
   endpointId: string,
   path: MaybeRefOrGetter<string>,
@@ -142,7 +122,6 @@ export function _useApiData<T = unknown>(
     method,
     body,
     client = apiParty.client === 'always',
-    cache = true,
     key,
     ...fetchOptions
   } = opts
@@ -186,73 +165,26 @@ export function _useApiData<T = unknown>(
     pick,
     watch: watch === false ? [] : [watchSources, ...(watch || [])],
     immediate,
-    getCachedData(key, nuxtApp, ctx) {
-      function isCacheValid() {
-        if (nuxtApp.isHydrating)
-          return true
-
-        if (!cache)
-          return false
-
-        const timestamp = useTimestampState(key)
-
-        if (timestamp.value === undefined)
-          return false
-
-        if (typeof cache === 'object' && cache.ttl !== undefined) {
-          const elapsedTime = Date.now() - timestamp.value
-          return elapsedTime <= cache.ttl
-        }
-        return true
-      }
-
-      // ignore cache if a refresh is requested manually
-      if (ctx.cause === 'refresh:manual' || ctx.cause === 'refresh:hook') {
-        return
-      }
-      if (isCacheValid()) {
-        return nuxtApp.payload.data[key] || nuxtApp.static?.data?.[key]
-      }
-    },
   }
 
   let controller: AbortController | undefined
 
   return useAsyncData<T, unknown>(
-    // TODO: Support reactive keys and push Nuxt compatibility to >=3.17.0
-    // watch === false ? _key.value : _key,
-    _key.value,
-    async (nuxt) => {
+    _key,
+    async () => {
       controller?.abort?.()
       controller = new AbortController()
 
-      const timestamp = useTimestampState(_key.value)
-
-      let result: T | undefined
-      try {
-        result = await _$api<T>(endpointId, toValue(path), {
-          path: toValue(opts.path),
-          method: toValue(opts.method),
-          query: toValue(opts.query),
-          headers: toValue(opts.headers),
-          body: toValue(opts.body),
-          client: toValue(opts.client),
-          signal: controller.signal,
-          ..._fetchOptions,
-        })
-      }
-      catch (error) {
-        // Invalidate cache if request fails
-        if (nuxt)
-          timestamp.value = undefined
-
-        throw error
-      }
-
-      if (nuxt && cache)
-        timestamp.value = Date.now()
-
-      return result
+      return await _$api<T>(endpointId, toValue(path), {
+        path: toValue(opts.path),
+        method: toValue(opts.method),
+        query: toValue(opts.query),
+        headers: toValue(opts.headers),
+        body: toValue(opts.body),
+        client: toValue(opts.client),
+        signal: controller.signal,
+        ..._fetchOptions,
+      })
     },
     _asyncDataOptions,
   ) as AsyncData<T | null, NuxtError>

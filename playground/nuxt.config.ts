@@ -6,6 +6,10 @@ export default defineNuxtConfig({
 
   compatibilityDate: '2025-06-01',
 
+  experimental: {
+    granularCachedData: true,
+  },
+
   hooks: {
     'api-party:extend': async (options) => {
       console.log(`[Build] Resolved endpoints:`, options.endpoints)
@@ -13,6 +17,7 @@ export default defineNuxtConfig({
   },
 
   apiParty: {
+    client: 'allow',
     endpoints: {
       jsonPlaceholder: {
         url: 'https://jsonplaceholder.typicode.com',

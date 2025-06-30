@@ -1,12 +1,11 @@
 import type { NitroFetchOptions } from 'nitropack'
 import type { ModuleOptions } from '../../module'
 import type { FetchResponseData, FilterMethods, MethodOption, ParamsOption, RequestBodyOption } from '../openapi'
-import type { EndpointFetchOptions } from '../types'
-import { useNuxtApp, useRequestFetch, useRequestHeaders, useRuntimeConfig } from '#imports'
+import { useNuxtApp, useRequestFetch, useRuntimeConfig } from '#imports'
 import { joinURL } from 'ufo'
 import { mergeFetchHooks } from '../hooks'
 import { resolvePathParams } from '../openapi'
-import { mergeHeaders, serializeMaybeEncodedBody } from '../utils'
+import { mergeHeaders } from '../utils'
 
 // #region types
 export interface SharedFetchOptions {
@@ -92,38 +91,20 @@ export async function _$api<T = unknown>(
     },
   })
 
-  if (client) {
-    return await globalThis.$fetch<T>(resolvePathParams(path, pathParams), {
-      ...fetchOptions,
-      ...fetchHooks,
-      baseURL: endpoint.url,
-      method,
-      query: {
-        ...endpoint.query,
-        ...query,
-      },
-      headers: mergeHeaders(
-        endpoint.token ? { Authorization: `Bearer ${endpoint.token}` } : undefined,
-        endpoint.headers,
-        headers,
-      ),
-      body,
-    })
-  }
-
-  return await useRequestFetch()<T>(joinURL('/api', apiParty.server.basePath!, endpointId), {
+  return await useRequestFetch()<T>(resolvePathParams(path, pathParams), {
     ...fetchOptions,
     ...fetchHooks,
-    method: 'POST',
-    body: {
-      path: resolvePathParams(path, pathParams),
-      query,
-      headers: [...mergeHeaders(
-        headers,
-        endpoint.cookies ? useRequestHeaders(['cookie']) : undefined,
-      )],
-      method,
-      body: await serializeMaybeEncodedBody(body),
-    } satisfies EndpointFetchOptions,
+    baseURL: client ? endpoint.url : joinURL('/api', apiParty.server.basePath!, endpointId, 'proxy'),
+    method,
+    query: {
+      ...endpoint.query,
+      ...query,
+    },
+    headers: mergeHeaders(
+      endpoint.token ? { Authorization: `Bearer ${endpoint.token}` } : undefined,
+      endpoint.headers,
+      headers,
+    ),
+    body,
   })
 }

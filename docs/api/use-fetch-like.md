@@ -26,59 +26,16 @@ By default, Nuxt waits until a `refresh` is finished before it can be executed a
 
 ## Caching
 
-By default, a [unique key is generated](/guide/caching) based in input parameters for each request to ensure that data fetching can be properly de-duplicated across requests. You can provide a custom key with the `key` option (similar to the key passed to [`useAsyncData`](https://nuxt.com/docs/api/composables/use-async-data)'s first argument):
+[See the `$fetch`-like composable](/docs/api/dollarfetch-like#caching) for more information on caching.
 
 ```ts
 const route = useRoute()
 
 const { data } = await useMyApiData('posts', {
-  key: () => `posts-${route.params.id}`
+  cache: 'no-store', // or 'default', 'reload', 'no-cache', 'force-cache', 'only-if-cached'
+  // other options...
 })
 ```
-
-::: tip
-The key can be a reactive value, e.g. a computed property.
-:::
-
-### Time to Live (TTL)
-
-You can set a max age or time-to-live (TTL) for the cached data by passing an object to `cache` with a `ttl` property. By default, responses will be cached forever. This will automatically invalidate the cache after the specified time in milliseconds:
-
-```ts
-const { data } = useMyApiData('posts', {
-  cache: {
-    // Cache for 5 minutes
-    ttl: 1000 * 60 * 5
-  }
-})
-```
-
-::: warning
-Old responses will not be removed from the cache immediately after the TTL expires, but will be considered stale and will not be used for new requests. The next request will fetch fresh data from the server.
-
-If you want to remove the cached data, you can use the `clear` function as described below.
-:::
-
-::: tip
-`ttl` is ignored during manual refreshes, meaning that if you call `refresh()`, the data will be fetched from the server regardless of the TTL.
-:::
-
-### Clearing cached data
-
-Clear the cache for a specific query by calling the `clear` function. This will remove the cached data for the query and allow the next request to fetch the data from the server:
-
-```ts
-const { data, refresh, clear } = await useMyApiData('posts')
-
-async function invalidateAndRefresh() {
-  clear()
-  await refresh()
-}
-```
-
-::: info
-`refresh()` will automatically invalidate the cache, but manually calling `clear()` can be useful if you want to reset the state without making a new request immediately.
-:::
 
 ## Examples
 

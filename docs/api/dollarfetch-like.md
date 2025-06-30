@@ -9,10 +9,26 @@ Returns the raw response of the API endpoint. Intended for actions inside method
 ## Type Declarations
 
 <<< @/../src/runtime/composables/$api.ts#types
+
 ## Caching
 
-::: warning
-Caching with the `$fetch`-like composable is no longer supported. Use the [`useFetch`-like composable](./use-fetch-like) instead, which better supports builtin nuxt data caching.
+Client caching can be done using your browser's builtin [Request cache](https://developer.mozilla.org/en-US/docs/Web/API/Request/cache) if the backend server supports [HTTP caching](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Caching).
+
+You can customize the caching behavior by passing the `cache` option to the composable.
+
+```ts
+const data = await $myApi(
+  'posts',
+  {
+    cache: 'no-store' // or 'default', 'reload', 'no-cache', 'force-cache', 'only-if-cached'
+  }
+)
+```
+
+::: note
+Previous versions of this module used the `cache` option as a boolean to control whether a response was cached for the session. This stored each response in memory with no cleanup, which was wasteful and not compatible with Nuxt 3.17's `experimental.purgeCachedData` option. The `cache` option now follows the [Request cache](https://developer.mozilla.org/en-US/docs/Web/API/Request/cache) specification.
+
+If you previously used the `cache` option as a boolean, you can achieve similar behavior by using either `no-store` for `false` or `default` for `true`.
 :::
 
 ## Example
