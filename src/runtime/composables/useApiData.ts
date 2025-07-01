@@ -3,6 +3,7 @@ import type { AsyncData, AsyncDataOptions, NuxtError } from 'nuxt/app'
 import type { MaybeRef, MaybeRefOrGetter, MultiWatchSources } from 'vue'
 import type { ModuleOptions } from '../../module'
 import type { FetchResponseData, FetchResponseError, FilterMethods, ParamsOption, RequestBodyOption } from '../openapi'
+import type { SharedFetchOptions } from './$api'
 import { useAsyncData, useRequestHeaders, useRuntimeConfig } from '#imports'
 import { hash } from 'ohash'
 import { computed, reactive, toValue } from 'vue'
@@ -23,15 +24,7 @@ type ComputedOptions<T> = {
 type ComputedMethodOption<M, P> = 'get' extends keyof P ? ComputedOptions<{ method?: M }> : ComputedOptions<{ method: M }>
 
 // #region types
-export type SharedAsyncDataOptions<ResT, DataT = ResT> = Omit<AsyncDataOptions<ResT, DataT>, 'watch'> & {
-  /**
-   * Skip the Nuxt server proxy and fetch directly from the API.
-   * Requires `client` set to `true` in the module options.
-   * @remarks
-   * If Nuxt SSR is disabled, client-side requests are enabled by default.
-   * @default false
-   */
-  client?: boolean
+export type SharedAsyncDataOptions<ResT, DataT = ResT> = SharedFetchOptions & Omit<AsyncDataOptions<ResT, DataT>, 'watch'> & {
   /**
    * By default, a cache key will be generated from the request options.
    * With this option, you can provide a custom cache key.

@@ -17,6 +17,21 @@ export interface SharedFetchOptions {
    * @default false
    */
   client?: boolean
+  /**
+   * The browser cache behavior.
+   *
+   * It accepts the same values as {@linkcode RequestInit.cache}. For backwards
+   * compatibility, you can also use `true` for `'default'` and `false` for
+   * `'no-store'`.
+   *
+   * @remarks
+   * This option is forwarded to the `fetch` API as the `cache` option.
+   *
+   * @default 'default'
+   * @see https://developer.mozilla.org/en-US/docs/Web/API/Request/cache
+   * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching
+   */
+  cache?: RequestInit['cache'] | boolean
 }
 
 export type ApiClientFetchOptions
@@ -63,15 +78,20 @@ export async function _$api<T = unknown>(
   const nuxt = useNuxtApp()
   const apiParty = useRuntimeConfig().public.apiParty as Required<ModuleOptions>
 
-  const {
+  let {
     path: pathParams,
     query,
     headers,
     method,
     body,
     client = apiParty.client === 'always',
+    cache,
     ...fetchOptions
   } = opts
+
+  if (typeof cache === 'boolean') {
+    cache = cache ? 'default' : 'no-store'
+  }
 
   if (client && !apiParty.client)
     throw new Error('Client-side API requests are disabled. Set "client: true" in the module options to enable them.')
@@ -106,5 +126,6 @@ export async function _$api<T = unknown>(
       headers,
     ),
     body,
+    cache,
   })
 }
