@@ -12,6 +12,8 @@ const { data, status, error, execute } = useJsonPlaceholderData<JsonPlaceholderC
     query: computed(() => ({
       postId: `${route.query.postId || 1}`,
     })),
+    // no-cache will check the server for a fresh response
+    cache: 'no-cache',
     onResponse({ response }) {
       if (import.meta.client) {
         console.log(response._data)

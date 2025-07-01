@@ -12,8 +12,6 @@ Returns the raw response of the API endpoint. Intended for actions inside method
 
 ## Caching
 
-Client caching can be done using your browser's builtin [Request cache](https://developer.mozilla.org/en-US/docs/Web/API/Request/cache) if the backend server supports [HTTP caching](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Caching).
-
 You can customize the caching behavior by passing the `cache` option to the composable.
 
 ```ts
@@ -25,10 +23,8 @@ const data = await $myApi(
 )
 ```
 
-::: note
-Previous versions of this module used the `cache` option as a boolean to control whether a response was cached for the session. This stored each response in memory with no cleanup, which was wasteful and not compatible with Nuxt 3.17's `experimental.purgeCachedData` option. The `cache` option now follows the [Request cache](https://developer.mozilla.org/en-US/docs/Web/API/Request/cache) specification.
-
-If you previously used the `cache` option as a boolean, you can achieve similar behavior by using either `no-store` for `false` or `default` for `true`.
+::: tip
+See the [caching guide](../guide/caching.md) for more information on caching.
 :::
 
 ## Example

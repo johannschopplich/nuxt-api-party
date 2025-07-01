@@ -26,16 +26,18 @@ By default, Nuxt waits until a `refresh` is finished before it can be executed a
 
 ## Caching
 
-[See the `$fetch`-like composable](./dollarfetch-like#caching) for more information on caching.
+You can customize the caching behavior by passing the `cache` option to the composable.
 
 ```ts
-const route = useRoute()
-
 const { data } = await useMyApiData('posts', {
   cache: 'no-store', // or 'default', 'reload', 'no-cache', 'force-cache', 'only-if-cached'
   // other options...
 })
 ```
+
+::: tip
+See the [caching guide](../guide/caching.md) for more information on caching.
+:::
 
 ## Examples
 
