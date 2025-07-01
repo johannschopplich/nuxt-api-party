@@ -6,7 +6,7 @@ import type { FetchResponseData, FetchResponseError, FilterMethods, ParamsOption
 import type { SharedFetchOptions } from './$api'
 import { useAsyncData, useRequestHeaders, useRuntimeConfig } from '#imports'
 import { hash } from 'ohash'
-import { computed, reactive, toValue } from 'vue'
+import { computed, reactive, toRef, toValue } from 'vue'
 import { CACHE_KEY_PREFIX } from '../constants'
 import { isFormData } from '../form-data'
 import { mergeHeaders } from '../utils'
@@ -139,8 +139,8 @@ export function _useApiData<T = unknown>(
   const _fetchOptions = reactive(fetchOptions)
 
   const watchSources = reactive({
-    path,
-    pathParams,
+    path: toRef(path),
+    pathParams: toRef(pathParams),
     query,
     headers: computed(() => mergeHeaders(
       toValue(headers),
