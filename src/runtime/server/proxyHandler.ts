@@ -67,6 +67,11 @@ export default defineEventHandler(async (event) => {
           await nitro.hooks.callHook('api-party:response', ctx, event)
         }),
       }).raw,
+      onResponse: (event) => {
+        if (!endpoint.cookies && event.node.res.hasHeader('set-cookie')) {
+          event.node.res.removeHeader('set-cookie')
+        }
+      },
     }),
   ])
 })
