@@ -1,16 +1,13 @@
 import type { NitroFetchOptions } from 'nitropack'
 import type { ModuleOptions } from '../../module'
 import type { FetchResponseData, FilterMethods, MethodOption, ParamsOption, RequestBodyOption } from '../openapi'
-import type { EndpointFetchOptions } from '../types'
-import { useNuxtApp, useRequestFetch, useRequestHeaders, useRuntimeConfig } from '#imports'
-import { hash } from 'ohash'
+import { useNuxtApp, useRequestFetch, useRuntimeConfig } from '#imports'
 import { joinURL } from 'ufo'
-import { CACHE_KEY_PREFIX } from '../constants'
-import { isFormData } from '../form-data'
 import { mergeFetchHooks } from '../hooks'
 import { resolvePathParams } from '../openapi'
-import { mergeHeaders, serializeMaybeEncodedBody } from '../utils'
+import { mergeHeaders } from '../utils'
 
+// #region types
 export interface SharedFetchOptions {
   /**
    * Skip the Nuxt server proxy and fetch directly from the API.
@@ -21,17 +18,20 @@ export interface SharedFetchOptions {
    */
   client?: boolean
   /**
-   * Cache the response for the same request.
-   * You can customize the cache key with the `key` option.
-   * @default false
+   * The browser cache behavior.
+   *
+   * It accepts the same values as {@linkcode RequestInit.cache}. For backwards
+   * compatibility, you can also use `true` for `'default'` and `false` for
+   * `'no-store'`.
+   *
+   * @remarks
+   * This option is forwarded to the `fetch` API as the `cache` option.
+   *
+   * @default 'default'
+   * @see https://developer.mozilla.org/en-US/docs/Web/API/Request/cache
+   * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching
    */
-  cache?: boolean
-  /**
-   * By default, a cache key will be generated from the request options.
-   * With this option, you can provide a custom cache key.
-   * @default undefined
-   */
-  key?: string
+  cache?: RequestInit['cache'] | boolean
 }
 
 export type ApiClientFetchOptions
@@ -40,6 +40,12 @@ export type ApiClientFetchOptions
       path?: Record<string, string>
       body?: string | Record<string, any> | FormData | null
     }
+
+export type ApiClient = <T = unknown>(
+  path: string,
+  opts?: ApiClientFetchOptions & SharedFetchOptions,
+) => Promise<T>
+// #endregion types
 
 export type OpenAPIClientFetchOptions<
   Method,
@@ -51,11 +57,6 @@ export type OpenAPIClientFetchOptions<
   & RequestBodyOption<Operation>
   & Omit<NitroFetchOptions<string>, 'query' | 'body' | 'method' | 'cache'>
   & SharedFetchOptions
-
-export type ApiClient = <T = unknown>(
-  path: string,
-  opts?: ApiClientFetchOptions & SharedFetchOptions,
-) => Promise<T>
 
 export type OpenAPIClient<Paths> = <
   ReqT extends Extract<keyof Paths, string>,
@@ -69,46 +70,31 @@ export type OpenAPIClient<Paths> = <
   options?: OpenAPIClientFetchOptions<Method, LowercasedMethod, Methods>
 ) => Promise<ResT>
 
-export function _$api<T = unknown>(
+export async function _$api<T = unknown>(
   endpointId: string,
   path: string,
   opts: ApiClientFetchOptions & SharedFetchOptions = {},
 ) {
   const nuxt = useNuxtApp()
   const apiParty = useRuntimeConfig().public.apiParty as Required<ModuleOptions>
-  const promiseMap = (nuxt._pendingRequests ||= new Map()) as Map<string, Promise<T>>
 
-  const {
+  let {
     path: pathParams,
     query,
     headers,
     method,
     body,
     client = apiParty.client === 'always',
-    cache = false,
-    key,
+    cache,
     ...fetchOptions
   } = opts
 
-  const _key = key === undefined
-    ? CACHE_KEY_PREFIX + hash([
-      endpointId,
-      path,
-      pathParams,
-      query,
-      method,
-      ...(isFormData(body) ? [] : [body]),
-    ])
-    : CACHE_KEY_PREFIX + key
+  if (typeof cache === 'boolean') {
+    cache = cache ? 'default' : 'no-store'
+  }
 
   if (client && !apiParty.client)
     throw new Error('Client-side API requests are disabled. Set "client: true" in the module options to enable them.')
-
-  if ((nuxt.isHydrating || cache) && nuxt.payload.data[_key])
-    return Promise.resolve(nuxt.payload.data[_key])
-
-  if (promiseMap.has(_key))
-    return promiseMap.get(_key)!
 
   const endpoint = (apiParty.endpoints || {})[endpointId]
 
@@ -125,10 +111,10 @@ export function _$api<T = unknown>(
     },
   })
 
-  const clientFetcher = () => globalThis.$fetch<T>(resolvePathParams(path, pathParams), {
+  return await useRequestFetch()<T>(resolvePathParams(path, pathParams), {
     ...fetchOptions,
     ...fetchHooks,
-    baseURL: endpoint.url,
+    baseURL: client ? endpoint.url : joinURL('/api', apiParty.server.basePath!, endpointId, 'proxy'),
     method,
     query: {
       ...endpoint.query,
@@ -140,40 +126,6 @@ export function _$api<T = unknown>(
       headers,
     ),
     body,
-  }) as Promise<T>
-
-  const serverFetcher = async () =>
-    (await useRequestFetch()<T>(joinURL('/api', apiParty.server.basePath!, endpointId), {
-      ...fetchOptions,
-      ...fetchHooks,
-      method: 'POST',
-      body: {
-        path: resolvePathParams(path, pathParams),
-        query,
-        headers: [...mergeHeaders(
-          headers,
-          endpoint.cookies ? useRequestHeaders(['cookie']) : undefined,
-        )],
-        method,
-        body: await serializeMaybeEncodedBody(body),
-      } satisfies EndpointFetchOptions,
-    })) as T
-
-  const request = (client ? clientFetcher() : serverFetcher())
-    .then((response) => {
-      if (import.meta.server || cache)
-        nuxt.payload.data[_key] = response
-      promiseMap.delete(_key)
-      return response
-    })
-    // Invalidate cache if request fails
-    .catch((error) => {
-      nuxt.payload.data[_key] = undefined
-      promiseMap.delete(_key)
-      throw error
-    }) as Promise<T>
-
-  promiseMap.set(_key, request)
-
-  return request
+    cache,
+  })
 }
