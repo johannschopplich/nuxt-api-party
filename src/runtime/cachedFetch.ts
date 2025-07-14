@@ -16,7 +16,7 @@ declare module '#app' {
  *
  * This is useful for backends which don't provide caching headers or POST
  * requests, which are not cached by the browser.
- * 
+ *
  * TODO: externalize this to an extensible user-facing module
  */
 export const cachedFetch = import.meta.server
