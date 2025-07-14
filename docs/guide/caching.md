@@ -78,3 +78,25 @@ async function invalidateAndRefresh() {
   await refresh()
 }
 ```
+
+### Legacy Caching Behavior
+
+To replicate the legacy caching behavior before version 3.0, you can pass `cache: true` to the request options. This will use the cache if available, and update it with the latest response from the server.
+
+```ts
+const { data } = await useJsonPlaceholderData('posts/1', {
+  cache: true // [!code ++]
+})
+```
+
+::: info
+Legacy caching behavior may be desired for endpoints that do not support client caching (non-GET requests) and when a server-based public cache is not available.
+:::
+
+::: warning
+Using `cache: true` is deprecated and may be removed in a future version. It is recommended to use the `fetch` option to provide a custom fetch function that implements the desired caching behavior.
+:::
+
+::: warning
+`cache: true` is not compatible with custom `fetch` functions. If you need to use a custom fetch function, you must handle caching manually.
+:::

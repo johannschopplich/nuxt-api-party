@@ -26,8 +26,7 @@ type ComputedMethodOption<M, P> = 'get' extends keyof P ? ComputedOptions<{ meth
 // #region types
 export type SharedAsyncDataOptions<ResT, DataT = ResT> = SharedFetchOptions & Omit<AsyncDataOptions<ResT, DataT>, 'watch'> & {
   /**
-   * By default, a cache key will be generated from the request options.
-   * With this option, you can provide a custom cache key.
+   * The key passed to `useAsyncData`. By default, will be generated from the request options.
    * @default undefined
    */
   key?: MaybeRefOrGetter<string>
@@ -48,7 +47,6 @@ export type UseApiDataOptions<T> = Pick<
   | 'retryDelay'
   | 'retryStatusCodes'
   | 'timeout'
-  | 'cache'
 > & Pick<
   NitroFetchOptions<string>,
   | 'onRequest'

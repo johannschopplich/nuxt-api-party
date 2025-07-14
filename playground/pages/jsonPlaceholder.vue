@@ -7,13 +7,13 @@ const route = useRoute()
 
 // Intended for similar use cases as `useFetch`
 const { data, status, error, execute } = useJsonPlaceholderData<JsonPlaceholderComment>(
-  'comments',
+  '/comments',
   {
     query: computed(() => ({
       postId: `${route.query.postId || 1}`,
     })),
     // no-cache will check the server for a fresh response
-    cache: 'no-cache',
+    cache: true,
     onResponse({ response }) {
       if (import.meta.client) {
         console.log(response._data)

@@ -119,3 +119,25 @@ const data = await $jsonPlaceholder(
 ::: info
 Set the `client` module option to `always` to make all requests on the client-side.
 :::
+
+## Custom Fetch
+
+You can pass a custom fetch function to the composable. This is useful if you want to use a different HTTP client or implement custom caching logic.
+
+```ts
+const data = await $jsonPlaceholder(
+  'posts',
+  {
+    fetch: (url, options) => {
+      // support fetching local routes during SSR
+      const fetch = useRequestFetch()
+      // Custom fetch logic here
+      return fetch(url, options)
+    }
+  }
+)
+```
+
+::: warning
+Using a custom fetch function will interfere with fetching local routes during SSR, which is required for the proxy to function. If you need to use a custom fetch function, be sure you either wrap `useRequestFetch()` as in the example, or only use it for client-side requests.
+:::

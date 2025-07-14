@@ -1,8 +1,10 @@
 import type { NitroFetchOptions } from 'nitropack'
+import type { $Fetch, FetchOptions, FetchRequest } from 'ofetch'
 import type { ModuleOptions } from '../../module'
 import type { FetchResponseData, FilterMethods, MethodOption, ParamsOption, RequestBodyOption } from '../openapi'
 import { useNuxtApp, useRequestFetch, useRuntimeConfig } from '#imports'
 import { joinURL } from 'ufo'
+import { cachedFetch } from '../cachedFetch'
 import { mergeFetchHooks } from '../hooks'
 import { resolvePathParams } from '../openapi'
 import { mergeHeaders } from '../utils'
@@ -32,6 +34,13 @@ export interface SharedFetchOptions {
    * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching
    */
   cache?: RequestInit['cache'] | boolean
+  /**
+   * Custom fetch function to use instead of the default `fetch`.
+   *
+   * @remarks
+   * This is useful for testing or when you want to use a different fetch implementation, such as one that supports caching.
+   */
+  fetch?: <T>(request: FetchRequest, options?: FetchOptions<any, T>) => Promise<T>
 }
 
 export type ApiClientFetchOptions
@@ -86,15 +95,23 @@ export async function _$api<T = unknown>(
     body,
     client = apiParty.client === 'always',
     cache,
+    fetch,
     ...fetchOptions
   } = opts
 
-  if (typeof cache === 'boolean') {
-    cache = cache ? 'default' : 'no-store'
-  }
-
   if (client && !apiParty.client)
     throw new Error('Client-side API requests are disabled. Set "client: true" in the module options to enable them.')
+
+  if (typeof cache === 'boolean') {
+    if (cache === true) {
+      if (fetch) {
+        console.warn('[nuxt-api-party] Using "cache: true" with a custom fetch function is not supported. You must implement caching logic in your custom fetch function.')
+      }
+      fetch ||= cachedFetch
+    }
+    cache = cache ? 'default' : 'no-store'
+  }
+  fetch ||= useRequestFetch() as $Fetch
 
   const endpoint = (apiParty.endpoints || {})[endpointId]
 
@@ -111,7 +128,7 @@ export async function _$api<T = unknown>(
     },
   })
 
-  return await useRequestFetch()<T>(resolvePathParams(path, pathParams), {
+  return await fetch<T>(resolvePathParams(path, pathParams), {
     ...fetchOptions,
     ...fetchHooks,
     baseURL: client ? endpoint.url : joinURL('/api', apiParty.server.basePath!, endpointId, 'proxy'),
