@@ -6,7 +6,7 @@ import type { FetchResponseData, FetchResponseError, FilterMethods, ParamsOption
 import type { SharedFetchOptions } from './$api'
 import { useAsyncData, useRequestHeaders, useRuntimeConfig } from '#imports'
 import { hash } from 'ohash'
-import { computed, reactive, toRef, toValue } from 'vue'
+import { computed, isReactive, reactive, toRef, toValue } from 'vue'
 import { CACHE_KEY_PREFIX } from '../constants'
 import { isFormData } from '../form-data'
 import { mergeHeaders } from '../utils'
@@ -93,6 +93,23 @@ export type UseOpenAPIData<Paths> = <
   autoKey?: string
 ) => AsyncData<DataT | null, ErrorT>
 
+/**
+ * Create a data key from the non-reactive entries in the values array.
+ *
+ * This ensures the data key is consistent and does not change when the values
+ * are reactive, which causes flashing in the UI.
+ */
+function generateDataKey(...values: unknown[]) {
+  return hash(
+    values.flatMap((value) => {
+      if (isReactive(value) || isFormData(value)) {
+        return []
+      }
+      return [value]
+    }),
+  )
+}
+
 export function _useApiData<T = unknown>(
   endpointId: string,
   path: MaybeRefOrGetter<string>,
@@ -118,14 +135,14 @@ export function _useApiData<T = unknown>(
   } = opts
 
   const _key = computed(key === undefined
-    ? () => CACHE_KEY_PREFIX + hash([
+    ? () => CACHE_KEY_PREFIX + generateDataKey(
         endpointId,
-        toValue(path),
-        toValue(pathParams),
-        toValue(query),
-        toValue(method),
-        ...(isFormData(toValue(body)) ? [] : [toValue(body)]),
-      ])
+        path,
+        pathParams,
+        query,
+        method,
+        body,
+      )
     : () => CACHE_KEY_PREFIX + toValue(key),
   )
 
