@@ -23,16 +23,16 @@ The available options are:
 - `true`: Equivalent to `'default'`
 - `false`: Equivalent to `'no-store'`
 
-Option comparison matrix:
+For reference, here is a table summarizing the behavior of each cache option:
 
-| Cache Option      | loads cache | stores cache | reuses stale | makes request
-| ------------------|-------------|--------------|--------------|--------------
-| `'default'`       | ✅          | ✅          | ❌           | ✅
-| `'no-store'`      | ❌          | ❌          | ❌           | ✅
-| `'reload'`        | ❌          | ✅          | ❌           | ✅
-| `'no-cache'`      | ✅          | ❌          | ❌           | ✅
-| `'force-cache'`   | ✅          | ❌          | ✅           | ✅
-| `'only-if-cached'`| ✅          | ❌          | ✅           | ❌
+| Cache Option      | Loads Cache | Stores Cache | Reuses Stale | Makes Request |
+| ------------------|-------------|--------------|--------------|---------------|
+| `'default'`       | ✅          | ✅           | ❌           | ✅
+| `'no-store'`      | ❌          | ❌           | ❌           | ✅
+| `'reload'`        | ❌          | ✅           | ❌           | ✅
+| `'no-cache'`      | ✅          | ❌           | ❌           | ✅
+| `'force-cache'`   | ✅          | ❌           | ✅           | ✅
+| `'only-if-cached'`| ✅          | ❌           | ✅           | ❌
 
 ## Examples
 
@@ -56,7 +56,7 @@ export default defineNuxtConfig({
 
 :::
 
-### Disable caching
+### Disable Caching
 
 ```ts
 // Disable caching for a single request
@@ -65,7 +65,7 @@ const { data } = await useJsonPlaceholderData('posts/1', {
 })
 ```
 
-### Refresh cached data
+### Refresh Cached Data
 
 For resources that may change frequently, use the `'no-cache'` option to ensure that the browser checks with the server for a fresh response before returning the cached response.
 
