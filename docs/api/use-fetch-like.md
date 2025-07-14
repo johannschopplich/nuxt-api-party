@@ -22,86 +22,22 @@ By default, Nuxt waits until a `refresh` is finished before it can be executed a
 
 ## Type Declarations
 
-```ts
-type SharedAsyncDataOptions<ResT, DataT = ResT> = Omit<AsyncDataOptions<ResT, DataT>, 'watch'> & {
-  /**
-   * Skip the Nuxt server proxy and fetch directly from the API.
-   * Requires `client` set to `true` in the module options.
-   * @remarks
-   * If Nuxt SSR is disabled, client-side requests are enabled by default.
-   * @default false
-   */
-  client?: boolean
-  /**
-   * Cache the response for the same request.
-   * You can customize the cache key with the `key` option.
-   * @default true
-   */
-  cache?: boolean
-  /**
-   * By default, a cache key will be generated from the request options.
-   * With this option, you can provide a custom cache key.
-   * @default undefined
-   */
-  key?: MaybeRefOrGetter<string>
-  /**
-   * Watch an array of reactive sources and auto-refresh the fetch result when they change.
-   * Fetch options and URL are watched by default. You can completely ignore reactive sources by using `watch: false`.
-   * @default undefined
-   */
-  watch?: MultiWatchSources | false
-}
-
-type UseApiDataOptions<T> = Pick<
-  ComputedOptions<NitroFetchOptions<string>>,
-  | 'onRequest'
-  | 'onRequestError'
-  | 'onResponse'
-  | 'onResponseError'
-  | 'query'
-  | 'headers'
-  | 'method'
-  | 'retry'
-  | 'retryDelay'
-  | 'retryStatusCodes'
-  | 'timeout'
-> & {
-  path?: MaybeRefOrGetter<Record<string, string>>
-  body?: MaybeRef<string | Record<string, any> | FormData | null>
-} & SharedAsyncDataOptions<T>
-
-function UseApiData<T = unknown>(
-  path: MaybeRefOrGetter<string>,
-  opts?: UseApiDataOptions<T>
-): AsyncData<T | null, NuxtError>
-```
+<<< @/../src/runtime/composables/useApiData.ts#types
 
 ## Caching
 
-By default, a [unique key is generated](/guide/caching) based in input parameters for each request to ensure that data fetching can be properly de-duplicated across requests. You can provide a custom key with the `key` option (similar to the key passed to [`useAsyncData`](https://nuxt.com/docs/api/composables/use-async-data)'s first argument):
+You can customize the caching behavior by passing the `cache` option to the composable.
 
 ```ts
-const route = useRoute()
-
 const { data } = await useMyApiData('posts', {
-  key: () => `posts-${route.params.id}`
+  cache: 'no-store', // or 'default', 'reload', 'no-cache', 'force-cache', 'only-if-cached'
+  // other options...
 })
 ```
 
 ::: tip
-The key can be a reactive value, e.g. a computed property.
+See the [caching guide](../guide/caching.md) for more information on caching.
 :::
-
-Clear the cache for a specific query by calling the `clear` function. This will remove the cached data for the query and allow the next request to fetch the data from the server:
-
-```ts
-const { data, refresh, clear } = await useMyApiData('posts')
-
-async function invalidateAndRefresh() {
-  clear()
-  await refresh()
-}
-```
 
 ## Examples
 

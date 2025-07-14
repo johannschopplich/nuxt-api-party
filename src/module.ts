@@ -114,7 +114,7 @@ export default defineNuxtModule<ModuleOptions>({
     name,
     configKey: 'apiParty',
     compatibility: {
-      nuxt: '>=3.7',
+      nuxt: '>=3.17',
     },
   },
   defaults: {
@@ -194,9 +194,13 @@ export default defineNuxtModule<ModuleOptions>({
 
     // Add Nuxt server route to proxy the API request server-side
     addServerHandler({
-      route: joinURL('/api', options.server!.basePath!, ':endpointId'),
-      handler: resolve('runtime/server/handler'),
-      method: 'post',
+      route: joinURL('/api', options.server!.basePath!, ':endpointId/proxy/**:path'),
+      handler: resolve('runtime/server/proxyHandler'),
+    })
+    // duplicated server handler because empty path will respond with 404
+    addServerHandler({
+      route: joinURL('/api', options.server!.basePath!, ':endpointId/proxy/'),
+      handler: resolve('runtime/server/proxyHandler'),
     })
 
     nuxt.hooks.hook('nitro:config', (config) => {
