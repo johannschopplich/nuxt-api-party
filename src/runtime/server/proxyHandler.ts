@@ -3,13 +3,14 @@ import type { ModuleOptions } from '../../module'
 import {
   createError,
   defineEventHandler,
+  getQuery,
   getRequestHeader,
   getRouterParam,
   isError,
   proxyRequest,
 } from 'h3'
 import { useNitroApp, useRuntimeConfig } from 'nitropack/runtime'
-import { joinURL } from 'ufo'
+import { joinURL, withQuery } from 'ufo'
 
 export default defineEventHandler(async (event) => {
   const nitro = useNitroApp()
@@ -51,7 +52,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const hookErrorPromise = createHookErrorPromise()
-  const url = joinURL(baseURL, path)
+  const url = withQuery(joinURL(baseURL, path), getQuery(event))
   return await Promise.race([
     hookErrorPromise,
     proxyRequest(event, url, {
