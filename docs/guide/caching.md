@@ -20,7 +20,7 @@ The available options are:
 - `'no-cache'`: Use the cache, but revalidate with the server before returning the cached response.
 - `'force-cache'`: Use the cache, even if it is stale.
 - `'only-if-cached'`: Use the cache, but do not make a request to the server if the resource is not in the cache. If the resource is not in the cache, will respond with a 504 Gateway Timeout error.
-- `true`: Equivalent to `'default'`
+- `true`: Enables legacy caching behavior. See the [Legacy Caching Behavior](#legacy-caching-behavior) section for more details.
 - `false`: Equivalent to `'no-store'`
 
 For reference, here is a table summarizing the behavior of each cache option:
@@ -81,7 +81,20 @@ async function invalidateAndRefresh() {
 
 ### Legacy Caching Behavior
 
-To replicate the legacy caching behavior before version 3.0, you can pass `cache: true` to the request options. This will use the cache if available, and update it with the latest response from the server.
+Legacy caching behavior is the default behavior in previous versions of Nuxt API Party. Instead of relying on the browser's cache, it uses a custom caching mechanism that stores the response in memory and updates it with the latest response from the server.
+
+Benefits of legacy caching over browser caching include:
+
+- Support for caching non-GET requests
+- Does not require the server to respond with `Cache-Control`, `ETag`, or `Last-Modified` headers.
+
+Downsides of legacy caching include:
+
+- Cache does not persist across page reloads.
+- Cache is not shared across tabs or windows.
+- Refreshing data requires a call to `clear` then `refresh` functions.
+
+To replicate the legacy caching behavior, you can pass `cache: true` to the request options. This will use the cache if available, and update it with the latest response from the server.
 
 ```ts
 const { data } = await useJsonPlaceholderData('posts/1', {
