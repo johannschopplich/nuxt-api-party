@@ -248,7 +248,7 @@ export const ${getRawComposableName(i)} = (...args) => _$api('${i}', ...args)
     nuxt.options.alias[`#${moduleName}`] = resolve(nuxt.options.buildDir, `module/${moduleName}`)
 
     // Add module template for generated composables
-    addTemplate({
+    const modTemplate = addTemplate({
       filename: `module/${moduleName}.mjs`,
       getContents() {
         return `
@@ -260,6 +260,15 @@ export const ${getDataComposableName(i)} = (...args) => _useApiData('${i}', ...a
 `.trimStart()).join('')}`.trimStart()
       },
     })
+
+    // Register composables for Nuxt autokey
+    nuxt.options.optimization.keyedComposables.push(
+      ...endpointKeys.map(i => ({
+        name: getDataComposableName(i),
+        argumentLength: 3,
+        source: modTemplate.dst,
+      })),
+    )
 
     // Add types for Nuxt auto-imports and the `#nuxt-api-party` module alias
     addTemplate({
