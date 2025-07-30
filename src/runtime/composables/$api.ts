@@ -162,5 +162,5 @@ export async function _$api<T = unknown>(
       },
     })
 
-  return await (apiParty.experimental.enablePrefixedProxy || client ? clientFetcher() : serverFetcher())
+  return await (apiParty.experimental?.enablePrefixedProxy || client ? clientFetcher() : serverFetcher())
 }

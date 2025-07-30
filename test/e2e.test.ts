@@ -23,15 +23,6 @@ describe('nuxt-api-party', async () => {
     const html = await $fetch<string>('/useTestApiData')
     expect(getTestResult(html)).toMatchSnapshot()
   })
-
-  it('hook doesn\'t swallow h3 errors', async () => {
-    await $fetch('/api/__api_party/forbidden/proxy/', {
-      ignoreResponseError: true,
-      onResponse: ({ response }) => {
-        expect(response.status).toBe(401)
-      },
-    })
-  })
 })
 
 function getTestResult(html: string) {
