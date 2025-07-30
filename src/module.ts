@@ -225,6 +225,7 @@ export default defineNuxtModule<ModuleOptions>({
       addServerHandler({
         route: joinURL('/api', options.server!.basePath!, ':endpointId'),
         handler: resolve('runtime/server/handler'),
+        method: 'post',
       })
     }
 
