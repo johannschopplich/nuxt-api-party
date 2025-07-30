@@ -2,12 +2,12 @@ import type { NitroFetchOptions } from 'nitropack'
 import type { $Fetch, FetchOptions, FetchRequest } from 'ofetch'
 import type { ModuleOptions } from '../../module'
 import type { FetchResponseData, FilterMethods, MethodOption, ParamsOption, RequestBodyOption } from '../openapi'
-import { useNuxtApp, useRequestFetch, useRuntimeConfig } from '#imports'
+import { useNuxtApp, useRequestFetch, useRequestHeaders, useRuntimeConfig } from '#imports'
 import { joinURL } from 'ufo'
 import { cachedFetch } from '../cachedFetch'
 import { mergeFetchHooks } from '../hooks'
 import { resolvePathParams } from '../openapi'
-import { mergeHeaders } from '../utils'
+import { mergeHeaders, serializeMaybeEncodedBody } from '../utils'
 
 // #region types
 export interface SharedFetchOptions {
@@ -128,7 +128,7 @@ export async function _$api<T = unknown>(
     },
   })
 
-  return await fetch<T>(resolvePathParams(path, pathParams), {
+  const clientFetcher = () => fetch<T>(resolvePathParams(path, pathParams), {
     ...fetchOptions,
     ...fetchHooks,
     baseURL: client ? endpoint.url : joinURL('/api', apiParty.server.basePath!, endpointId, 'proxy'),
@@ -143,6 +143,24 @@ export async function _$api<T = unknown>(
       headers,
     ),
     body,
-    cache,
   })
+
+  const serverFetcher = async () =>
+    await fetch<T>(joinURL('/api', apiParty.server.basePath!, endpointId), {
+      ...fetchOptions,
+      ...fetchHooks,
+      method: 'POST',
+      body: {
+        path: resolvePathParams(path, pathParams),
+        query,
+        headers: [...mergeHeaders(
+          headers,
+          endpoint.cookies ? useRequestHeaders(['cookie']) : undefined,
+        )],
+        method,
+        body: await serializeMaybeEncodedBody(body),
+      },
+    })
+
+  return await (apiParty.experimental.enablePrefixedProxy || client ? clientFetcher() : serverFetcher())
 }

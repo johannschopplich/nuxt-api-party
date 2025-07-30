@@ -83,6 +83,20 @@ export interface ModuleOptions {
      */
     basePath?: string
   }
+
+  experimental?: {
+    /**
+     * Set to `true` to enable prefixed proxy endpoints.
+     *
+     * Prefixed endpoints more closely match the target endpoint's request
+     * by forwarding the path, method, headers, query, and body directly to the
+     * backend. It uses h3's `proxyRequest` utility. The default behavior is to
+     * wrap each endpoint in a POST request.
+     *
+     * @default false
+     */
+    enablePrefixedProxy?: boolean
+  }
 }
 
 declare module '@nuxt/schema' {
@@ -123,6 +137,9 @@ export default defineNuxtModule<ModuleOptions>({
     openAPITS: {},
     server: {
       basePath: '__api_party',
+    },
+    experimental: {
+      enablePrefixedProxy: false,
     },
   },
   async setup(options, nuxt) {
@@ -192,16 +209,24 @@ export default defineNuxtModule<ModuleOptions>({
       schemaEndpointIds.length = 0
     }
 
-    // Add Nuxt server route to proxy the API request server-side
-    addServerHandler({
-      route: joinURL('/api', options.server!.basePath!, ':endpointId/proxy/**:path'),
-      handler: resolve('runtime/server/proxyHandler'),
-    })
-    // duplicated server handler because empty path will respond with 404
-    addServerHandler({
-      route: joinURL('/api', options.server!.basePath!, ':endpointId/proxy/'),
-      handler: resolve('runtime/server/proxyHandler'),
-    })
+    if (options.experimental?.enablePrefixedProxy) {
+      // Add Nuxt server route to proxy the API request server-side
+      addServerHandler({
+        route: joinURL('/api', options.server!.basePath!, ':endpointId/proxy/**:path'),
+        handler: resolve('runtime/server/proxyHandler'),
+      })
+      // duplicated server handler because empty path will respond with 404
+      addServerHandler({
+        route: joinURL('/api', options.server!.basePath!, ':endpointId/proxy/'),
+        handler: resolve('runtime/server/proxyHandler'),
+      })
+    }
+    else {
+      addServerHandler({
+        route: joinURL('/api', options.server!.basePath!, ':endpointId'),
+        handler: resolve('runtime/server/handler'),
+      })
+    }
 
     nuxt.hooks.hook('nitro:config', (config) => {
       // Inline local server handler dependencies into Nitro bundle
