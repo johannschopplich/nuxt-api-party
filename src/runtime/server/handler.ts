@@ -25,7 +25,7 @@ const ALLOWED_REQUEST_HEADERS = [
 export default defineEventHandler(async (event) => {
   const nitro = useNitroApp()
   const endpointId = getRouterParam(event, 'endpointId')!
-  const apiParty = useRuntimeConfig().apiParty as Required<ModuleOptions>
+  const apiParty = useRuntimeConfig().apiParty as Pick<ModuleOptions, 'endpoints'>
   const endpoints = apiParty.endpoints || {}
   const endpoint = endpoints[endpointId]
 

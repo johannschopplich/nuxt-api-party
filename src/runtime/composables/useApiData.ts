@@ -4,7 +4,9 @@ import type { MaybeRef, MaybeRefOrGetter, MultiWatchSources } from 'vue'
 import type { ModuleOptions } from '../../module'
 import type { FetchResponseData, FetchResponseError, FilterMethods, ParamsOption, RequestBodyOption } from '../openapi'
 import type { SharedFetchOptions } from './$api'
+import { allowClient } from '#build/module/nuxt-api-party.config'
 import { useAsyncData, useRequestHeaders, useRuntimeConfig } from '#imports'
+import { defu } from 'defu'
 import { hash } from 'ohash'
 import { computed, isReactive, reactive, toRef, toValue } from 'vue'
 import { CACHE_KEY_PREFIX } from '../constants'
@@ -115,7 +117,7 @@ export function _useApiData<T = unknown>(
   path: MaybeRefOrGetter<string>,
   opts: UseApiDataOptions<T> = {},
 ) {
-  const apiParty = useRuntimeConfig().public.apiParty as Required<ModuleOptions>
+  const apiParty = useRuntimeConfig().public.apiParty as Pick<ModuleOptions, 'endpoints'>
   const {
     server,
     lazy,
@@ -129,7 +131,7 @@ export function _useApiData<T = unknown>(
     headers,
     method,
     body,
-    client = apiParty.client === 'always',
+    client = allowClient === 'always',
     key,
     ...fetchOptions
   } = opts
@@ -146,7 +148,7 @@ export function _useApiData<T = unknown>(
     : () => CACHE_KEY_PREFIX + toValue(key),
   )
 
-  if (client && !apiParty.client)
+  if (client && !allowClient)
     throw new Error('Client-side API requests are disabled. Set "client: true" in the module options to enable them.')
 
   const endpoint = (apiParty.endpoints || {})[endpointId]

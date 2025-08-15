@@ -2,6 +2,7 @@ import type { NitroFetchOptions } from 'nitropack'
 import type { $Fetch, FetchOptions, FetchRequest } from 'ofetch'
 import type { ModuleOptions } from '../../module'
 import type { FetchResponseData, FilterMethods, MethodOption, ParamsOption, RequestBodyOption } from '../openapi'
+import { allowClient, experimentalEnablePrefixedProxy, serverBasePath } from '#build/module/nuxt-api-party.config'
 import { useNuxtApp, useRequestFetch, useRequestHeaders, useRuntimeConfig } from '#imports'
 import { joinURL } from 'ufo'
 import { cachedFetch } from '../cachedFetch'
@@ -85,7 +86,7 @@ export async function _$api<T = unknown>(
   opts: ApiClientFetchOptions & SharedFetchOptions = {},
 ) {
   const nuxt = useNuxtApp()
-  const apiParty = useRuntimeConfig().public.apiParty as Required<ModuleOptions>
+  const apiParty = useRuntimeConfig().public.apiParty as Pick<ModuleOptions, 'endpoints'>
 
   let {
     path: pathParams,
@@ -93,13 +94,13 @@ export async function _$api<T = unknown>(
     headers,
     method,
     body,
-    client = apiParty.client === 'always',
+    client = allowClient === 'always',
     cache,
     fetch,
     ...fetchOptions
   } = opts
 
-  if (client && !apiParty.client)
+  if (client && !allowClient)
     throw new Error('Client-side API requests are disabled. Set "client: true" in the module options to enable them.')
 
   if (typeof cache === 'boolean') {
@@ -131,7 +132,7 @@ export async function _$api<T = unknown>(
   const clientFetcher = () => fetch<T>(resolvePathParams(path, pathParams), {
     ...fetchOptions,
     ...fetchHooks,
-    baseURL: client ? endpoint.url : joinURL('/api', apiParty.server.basePath!, endpointId, 'proxy'),
+    baseURL: client ? endpoint.url : joinURL('/api', serverBasePath, endpointId, 'proxy'),
     method,
     query: {
       ...endpoint.query,
@@ -146,7 +147,7 @@ export async function _$api<T = unknown>(
   })
 
   const serverFetcher = async () =>
-    await fetch<T>(joinURL('/api', apiParty.server.basePath!, endpointId), {
+    await fetch<T>(joinURL('/api', serverBasePath, endpointId), {
       ...fetchOptions,
       ...fetchHooks,
       method: 'POST',
@@ -162,5 +163,5 @@ export async function _$api<T = unknown>(
       },
     })
 
-  return await (apiParty.experimental?.enablePrefixedProxy || client ? clientFetcher() : serverFetcher())
+  return await (experimentalEnablePrefixedProxy || client ? clientFetcher() : serverFetcher())
 }

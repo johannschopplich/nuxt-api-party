@@ -10,7 +10,7 @@ export function _$api<T = unknown>(
   opts: ApiClientFetchOptions = {},
 ): Promise<T> {
   const { path: pathParams, query, headers, ...fetchOptions } = opts
-  const apiParty = useRuntimeConfig().apiParty as Required<ModuleOptions>
+  const apiParty = useRuntimeConfig().apiParty as Pick<ModuleOptions, 'endpoints'>
   const endpoints = apiParty.endpoints || {}
   const endpoint = endpoints[endpointId]
 
