@@ -180,13 +180,10 @@ export default defineNuxtModule<ModuleOptions>({
     const getRawComposableName = (endpointId: string) => `$${camelCase(endpointId)}`
     const getDataComposableName = (endpointId: string) => `use${pascalCase(endpointId)}Data`
 
-
     if (!nuxt.options.ssr) {
       logger.info('Enabling Nuxt API Party client requests by default because SSR is disabled.')
       options.client = 'always'
     }
-
-    const resolvedOptions = nuxt.options.runtimeConfig.apiParty
 
     await nuxt.callHook('api-party:extend', options)
     // Private runtime config
@@ -196,6 +193,8 @@ export default defineNuxtModule<ModuleOptions>({
         endpoints: options.endpoints,
       },
     )
+
+    const resolvedOptions = nuxt.options.runtimeConfig.apiParty
 
     if (!Object.keys(resolvedOptions.endpoints).length) {
       logger.warn('No API endpoints found. Please add at least one endpoint to your configuration.')
@@ -227,9 +226,9 @@ export default defineNuxtModule<ModuleOptions>({
       resolve(path),
     )
 
-    const endpointKeys = Object.keys(resolvedOptions.endpoints)
+    const endpointKeys = Object.keys(options.endpoints)
     const schemaEndpoints = Object.fromEntries(
-      Object.entries(resolvedOptions.endpoints)
+      Object.entries(options.endpoints)
         .filter(([, endpoint]) => 'schema' in endpoint),
     )
     const schemaEndpointIds = Object.keys(schemaEndpoints)
