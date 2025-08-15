@@ -83,6 +83,17 @@ export interface ModuleOptions {
      */
     basePath?: string
   }
+
+  experimental: {
+    /**
+     * Enable key injection for useApiData composables like Nuxt's `useAsyncData` and `useFetch` composables.
+     *
+     * With an auto-generated default key, payload caching will be unique for each instance without an explicit key option.
+     *
+     * @default false
+     */
+    enableAutoKeyInjection?: boolean
+  }
 }
 
 declare module '@nuxt/schema' {
@@ -261,14 +272,16 @@ export const ${getDataComposableName(i)} = (...args) => _useApiData('${i}', ...a
       },
     })
 
-    // Register composables for Nuxt autokey
-    nuxt.options.optimization.keyedComposables.push(
-      ...endpointKeys.map(i => ({
-        name: getDataComposableName(i),
-        argumentLength: 3,
-        source: modTemplate.dst,
-      })),
-    )
+    if (options.experimental?.enableAutoKeyInjection) {
+      // Register composables for Nuxt autokey
+      nuxt.options.optimization.keyedComposables.push(
+        ...endpointKeys.map(i => ({
+          name: getDataComposableName(i),
+          argumentLength: 3,
+          source: modTemplate.dst,
+        })),
+      )
+    }
 
     // Add types for Nuxt auto-imports and the `#nuxt-api-party` module alias
     addTemplate({
