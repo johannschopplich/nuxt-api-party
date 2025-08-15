@@ -107,7 +107,7 @@ export interface ModuleOptions {
       /**
        * The default cache mode for requests made with the `$api` composable
        *
-       * @default true
+       * @default false
        */
       cache?: boolean | Request['cache']
     }
@@ -170,12 +170,8 @@ export default defineNuxtModule<ModuleOptions>({
       enablePrefixedProxy: false,
     },
     defaults: {
-      $api: {
-        cache: true,
-      },
-      useApiData: {
-        cache: true,
-      },
+      $api: {},
+      useApiData: {},
     },
   },
   async setup(options, nuxt) {
@@ -424,8 +420,8 @@ ${await generateDeclarationTypes(schemaEndpoints, options.openAPITS)}
         experimentalEnablePrefixedProxy: options.experimental.enablePrefixedProxy ?? false,
 
         // Developer defined defaults which can change behavior
-        $apiGlobalDefaults: options.defaults.$api,
-        useApiDataGlobalDefaults: options.defaults.useApiData,
+        $apiGlobalDefaults: options.defaults.$api || {},
+        useApiDataGlobalDefaults: options.defaults.useApiData || {},
       },
       types: {
         allowClient: {
