@@ -74,7 +74,7 @@ interface BuildConfigOptions<T extends object> {
  * Define a generated configuration script which can control build behavior
  * when imported.
  *
- * Modules can import this file as `#build/${filename}`. Checking the value of
+ * Modules can import this file as `#build/${basename}`. Checking the value of
  * exported attributes will be tree-shaken, so only the branches that
  * are configured used will be included in the final build.
  *
@@ -83,7 +83,7 @@ interface BuildConfigOptions<T extends object> {
  * the literal value.
  *
  * @param opts The configuration options
- * @param opts.filename The filename to use for the generated module
+ * @param opts.basename The filename to use for the generated module without extension
  * @param opts.config The configuration object to export
  * @param opts.types Custom types for the configuration values
  */
