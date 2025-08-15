@@ -2,8 +2,9 @@ import type { NitroFetchOptions } from 'nitropack'
 import type { $Fetch, FetchOptions, FetchRequest } from 'ofetch'
 import type { ModuleOptions } from '../../module'
 import type { FetchResponseData, FilterMethods, MethodOption, ParamsOption, RequestBodyOption } from '../openapi'
-import { allowClient, experimentalEnablePrefixedProxy, serverBasePath } from '#build/module/nuxt-api-party.config'
+import { $apiGlobalDefaults, allowClient, experimentalEnablePrefixedProxy, serverBasePath } from '#build/module/nuxt-api-party.config'
 import { useNuxtApp, useRequestFetch, useRequestHeaders, useRuntimeConfig } from '#imports'
+import defu from 'defu'
 import { joinURL } from 'ufo'
 import { cachedFetch } from '../cachedFetch'
 import { mergeFetchHooks } from '../hooks'
@@ -87,6 +88,8 @@ export async function _$api<T = unknown>(
 ) {
   const nuxt = useNuxtApp()
   const apiParty = useRuntimeConfig().public.apiParty as Pick<ModuleOptions, 'endpoints'>
+
+  opts = defu($apiGlobalDefaults, opts)
 
   let {
     path: pathParams,

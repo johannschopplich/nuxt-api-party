@@ -4,7 +4,7 @@ import type { MaybeRef, MaybeRefOrGetter, MultiWatchSources } from 'vue'
 import type { ModuleOptions } from '../../module'
 import type { FetchResponseData, FetchResponseError, FilterMethods, ParamsOption, RequestBodyOption } from '../openapi'
 import type { SharedFetchOptions } from './$api'
-import { allowClient } from '#build/module/nuxt-api-party.config'
+import { allowClient, useApiDataGlobalDefaults } from '#build/module/nuxt-api-party.config'
 import { useAsyncData, useRequestHeaders, useRuntimeConfig } from '#imports'
 import { defu } from 'defu'
 import { hash } from 'ohash'
@@ -118,6 +118,7 @@ export function _useApiData<T = unknown>(
   opts: UseApiDataOptions<T> = {},
 ) {
   const apiParty = useRuntimeConfig().public.apiParty as Pick<ModuleOptions, 'endpoints'>
+  opts = defu(useApiDataGlobalDefaults, opts)
   const {
     server,
     lazy,

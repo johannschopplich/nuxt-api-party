@@ -98,6 +98,31 @@ export interface ModuleOptions {
      */
     enablePrefixedProxy?: boolean
   }
+
+  defaults: {
+    /**
+     * Default options for the `$api` composable
+     */
+    $api?: {
+      /**
+       * The default cache mode for requests made with the `$api` composable
+       *
+       * @default true
+       */
+      cache?: boolean | Request['cache']
+    }
+    /**
+     * Default options for the `useApiData` composable
+     */
+    useApiData?: {
+      /**
+       * The default cache mode for requests made with the `useApiData` composable
+       *
+       * @default true
+       */
+      cache?: true
+    }
+  }
 }
 
 declare module '@nuxt/schema' {
@@ -143,6 +168,14 @@ export default defineNuxtModule<ModuleOptions>({
     },
     experimental: {
       enablePrefixedProxy: false,
+    },
+    defaults: {
+      $api: {
+        cache: true,
+      },
+      useApiData: {
+        cache: true,
+      },
     },
   },
   async setup(options, nuxt) {
@@ -389,6 +422,10 @@ ${await generateDeclarationTypes(schemaEndpoints, options.openAPITS)}
 
         // Options used for tree-shaking
         experimentalEnablePrefixedProxy: options.experimental.enablePrefixedProxy ?? false,
+
+        // Developer defined defaults which can change behavior
+        $apiGlobalDefaults: options.defaults.$api,
+        useApiDataGlobalDefaults: options.defaults.useApiData,
       },
       types: {
         allowClient: {
