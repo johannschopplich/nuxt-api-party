@@ -26,7 +26,7 @@ type ComputedOptions<T> = {
 type ComputedMethodOption<M, P> = 'get' extends keyof P ? ComputedOptions<{ method?: M }> : ComputedOptions<{ method: M }>
 
 // #region options
-export type SharedAsyncDataOptions<ResT, DataT = ResT> = Omit<AsyncDataOptions<ResT, DataT>, 'watch'> & {
+export type SharedAsyncDataOptions<ResT, DataT = ResT> = SharedFetchOptions & Omit<AsyncDataOptions<ResT, DataT>, 'watch'> & {
   /**
    * The key passed to `useAsyncData`. By default, will be generated from the request options.
    * @default undefined
