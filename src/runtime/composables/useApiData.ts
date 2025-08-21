@@ -78,6 +78,7 @@ export type UseApiDataOptions<T> = Pick<
 export type UseApiData = <T = unknown>(
   path: MaybeRefOrGetter<string>,
   opts?: UseApiDataOptions<T>,
+  autoKey?: string
 ) => AsyncData<T | null, NuxtError>
 // #endregion options
 
@@ -113,8 +114,10 @@ export type UseOpenAPIData<Paths> = <
 export function _useApiData<T = unknown>(
   endpointId: string,
   path: MaybeRefOrGetter<string>,
-  opts: UseApiDataOptions<T> = {},
+  arg1?: UseApiDataOptions<T> | string,
+  arg2?: string,
 ) {
+  const [opts = {}, autoKey] = typeof arg1 === 'string' ? [{}, arg1] : [arg1, arg2]
   const apiParty = useRuntimeConfig().public.apiParty as Required<ModuleOptions>
   const {
     server,
@@ -138,6 +141,7 @@ export function _useApiData<T = unknown>(
   const _path = computed(() => resolvePathParams(toValue(path), toValue(pathParams)))
   const _key = computed(key === undefined
     ? () => CACHE_KEY_PREFIX + hash([
+        autoKey,
         endpointId,
         _path.value,
         toValue(query),
