@@ -13,6 +13,8 @@ import { name } from '../package.json'
 import { addConfigScript } from './kit'
 import { generateDeclarationTypes } from './openapi'
 
+// #region options
+// #region endpoints
 export interface EndpointConfiguration {
   url: string
   token?: string
@@ -23,6 +25,7 @@ export interface EndpointConfiguration {
   schema?: string | OpenAPI3
   openAPITS?: OpenAPITSOptions
 }
+// #endregion endpoints
 
 export interface ModuleOptions {
   /**
@@ -145,6 +148,7 @@ export interface ModuleOptions {
     }
   }
 }
+// #endregion options
 
 declare module '@nuxt/schema' {
   interface RuntimeConfig {

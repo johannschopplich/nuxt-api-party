@@ -15,7 +15,7 @@ import { mergeFetchHooks } from '../hooks'
 import { resolvePathParams } from '../openapi'
 import { mergeHeaders, serializeMaybeEncodedBody } from '../utils'
 
-// #region types
+// #region options
 export interface SharedFetchOptions {
   /**
    * Skip the Nuxt server proxy and fetch directly from the API.
@@ -59,7 +59,7 @@ export type ApiClient = <T = unknown>(
   path: string,
   opts?: ApiClientFetchOptions & SharedFetchOptions,
 ) => Promise<T>
-// #endregion types
+// #endregion options
 
 export type OpenAPIClientFetchOptions<
   Method,

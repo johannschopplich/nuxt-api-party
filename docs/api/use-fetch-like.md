@@ -22,7 +22,7 @@ By default, Nuxt waits until a `refresh` is finished before it can be executed a
 
 ## Type Declarations
 
-<<< @/../src/runtime/composables/useApiData.ts#types
+<<< @/../src/runtime/composables/useApiData.ts#options
 
 ## Caching
 

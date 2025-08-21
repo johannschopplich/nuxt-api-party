@@ -8,7 +8,7 @@ Returns the raw response of the API endpoint. Intended for actions inside method
 
 ## Type Declarations
 
-<<< @/../src/runtime/composables/$api.ts#types
+<<< @/../src/runtime/composables/$api.ts#options
 
 ## Caching
 

@@ -25,8 +25,8 @@ type ComputedOptions<T> = {
 
 type ComputedMethodOption<M, P> = 'get' extends keyof P ? ComputedOptions<{ method?: M }> : ComputedOptions<{ method: M }>
 
-// #region types
-export type SharedAsyncDataOptions<ResT, DataT = ResT> = SharedFetchOptions & Omit<AsyncDataOptions<ResT, DataT>, 'watch'> & {
+// #region options
+export type SharedAsyncDataOptions<ResT, DataT = ResT> = Omit<AsyncDataOptions<ResT, DataT>, 'watch'> & {
   /**
    * The key passed to `useAsyncData`. By default, will be generated from the request options.
    * @default undefined
@@ -64,7 +64,7 @@ export type UseApiData = <T = unknown>(
   path: MaybeRefOrGetter<string>,
   opts?: UseApiDataOptions<T>,
 ) => AsyncData<T | null, NuxtError>
-// #endregion types
+// #endregion options
 
 export type UseOpenAPIDataOptions<
   Method,
