@@ -25,6 +25,7 @@ type ComputedOptions<T> = {
 
 type ComputedMethodOption<M, P> = 'get' extends keyof P ? ComputedOptions<{ method?: M }> : ComputedOptions<{ method: M }>
 
+// #region options
 export type SharedAsyncDataOptions<ResT, DataT = ResT> = Omit<AsyncDataOptions<ResT, DataT>, 'watch'> & {
   /**
    * Skip the Nuxt server proxy and fetch directly from the API.
@@ -78,6 +79,7 @@ export type UseApiData = <T = unknown>(
   path: MaybeRefOrGetter<string>,
   opts?: UseApiDataOptions<T>,
 ) => AsyncData<T | null, NuxtError>
+// #endregion options
 
 export type UseOpenAPIDataOptions<
   Method,

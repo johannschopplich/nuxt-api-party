@@ -8,42 +8,7 @@ Returns the raw response of the API endpoint. Intended for actions inside method
 
 ## Type Declarations
 
-```ts
-interface SharedFetchOptions {
-  /**
-   * Skip the Nuxt server proxy and fetch directly from the API.
-   * Requires `client` set to `true` in the module options.
-   * @remarks
-   * If Nuxt SSR is disabled, client-side requests are enabled by default.
-   * @default false
-   */
-  client?: boolean
-  /**
-   * Cache the response for the same request.
-   * You can customize the cache key with the `key` option.
-   * @default false
-   */
-  cache?: boolean
-  /**
-   * By default, a cache key will be generated from the request options.
-   * With this option, you can provide a custom cache key.
-   * @default undefined
-   */
-  key?: string
-}
-
-type ApiClientFetchOptions
-  = Omit<NitroFetchOptions<string>, 'body' | 'cache'>
-    & {
-      path?: Record<string, string>
-      body?: string | Record<string, any> | FormData | null
-    }
-
-function $Api<T = unknown>(
-  path: string,
-  opts?: ApiClientFetchOptions & SharedFetchOptions
-): Promise<T>
-```
+<<< @/../src/runtime/composables/$api.ts#options
 
 ## Caching
 
