@@ -2,15 +2,15 @@ import type { NitroFetchOptions } from 'nitropack'
 import type { AsyncData, AsyncDataOptions, NuxtError } from 'nuxt/app'
 import type { MaybeRef, MaybeRefOrGetter, MultiWatchSources } from 'vue'
 import type { ModuleOptions } from '../../module'
-import type { FetchResponseData, FetchResponseError, FilterMethods, ParamsOption, RequestBodyOption } from '../openapi'
 import type { SharedFetchOptions } from './$api'
-import { allowClient, useApiDataGlobalDefaults } from '#build/module/nuxt-api-party.config'
+import { allowClient, experimentalDisableClientPayloadCache, useApiDataGlobalDefaults } from '#build/module/nuxt-api-party.config'
 import { useAsyncData, useRequestHeaders, useRuntimeConfig } from '#imports'
 import { defu } from 'defu'
 import { hash } from 'ohash'
-import { computed, isReactive, reactive, toRef, toValue } from 'vue'
+import { computed, reactive, toValue } from 'vue'
 import { CACHE_KEY_PREFIX } from '../constants'
 import { isFormData } from '../form-data'
+import { type FetchResponseData, type FetchResponseError, type FilterMethods, type ParamsOption, type RequestBodyOption, resolvePathParams } from '../openapi'
 import { mergeHeaders } from '../utils'
 import { _$api } from './$api'
 
@@ -95,29 +95,13 @@ export type UseOpenAPIData<Paths> = <
   autoKey?: string
 ) => AsyncData<DataT | null, ErrorT>
 
-/**
- * Create a data key from the non-reactive entries in the values array.
- *
- * This ensures the data key is consistent and does not change when the values
- * are reactive, which causes flashing in the UI.
- */
-function generateDataKey(...values: unknown[]) {
-  return hash(
-    values.flatMap((value) => {
-      if (isReactive(value) || isFormData(value)) {
-        return []
-      }
-      return [value]
-    }),
-  )
-}
-
 export function _useApiData<T = unknown>(
   endpointId: string,
   path: MaybeRefOrGetter<string>,
   opts: UseApiDataOptions<T> = {},
 ) {
   const apiParty = useRuntimeConfig().public.apiParty as Pick<ModuleOptions, 'endpoints'>
+
   opts = defu(useApiDataGlobalDefaults, opts)
   const {
     server,
@@ -137,15 +121,17 @@ export function _useApiData<T = unknown>(
     ...fetchOptions
   } = opts
 
+  fetchOptions.cache ??= experimentalDisableClientPayloadCache ? true : 'default'
+
+  const _path = computed(() => resolvePathParams(toValue(path), toValue(pathParams)))
   const _key = computed(key === undefined
-    ? () => CACHE_KEY_PREFIX + generateDataKey(
+    ? () => CACHE_KEY_PREFIX + hash([
         endpointId,
-        path,
-        pathParams,
-        query,
-        method,
-        body,
-      )
+        _path.value,
+        toValue(query),
+        toValue(method),
+        ...(isFormData(toValue(body)) ? [] : [toValue(body)]),
+      ])
     : () => CACHE_KEY_PREFIX + toValue(key),
   )
 
@@ -157,8 +143,7 @@ export function _useApiData<T = unknown>(
   const _fetchOptions = reactive(fetchOptions)
 
   const watchSources = reactive({
-    path: toRef(path),
-    pathParams: toRef(pathParams),
+    path: _path,
     query,
     headers: computed(() => mergeHeaders(
       toValue(headers),

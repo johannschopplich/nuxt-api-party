@@ -1,12 +1,16 @@
+import type { NuxtApp } from '#app'
 import type { NitroFetchOptions } from 'nitropack'
-import type { $Fetch, FetchOptions, FetchRequest } from 'ofetch'
+import type { FetchOptions } from 'ofetch'
 import type { ModuleOptions } from '../../module'
 import type { FetchResponseData, FilterMethods, MethodOption, ParamsOption, RequestBodyOption } from '../openapi'
-import { $apiGlobalDefaults, allowClient, experimentalEnablePrefixedProxy, serverBasePath } from '#build/module/nuxt-api-party.config'
+import { $apiGlobalDefaults, allowClient, experimentalDisableClientPayloadCache, experimentalEnablePrefixedProxy, serverBasePath } from '#build/module/nuxt-api-party.config'
 import { useNuxtApp, useRequestFetch, useRequestHeaders, useRuntimeConfig } from '#imports'
+import { consola } from 'consola'
 import defu from 'defu'
+import { hash } from 'ohash'
 import { joinURL } from 'ufo'
-import { cachedFetch } from '../cachedFetch'
+import { CACHE_KEY_PREFIX } from '../constants'
+import { isFormData } from '../form-data'
 import { mergeFetchHooks } from '../hooks'
 import { resolvePathParams } from '../openapi'
 import { mergeHeaders, serializeMaybeEncodedBody } from '../utils'
@@ -37,12 +41,11 @@ export interface SharedFetchOptions {
    */
   cache?: RequestInit['cache'] | boolean
   /**
-   * Custom fetch function to use instead of the default `fetch`.
-   *
-   * @remarks
-   * This is useful for testing or when you want to use a different fetch implementation, such as one that supports caching.
+   * By default, a cache key will be generated from the request options.
+   * With this option, you can provide a custom cache key.
+   * @default undefined
    */
-  fetch?: <T>(request: FetchRequest, options?: FetchOptions<any, T>) => Promise<T>
+  key?: string
 }
 
 export type ApiClientFetchOptions
@@ -81,6 +84,16 @@ export type OpenAPIClient<Paths> = <
   options?: OpenAPIClientFetchOptions<Method, LowercasedMethod, Methods>
 ) => Promise<ResT>
 
+declare module '#app' {
+  interface NuxtApp {
+    _pendingRequests?: Map<string, Promise<any>>
+  }
+}
+
+function getPromiseMap(nuxt: NuxtApp): Map<string, Promise<any>> {
+  return (nuxt._pendingRequests ||= new Map()) as Map<string, Promise<any>>
+}
+
 export async function _$api<T = unknown>(
   endpointId: string,
   path: string,
@@ -91,33 +104,58 @@ export async function _$api<T = unknown>(
 
   opts = defu($apiGlobalDefaults, opts)
 
-  let {
+  const {
     path: pathParams,
     query,
     headers,
     method,
     body,
     client = allowClient === 'always',
-    cache,
-    fetch,
+    key,
     ...fetchOptions
   } = opts
 
   if (client && !allowClient)
     throw new Error('Client-side API requests are disabled. Set "client: true" in the module options to enable them.')
 
-  if (typeof cache === 'boolean') {
-    if (cache === true) {
-      if (fetch) {
-        console.warn('[nuxt-api-party] Using "cache: true" with a custom fetch function is not supported. You must implement caching logic in your custom fetch function.')
-      }
-      fetch ||= cachedFetch
+  if (experimentalDisableClientPayloadCache && typeof fetchOptions.cache === 'boolean') {
+    if (import.meta.dev) {
+      consola.error('[nuxt-api-party] Payload caching is disabled. Set `experimental.disableClientPayloadCache: false` in the module options to enable it.')
     }
-    cache = cache ? 'default' : 'no-store'
+    fetchOptions.cache = fetchOptions.cache ? 'default' : 'no-store'
   }
-  fetch ||= useRequestFetch() as $Fetch
+  const { cache } = fetchOptions
+  if (typeof fetchOptions.cache === 'boolean') {
+    if (import.meta.dev) {
+      consola.warn('[nuxt-api-party] Payload caching is deprecated. Use `cache: \'default\'` or `cache: \'no-store\'` to use http caching if the endpoint supports it.')
+    }
+    delete fetchOptions.cache
+  }
+
+  // TODO remove caching support from $api composable
+  const _key = key === undefined
+    ? CACHE_KEY_PREFIX + hash([
+      endpointId,
+      path,
+      pathParams,
+      query,
+      method,
+      ...(isFormData(body) ? [] : [body]),
+    ])
+    : CACHE_KEY_PREFIX + key
 
   const endpoint = (apiParty.endpoints || {})[endpointId]
+
+  if (!experimentalDisableClientPayloadCache) {
+    if ((nuxt.isHydrating || cache === true) && nuxt.payload.data[_key]) {
+      return nuxt.payload.data[_key]
+    }
+
+    const result = getPromiseMap(nuxt).get(_key)
+    if (result) {
+      return result
+    }
+  }
 
   const fetchHooks = mergeFetchHooks(fetchOptions, {
     async onRequest(ctx) {
@@ -132,8 +170,10 @@ export async function _$api<T = unknown>(
     },
   })
 
+  const fetch = useRequestFetch()
+
   const clientFetcher = () => fetch<T>(resolvePathParams(path, pathParams), {
-    ...fetchOptions,
+    ...(fetchOptions as FetchOptions),
     ...fetchHooks,
     baseURL: client ? endpoint.url : joinURL('/api', serverBasePath, endpointId, 'proxy'),
     method,
@@ -147,11 +187,11 @@ export async function _$api<T = unknown>(
       headers,
     ),
     body,
-  })
+  }) as Promise<T>
 
   const serverFetcher = async () =>
-    await fetch<T>(joinURL('/api', serverBasePath, endpointId), {
-      ...fetchOptions,
+    (await fetch<T>(joinURL('/api', serverBasePath, endpointId), {
+      ...(fetchOptions as FetchOptions),
       ...fetchHooks,
       method: 'POST',
       body: {
@@ -164,7 +204,27 @@ export async function _$api<T = unknown>(
         method,
         body: await serializeMaybeEncodedBody(body),
       },
-    })
+    })) as T
 
-  return await (experimentalEnablePrefixedProxy || client ? clientFetcher() : serverFetcher())
+  const request = (experimentalEnablePrefixedProxy || client ? clientFetcher() : serverFetcher())
+    .then((response) => {
+      if (!experimentalDisableClientPayloadCache && (import.meta.server || cache === true)) {
+        nuxt.payload.data[_key] = response
+        getPromiseMap(nuxt).delete(_key)
+      }
+      return response
+    })
+    // Invalidate cache if request fails
+    .catch((error) => {
+      if (!experimentalDisableClientPayloadCache) {
+        nuxt.payload.data[_key] = undefined
+        getPromiseMap(nuxt).delete(_key)
+      }
+      throw error
+    }) as Promise<T>
+
+  if (!experimentalDisableClientPayloadCache)
+    getPromiseMap(nuxt).set(_key, request)
+
+  return request
 }

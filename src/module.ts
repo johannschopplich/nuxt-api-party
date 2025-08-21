@@ -89,14 +89,27 @@ export interface ModuleOptions {
     /**
      * Set to `true` to enable prefixed proxy endpoints.
      *
-     * Prefixed endpoints more closely match the target endpoint's request
-     * by forwarding the path, method, headers, query, and body directly to the
-     * backend. It uses h3's `proxyRequest` utility. The default behavior is to
-     * wrap each endpoint in a POST request.
+     * Prefixed endpoints more closely match the target endpoint's request by forwarding the path, method, headers,
+     * query, and body directly to the backend. It uses h3's `proxyRequest` utility. The default behavior is to wrap
+     * each endpoint in a POST request.
      *
      * @default false
      */
     enablePrefixedProxy?: boolean
+
+    /**
+     * Set to `true` to disable the built-in payload caching mechanism by default.
+     *
+     * Disabling this can be useful if you want to implement your own caching strategy or reuse the browser's HTTP
+     * cache by setting the `cache` option on requests.
+     *
+     * @remarks
+     * Compared to setting `defaults.useApiData.cache: false`, this will prevent any client caching, even if explicitly
+     * enabled on a request. Any caching logic will also be tree-shaken.
+     *
+     * @default false
+     */
+    disableClientPayloadCache?: boolean
   }
 
   defaults: {
@@ -107,6 +120,10 @@ export interface ModuleOptions {
       /**
        * The default cache mode for requests made with the `$api` composable
        *
+       * @remarks
+       * If `experimental.disableClientPayloadCache` is `true`, setting this to `true` as well will result in an error
+       * at runtime.
+       *
        * @default false
        */
       cache?: boolean | Request['cache']
@@ -116,7 +133,11 @@ export interface ModuleOptions {
      */
     useApiData?: {
       /**
-       * The default cache mode for requests made with the `useApiData` composable
+       * The default cache mode for requests made with the `useApiData` composable.
+       *
+       * @remarks
+       * Setting this to `false` will disable client-side caching by default, but it can still be enabled per-request.
+       * To disable client-side caching completely, use the `experimental.disableClientPayloadCache` option.
        *
        * @default true
        */
@@ -168,6 +189,7 @@ export default defineNuxtModule<ModuleOptions>({
     },
     experimental: {
       enablePrefixedProxy: false,
+      disableClientPayloadCache: false,
     },
     defaults: {
       $api: {},
@@ -417,6 +439,7 @@ ${await generateDeclarationTypes(schemaEndpoints, options.openAPITS)}
 
         // Options used for tree-shaking
         experimentalEnablePrefixedProxy: options.experimental.enablePrefixedProxy ?? false,
+        experimentalDisableClientPayloadCache: options.experimental.disableClientPayloadCache ?? false,
 
         // Developer defined defaults which can change behavior
         $apiGlobalDefaults: options.defaults.$api || {},
