@@ -86,7 +86,7 @@ export interface ModuleOptions {
 
   experimental: {
     /**
-     * Enable key injection for useApiData composables like Nuxt's `useAsyncData` and `useFetch` composables.
+     * Enable key injection for `useMyApiData` composables like Nuxt's `useAsyncData` and `useFetch` composables.
      *
      * With an auto-generated default key, payload caching will be unique for each instance without an explicit key option.
      *
