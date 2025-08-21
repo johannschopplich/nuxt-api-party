@@ -73,4 +73,3 @@ The global [configuration options](https://openapi-ts.pages.dev/node/#options) f
 ## Type Declaration
 
 <<< @/../src/module.ts#options
-

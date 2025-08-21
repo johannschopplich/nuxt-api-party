@@ -59,7 +59,6 @@ export type OpenAPIClientFetchOptions<
   & Omit<NitroFetchOptions<string>, 'query' | 'body' | 'method' | 'cache'>
   & SharedFetchOptions
 
-
 export type OpenAPIClient<Paths> = <
   ReqT extends Extract<keyof Paths, string>,
   Methods extends FilterMethods<Paths[ReqT]>,
