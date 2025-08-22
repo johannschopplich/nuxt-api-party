@@ -161,7 +161,7 @@ export function _$api<T = unknown>(
       } satisfies EndpointFetchOptions,
     })) as T
 
-  const request = (client ? clientFetcher() : serverFetcher())
+  const request = (allowClient && client ? clientFetcher() : serverFetcher())
     .then((response) => {
       if (import.meta.server || cache)
         nuxt.payload.data[_key] = response

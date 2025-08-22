@@ -209,7 +209,7 @@ export function _useApiData<T = unknown>(
       })
 
       try {
-        if (client) {
+        if (allowClient && client) {
           result = (await globalThis.$fetch<T>(_path.value, {
             ..._fetchOptions,
             ...fetchHooks,
