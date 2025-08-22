@@ -1,9 +1,9 @@
 import type { NitroFetchOptions } from 'nitropack'
 import type { AsyncData, AsyncDataOptions, NuxtError } from 'nuxt/app'
 import type { MaybeRef, MaybeRefOrGetter, MultiWatchSources } from 'vue'
-import type { ModuleOptions } from '../../module'
 import type { FetchResponseData, FetchResponseError, FilterMethods, ParamsOption, RequestBodyOption } from '../openapi'
 import type { EndpointFetchOptions } from '../types'
+import { allowClient, serverBasePath } from '#build/module/nuxt-api-party.config'
 import { useAsyncData, useRequestFetch, useRequestHeaders, useRuntimeConfig } from '#imports'
 import { hash } from 'ohash'
 import { joinURL } from 'ufo'
@@ -118,7 +118,7 @@ export function _useApiData<T = unknown>(
   arg2?: string,
 ) {
   const [opts = {}, autoKey] = typeof arg1 === 'string' ? [{}, arg1] : [arg1, arg2]
-  const apiParty = useRuntimeConfig().public.apiParty as Required<ModuleOptions>
+  const apiParty = useRuntimeConfig().public.apiParty
   const {
     server,
     lazy,
@@ -132,7 +132,7 @@ export function _useApiData<T = unknown>(
     headers,
     method,
     body,
-    client = apiParty.client === 'always',
+    client = allowClient === 'always',
     cache = true,
     key,
     ...fetchOptions
@@ -151,7 +151,7 @@ export function _useApiData<T = unknown>(
     : () => CACHE_KEY_PREFIX + toValue(key),
   )
 
-  if (client && !apiParty.client)
+  if (client && !allowClient)
     throw new Error('Client-side API requests are disabled. Set "client: true" in the module options to enable them.')
 
   const endpoint = (apiParty.endpoints || {})[endpointId]
@@ -230,7 +230,7 @@ export function _useApiData<T = unknown>(
         }
         else {
           result = (await useRequestFetch()<T>(
-            joinURL('/api', apiParty.server.basePath!, endpointId),
+            joinURL('/api', serverBasePath, endpointId),
             {
               ..._fetchOptions,
               ...fetchHooks,
