@@ -113,10 +113,6 @@ export interface ModuleOptions {
      * Disabling this can be useful if you want to implement your own caching strategy or reuse the browser's HTTP
      * cache by setting the `cache` option on requests.
      *
-     * @remarks
-     * Compared to setting `defaults.useApiData.cache: false`, this will prevent any client caching, even if explicitly
-     * enabled on a request. Any caching logic will also be tree-shaken.
-     *
      * @default false
      */
     disableClientPayloadCache?: boolean
