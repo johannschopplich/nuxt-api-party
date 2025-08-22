@@ -52,7 +52,6 @@
     "@nuxt/kit": "^3.17.4",
     "defu": "^6.1.4",
     "jiti": "^2.4.2",
-    "magicast": "^0.3.5",
     "ofetch": "^1.4.1",
     "ohash": "^2.0.11",
     "openapi-typescript-helpers": "0.0.13",

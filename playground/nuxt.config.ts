@@ -18,6 +18,9 @@ export default defineNuxtConfig({
 
   apiParty: {
     client: 'allow',
+    experimental: {
+      disableClientPayloadCache: true,
+    },
     endpoints: {
       jsonPlaceholder: {
         url: 'https://jsonplaceholder.typicode.com',

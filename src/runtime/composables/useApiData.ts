@@ -3,9 +3,8 @@ import type { AsyncData, AsyncDataOptions, NuxtError } from 'nuxt/app'
 import type { MaybeRef, MaybeRefOrGetter, MultiWatchSources } from 'vue'
 import type { ModuleOptions } from '../../module'
 import type { SharedFetchOptions } from './$api'
-import { allowClient, experimentalDisableClientPayloadCache, useApiDataGlobalDefaults } from '#build/module/nuxt-api-party.config'
+import { allowClient, experimentalDisableClientPayloadCache } from '#build/module/nuxt-api-party.config'
 import { useAsyncData, useRequestHeaders, useRuntimeConfig } from '#imports'
-import { defu } from 'defu'
 import { hash } from 'ohash'
 import { computed, reactive, toValue } from 'vue'
 import { CACHE_KEY_PREFIX } from '../constants'
@@ -102,10 +101,9 @@ export function _useApiData<T = unknown>(
   arg1?: UseApiDataOptions<T> | string,
   arg2?: string,
 ) {
-  let [opts = {}, autoKey] = typeof arg1 === 'string' ? [{}, arg1] : [arg1, arg2]
+  const [opts = {}, autoKey] = typeof arg1 === 'string' ? [{}, arg1] : [arg1, arg2]
   const apiParty = useRuntimeConfig().public.apiParty as Pick<ModuleOptions, 'endpoints'>
 
-  opts = defu(useApiDataGlobalDefaults, opts)
   const {
     server,
     lazy,

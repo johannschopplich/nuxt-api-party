@@ -1,5 +1,4 @@
 import type { H3Error } from 'h3'
-import type { ModuleOptions } from '../../module'
 import {
   createError,
   defineEventHandler,
@@ -16,7 +15,7 @@ export default defineEventHandler(async (event) => {
   const nitro = useNitroApp()
   const endpointId = getRouterParam(event, 'endpointId')!
   const path = getRouterParam(event, 'path') || ''
-  const apiParty = useRuntimeConfig().apiParty as Pick<ModuleOptions, 'endpoints'>
+  const apiParty = useRuntimeConfig().apiParty
   const endpoints = apiParty.endpoints || {}
   const endpoint = endpoints[endpointId]
 

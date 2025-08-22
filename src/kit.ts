@@ -1,6 +1,4 @@
-import type { ExportNamedDeclaration, Node, TSType } from '@babel/types'
 import { addTemplate, createResolver, useNuxt } from '@nuxt/kit'
-import { builders, generateCode } from 'magicast'
 import { relative } from 'pathe'
 
 export function extendTypes(
@@ -28,78 +26,5 @@ ${s}`.trimStart()
     references.push({
       path: resolve(nuxt.options.buildDir, `module/${module}.d.ts`),
     })
-  })
-}
-
-function generateProgramNode<T extends object>(config: T, options: { output: 'js' } | { output: 'dts', types: Partial<Record<keyof T & string, TSType>> }) {
-  return {
-    type: 'Program',
-    body: Object.entries(config).map(([name, value]): ExportNamedDeclaration => ({
-      type: 'ExportNamedDeclaration',
-      specifiers: [],
-      declaration: {
-        type: 'VariableDeclaration',
-        kind: 'const',
-        declarations: [{
-          type: 'VariableDeclarator',
-          id: {
-            type: 'Identifier',
-            name,
-            typeAnnotation: options.output === 'dts'
-              ? {
-                  type: 'TSTypeAnnotation',
-                  typeAnnotation: {
-                    type: 'TSLiteralType',
-                    literal: options.types[name as keyof T] || builders.literal(value),
-                  },
-                }
-              : undefined,
-          },
-          init: options.output === 'js' ? builders.literal(value) : undefined,
-        }],
-      },
-    })),
-    directives: [],
-    sourceType: 'module',
-  } satisfies Node
-}
-
-interface BuildConfigOptions<T extends object> {
-  basename: string
-  config: T
-  types?: Partial<Record<keyof T & string, TSType>>
-}
-
-/**
- * Define a generated configuration script which can control build behavior
- * when imported.
- *
- * Modules can import this file as `#build/${basename}`. Checking the value of
- * exported attributes will be tree-shaken, so only the branches that
- * are configured used will be included in the final build.
- *
- * Custom types can be provided for the configuration values when generating
- * declaration files. If a type for an attribute is not provided, it will use
- * the literal value.
- *
- * @param opts The configuration options
- * @param opts.basename The filename to use for the generated module without extension
- * @param opts.config The configuration object to export
- * @param opts.types Custom types for the configuration values
- */
-export function addConfigScript<T extends object>(opts: BuildConfigOptions<T>) {
-  addTemplate({
-    filename: `${opts.basename}.js`,
-    getContents: () => {
-      return generateCode(generateProgramNode(opts.config, { output: 'js' })).code
-    },
-  })
-
-  addTemplate({
-    filename: `${opts.basename}.d.ts`,
-    write: true,
-    getContents: () => {
-      return generateCode(generateProgramNode(opts.config, { output: 'dts', types: opts.types ?? {} })).code
-    },
   })
 }
