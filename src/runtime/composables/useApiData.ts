@@ -102,6 +102,9 @@ export function _useApiData<T = unknown>(
 ) {
   const [opts = {}, autoKey] = typeof arg1 === 'string' ? [{}, arg1] : [arg1, arg2]
   const apiParty = useRuntimeConfig().public.apiParty
+  if (!experimentalDisableClientPayloadCache) {
+    opts.cache ??= true
+  }
   const {
     server,
     lazy,
@@ -119,8 +122,6 @@ export function _useApiData<T = unknown>(
     key,
     ...fetchOptions
   } = opts
-
-  fetchOptions.cache ??= experimentalDisableClientPayloadCache ? true : 'default'
 
   const _path = computed(() => resolvePathParams(toValue(path), toValue(pathParams)))
   const _key = computed(key === undefined
