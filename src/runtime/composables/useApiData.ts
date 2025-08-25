@@ -2,17 +2,14 @@ import type { NitroFetchOptions } from 'nitropack'
 import type { AsyncData, AsyncDataOptions, NuxtError } from 'nuxt/app'
 import type { MaybeRef, MaybeRefOrGetter, MultiWatchSources } from 'vue'
 import type { FetchResponseData, FetchResponseError, FilterMethods, ParamsOption, RequestBodyOption } from '../openapi'
-import type { EndpointFetchOptions } from '../types'
-import { allowClient, serverBasePath } from '#build/module/nuxt-api-party.config'
-import { useAsyncData, useRequestFetch, useRequestHeaders, useRuntimeConfig } from '#imports'
+import { allowClient } from '#build/module/nuxt-api-party.config'
+import { useFetch } from '#imports'
 import { hash } from 'ohash'
-import { joinURL } from 'ufo'
-import { computed, reactive, toValue } from 'vue'
+import { computed, toValue } from 'vue'
 import { CACHE_KEY_PREFIX } from '../constants'
 import { isFormData } from '../form-data'
-import { mergeFetchHooks } from '../hooks'
 import { resolvePathParams } from '../openapi'
-import { mergeHeaders, serializeMaybeEncodedBody } from '../utils'
+import { _$api } from './$api'
 
 type ComputedOptions<T> = {
   // eslint-disable-next-line ts/no-unsafe-function-type
@@ -118,20 +115,8 @@ export function _useApiData<T = unknown>(
   arg2?: string,
 ) {
   const [opts = {}, autoKey] = typeof arg1 === 'string' ? [{}, arg1] : [arg1, arg2]
-  const apiParty = useRuntimeConfig().public.apiParty
   const {
-    server,
-    lazy,
-    default: defaultFn,
-    transform,
-    pick,
-    watch,
-    immediate,
     path: pathParams,
-    query,
-    headers,
-    method,
-    body,
     client = allowClient === 'always',
     cache = true,
     key,
@@ -144,9 +129,9 @@ export function _useApiData<T = unknown>(
         autoKey,
         endpointId,
         _path.value,
-        toValue(query),
-        toValue(method),
-        ...(isFormData(toValue(body)) ? [] : [toValue(body)]),
+        toValue(opts.query),
+        toValue(opts.method),
+        ...(isFormData(toValue(opts.body)) ? [] : [toValue(opts.body)]),
       ])
     : () => CACHE_KEY_PREFIX + toValue(key),
   )
@@ -154,110 +139,9 @@ export function _useApiData<T = unknown>(
   if (client && !allowClient)
     throw new Error('Client-side API requests are disabled. Set "client: true" in the module options to enable them.')
 
-  const endpoint = (apiParty.endpoints || {})[endpointId]
-
-  const _fetchOptions = reactive(fetchOptions)
-
-  const _endpointFetchOptions = reactive({
-    path: _path,
-    query,
-    headers: computed(() => mergeHeaders(
-      toValue(headers),
-      endpoint.cookies ? useRequestHeaders(['cookie']) : undefined,
-    )),
-    method,
-    body,
-  }) satisfies EndpointFetchOptions
-
-  const _asyncDataOptions: AsyncDataOptions<T> = {
-    server,
-    lazy,
-    default: defaultFn,
-    transform,
-    pick,
-    watch: watch === false ? [] : [_endpointFetchOptions, ...(watch || [])],
-    immediate,
-  }
-
-  let controller: AbortController | undefined
-
-  return useAsyncData<T, unknown>(
-    // TODO: Support reactive keys and push Nuxt compatibility to >=3.17.0
-    // watch === false ? _key.value : _key,
-    _key.value,
-    async (nuxt) => {
-      controller?.abort?.()
-
-      if (nuxt && (nuxt.isHydrating || cache) && nuxt.payload.data[_key.value])
-        return nuxt.payload.data[_key.value]
-
-      controller = new AbortController()
-
-      let result: T | undefined
-
-      const fetchHooks = mergeFetchHooks(fetchOptions, {
-        async onRequest(ctx) {
-          await nuxt?.callHook('api-party:request', ctx)
-          // @ts-expect-error: Types will be generated on Nuxt prepare
-          await nuxt?.callHook(`api-party:request:${endpointId}`, ctx)
-        },
-        async onResponse(ctx) {
-          // @ts-expect-error: Types will be generated on Nuxt prepare
-          await nuxt?.callHook(`api-party:response:${endpointId}`, ctx)
-          await nuxt?.callHook('api-party:response', ctx)
-        },
-      })
-
-      try {
-        if (allowClient && client) {
-          result = (await globalThis.$fetch<T>(_path.value, {
-            ..._fetchOptions,
-            ...fetchHooks,
-            signal: controller.signal,
-            baseURL: endpoint.url,
-            method: _endpointFetchOptions.method,
-            query: {
-              ...endpoint.query,
-              ..._endpointFetchOptions.query,
-            },
-            headers: mergeHeaders(
-              endpoint.token ? { Authorization: `Bearer ${endpoint.token}` } : {},
-              endpoint.headers,
-              _endpointFetchOptions.headers,
-            ),
-            body: _endpointFetchOptions.body,
-          })) as T
-        }
-        else {
-          result = (await useRequestFetch()<T>(
-            joinURL('/api', serverBasePath, endpointId),
-            {
-              ..._fetchOptions,
-              ...fetchHooks,
-              signal: controller.signal,
-              method: 'POST',
-              body: {
-                ..._endpointFetchOptions,
-                body: await serializeMaybeEncodedBody(_endpointFetchOptions.body),
-                headers: [..._endpointFetchOptions.headers],
-              } satisfies EndpointFetchOptions,
-            },
-          )) as T
-        }
-      }
-      catch (error) {
-        // Invalidate cache if request fails
-        if (nuxt)
-          nuxt.payload.data[_key.value] = undefined
-
-        throw error
-      }
-
-      if (nuxt && cache)
-        nuxt.payload.data[_key.value] = result
-
-      return result
-    },
-    _asyncDataOptions,
-  ) as AsyncData<T | null, NuxtError>
+  return useFetch(_path, {
+    ...fetchOptions,
+    key: _key,
+    $fetch: ((request: string, opts) => _$api(endpointId, request, { ...opts, cache })) as typeof globalThis.$fetch,
+  })
 }
