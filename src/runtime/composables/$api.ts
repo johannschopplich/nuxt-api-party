@@ -122,25 +122,32 @@ export async function _$api<T = unknown>(
   const cache = typeof _cache === 'boolean' ? _cache ? 'default' : 'no-store' : _cache
 
   // TODO remove caching support from $api composable
-  const _key = key === undefined
-    ? CACHE_KEY_PREFIX + hash([
-      endpointId,
-      path,
-      pathParams,
-      query,
-      method,
-      ...(isFormData(body) ? [] : [body]),
-    ])
-    : CACHE_KEY_PREFIX + key
+  let _key: string | undefined
+  const getkey = () => {
+    if (_key) {
+      return _key
+    }
+    return _key = key === undefined
+      ? CACHE_KEY_PREFIX + hash([
+        endpointId,
+        path,
+        pathParams,
+        query,
+        method,
+        ...(isFormData(body) ? [] : [body]),
+      ])
+      : CACHE_KEY_PREFIX + key
+  }
 
   const endpoint = apiParty.endpoints[endpointId]
 
   if (!experimentalDisableClientPayloadCache) {
-    if ((nuxt.isHydrating || enablePayloadCache) && nuxt.payload.data[_key]) {
-      return nuxt.payload.data[_key]
+    const k = getkey()
+    if ((nuxt.isHydrating || enablePayloadCache) && nuxt.payload.data[k]) {
+      return nuxt.payload.data[k]
     }
 
-    const result = getPromiseMap(nuxt).get(_key)
+    const result = getPromiseMap(nuxt).get(k)
     if (result) {
       return result
     }
@@ -200,22 +207,26 @@ export async function _$api<T = unknown>(
   const request = (allowClient && (experimentalEnablePrefixedProxy || client) ? clientFetcher() : serverFetcher())
     .then((response) => {
       if (!experimentalDisableClientPayloadCache && (import.meta.server || enablePayloadCache)) {
-        nuxt.payload.data[_key] = response
-        getPromiseMap(nuxt).delete(_key)
+        const k = getkey()
+        nuxt.payload.data[k] = response
+        getPromiseMap(nuxt).delete(k)
       }
       return response
     })
     // Invalidate cache if request fails
     .catch((error) => {
       if (!experimentalDisableClientPayloadCache) {
-        nuxt.payload.data[_key] = undefined
-        getPromiseMap(nuxt).delete(_key)
+        const k = getkey()
+        nuxt.payload.data[k] = undefined
+        getPromiseMap(nuxt).delete(k)
       }
       throw error
     }) as Promise<T>
 
-  if (!experimentalDisableClientPayloadCache)
-    getPromiseMap(nuxt).set(_key, request)
+  if (!experimentalDisableClientPayloadCache) {
+    const k = getkey()
+    getPromiseMap(nuxt).set(k, request)
+  }
 
   return request
 }
