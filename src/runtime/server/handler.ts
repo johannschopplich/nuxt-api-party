@@ -25,8 +25,7 @@ export default defineEventHandler(async (event) => {
   const nitro = useNitroApp()
   const endpointId = getRouterParam(event, 'endpointId')!
   const apiParty = useRuntimeConfig().apiParty
-  const endpoints = apiParty.endpoints || {}
-  const endpoint = endpoints[endpointId]
+  const endpoint = apiParty.endpoints[endpointId]
 
   if (!endpoint) {
     throw createError({

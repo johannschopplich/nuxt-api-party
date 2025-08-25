@@ -126,6 +126,7 @@ declare module '@nuxt/schema' {
       endpoints: Record<string, EndpointConfiguration>
     }
   }
+
   interface PublicRuntimeConfig {
     apiParty: {
       endpoints: Record<string, Partial<EndpointConfiguration>>
@@ -415,28 +416,28 @@ ${await generateDeclarationTypes(schemaEndpoints, options.openAPITS!)}
       })
     }
 
-    // Baked module config, unchangable
+    // Provide module options as constants
     addTemplate({
-      filename: `module/${moduleName}.config.js`,
-      getContents: () => `\
+      filename: `module/${moduleName}.config.mjs`,
+      getContents: () => `
 export const allowClient = ${JSON.stringify(options.client)}
 export const serverBasePath = ${JSON.stringify(options.server?.basePath)}
 
 export const experimentalEnablePrefixedProxy = ${JSON.stringify(options.experimental?.enablePrefixedProxy ?? false)}
 export const experimentalDisableClientPayloadCache = ${JSON.stringify(options.experimental?.disableClientPayloadCache ?? false)}
-`,
+`.trimStart(),
     })
 
     addTemplate({
       filename: `module/${moduleName}.config.d.ts`,
-      write: false, // internal config, no need to write to disk
-      getContents: () => `\
-export const allowClient: boolean | 'allow' | 'always'
-export const serverBasePath: string
+      write: false, // Internal config, no need to write to disk
+      getContents: () => `
+export declare const allowClient: boolean | 'allow' | 'always'
+export declare const serverBasePath: string
 
-export const experimentalEnablePrefixedProxy: boolean
-export const experimentalDisableClientPayloadCache: boolean
-`,
+export declare const experimentalEnablePrefixedProxy: boolean
+export declare const experimentalDisableClientPayloadCache: boolean
+`.trimStart(),
     })
   },
 })

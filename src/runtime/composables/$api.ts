@@ -1,7 +1,6 @@
 import type { NuxtApp } from '#app'
 import type { NitroFetchOptions } from 'nitropack'
 import type { FetchOptions } from 'ofetch'
-import type { ModuleOptions } from '../../module'
 import type { FetchResponseData, FilterMethods, MethodOption, ParamsOption, RequestBodyOption } from '../openapi'
 import { allowClient, experimentalDisableClientPayloadCache, experimentalEnablePrefixedProxy, serverBasePath } from '#build/module/nuxt-api-party.config'
 import { useNuxtApp, useRequestFetch, useRequestHeaders, useRuntimeConfig } from '#imports'
@@ -99,7 +98,7 @@ export async function _$api<T = unknown>(
   opts: ApiClientFetchOptions & SharedFetchOptions = {},
 ) {
   const nuxt = useNuxtApp()
-  const apiParty = useRuntimeConfig().public.apiParty as Pick<ModuleOptions, 'endpoints'>
+  const apiParty = useRuntimeConfig().public.apiParty
 
   const {
     path: pathParams,
@@ -141,7 +140,7 @@ export async function _$api<T = unknown>(
     ])
     : CACHE_KEY_PREFIX + key
 
-  const endpoint = (apiParty.endpoints || {})[endpointId]
+  const endpoint = apiParty.endpoints[endpointId]
 
   if (!experimentalDisableClientPayloadCache) {
     if ((nuxt.isHydrating || cache === true) && nuxt.payload.data[_key]) {
@@ -203,7 +202,7 @@ export async function _$api<T = unknown>(
       },
     })) as T
 
-  const request = (experimentalEnablePrefixedProxy || client ? clientFetcher() : serverFetcher())
+  const request = (allowClient && (experimentalEnablePrefixedProxy || client) ? clientFetcher() : serverFetcher())
     .then((response) => {
       if (!experimentalDisableClientPayloadCache && (import.meta.server || cache === true)) {
         nuxt.payload.data[_key] = response

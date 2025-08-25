@@ -1,7 +1,6 @@
 import type { NitroFetchOptions } from 'nitropack'
 import type { AsyncData, AsyncDataOptions, NuxtError } from 'nuxt/app'
 import type { MaybeRef, MaybeRefOrGetter, MultiWatchSources } from 'vue'
-import type { ModuleOptions } from '../../module'
 import type { SharedFetchOptions } from './$api'
 import { allowClient, experimentalDisableClientPayloadCache } from '#build/module/nuxt-api-party.config'
 import { useAsyncData, useRequestHeaders, useRuntimeConfig } from '#imports'
@@ -102,8 +101,7 @@ export function _useApiData<T = unknown>(
   arg2?: string,
 ) {
   const [opts = {}, autoKey] = typeof arg1 === 'string' ? [{}, arg1] : [arg1, arg2]
-  const apiParty = useRuntimeConfig().public.apiParty as Pick<ModuleOptions, 'endpoints'>
-
+  const apiParty = useRuntimeConfig().public.apiParty
   const {
     server,
     lazy,
