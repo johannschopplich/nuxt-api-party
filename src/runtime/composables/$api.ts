@@ -92,16 +92,14 @@ export function _$api<T = unknown>(
     ...fetchOptions
   } = opts
 
-  const _key = key === undefined
-    ? CACHE_KEY_PREFIX + hash([
-      endpointId,
-      path,
-      pathParams,
-      query,
-      method,
-      ...(isFormData(body) ? [] : [body]),
-    ])
-    : CACHE_KEY_PREFIX + key
+  const _key = key || CACHE_KEY_PREFIX + hash([
+    endpointId,
+    path,
+    pathParams,
+    query,
+    method,
+    ...(isFormData(body) ? [] : [body]),
+  ])
 
   if (client && !allowClient)
     throw new Error('Client-side API requests are disabled. Set "client: true" in the module options to enable them.')
