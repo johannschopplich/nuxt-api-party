@@ -142,6 +142,6 @@ export function _useApiData<T = unknown>(
   return useFetch(_path, {
     ...fetchOptions,
     key: _key,
-    $fetch: ((request: string, opts) => _$api(endpointId, request, {...opts, cache})) as typeof globalThis.$fetch
+    $fetch: ((request: string, opts) => _$api(endpointId, request, { ...opts, cache })) as typeof globalThis.$fetch,
   })
 }
