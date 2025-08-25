@@ -44,7 +44,6 @@ async function updateUser() {
       body: {
         firstName: 'first name 2',
       },
-      cache: false,
     })
     await execute()
   }

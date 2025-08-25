@@ -70,6 +70,14 @@ export default defineNuxtConfig({
 
 The global [configuration options](https://openapi-ts.pages.dev/node/#options) for `openapi-typescript`. Options set here will be applied to every endpoint schema, but can be overridden by individual endpoint options.
 
+## `apiParty.experimental.enablePrefixedProxy`
+
+When set to `true`, this experimental option will globally enable direct API proxying using h3's `requestProxy` utility.
+
+By default, all API requests go through an internal `POST` endpoint which passes the request to the backend service. This can be confusing when looking at the browser network debug tool if you don't expect it. Also as it uses a `POST` request, it isn't compatible with cache control.
+
+Enable this option if this behavior is undeired or you want to take advantage of cache control.
+
 ## Type Declaration
 
 <<< @/../src/module.ts#options

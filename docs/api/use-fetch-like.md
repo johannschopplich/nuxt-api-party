@@ -26,30 +26,18 @@ By default, Nuxt waits until a `refresh` is finished before it can be executed a
 
 ## Caching
 
-By default, a [unique key is generated](/guide/caching) based in input parameters for each request to ensure that data fetching can be properly de-duplicated across requests. You can provide a custom key with the `key` option (similar to the key passed to [`useAsyncData`](https://nuxt.com/docs/api/composables/use-async-data)'s first argument):
+You can customize the caching behavior by passing the `cache` option to the composable.
 
 ```ts
-const route = useRoute()
-
 const { data } = await useMyApiData('posts', {
-  key: () => `posts-${route.params.id}`
+  cache: 'no-store', // or 'default', 'reload', 'no-cache', 'force-cache', 'only-if-cached'
+  // other options...
 })
 ```
 
 ::: tip
-The key can be a reactive value, e.g. a computed property.
+See the [caching guide](../guide/caching.md) for more information on caching.
 :::
-
-Clear the cache for a specific query by calling the `clear` function. This will remove the cached data for the query and allow the next request to fetch the data from the server:
-
-```ts
-const { data, refresh, clear } = await useMyApiData('posts')
-
-async function invalidateAndRefresh() {
-  clear()
-  await refresh()
-}
-```
 
 ## Examples
 
