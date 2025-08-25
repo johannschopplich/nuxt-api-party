@@ -1,4 +1,3 @@
-import type { ModuleOptions } from '../../module'
 import type { ApiClientFetchOptions } from '../composables/$api'
 import { useRuntimeConfig } from 'nitropack/runtime'
 import { resolvePathParams } from '../openapi'
@@ -10,9 +9,8 @@ export function _$api<T = unknown>(
   opts: ApiClientFetchOptions = {},
 ): Promise<T> {
   const { path: pathParams, query, headers, ...fetchOptions } = opts
-  const apiParty = useRuntimeConfig().apiParty as Required<ModuleOptions>
-  const endpoints = apiParty.endpoints || {}
-  const endpoint = endpoints[endpointId]
+  const apiParty = useRuntimeConfig().apiParty
+  const endpoint = apiParty.endpoints[endpointId]
 
   return globalThis.$fetch<T>(resolvePathParams(path, pathParams), {
     ...fetchOptions,

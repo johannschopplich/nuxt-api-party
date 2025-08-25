@@ -1,7 +1,7 @@
 import type { NitroFetchOptions } from 'nitropack'
-import type { ModuleOptions } from '../../module'
 import type { FetchResponseData, FilterMethods, MethodOption, ParamsOption, RequestBodyOption } from '../openapi'
 import type { EndpointFetchOptions } from '../types'
+import { allowClient, serverBasePath } from '#build/module/nuxt-api-party.config'
 import { useNuxtApp, useRequestFetch, useRequestHeaders, useRuntimeConfig } from '#imports'
 import { hash } from 'ohash'
 import { joinURL } from 'ufo'
@@ -77,7 +77,7 @@ export function _$api<T = unknown>(
   opts: ApiClientFetchOptions & SharedFetchOptions = {},
 ) {
   const nuxt = useNuxtApp()
-  const apiParty = useRuntimeConfig().public.apiParty as Required<ModuleOptions>
+  const apiParty = useRuntimeConfig().public.apiParty
   const promiseMap = (nuxt._pendingRequests ||= new Map()) as Map<string, Promise<T>>
 
   const {
@@ -86,7 +86,7 @@ export function _$api<T = unknown>(
     headers,
     method,
     body,
-    client = apiParty.client === 'always',
+    client = allowClient === 'always',
     cache = false,
     key,
     ...fetchOptions
@@ -103,7 +103,7 @@ export function _$api<T = unknown>(
     ])
     : CACHE_KEY_PREFIX + key
 
-  if (client && !apiParty.client)
+  if (client && !allowClient)
     throw new Error('Client-side API requests are disabled. Set "client: true" in the module options to enable them.')
 
   if ((nuxt.isHydrating || cache) && nuxt.payload.data[_key])
@@ -112,7 +112,7 @@ export function _$api<T = unknown>(
   if (promiseMap.has(_key))
     return promiseMap.get(_key)!
 
-  const endpoint = (apiParty.endpoints || {})[endpointId]
+  const endpoint = apiParty.endpoints[endpointId]
 
   const fetchHooks = mergeFetchHooks(fetchOptions, {
     async onRequest(ctx) {
@@ -145,7 +145,7 @@ export function _$api<T = unknown>(
   }) as Promise<T>
 
   const serverFetcher = async () =>
-    (await useRequestFetch()<T>(joinURL('/api', apiParty.server.basePath!, endpointId), {
+    (await useRequestFetch()<T>(joinURL('/api', serverBasePath, endpointId), {
       ...fetchOptions,
       ...fetchHooks,
       method: 'POST',
@@ -161,7 +161,7 @@ export function _$api<T = unknown>(
       } satisfies EndpointFetchOptions,
     })) as T
 
-  const request = (client ? clientFetcher() : serverFetcher())
+  const request = (allowClient && client ? clientFetcher() : serverFetcher())
     .then((response) => {
       if (import.meta.server || cache)
         nuxt.payload.data[_key] = response

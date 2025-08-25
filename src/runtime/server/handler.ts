@@ -1,4 +1,3 @@
-import type { ModuleOptions } from '../../module'
 import type { EndpointFetchOptions } from '../types'
 import {
   createError,
@@ -25,9 +24,8 @@ const ALLOWED_REQUEST_HEADERS = [
 export default defineEventHandler(async (event) => {
   const nitro = useNitroApp()
   const endpointId = getRouterParam(event, 'endpointId')!
-  const apiParty = useRuntimeConfig().apiParty as Required<ModuleOptions>
-  const endpoints = apiParty.endpoints || {}
-  const endpoint = endpoints[endpointId]
+  const apiParty = useRuntimeConfig().apiParty
+  const endpoint = apiParty.endpoints[endpointId]
 
   if (!endpoint) {
     throw createError({
