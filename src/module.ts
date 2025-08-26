@@ -96,6 +96,26 @@ export interface ModuleOptions {
      * @default false
      */
     enableAutoKeyInjection?: boolean
+    /**
+     * Set to `true` to enable prefixed proxy endpoints.
+     *
+     * Prefixed endpoints more closely match the target endpoint's request by forwarding the path, method, headers,
+     * query, and body directly to the backend. It uses h3's `proxyRequest` utility. The default behavior is to wrap
+     * each endpoint in a POST request.
+     *
+     * @default false
+     */
+    enablePrefixedProxy?: boolean
+
+    /**
+     * Set to `true` to disable the built-in payload caching mechanism by default.
+     *
+     * Disabling this can be useful if you want to implement your own caching strategy or reuse the browser's HTTP
+     * cache by setting the `cache` option on requests.
+     *
+     * @default false
+     */
+    disableClientPayloadCache?: boolean
   }
 }
 // #endregion options
@@ -149,6 +169,8 @@ export default defineNuxtModule<ModuleOptions>().with({
     },
     experimental: {
       enableAutoKeyInjection: false,
+      enablePrefixedProxy: false,
+      disableClientPayloadCache: false,
     },
   },
   async setup(options, nuxt) {
@@ -216,12 +238,25 @@ export default defineNuxtModule<ModuleOptions>().with({
       schemaEndpointIds.length = 0
     }
 
-    // Add Nuxt server route to proxy the API request server-side
-    addServerHandler({
-      route: joinURL('/api', options.server.basePath, ':endpointId'),
-      handler: resolve('runtime/server/handler'),
-      method: 'post',
-    })
+    if (options.experimental.enablePrefixedProxy) {
+      // Add Nuxt server route to proxy the API request server-side
+      addServerHandler({
+        route: joinURL('/api', options.server.basePath, ':endpointId/proxy/**:path'),
+        handler: resolve('runtime/server/proxyHandler'),
+      })
+      // Duplicated server handler because empty path will respond with 404
+      addServerHandler({
+        route: joinURL('/api', options.server.basePath, ':endpointId/proxy/'),
+        handler: resolve('runtime/server/proxyHandler'),
+      })
+    }
+    else {
+      addServerHandler({
+        route: joinURL('/api', options.server.basePath, ':endpointId'),
+        handler: resolve('runtime/server/handler'),
+        method: 'post',
+      })
+    }
 
     nuxt.hooks.hook('nitro:config', (config) => {
       // Inline local server handler dependencies into Nitro bundle
@@ -387,6 +422,9 @@ ${await generateDeclarationTypes(schemaEndpoints, options.openAPITS)}
       getContents: () => `
 export const allowClient = ${JSON.stringify(options.client)}
 export const serverBasePath = ${JSON.stringify(options.server.basePath)}
+
+export const experimentalEnablePrefixedProxy = ${JSON.stringify(options.experimental.enablePrefixedProxy)}
+export const experimentalDisableClientPayloadCache = ${JSON.stringify(options.experimental.disableClientPayloadCache)}
 `.trimStart(),
     })
 
@@ -396,6 +434,9 @@ export const serverBasePath = ${JSON.stringify(options.server.basePath)}
       getContents: () => `
 export declare const allowClient: boolean | 'allow' | 'always'
 export declare const serverBasePath: string
+
+export declare const experimentalEnablePrefixedProxy: boolean
+export declare const experimentalDisableClientPayloadCache: boolean
 `.trimStart(),
     })
   },

@@ -10,8 +10,8 @@ type Pet = Components['schemas']['Pet']
 type PetIdRequestBody = PetStoreRequestBody<'addPet'>
 type PetIdResponse = PetStoreResponse<'getPetById'>
 
-const availableStatus = ['pending', 'sold'] as const
-const status = ref<typeof availableStatus[number] | undefined>()
+const availableStatus = ['pending', 'sold', 'available'] as const
+const status = ref<typeof availableStatus[number]>('pending')
 const { data: user, execute } = await usePetStoreData('/user/{username}', {
   path: { username: 'user1' },
   cache: true,
@@ -44,7 +44,6 @@ async function updateUser() {
       body: {
         firstName: 'first name 2',
       },
-      cache: false,
     })
     await execute()
   }
@@ -130,7 +129,7 @@ async function removePet(petId: number) {
     <h2>usePetStoreData</h2>
     <p>Status: {{ status }}</p>
     <p>
-      <button @click="status = availableStatus[status ? availableStatus.indexOf(status) + 1 % 3 : 0]">
+      <button @click="status = availableStatus[(availableStatus.indexOf(status) + 1) % 3]">
         Next status
       </button>
     </p>

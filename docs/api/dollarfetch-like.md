@@ -12,15 +12,20 @@ Returns the raw response of the API endpoint. Intended for actions inside method
 
 ## Caching
 
-By default, a [unique key is generated](/guide/caching) based in input parameters for each request to ensure that data fetching can be properly de-duplicated across requests. You can provide a custom key with the `key` option:
+You can customize the caching behavior by passing the `cache` option to the composable.
 
 ```ts
-const route = useRoute()
-
-const data = await $myApi('posts', {
-  key: `posts-${route.params.id}`
-})
+const data = await $myApi(
+  'posts',
+  {
+    cache: 'no-store' // or 'default', 'reload', 'no-cache', 'force-cache', 'only-if-cached'
+  }
+)
 ```
+
+::: tip
+See the [caching guide](../guide/caching.md) for more information on caching.
+:::
 
 ## Example
 
@@ -113,4 +118,26 @@ const data = await $jsonPlaceholder(
 
 ::: info
 Set the `client` module option to `always` to make all requests on the client-side.
+:::
+
+## Custom Fetch
+
+You can pass a custom fetch function to the composable. This is useful if you want to use a different HTTP client or implement custom caching logic.
+
+```ts
+const data = await $jsonPlaceholder(
+  'posts',
+  {
+    fetch(url, options) {
+      // Support fetching local routes during SSR
+      const fetch = useRequestFetch()
+      // Custom fetch logic here
+      return fetch(url, options)
+    }
+  }
+)
+```
+
+::: warning
+Using a custom fetch function will interfere with fetching local routes during SSR, which is required for the proxy to function. If you need to use a custom fetch function, be sure you either wrap `useRequestFetch()` as in the example, or only use it for client-side requests.
 :::

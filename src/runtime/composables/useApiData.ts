@@ -1,14 +1,14 @@
 import type { NitroFetchOptions } from 'nitropack'
 import type { AsyncData, AsyncDataOptions, NuxtError } from 'nuxt/app'
 import type { MaybeRef, MaybeRefOrGetter, MultiWatchSources } from 'vue'
-import type { FetchResponseData, FetchResponseError, FilterMethods, ParamsOption, RequestBodyOption } from '../openapi'
-import { allowClient } from '#build/module/nuxt-api-party.config'
+import type { SharedFetchOptions } from './$api'
+import { allowClient, experimentalDisableClientPayloadCache } from '#build/module/nuxt-api-party.config'
 import { useFetch } from '#imports'
 import { hash } from 'ohash'
 import { computed, toValue } from 'vue'
 import { CACHE_KEY_PREFIX } from '../constants'
 import { isFormData } from '../form-data'
-import { resolvePathParams } from '../openapi'
+import { type FetchResponseData, type FetchResponseError, type FilterMethods, type ParamsOption, type RequestBodyOption, resolvePathParams } from '../openapi'
 import { _$api } from './$api'
 
 type ComputedOptions<T> = {
@@ -23,24 +23,9 @@ type ComputedOptions<T> = {
 type ComputedMethodOption<M, P> = 'get' extends keyof P ? ComputedOptions<{ method?: M }> : ComputedOptions<{ method: M }>
 
 // #region options
-export type SharedAsyncDataOptions<ResT, DataT = ResT> = Omit<AsyncDataOptions<ResT, DataT>, 'watch'> & {
+export type SharedAsyncDataOptions<ResT, DataT = ResT> = SharedFetchOptions & Omit<AsyncDataOptions<ResT, DataT>, 'watch'> & {
   /**
-   * Skip the Nuxt server proxy and fetch directly from the API.
-   * Requires `client` set to `true` in the module options.
-   * @remarks
-   * If Nuxt SSR is disabled, client-side requests are enabled by default.
-   * @default false
-   */
-  client?: boolean
-  /**
-   * Cache the response for the same request.
-   * You can customize the cache key with the `key` option.
-   * @default true
-   */
-  cache?: boolean
-  /**
-   * By default, a cache key will be generated from the request options.
-   * With this option, you can provide a custom cache key.
+   * The key passed to `useAsyncData`. By default, will be generated from the request options.
    * @default undefined
    */
   key?: MaybeRefOrGetter<string>
@@ -115,24 +100,26 @@ export function _useApiData<T = unknown>(
   arg2?: string,
 ) {
   const [opts = {}, autoKey] = typeof arg1 === 'string' ? [{}, arg1] : [arg1, arg2]
+
+  if (!experimentalDisableClientPayloadCache) {
+    opts.cache ??= true
+  }
   const {
     path: pathParams,
     client = allowClient === 'always',
-    cache = true,
-    key,
+    cache,
     ...fetchOptions
   } = opts
 
   const _path = computed(() => resolvePathParams(toValue(path), toValue(pathParams)))
-  const _key = computed(() => toValue(key) || (CACHE_KEY_PREFIX + hash([
+  const _key = computed(() => toValue(opts.key) || (CACHE_KEY_PREFIX + hash([
     autoKey,
     endpointId,
     _path.value,
     toValue(opts.query),
     toValue(opts.method),
     ...(isFormData(toValue(opts.body)) ? [] : [toValue(opts.body)]),
-  ])),
-  )
+  ])))
 
   if (client && !allowClient)
     throw new Error('Client-side API requests are disabled. Set "client: true" in the module options to enable them.')
