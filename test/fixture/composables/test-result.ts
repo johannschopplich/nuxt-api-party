@@ -4,7 +4,7 @@ export function useTestResult(data: unknown) {
   useHead({
     script: [
       {
-        children: JSON.stringify(data),
+        innerHTML: JSON.stringify(data),
         type: 'text/test-result',
       },
     ],
