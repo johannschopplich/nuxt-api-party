@@ -124,16 +124,14 @@ export function _useApiData<T = unknown>(
   } = opts
 
   const _path = computed(() => resolvePathParams(toValue(path), toValue(pathParams)))
-  const _key = computed(key === undefined
-    ? () => CACHE_KEY_PREFIX + hash([
-        autoKey,
-        endpointId,
-        _path.value,
-        toValue(opts.query),
-        toValue(opts.method),
-        ...(isFormData(toValue(opts.body)) ? [] : [toValue(opts.body)]),
-      ])
-    : () => CACHE_KEY_PREFIX + toValue(key),
+  const _key = computed(() => toValue(key) || (CACHE_KEY_PREFIX + hash([
+    autoKey,
+    endpointId,
+    _path.value,
+    toValue(opts.query),
+    toValue(opts.method),
+    ...(isFormData(toValue(opts.body)) ? [] : [toValue(opts.body)]),
+  ])),
   )
 
   if (client && !allowClient)
