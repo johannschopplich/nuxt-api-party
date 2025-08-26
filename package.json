@@ -2,7 +2,7 @@
   "name": "nuxt-api-party",
   "type": "module",
   "version": "2.2.8",
-  "packageManager": "pnpm@10.12.1",
+  "packageManager": "pnpm@10.15.0",
   "description": "Securely connect to any API with a server proxy and generated composables",
   "author": "Johann Schopplich <hello@johannschopplich.com>",
   "license": "MIT",
@@ -33,9 +33,9 @@
   ],
   "scripts": {
     "prepack": "nuxt-module-build build",
-    "dev": "nuxi dev playground",
-    "dev:build": "nuxi build playground",
-    "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxi prepare playground && nuxi prepare test/fixture",
+    "dev": "nuxt dev playground",
+    "dev:build": "nuxt build playground",
+    "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxt prepare playground && nuxt prepare test/fixture",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
@@ -49,9 +49,9 @@
     "openapi-typescript": "^5 || ^6 || ^7"
   },
   "dependencies": {
-    "@nuxt/kit": "^3.17.4",
+    "@nuxt/kit": "^4.0.3",
     "defu": "^6.1.4",
-    "jiti": "^2.4.2",
+    "jiti": "^2.5.1",
     "ofetch": "^1.4.1",
     "ohash": "^2.0.11",
     "openapi-typescript-helpers": "0.0.13",
@@ -60,16 +60,16 @@
     "ufo": "^1.6.1"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^4.13.2",
-    "@nuxt/module-builder": "^1.0.1",
-    "@nuxt/test-utils": "^3.19.1",
-    "@types/node": "^22.15.31",
-    "bumpp": "^10.1.1",
-    "eslint": "^9.28.0",
-    "nuxt": "^3.17.5",
-    "openapi-typescript": "^7.8.0",
-    "typescript": "^5.8.3",
-    "vitest": "^3.2.3",
-    "vue-tsc": "^2.2.10"
+    "@antfu/eslint-config": "^5.2.1",
+    "@nuxt/module-builder": "^1.0.2",
+    "@nuxt/test-utils": "^3.19.2",
+    "@types/node": "^24.3.0",
+    "bumpp": "^10.2.3",
+    "eslint": "^9.34.0",
+    "nuxt": "^4.0.3",
+    "openapi-typescript": "^7.9.1",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4",
+    "vue-tsc": "^3.0.6"
   }
 }

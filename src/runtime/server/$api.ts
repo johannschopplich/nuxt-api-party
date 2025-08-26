@@ -10,7 +10,7 @@ export function _$api<T = unknown>(
 ): Promise<T> {
   const { path: pathParams, query, headers, ...fetchOptions } = opts
   const apiParty = useRuntimeConfig().apiParty
-  const endpoint = apiParty.endpoints[endpointId]
+  const endpoint = apiParty.endpoints[endpointId]!
 
   return globalThis.$fetch<T>(resolvePathParams(path, pathParams), {
     ...fetchOptions,

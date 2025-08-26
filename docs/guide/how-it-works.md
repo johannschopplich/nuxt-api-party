@@ -16,4 +16,4 @@ API calls executed on the server (SSR) are hydrated on the client to avoid unnec
 
 ## Nuxt Static Generation
 
-When using `nuxi generate` to pre-render your application, the result of each API call is stored in the [Nuxt `payload`](https://nuxt.com/docs/api/composables/use-nuxt-app#payload).
+When using `nuxt generate` to pre-render your application, the result of each API call is stored in the [Nuxt `payload`](https://nuxt.com/docs/api/composables/use-nuxt-app#payload).

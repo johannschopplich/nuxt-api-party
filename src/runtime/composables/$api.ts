@@ -139,7 +139,7 @@ export async function _$api<T = unknown>(
     return _key
   }
 
-  const endpoint = apiParty.endpoints[endpointId]
+  const endpoint = apiParty.endpoints[endpointId]!
 
   if (!experimentalDisableClientPayloadCache) {
     const k = getCacheKey()

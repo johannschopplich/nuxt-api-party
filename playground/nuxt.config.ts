@@ -4,7 +4,7 @@ import NuxtApiParty from '../src/module'
 export default defineNuxtConfig({
   modules: [NuxtApiParty],
 
-  compatibilityDate: '2025-06-01',
+  compatibilityDate: '2025-08-01',
 
   experimental: {
     granularCachedData: true,

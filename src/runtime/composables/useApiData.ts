@@ -1,6 +1,7 @@
 import type { NitroFetchOptions } from 'nitropack'
 import type { AsyncData, AsyncDataOptions, NuxtError } from 'nuxt/app'
 import type { MaybeRef, MaybeRefOrGetter, MultiWatchSources } from 'vue'
+import type { FetchResponseData, FetchResponseError, FilterMethods, ParamsOption, RequestBodyOption } from '../openapi'
 import type { SharedFetchOptions } from './$api'
 import { allowClient, experimentalDisableClientPayloadCache } from '#build/module/nuxt-api-party.config'
 import { useFetch } from '#imports'
@@ -8,7 +9,7 @@ import { hash } from 'ohash'
 import { computed, toValue } from 'vue'
 import { CACHE_KEY_PREFIX } from '../constants'
 import { isFormData } from '../form-data'
-import { type FetchResponseData, type FetchResponseError, type FilterMethods, type ParamsOption, type RequestBodyOption, resolvePathParams } from '../openapi'
+import { resolvePathParams } from '../openapi'
 import { _$api } from './$api'
 
 type ComputedOptions<T> = {
@@ -61,7 +62,7 @@ export type UseApiData = <T = unknown>(
   path: MaybeRefOrGetter<string>,
   opts?: UseApiDataOptions<T>,
   autoKey?: string
-) => AsyncData<T | null, NuxtError>
+) => AsyncData<T | undefined, NuxtError>
 // #endregion options
 
 export type UseOpenAPIDataOptions<
@@ -91,7 +92,7 @@ export type UseOpenAPIData<Paths> = <
   path: MaybeRefOrGetter<ReqT>,
   options?: UseOpenAPIDataOptions<Method, LowercasedMethod, Methods, ResT, DataT>,
   autoKey?: string
-) => AsyncData<DataT | null, ErrorT>
+) => AsyncData<DataT | undefined, ErrorT>
 
 export function _useApiData<T = unknown>(
   endpointId: string,
