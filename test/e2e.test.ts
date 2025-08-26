@@ -23,6 +23,12 @@ describe('nuxt-api-party', async () => {
     const html = await $fetch<string>('/useTestApiData')
     expect(getTestResult(html)).toMatchSnapshot()
   })
+
+  it('test endpoint from module module hook is added', async () => {
+    // Just test if the endpoint is callable. The actual functionality is tested in unit tests.
+    // If it returns a 500 error, the endpoint is not registered correctly.
+    await $fetch<string>('/useTestModData')
+  })
 })
 
 function getTestResult(html: string) {
