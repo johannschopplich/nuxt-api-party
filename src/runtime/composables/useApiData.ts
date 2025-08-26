@@ -129,5 +129,5 @@ export function _useApiData<T = unknown>(
     ...fetchOptions,
     key: _key,
     $fetch: ((request: string, opts) => _$api(endpointId, request, { ...opts, cache, client, key: _key.value })) as typeof globalThis.$fetch,
-  })
+  }) as AsyncData<T | undefined, NuxtError>
 }
