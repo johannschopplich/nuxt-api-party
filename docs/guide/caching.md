@@ -1,51 +1,40 @@
 # Caching
 
-You can cache your API responses to improve performance between multiple calls like for page navigation.
+If your endpoint supports [client caching](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Caching), the response will be cached by the browser. Subsequent GET requests to the same endpoint will return the cached response, if available, without making a new request to the server.
 
-In general, if the response is cached, it will be cached indefinitely while your application is running. The cache is only invalidated:
-
-- When the cache is manually cleared with the `clear` function.
-- When the cache is automatically invalidated after an error response.
-- When the cache key changes, e.g. when the query parameters are updated.
+The cached response will be used until it expires.
 
 ::: info
-Responses from the [`useFetch`-like composable](/api/use-fetch-like) are cached by default. On the other hand, you have to enable caching for [`$fetch` composable](/api/dollarfetch-like) manually.
+Your upstream server endpoints **MUST** respond with a `Cache-Control` header for caching to be enabled.
 :::
-
-## Caching Strategy
-
-Both [generated composables](/api/#generated-composables) will calculate a cache key (if no custom one is provided) based on the following properties:
-
-- API endpoint ID
-- Path
-- Path Parameters (if [OpenAPI type generation](/guide/openapi-types) is enabled)
-- Query
-- HTTP method
-- Body
-
-If the cache key is already present in the cache, the cached response will be returned instead of making a new API call.
-
-::: tip
-The cache key is reactive when using the [`useFetch`-like composable](/api/use-fetch-like). This means that the cache key will be recalculated when any of the properties change.
-:::
-
-## Custom Cache Key
-
-For more control over when the cache should be invalidated, you can provide a custom cache key to de-duplicate requests. Please head to the API references for more information:
-
-- [Customize the cache key](/api/use-fetch-like#caching) for the `useFetch`-like composable.
-- [Customize the cache](/api/dollarfetch-like#caching) for the `$fetch`-like composable.
 
 ## Cache Options
 
-You can disable the cache for each request by setting the `cache` option to `false`. This is necessary for the `useFetch`-like composable:
+Caching is enabled by default for all requests. You can control the caching behavior by setting the `cache` option in the request options. The `cache` option accepts the same values as [`Request.cache`](https://developer.mozilla.org/en-US/docs/Web/API/Request/cache).
 
-```ts
-// Disable caching for a single request
-const { data } = await useJsonPlaceholderData('posts/1', {
-  cache: false
-})
-```
+The available options are:
+
+- `'default'`: Checks the cache. If it is missing or stale, executes the request and stores the cached response.
+- `'no-store'`: Always fetch from the server, doesn't update the cache.
+- `'reload'`: Reload the resource from the server and update the cache.
+- `'no-cache'`: Use the cache, but revalidate with the server before returning the cached response.
+- `'force-cache'`: Use the cache, even if it is stale.
+- `'only-if-cached'`: Use the cache, but do not make a request to the server if the resource is not in the cache. If the resource is not in the cache, will respond with a 504 Gateway Timeout error.
+- `true`: Enables legacy caching behavior. See the [Legacy Caching Behavior](#legacy-caching-behavior) section for more details.
+- `false`: Equivalent to `'no-store'`
+
+For reference, here is a table summarizing the behavior of each cache option:
+
+| Cache Option      | Loads Cache | Stores Cache | Reuses Stale | Makes Request |
+| ------------------|-------------|--------------|--------------|---------------|
+| `'default'`       | ✅          | ✅           | ❌           | ✅
+| `'no-store'`      | ❌          | ❌           | ❌           | ✅
+| `'reload'`        | ❌          | ✅           | ❌           | ✅
+| `'no-cache'`      | ✅          | ❌           | ❌           | ✅
+| `'force-cache'`   | ✅          | ❌           | ✅           | ✅
+| `'only-if-cached'`| ✅          | ❌           | ✅           | ❌
+
+## Examples
 
 ::: info
 These examples assume that you have set up an API endpoint called `jsonPlaceholder`:
@@ -67,34 +56,60 @@ export default defineNuxtConfig({
 
 :::
 
-Although the `$myApi` composables are intended for one-time API calls, like submitting form data, you can also cache their responses when needed:
+### Disable Caching
 
 ```ts
-// Enable cache for a single request
-const response = $jsonPlaceholder('posts/1', {
-  method: 'POST',
-  body: {
-    foo: 'bar'
-  },
-  cache: true
+// Disable caching for a single request
+const { data } = await useJsonPlaceholderData('posts/1', {
+  cache: 'no-store' // [!code ++]
 })
 ```
 
-## Invalidate Cache
+### Refresh Cached Data
 
-You can clear the cache for a specific query by calling the `clear` function. This will remove the cached data for the query and allow the next request to fetch the data from the server.
-
-For example, use the `refresh` function to make a new API call after clearing the cache:
+For resources that may change frequently, use the `'no-cache'` option to ensure that the browser checks with the server for a fresh response before returning the cached response.
 
 ```ts
-const { data, refresh, clear } = await useMyApiData('posts')
+const { data, refresh } = await useJsonPlaceholderData('posts', {
+  cache: 'no-cache' // [!code ++]
+})
 
 async function invalidateAndRefresh() {
-  clear()
   await refresh()
 }
 ```
 
-## Invalidate Cache On Error
+### Legacy Caching Behavior
 
-If a request fails, the cache will be invalidated by default. This means that the next request will not return the cached response, but make a new API call instead.
+Legacy caching behavior is the default behavior in previous versions of Nuxt API Party. Instead of relying on the browser's cache, it uses a custom caching mechanism that stores the response in memory and updates it with the latest response from the server.
+
+Benefits of legacy caching over browser caching include:
+
+- Support for caching non-GET requests
+- Does not require the server to respond with `Cache-Control`, `ETag`, or `Last-Modified` headers.
+
+Downsides of legacy caching include:
+
+- Cache does not persist across page reloads.
+- Cache is not shared across tabs or windows.
+- Refreshing data requires a call to `clear` then `refresh` functions.
+
+To replicate the legacy caching behavior, you can pass `cache: true` to the request options. This will use the cache if available, and update it with the latest response from the server.
+
+```ts
+const { data } = await useJsonPlaceholderData('posts/1', {
+  cache: true // [!code ++]
+})
+```
+
+::: info
+Legacy caching behavior may be desired for endpoints that do not support client caching (non-GET requests) and when a server-based public cache is not available.
+:::
+
+::: warning
+Using `cache: true` is deprecated and may be removed in a future version. It is recommended to use the `fetch` option to provide a custom fetch function that implements the desired caching behavior.
+:::
+
+::: warning
+`cache: true` is not compatible with custom `fetch` functions. If you need to use a custom fetch function, you must handle caching manually.
+:::

@@ -6,12 +6,14 @@ import { $jsonPlaceholder, computed, navigateTo, ref, useJsonPlaceholderData, us
 const route = useRoute()
 
 // Intended for similar use cases as `useFetch`
-const { data, status, error } = await useJsonPlaceholderData<JsonPlaceholderComment>(
-  'comments',
+const { data, status, error, execute } = useJsonPlaceholderData<JsonPlaceholderComment>(
+  '/comments',
   {
     query: computed(() => ({
       postId: `${route.query.postId || 1}`,
     })),
+    // no-cache will check the server for a fresh response
+    cache: 'no-cache',
     onResponse({ response }) {
       if (import.meta.client) {
         console.log(response._data)
@@ -21,6 +23,16 @@ const { data, status, error } = await useJsonPlaceholderData<JsonPlaceholderComm
 )
 
 watch(error, value => console.log(value))
+
+async function decrementPostId() {
+  await navigateTo({
+    query: {
+      postId: `${Number(route.query.postId || 1) - 1}`,
+    },
+  })
+
+  console.log('Post ID:', route.query.postId)
+}
 
 async function incrementPostId() {
   await navigateTo({
@@ -78,10 +90,18 @@ async function onSubmit() {
       Status: <mark>{{ status }}</mark>
     </p>
     <p>
+      <button @click="decrementPostId()">
+        Decrement Post ID
+      </button>
+      Post ID: <mark>{{ route.query.postId || 1 }}</mark>
+
       <button @click="incrementPostId()">
         Increment Post ID
       </button>
+      <button @click="execute()">
+        Re-fetch
+      </button>
     </p>
-    <pre>{{ JSON.stringify(data, undefined, 2) }}</pre>
+    <pre>{{ data }}</pre>
   </div>
 </template>
