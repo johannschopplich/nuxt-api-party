@@ -3,7 +3,7 @@ import type { H3Event } from 'h3'
 import type { FetchContext, FetchResponse } from 'ofetch'
 import type { OpenAPI3, OpenAPITSOptions } from 'openapi-typescript'
 import type { QueryObject } from 'ufo'
-import { addImportsSources, addServerHandler, addTemplate, addTypeTemplate, createResolver, defineNuxtModule, useLogger } from '@nuxt/kit'
+import { addServerHandler, addTemplate, addTypeTemplate, createResolver, defineNuxtModule, useLogger } from '@nuxt/kit'
 import { defu } from 'defu'
 import { createJiti } from 'jiti'
 import { relative } from 'pathe'
@@ -184,7 +184,9 @@ export default defineNuxtModule<ModuleOptions>().with({
       options.client = 'always'
     }
 
-    nuxt.hook('modules:done', async () => {
+    // ensure other modules are loaded before we call the hook.
+    // Use imports:sources because modules:done is too late to register auto-imports
+    nuxt.hook('imports:sources', async (sources) => {
       await nuxt.callHook('api-party:extend', options)
 
       // Private runtime config
@@ -299,7 +301,7 @@ export const ${getRawComposableName(i)} = (...args) => _$api('${i}', ...args)
       })
 
       // Add Nuxt auto-imports for generated composables
-      addImportsSources({
+      sources.push({
         from: resolve(nuxt.options.buildDir, `module/${moduleName}`),
         imports: endpointKeys.flatMap(i => [getRawComposableName(i), getDataComposableName(i)]),
       })
