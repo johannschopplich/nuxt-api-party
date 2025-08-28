@@ -70,13 +70,29 @@ export default defineNuxtConfig({
 
 The global [configuration options](https://openapi-ts.pages.dev/node/#options) for `openapi-typescript`. Options set here will be applied to every endpoint schema, but can be overridden by individual endpoint options.
 
-## `apiParty.experimental.enablePrefixedProxy`
+## `apiParty.experimental`
+
+These feature flags enable experimental features which change the default behavior of the module that may become the default in the future.
+
+### `enableAutoKeyInjection`
+
+When set to `true`, this experimental option will instruct nuxt to generate a unique key for each composable call based on its location in the code, similar to `useFetch` and `useAsyncData`.
+
+As a consequence, in order to share data between multiple calls to the same resource, you will need to provide a `key` option to the composable call. The same restrictions apply as with `useFetch` and `useAsyncData`, meaning that each call must share the same `pick`, `transform`, and `getCachedData` options.
+
+### `enablePrefixedProxy`
 
 When set to `true`, this experimental option will globally enable direct API proxying using h3's `requestProxy` utility.
 
 By default, all API requests go through an internal `POST` endpoint which passes the request to the backend service. This can be confusing when looking at the browser network debug tool if you don't expect it. Also as it uses a `POST` request, it isn't compatible with cache control.
 
 Enable this option if this behavior is undeired or you want to take advantage of cache control.
+
+### `disableClientPayloadCache`
+
+When set to `true`, this experimental option will disable the client-side payload cache for all generated composables.
+
+This has the same effect as setting `cache: false` in each individual composable call and enforces it globally. Additionally, the logic for in-memory caching is completely removed from the composables, resulting in smaller bundle sizes.
 
 ## Type Declaration
 
