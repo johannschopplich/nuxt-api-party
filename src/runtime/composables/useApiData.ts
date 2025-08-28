@@ -24,7 +24,7 @@ type ComputedOptions<T> = {
 type ComputedMethodOption<M, P> = 'get' extends keyof P ? ComputedOptions<{ method?: M }> : ComputedOptions<{ method: M }>
 
 // #region options
-export type SharedAsyncDataOptions<ResT, DataT = ResT> = SharedFetchOptions & Omit<AsyncDataOptions<ResT, DataT>, 'watch'> & {
+export type SharedAsyncDataOptions<ResT, DataT = ResT> = ComputedOptions<SharedFetchOptions> & Omit<AsyncDataOptions<ResT, DataT>, 'watch'> & {
   /**
    * The key passed to `useAsyncData`. By default, will be generated from the request options.
    * @default undefined
@@ -75,7 +75,6 @@ export type UseOpenAPIDataOptions<
 > = ComputedMethodOption<Method, Params>
   & ComputedOptions<ParamsOption<Operation>>
   & ComputedOptions<RequestBodyOption<Operation>>
-  & Omit<AsyncDataOptions<ResT, DataT>, 'query' | 'body' | 'method'>
   & Pick<NitroFetchOptions<string>, 'onRequest' | 'onRequestError' | 'onResponse' | 'onResponseError'>
   & SharedAsyncDataOptions<ResT, DataT>
 
@@ -92,7 +91,7 @@ export type UseOpenAPIData<Paths> = <
   path: MaybeRefOrGetter<ReqT>,
   options?: UseOpenAPIDataOptions<Method, LowercasedMethod, Methods, ResT, DataT>,
   autoKey?: string
-) => AsyncData<DataT | undefined, ErrorT>
+) => AsyncData<DataT | undefined, NuxtError<ErrorT>>
 
 export function _useApiData<T = unknown>(
   endpointId: string,
@@ -122,12 +121,17 @@ export function _useApiData<T = unknown>(
     ...(isFormData(toValue(opts.body)) ? [] : [toValue(opts.body)]),
   ])))
 
-  if (client && !allowClient)
+  if (toValue(client) && !allowClient)
     throw new Error('Client-side API requests are disabled. Set "client: true" in the module options to enable them.')
 
   return useFetch(_path, {
     ...fetchOptions,
     key: _key,
-    $fetch: ((request: string, opts) => _$api(endpointId, request, { ...opts, cache, client, key: _key.value })) as typeof globalThis.$fetch,
+    $fetch: ((request: string, opts) => _$api(endpointId, request, {
+      ...opts,
+      cache: toValue(cache),
+      client: toValue(client),
+      key: _key.value,
+    })) as typeof globalThis.$fetch,
   }) as AsyncData<T | undefined, NuxtError>
 }
