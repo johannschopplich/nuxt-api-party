@@ -117,7 +117,7 @@ export async function _$api<T = unknown>(
     consola.error('[nuxt-api-party] Payload caching is disabled. Set `experimental.disableClientPayloadCache: false` in the module options to enable it.')
   }
   // Local caching support
-  const enablePayloadCache = !experimentalDisableClientPayloadCache && typeof _cache === 'boolean' ? _cache : false
+  const enablePayloadCache = (!experimentalDisableClientPayloadCache && typeof _cache === 'boolean') ? _cache : false
   // Request cache mode
   const cache = typeof _cache === 'boolean' ? _cache ? 'default' : 'no-store' : _cache
 
@@ -147,9 +147,11 @@ export async function _$api<T = unknown>(
       return nuxt.payload.data[k]
     }
 
-    const result = getPromiseMap(nuxt).get(k)
-    if (result) {
-      return result
+    if (enablePayloadCache) {
+      const result = getPromiseMap(nuxt).get(k)
+      if (result) {
+        return result
+      }
     }
   }
 
@@ -219,7 +221,7 @@ export async function _$api<T = unknown>(
     })
     // Invalidate cache if request fails
     .catch((error) => {
-      if (!experimentalDisableClientPayloadCache) {
+      if (!experimentalDisableClientPayloadCache && (import.meta.server || enablePayloadCache)) {
         const k = getCacheKey()
         nuxt.payload.data[k] = undefined
         getPromiseMap(nuxt).delete(k)
@@ -227,7 +229,7 @@ export async function _$api<T = unknown>(
       throw error
     }) as Promise<T>
 
-  if (!experimentalDisableClientPayloadCache) {
+  if (!experimentalDisableClientPayloadCache && (import.meta.server || enablePayloadCache)) {
     const k = getCacheKey()
     getPromiseMap(nuxt).set(k, request)
   }
