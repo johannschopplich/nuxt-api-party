@@ -5,6 +5,8 @@ import { $jsonPlaceholder, computed, navigateTo, ref, useJsonPlaceholderData, us
 
 const route = useRoute()
 
+const cache = ref<RequestCache>('default')
+
 // Intended for similar use cases as `useFetch`
 const { data, status, error, execute } = useJsonPlaceholderData<JsonPlaceholderComment>(
   '/comments',
@@ -13,7 +15,13 @@ const { data, status, error, execute } = useJsonPlaceholderData<JsonPlaceholderC
       postId: `${route.query.postId || 1}`,
     })),
     // no-cache will check the server for a fresh response
-    cache: 'no-cache',
+    cache,
+    onRequest() {
+      // Reset cache mode to default after a manual trigger
+      if (cache.value === 'reload') {
+        cache.value = 'default'
+      }
+    },
     onResponse({ response }) {
       if (import.meta.client) {
         console.log(response._data)
@@ -21,6 +29,11 @@ const { data, status, error, execute } = useJsonPlaceholderData<JsonPlaceholderC
     },
   },
 )
+
+async function refreshComments() {
+  cache.value = 'reload'
+  await execute()
+}
 
 watch(error, value => console.log(value))
 
@@ -98,7 +111,7 @@ async function onSubmit() {
       <button @click="incrementPostId()">
         Increment Post ID
       </button>
-      <button @click="execute()">
+      <button @click="refreshComments()">
         Re-fetch
       </button>
     </p>
