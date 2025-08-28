@@ -14,7 +14,7 @@ const { data, status, error, execute } = useJsonPlaceholderData<JsonPlaceholderC
     query: computed(() => ({
       postId: `${route.query.postId || 1}`,
     })),
-    // no-cache will check the server for a fresh response
+    // `no-cache` will check the server for a fresh response
     cache,
     onRequest() {
       // Reset cache mode to default after a manual trigger

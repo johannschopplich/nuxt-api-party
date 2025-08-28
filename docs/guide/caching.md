@@ -8,7 +8,7 @@ In-Memory caching is the default caching behavior for data composables. It uses 
 
 Benefits of in-memory caching over browser caching include:
 
-- Support for caching non-GET requests
+- Support for caching non-GET requests.
 - Does not require the server to respond with `Cache-Control`, `ETag`, or `Last-Modified` headers.
 
 Downsides of legacy caching include:
@@ -46,8 +46,8 @@ export default defineNuxtConfig({
 
 To support HTTP client caching, your endpoint must meet the following requirements:
 
-- Support GET requests
-- Respond with a cache supporting headers such as `Cache-Control`, `ETag`, or `Last-Modified`
+- Support GET requests.
+- Respond with a cache supporting headers, such as `Cache-Control`, `ETag`, or `Last-Modified`.
 
 ## Cache Options
 
@@ -104,7 +104,7 @@ Omitting or passing `true` to the `cache` option enables in-memory caching behav
 ```ts
 // In-Memory caching behavior
 const { data } = await useJsonPlaceholderData('posts', {
-  // the default value is `true`
+  // The default value is `true`
   cache: true // [!code ++]
 })
 ```
