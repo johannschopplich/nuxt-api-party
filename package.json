@@ -1,7 +1,7 @@
 {
   "name": "nuxt-api-party",
   "type": "module",
-  "version": "3.0.2",
+  "version": "3.1.0",
   "packageManager": "pnpm@10.15.0",
   "description": "Securely connect to any API with a server proxy and generated composables",
   "author": "Johann Schopplich <hello@johannschopplich.com>",
