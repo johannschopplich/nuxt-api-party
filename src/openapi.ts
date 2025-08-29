@@ -24,8 +24,9 @@ export async function generateOpenAPITypes(
       }),
   )
 
-  return resolvedSchemaEntries.map(
-    ([id, types]) => `
+  return resolvedSchemaEntries
+    .map(
+      ([id, types]) => `
 declare module "#nuxt-api-party/${id}" {
 ${normalizeIndentation(types).trimEnd()}
 
@@ -45,7 +46,9 @@ ${normalizeIndentation(types).trimEnd()}
     T extends keyof operations
   > = operations[T]['parameters'] extends { query?: infer U } ? U : never
 }`.trimStart(),
-  ).join('\n\n').trimStart()
+    )
+    .join('\n\n')
+    .trimStart()
 }
 
 export function generateOpenAPITypeHelpers(id: string) {

@@ -327,7 +327,7 @@ import type { ApiClient, OpenAPIClient, ApiClientFetchOptions, OpenAPIClientFetc
 import type { UseApiData, UseOpenAPIData, UseApiDataOptions, UseOpenAPIDataOptions } from '${relativeTo('runtime/composables/useApiData')}'
 
 ${schemaEndpointIds.map(i => `
-import type { paths as ${pascalCase(i)}Paths, operations as ${pascalCase(i)}Operations } from '#${moduleName}/${i}'
+import type { paths as ${pascalCase(i)}Paths, components as ${pascalCase(i)}Components, operations as ${pascalCase(i)}Operations } from '#${moduleName}/${i}'
 `.trimStart()).join('').trimEnd()}
 
 export type { FetchResponseData, FetchResponseError, MethodOption, ParamsOption, RequestBodyOption, FilterMethods } from '${relativeTo('runtime/openapi')}'
@@ -339,6 +339,10 @@ export declare const ${getDataComposableName(i)}: ${schemaEndpointIds.includes(i
 `.trimStart()).join('').trimEnd()}
 
 ${schemaEndpointIds.map(generateOpenAPITypeHelpers).join('\n\n')}
+
+// Type helpers for OpenAPI schemas
+type NonNeverKeys<T> = { [K in keyof T]: T[K] extends never ? never : K }[keyof T]
+type PathMethods<T, P extends keyof T> = Exclude<NonNeverKeys<T[P]>, 'parameters'>
 `.trimStart()
       },
     })
