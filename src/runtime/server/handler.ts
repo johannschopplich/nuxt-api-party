@@ -34,15 +34,13 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const _body = await readBody<EndpointFetchOptions>(event)
-
   const {
     path,
     query,
     headers,
     method,
     body,
-  } = _body
+  } = await readBody<EndpointFetchOptions>(event)
 
   // Check if the path is an absolute URL
   if (new URL(path, 'http://localhost').origin !== 'http://localhost') {
