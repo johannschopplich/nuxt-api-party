@@ -1,17 +1,14 @@
 <script setup lang="ts">
 /* eslint-disable unused-imports/no-unused-vars */
 import type { NuxtError } from '#app'
-import type { components as Components, RequestBody as PetStoreRequestBody, Response as PetStoreResponse } from '#nuxt-api-party/petStore'
+import type { components as Components } from '#nuxt-api-party/petStore'
 import { $petStore, computed, ref, usePetStoreData, watch } from '#imports'
 
 type Pet = Components['schemas']['Pet']
 
-// For demonstration purposes: How to extract the request body and response types
-type PetIdRequestBody = PetStoreRequestBody<'addPet'>
-type PetIdResponse = PetStoreResponse<'getPetById'>
-
 const availableStatus = ['pending', 'sold', 'available'] as const
 const status = ref<typeof availableStatus[number]>('pending')
+
 const { data: user, execute } = await usePetStoreData('/user/{username}', {
   path: { username: 'user1' },
   cache: true,
@@ -129,7 +126,7 @@ async function removePet(petId: number) {
     <h2>usePetStoreData</h2>
     <p>Status: {{ status }}</p>
     <p>
-      <button @click="status = availableStatus[(availableStatus.indexOf(status) + 1) % 3]">
+      <button @click="status = availableStatus[(availableStatus.indexOf(status) + 1) % 3]!">
         Next status
       </button>
     </p>
