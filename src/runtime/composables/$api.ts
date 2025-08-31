@@ -116,6 +116,7 @@ export async function _$api<T = unknown>(
   if (import.meta.dev && experimentalDisableClientPayloadCache && typeof _cache === 'boolean') {
     consola.error('[nuxt-api-party] Payload caching is disabled. Set `experimental.disableClientPayloadCache: false` in the module options to enable it.')
   }
+
   // Local caching support
   const enablePayloadCache = (!experimentalDisableClientPayloadCache && typeof _cache === 'boolean') ? _cache : false
   // Request cache mode

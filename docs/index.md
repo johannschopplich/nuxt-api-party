@@ -4,7 +4,7 @@ titleTemplate: Server Proxy and Generated API Composables
 hero:
   name: Nuxt API Party
   text: Server Proxy and Generated API Composables
-  tagline: Like useFetch and $fetch, but for each API
+  tagline: Like useFetch and $fetch, but for all your APIs
   image:
     src: /logo-shadow.svg
     alt: Nuxt API Party Logo
