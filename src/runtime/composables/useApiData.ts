@@ -104,6 +104,7 @@ export function _useApiData<T = unknown>(
   if (!experimentalDisableClientPayloadCache) {
     opts.cache ??= true
   }
+
   const {
     path: pathParams,
     client = allowClient === 'always',
