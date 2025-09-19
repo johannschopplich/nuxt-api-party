@@ -63,11 +63,11 @@ export default defineConfig({
 function nav(): DefaultTheme.NavItem[] {
   return [
     {
-      text: 'Guide',
+      text: 'Guides',
       activeMatch: '^/guide/',
       items: [
         {
-          text: 'Guide',
+          text: 'Essentials',
           items: [
             { text: 'Getting Started', link: '/guide/getting-started' },
             { text: 'How It Works', link: '/guide/how-it-works' },
@@ -96,10 +96,7 @@ function nav(): DefaultTheme.NavItem[] {
     {
       text: 'API',
       items: [
-        {
-          text: 'Overview',
-          link: '/api/',
-        },
+        { text: 'Overview', link: '/api/' },
         {
           text: 'Composables',
           items: [
@@ -112,10 +109,7 @@ function nav(): DefaultTheme.NavItem[] {
     {
       text: `v${version}`,
       items: [
-        {
-          text: 'Release Notes ',
-          link: releases,
-        },
+        { text: 'Release Notes ', link: releases },
       ],
     },
   ]

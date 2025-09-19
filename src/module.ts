@@ -179,7 +179,7 @@ export default defineNuxtModule<ModuleOptions>().with({
     const resolvedOptions = nuxt.options.runtimeConfig.apiParty
 
     if (!Object.keys(resolvedOptions.endpoints).length) {
-      logger.warn('No API endpoints found. Please add at least one endpoint to your configuration.')
+      logger.warn('No API endpoints found. Nuxt API Party requires at least one defined endpoint.')
     }
 
     // Write options to public runtime config if client requests are enabled

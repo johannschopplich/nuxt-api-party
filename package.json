@@ -2,7 +2,7 @@
   "name": "nuxt-api-party",
   "type": "module",
   "version": "3.1.2",
-  "packageManager": "pnpm@10.15.0",
+  "packageManager": "pnpm@10.17.0",
   "description": "Securely connect to any API with a server proxy and generated composables",
   "author": "Johann Schopplich <hello@johannschopplich.com>",
   "license": "MIT",
@@ -54,7 +54,7 @@
     }
   },
   "dependencies": {
-    "@nuxt/kit": "^4.0.3",
+    "@nuxt/kit": "^4.1.2",
     "defu": "^6.1.4",
     "h3": "^1.15.4",
     "jiti": "^2.5.1",
@@ -66,16 +66,16 @@
     "ufo": "^1.6.1"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^5.2.1",
+    "@antfu/eslint-config": "^5.3.0",
     "@nuxt/module-builder": "^1.0.2",
     "@nuxt/test-utils": "^3.19.2",
-    "@types/node": "^24.3.0",
+    "@types/node": "^24.5.2",
     "bumpp": "^10.2.3",
-    "eslint": "^9.34.0",
-    "nuxt": "^4.0.3",
+    "eslint": "^9.35.0",
+    "nuxt": "^4.1.2",
     "openapi-typescript": "^7.9.1",
     "typescript": "^5.9.2",
     "vitest": "^3.2.4",
-    "vue-tsc": "^3.0.6"
+    "vue-tsc": "^3.0.7"
   }
 }
