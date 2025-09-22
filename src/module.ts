@@ -1,7 +1,9 @@
-import type { HookResult } from '@nuxt/schema'
+import type { HookResult, Nuxt } from '@nuxt/schema'
 import type { OpenAPI3, OpenAPITSOptions } from 'openapi-typescript'
 import type { QueryObject } from 'ufo'
-import { addImportsSources, addServerHandler, addTemplate, addTypeTemplate, createResolver, defineNuxtModule, useLogger } from '@nuxt/kit'
+import { fileURLToPath } from 'node:url'
+import { addImportsSources, addServerHandler, addTemplate, addTypeTemplate, createResolver, defineNuxtModule, updateTemplates, useLogger } from '@nuxt/kit'
+import { watch } from 'chokidar'
 import { defu } from 'defu'
 import { createJiti } from 'jiti'
 import { relative } from 'pathe'
@@ -114,6 +116,17 @@ export interface ModuleOptions {
      * @default false
      */
     disableClientPayloadCache?: boolean
+
+    /**
+     * Enable the file watcher for local OpenAPI schema files using chokidar.
+     *
+     * When enabled, changes to local schema files will automatically regenerate the types. When disabled, you will
+     * need to restart the Nuxt dev server to pick up changes to local schema files. Has no effect if no local schema
+     * files are used or for remote schemas.
+     *
+     * @default true
+     */
+    enableSchemaFileWatcher?: boolean
   }
 }
 // #endregion options
@@ -155,6 +168,7 @@ export default defineNuxtModule<ModuleOptions>().with({
       enableAutoKeyInjection: false,
       enablePrefixedProxy: false,
       disableClientPayloadCache: false,
+      enableSchemaFileWatcher: true,
     },
   },
   async setup(options, nuxt) {
@@ -433,5 +447,36 @@ export declare const experimentalEnablePrefixedProxy: boolean
 export declare const experimentalDisableClientPayloadCache: boolean
 `.trimStart(),
     })
+
+    if (options.experimental.enableSchemaFileWatcher) {
+      // Watch for changes in local schema files
+      const schemaFiles = Object.values(schemaEndpoints)
+        .map(({ schema }) => schema)
+        .filter((schema): schema is string => typeof schema === 'string' && !/^https?:\/\//.test(schema))
+        .map(schema => schema.startsWith('file:') ? fileURLToPath(schema) : schema)
+        .map(schema => resolve(nuxt.options.rootDir, schema))
+
+      createSchemaWatcher(schemaFiles, nuxt)
+    }
   },
 })
+
+function createSchemaWatcher(schemaFiles: string[], nuxt: Nuxt) {
+  if (!schemaFiles.length) {
+    // No local schema files to watch
+    return
+  }
+  const watcher = watch(schemaFiles)
+  const watcherCallback = () => {
+    // Update the schema types template, which will trigger a types regeneration
+    // Don't care about the file path since only the watched files will trigger this
+    updateTemplates({ filter: t => t.filename === `module/${name}.schema.d.ts` })
+  }
+
+  watcher.on('change', watcherCallback)
+  watcher.on('add', watcherCallback)
+  watcher.on('unlink', watcherCallback)
+
+  // Close watcher on Nuxt close, otherwise reloads may leave orphaned watchers and duplicate events
+  nuxt.hooks.hook('close', () => watcher.close())
+}
