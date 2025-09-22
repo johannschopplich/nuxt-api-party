@@ -28,7 +28,7 @@ The cached response will be used until it expires.
 To enable built-in browser caching in your data composable, set the `cache` option to one of the values in the [options](#cache-options) section below.
 
 ::: tip
-To support HTTP caching, you must enable the [`enablePrefixedProxy`](../config/index.md#enableprefixedproxy) experimental option in your `nuxt.config` file. This allows GET requests to be GET requests, which is required for caching to work correctly.
+To support HTTP caching, you must enable the [`enablePrefixedProxy`](/config/index#enableprefixedproxy) experimental option in your `nuxt.config` file. This allows GET requests to be GET requests, which is required for caching to work correctly.
 
 ```ts
 export default defineNuxtConfig({

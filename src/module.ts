@@ -466,10 +466,11 @@ function createSchemaWatcher(schemaFiles: string[], nuxt: Nuxt) {
     // No local schema files to watch
     return
   }
+
   const watcher = watch(schemaFiles)
   const watcherCallback = () => {
     // Update the schema types template, which will trigger a types regeneration
-    // Don't care about the file path since only the watched files will trigger this
+    // Ignore the file path since only the watched files will trigger this
     updateTemplates({ filter: t => t.filename === `module/${name}.schema.d.ts` })
   }
 
@@ -477,6 +478,6 @@ function createSchemaWatcher(schemaFiles: string[], nuxt: Nuxt) {
   watcher.on('add', watcherCallback)
   watcher.on('unlink', watcherCallback)
 
-  // Close watcher on Nuxt close, otherwise reloads may leave orphaned watchers and duplicate events
+  // Close watcher on Nuxt `close`, otherwise reloads may leave orphaned watchers and duplicate events
   nuxt.hooks.hook('close', () => watcher.close())
 }

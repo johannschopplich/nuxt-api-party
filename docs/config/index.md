@@ -96,11 +96,13 @@ This has the same effect as setting `cache: false` in each individual composable
 
 ### `enableSchemaFileWatcher`
 
-Default: `true`
+::: tip
+This option is enabled by default in development mode.
+:::
 
 When set to `true`, this experimental option will enable a file watcher for local OpenAPI schema files using `chokidar`.
 
-When enabled, changes to local schema files will automatically regenerate the types. When disabled, you will need to restart the Nuxt dev server to pick up changes to local schema files. Has no effect on remote schemas.
+When enabled, changes to local schema files will automatically regenerate the types. When disabled, you will need to restart the Nuxt dev server to pick up changes to local schema files. It has no effect on remote schemas.
 
 ## Type Declaration
 

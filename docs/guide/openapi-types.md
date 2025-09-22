@@ -100,7 +100,7 @@ export default defineNuxtConfig({
 ```
 
 ::: tip
-If the [`enableSchemaFileWatcher`](../config/index.md#enableschemafilewatcher) experimental option is enabled (it is by default), changes to local schema files will automatically regenerate the types. When disabled or using a remote schema, you will need to restart the Nuxt dev server to pick up changes.
+If the [`enableSchemaFileWatcher`](/config/index#enableschemafilewatcher) experimental option is enabled (it is by default), changes to local schema files will automatically regenerate the types. When disabled or using a remote schema, you will need to restart the Nuxt dev server to pick up changes.
 :::
 
 ## Using the Types
