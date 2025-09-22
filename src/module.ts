@@ -448,7 +448,7 @@ export declare const experimentalDisableClientPayloadCache: boolean
 `.trimStart(),
     })
 
-    if (options.experimental.enableSchemaFileWatcher) {
+    if (nuxt.options.dev && options.experimental.enableSchemaFileWatcher) {
       // Watch for changes in local schema files
       const schemaFiles = Object.values(schemaEndpoints)
         .map(({ schema }) => schema)
