@@ -1,9 +1,10 @@
 import type { NuxtApp } from '#app'
-import type { NitroFetchOptions } from 'nitropack'
+import type { H3Event$Fetch, NitroFetchOptions } from 'nitropack'
 import type { FetchResponseData, FilterMethods, MethodOption, ParamsOption, RequestBodyOption } from '../openapi'
 import { allowClient, experimentalDisableClientPayloadCache, experimentalEnablePrefixedProxy, serverBasePath } from '#build/module/nuxt-api-party.config'
 import { useNuxtApp, useRequestFetch, useRequestHeaders, useRuntimeConfig } from '#imports'
 import { consola } from 'consola'
+import { defu } from 'defu'
 import { hash } from 'ohash'
 import { joinURL } from 'ufo'
 import { CACHE_KEY_PREFIX } from '../constants'
@@ -42,6 +43,21 @@ export interface SharedFetchOptions {
    * @default undefined
    */
   key?: string
+  /**
+   * A custom `$fetch` function to use.
+   *
+   * @remarks
+   * Implementers supporting server-side should wrap `useRequestFetch()`.
+   *
+   * @default useRequestFetch()
+   * @example
+   * ```ts
+   * async (request, options) => {
+   *   return await useRequestFetch()(request, options)
+   * }
+   * ```
+   */
+  $fetch?: H3Event$Fetch
 }
 
 export type ApiClientFetchOptions
@@ -107,8 +123,13 @@ export async function _$api<T = unknown>(
     client = allowClient === 'always',
     key,
     cache: _cache,
+    $fetch = useRequestFetch(),
     ...fetchOptions
-  } = opts
+  } = defu(
+    opts,
+    nuxt.$apiParty?.endpoints?.[endpointId]?.defaults,
+    nuxt.$apiParty?.defaults,
+  )
 
   if (client && !allowClient)
     throw new Error('Client-side API requests are disabled. Set "client: true" in the module options to enable them.')
@@ -169,9 +190,7 @@ export async function _$api<T = unknown>(
     },
   })
 
-  const fetch = useRequestFetch()
-
-  const clientFetcher = (baseURL: string) => fetch<T>(resolvePathParams(path, pathParams), {
+  const clientFetcher = (baseURL: string) => $fetch<T>(resolvePathParams(path, pathParams), {
     ...fetchOptions,
     ...fetchHooks,
     cache,
@@ -190,7 +209,7 @@ export async function _$api<T = unknown>(
   }) as Promise<T>
 
   const serverFetcher = async () =>
-    (await fetch<T>(joinURL('/api', serverBasePath, endpointId), {
+    (await $fetch<T>(joinURL('/api', serverBasePath, endpointId), {
       ...fetchOptions,
       ...fetchHooks,
       cache,
