@@ -1,6 +1,8 @@
-# Caching
+# Caching Strategies
 
-Nuxt API Party provides flexible caching options for data composables to optimize performance and reduce unnecessary network requests.
+Effective caching is crucial for building performant applications that minimize network requests while keeping data fresh. Nuxt API Party provides two complementary caching mechanisms: **in-memory caching** for rapid data access and **browser HTTP caching** for persistent storage across sessions.
+
+Understanding these caching strategies helps you optimize your application's performance while ensuring users see up-to-date information when needed.
 
 ## In-Memory Caching
 
@@ -27,8 +29,8 @@ The cached response will be used until it expires.
 
 To enable built-in browser caching in your data composable, set the `cache` option to one of the values in the [options](#cache-options) section below.
 
-::: tip
-To support HTTP caching, you must enable the [`enablePrefixedProxy`](/config/index#enableprefixedproxy) experimental option in your `nuxt.config` file. This allows GET requests to be GET requests, which is required for caching to work correctly.
+::: tip HTTP Caching
+To support HTTP caching, you must enable the [`enablePrefixedProxy`](/essentials/module-configuration#enableprefixedproxy) experimental option in your `nuxt.config` file. This allows GET requests to be GET requests, which is required for caching to work correctly.
 
 ```ts
 export default defineNuxtConfig({
@@ -77,7 +79,7 @@ For reference, here is a table summarizing the behavior of each cache option:
 
 ## Examples
 
-::: info
+::: info Demo Setup
 These examples assume that you have set up an API endpoint called `jsonPlaceholder`:
 
 ```ts

@@ -2,7 +2,7 @@
 
 Returns the raw response of the API endpoint. Intended for actions inside methods, e.g. when sending form data to the API when clicking a submit button.
 
-::: info
+::: info Placeholder
 `$myApi` is a placeholder used as an example in the documentation. The composable is generated based on your API endpoint ID. For example, if you were to call an endpoint `jsonPlaceholder`, the composable will be called `$jsonPlaceholder`.
 :::
 
@@ -24,13 +24,13 @@ const data = await $myApi(
 ```
 
 ::: tip
-See the [caching guide](../guide/caching.md) for more information on caching.
+See the [caching guide](/guides/caching-strategies) for more information on caching.
 :::
 
 ## Example
 
-::: info
-The example below assume that you have set up an API endpoint called `jsonPlaceholder`:
+::: info Demo Setup
+These examples assume that you have set up an API endpoint called `jsonPlaceholder`:
 
 ```ts
 // `nuxt.config.ts`

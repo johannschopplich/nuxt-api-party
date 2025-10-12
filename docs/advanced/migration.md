@@ -2,7 +2,7 @@
 
 ## v3.0.0
 
-Caching has been completely refactored in Nuxt API Party v3. If you are using caching, please read the [caching documentation](./caching) to understand the new caching system.
+Caching has been completely refactored in Nuxt API Party v3. If you are using caching, please read the [caching documentation](/guides/caching-strategies) to understand the new caching system.
 
 ::: warning
 Caching behavior is now controlled by the upstream endpoint. If your endpoint does not support caching, the responses will not be stored in the browser's cache. This is a breaking change from previous versions, where caching was done regardless.
@@ -13,8 +13,8 @@ See the MDN documentation on [HTTP caching](https://developer.mozilla.org/en-US/
 :::
 
 - Cached responses are no longer stored in the Nuxt payload data. Instead, they are stored in the browser's cache, which allows for better memory management and performance. This follows a change done in Nuxt 3.17.
-- Generated `$api` and `useApiData` composables now support the `RequestInit.cache` option. For convenience, you can pass `true` for `'default'` caching, or `false` for `'no-store'` caching.
-- `$api` composables now have caching enabled by default. To restore the old behavior, you can set the `cache` option to `false` or `'no-store'` in the request options.
+- Generated `$myApi` and `useMyApiData` composables now support the `RequestInit.cache` option. For convenience, you can pass `true` for `'default'` caching, or `false` for `'no-store'` caching.
+- `$myApi` composables now have caching enabled by default. To restore the old behavior, you can set the `cache` option to `false` or `'no-store'` in the request options.
 
   ```ts
   const data = $petStore('/user/{username}', {

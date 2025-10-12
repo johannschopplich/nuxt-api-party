@@ -7,7 +7,7 @@ import { github, name, ogImage, ogUrl, releases } from './meta'
 export default defineConfig({
   lang: 'en-US',
   title: name,
-  description: 'Server proxy and generated API composables',
+  description: 'Type-safe composables for secure API access',
   head: [
     ['link', { rel: 'icon', href: '/logo.svg', type: 'image/svg+xml' }],
     ['meta', { name: 'author', content: 'Johann Schopplich' }],
@@ -37,11 +37,47 @@ export default defineConfig({
       text: 'Suggest changes to this page',
     },
 
-    nav: nav(),
+    nav: [
+      {
+        text: 'Essentials',
+        activeMatch: '^/essentials/',
+        items: [
+          { text: 'What is Nuxt API Party?', link: '/essentials/what-is-nuxt-api-party' },
+          { text: 'Getting Started', link: '/essentials/getting-started' },
+          { text: 'Data Fetching Methods', link: '/essentials/data-fetching-methods' },
+          { text: 'Module Configuration', link: '/essentials/module-configuration' },
+        ],
+      },
+      {
+        text: 'Guides',
+        activeMatch: '^/guides/',
+        items: [
+          { text: 'OpenAPI Integration', link: '/guides/openapi-integration' },
+          { text: 'Caching Strategies', link: '/guides/caching-strategies' },
+          { text: 'Hooks', link: '/guides/hooks' },
+          { text: 'Interceptors', link: '/guides/interceptors' },
+          { text: 'Error Handling', link: '/guides/error-handling' },
+          { text: 'Cookie Forwarding', link: '/guides/cookie-forwarding' },
+          { text: 'Dynamic Backend URL', link: '/guides/dynamic-backend-url' },
+        ],
+      },
+      {
+        text: 'API',
+        link: '/api/',
+        activeMatch: '^/api/',
+      },
+      {
+        text: `v${version}`,
+        items: [
+          { text: 'Release Notes ', link: releases },
+        ],
+      },
+    ],
 
     sidebar: {
-      '/guide/': sidebarGuide(),
-      '/config/': sidebarGuide(),
+      '/essentials/': sidebarCore(),
+      '/guides/': sidebarCore(),
+      '/advanced/': sidebarCore(),
       '/api/': sidebarApi(),
     },
 
@@ -60,91 +96,37 @@ export default defineConfig({
   },
 })
 
-function nav(): DefaultTheme.NavItem[] {
+function sidebarCore(): DefaultTheme.SidebarItem[] {
   return [
     {
-      text: 'Guides',
-      activeMatch: '^/guide/',
+      text: 'Essentials',
       items: [
-        {
-          text: 'Essentials',
-          items: [
-            { text: 'Getting Started', link: '/guide/getting-started' },
-            { text: 'How It Works', link: '/guide/how-it-works' },
-            { text: 'Error Handling', link: '/guide/error-handling' },
-            { text: 'OpenAPI Types', link: '/guide/openapi-types' },
-          ],
-        },
-        {
-          text: 'Advanced',
-          items: [
-            { text: 'Caching', link: '/guide/caching' },
-            { text: 'Interceptors', link: '/guide/interceptors' },
-            { text: 'Hooks', link: '/guide/hooks' },
-            { text: 'Cookies', link: '/guide/cookies' },
-            { text: 'Retries', link: '/guide/retries' },
-            { text: 'Dynamic Backend URL', link: '/guide/dynamic-backend-url' },
-          ],
-        },
+        { text: 'What is Nuxt API Party?', link: '/essentials/what-is-nuxt-api-party' },
+        { text: 'Getting Started', link: '/essentials/getting-started' },
+        { text: 'Data Fetching Methods', link: '/essentials/data-fetching-methods' },
+        { text: 'Module Configuration', link: '/essentials/module-configuration' },
       ],
     },
-    {
-      text: 'Config',
-      link: '/config/',
-      activeMatch: '^/config/',
-    },
-    {
-      text: 'API',
-      items: [
-        { text: 'Overview', link: '/api/' },
-        {
-          text: 'Composables',
-          items: [
-            { text: 'useFetch-like', link: '/api/use-fetch-like' },
-            { text: '$fetch-like', link: '/api/dollarfetch-like' },
-          ],
-        },
-      ],
-    },
-    {
-      text: `v${version}`,
-      items: [
-        { text: 'Release Notes ', link: releases },
-      ],
-    },
-  ]
-}
-
-function sidebarGuide(): DefaultTheme.SidebarItem[] {
-  return [
     {
       text: 'Guides',
       items: [
-        { text: 'Getting Started', link: '/guide/getting-started' },
-        { text: 'How It Works', link: '/guide/how-it-works' },
-        { text: 'Error Handling', link: '/guide/error-handling' },
-        { text: 'OpenAPI Types', link: '/guide/openapi-types' },
-      ],
-    },
-    {
-      text: 'Module',
-      items: [
-        { text: 'Configuration', link: '/config/' },
+        { text: 'OpenAPI Integration', link: '/guides/openapi-integration' },
+        { text: 'Caching Strategies', link: '/guides/caching-strategies' },
+        { text: 'Hooks', link: '/guides/hooks' },
+        { text: 'Interceptors', link: '/guides/interceptors' },
+        { text: 'Error Handling', link: '/guides/error-handling' },
+        { text: 'Cookie Forwarding', link: '/guides/cookie-forwarding' },
+        { text: 'Dynamic Backend URL', link: '/guides/dynamic-backend-url' },
       ],
     },
     {
       text: 'Advanced',
       items: [
-        { text: 'Caching', link: '/guide/caching' },
-        { text: 'Interceptors', link: '/guide/interceptors' },
-        { text: 'Hooks', link: '/guide/hooks' },
-        { text: 'Cookies', link: '/guide/cookies' },
-        { text: 'Retries', link: '/guide/retries' },
-        { text: 'Dynamic Backend URL', link: '/guide/dynamic-backend-url' },
+        { text: 'How Does It Work?', link: '/advanced/how-it-works' },
+        { text: 'Migration', link: '/advanced/migration' },
       ],
     },
-    { text: 'Migration', link: '/guide/migration' },
-    { text: 'API', link: '/api/' },
+    { text: 'API Reference', link: '/api/' },
     { text: 'Playground', link: 'https://github.com/johannschopplich/nuxt-api-party/tree/main/playground' },
   ]
 }
@@ -156,10 +138,16 @@ function sidebarApi(): DefaultTheme.SidebarItem[] {
       link: '/api/',
     },
     {
-      text: 'Composables',
+      text: 'Generated Composables',
       items: [
-        { text: 'useFetch-like', link: '/api/use-fetch-like' },
-        { text: '$fetch-like', link: '/api/dollarfetch-like' },
+        { text: 'useFetch-like Composables', link: '/api/use-fetch-like' },
+        { text: '$fetch-like Composables', link: '/api/dollarfetch-like' },
+      ],
+    },
+    {
+      text: 'Types',
+      items: [
+        { text: 'OpenAPI Type Helpers', link: '/api/openapi-types' },
       ],
     },
   ]

@@ -6,18 +6,25 @@ Responses are **cached** between function calls for the same path based on a cal
 
 The composable supports every [`useAsyncData` option](https://nuxt.com/docs/api/composables/use-async-data/#params).
 
-::: info
+::: info Placeholder
 `useMyApiData` is a placeholder used as an example in the documentation. The composable is generated based on your API endpoint ID. For example, if you were to call an endpoint `jsonPlaceholder`, the composable will be called `useJsonPlaceholderData`.
 :::
 
 ## Return Values
 
-- `data`: the result of the asynchronous function that is passed in.
-- `refresh`/`execute`: a function that can be used to refresh the data returned by the `handler` function.
-- `error`: an error object if the data fetching failed.
-- `status`: a string indicating the status of the data request (`'idle'`, `'pending'`, `'success'`, `'error'`).
-- `clear`: a function which will set `data` to `undefined`, set `error` to `null`, set `status` to `'idle'`, and mark any currently pending requests as cancelled.
+- **`data`**: the result of the asynchronous function that is passed in.
+- **`refresh`/`execute`**: a function that can be used to refresh the data returned by the handler function.
+- **`error`**: an error object if the data fetching failed.
+- **`status`**: a string indicating the status of the data request:
+  - `idle`: when the request has not started, such as:
+    - when `execute` has not yet been called and `{ immediate: false }` is set
+    - when rendering HTML on the server and `{ server: false }` is set
+  - `pending`: the request is in progress
+  - `success`: the request has completed successfully
+  - `error`: the request has failed
+- **`clear`**: a function that can be used to set `data` to `undefined` (or the value of `options.default()` if provided), set `error` to `undefined`, set `status` to `idle`, and mark any currently pending requests as cancelled.
 
+By default, Nuxt waits until a `refresh` is finished before it can be executed again.
 By default, Nuxt waits until a `refresh` is finished before it can be executed again.
 
 ## Type Declarations
@@ -36,13 +43,13 @@ const { data } = await useMyApiData('posts', {
 ```
 
 ::: tip
-See the [caching guide](../guide/caching.md) for more information on caching.
+See the [caching guide](/guides/caching-strategies) for more information on caching.
 :::
 
 ## Examples
 
-::: info
-The examples below assume that you have set up an API endpoint called `jsonPlaceholder`:
+::: info Demo Setup
+These examples assume that you have set up an API endpoint called `jsonPlaceholder`:
 
 ```ts
 // `nuxt.config.ts`

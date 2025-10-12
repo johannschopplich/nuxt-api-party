@@ -9,7 +9,7 @@ export default defineNuxtConfig({
 
   apiParty: {
     endpoints: {
-      // ... your API endpoints
+      // ... Your endpoints go here
     }
   }
 })
@@ -19,26 +19,26 @@ export default defineNuxtConfig({
 
 Main module configuration for your API endpoints. Each key represents an endpoint ID, which is used to generate the composables. The value is an object with the following properties:
 
-- `url`: The URL of the API endpoint
-- `token`: The API token to use for the endpoint (optional)
-- `query`: Query parameters to send with each request (optional)
-- `headers`: Headers to send with each request (optional)
-- `cookies`: Whether to send cookies with each request (optional)
-- `allowedUrls`: A list of allowed URLs to change the [backend URL at runtime](/guide/dynamic-backend-url) (optional)
-- `schema`: A URL, file path, or object representing an [OpenAPI Schema](https://swagger.io/resources/open-api) used to [generate types](/guide/openapi-types) (optional)
-- `openAPITS`: [Configuration options](https://openapi-ts.pages.dev/node/#options) for `openapi-typescript`. Options defined here will override the global `openAPITS`
+- `url` (required): Base URL of the API
+- `token` (optional): Bearer token for authentication
+- `query` (optional): Default query parameters to send with each request
+- `headers` (optional): Default headers to send with each request
+- `cookies` (optional): Whether to forward cookies in requests
+- `allowedUrls` (optional): URLs allowed for [dynamic backend switching](/guides/dynamic-backend-url)
+- `schema` (optional): [OpenAPI Schema](https://swagger.io/resources/open-api) schema URL or file path for [type generation](/guides/openapi-integration)
+- `openAPITS` (optional): Endpoint-specific configuration options for [`openapi-typescript`](https://openapi-ts.dev/node/#options). Will override the global `openAPITS` options if provided.
 
-::: info
+**Default value**: `{}`
+
+::: info Placeholders
 The composables are generated based on your API endpoint ID. For example, if you were to call an endpoint `jsonPlaceholder`, the composables will be called `useJsonPlaceholderData` and `$jsonPlaceholder`.
 :::
 
-Default value: `{}`
-
-**Type**
+**Type Declaration:**
 
 <<< @/../src/module.ts#endpoints
 
-**Example**
+**Example:**
 
 ```ts
 export default defineNuxtConfig({
@@ -68,7 +68,7 @@ export default defineNuxtConfig({
 
 ## `apiParty.openAPITS`
 
-The global [configuration options](https://openapi-ts.pages.dev/node/#options) for `openapi-typescript`. Options set here will be applied to every endpoint schema, but can be overridden by individual endpoint options.
+The global [configuration options](https://openapi-ts.dev/node/#options) for `openapi-typescript`. Options set here will be applied to every endpoint schema, but can be overridden by individual endpoint options.
 
 ## `apiParty.experimental`
 
