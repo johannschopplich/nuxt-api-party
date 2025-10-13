@@ -1,6 +1,6 @@
 ---
 layout: home
-titleTemplate: Type-safe composables for secure API access
+titleTemplate: Auto-generated composables for secure API access
 hero:
   name: Nuxt API Party
   text: The Easiest Rest API Client Generator
