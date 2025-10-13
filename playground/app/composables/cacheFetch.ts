@@ -17,9 +17,12 @@ export function useIDBCacheFetch({ dbName, storeName = 'cache', base }: { dbName
   return async (request, options) => {
     const { cache = 'default' } = options ?? {}
 
-    const canCache = ['get', 'head'].includes(options?.method?.toLowerCase() ?? 'get')
+    if (!['get', 'head'].includes(options?.method?.toLowerCase() ?? 'get')) {
+      return await $fetch(request, options)
+    }
+
     const key = hash([request, options?.method?.toUpperCase() ?? 'GET', options?.baseURL, options?.query || options?.params])
-    if (canCache && !['no-cache', 'reload'].includes(cache)) {
+    if (cache !== 'reload' && cache !== 'no-store') {
       const response = await storage.getItemRaw(key)
       if (response) {
         return response.data
@@ -30,10 +33,9 @@ export function useIDBCacheFetch({ dbName, storeName = 'cache', base }: { dbName
       ...options,
       ...mergeFetchHooks(options ?? {}, {
         async onResponse({ response }) {
-          if (!canCache || cache === 'no-store') {
-            return
+          if (cache !== 'no-store') {
+            await storage.setItemRaw(key, { data: response._data })
           }
-          await storage.setItemRaw(key, { data: response._data })
         },
       }),
     })
