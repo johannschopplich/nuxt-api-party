@@ -3,7 +3,7 @@
   "type": "module",
   "version": "3.3.0",
   "packageManager": "pnpm@10.17.0",
-  "description": "Securely connect to any API with a server proxy and generated composables",
+  "description": "Auto-generated composables for secure API access, with OpenAPI support",
   "author": "Johann Schopplich <hello@johannschopplich.com>",
   "license": "MIT",
   "homepage": "https://nuxt-api-party.byjohann.dev",

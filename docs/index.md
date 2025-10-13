@@ -4,7 +4,7 @@ titleTemplate: Type-safe composables for secure API access
 hero:
   name: Nuxt API Party
   text: The Easiest Rest API Client Generator
-  tagline: Type-safe composables for secure API access
+  tagline: Auto-generated composables for secure API access
   image:
     src: /logo-shadow.svg
     alt: Nuxt API Party Logo
@@ -56,7 +56,7 @@ features:
     link: /guides/hooks
     linkText: Customize at Build-Time
   - title: Proxy Errors
-    icon: <span class="i-carbon:error-outline"></span>
+    icon: <span class="i-carbon:i-carbon-server-proxy"></span>
     details: Pass-through errors from your API to your app.
     link: /guides/error-handling
     linkText: Log and Handle Errors
