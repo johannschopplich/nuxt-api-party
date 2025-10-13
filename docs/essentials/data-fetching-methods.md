@@ -3,7 +3,7 @@
 Nuxt API Party provides two distinct approaches to fetch data from your APIs. Understanding when to use each method will help you build more efficient and maintainable applications.
 
 ::: tip
-The generated composables follow the exact same patterns as Nuxt's native `useFetch` and `$fetch`. If you're familiar with Nuxt data fetching, you already know how to use Nuxt API Party!
+The generated composables follow the exact same patterns as Nuxt's native `useFetch` and `$fetch`. If you are familiar with Nuxt data fetching, you already know how to use Nuxt API Party!
 :::
 
 ## Methods Comparison
