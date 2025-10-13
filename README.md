@@ -2,20 +2,20 @@
 
 # Nuxt API Party
 
-[Nuxt](https://nuxt.com) module to securely connect to any API.
+[Nuxt](https://nuxt.com) module that provides seamless integration with multiple API endpoints. It generates **type-safe composables** for each API endpoint you configure, offering a familiar developer experience similar to Nuxt's `useFetch` and `$fetch` while keeping your **API credentials secure** and eliminating **CORS issues** through a server proxy.
 
 - [✨ &nbsp;Release Notes](https://github.com/johannschopplich/nuxt-api-party/releases)
 - [📖 &nbsp;Read the documentation](https://nuxt-api-party.byjohann.dev)
 
 ## Features
 
-- 🪅 [Generated composables](https://nuxt-api-party.byjohann.dev/api/#generated-composables)
-- 🔒 Protected API credentials in the client
-- 🪢 Token-based authentication built-in or bring your own headers
-- 🧇 [Connect multiple API endpoints](#basic-usage)
-- 🍱 Feels just like [`useFetch`](https://nuxt.com/docs/api/composables/use-fetch)
-- 🗃 Cached responses
-- 🦾 Strongly typed
+- 🪅 [Auto-generated composables](https://nuxt-api-party.byjohann.dev/api/#generated-composables) for each API endpoint
+- 🔒 Protected API credentials with Nuxt proxy route
+- 🌐 No CORS issues
+- 🍱 Familiar developer experience to [`useFetch`](https://nuxt.com/docs/api/composables/use-fetch) and `$fetch`
+- 🧇 [Connect all your APIs](https://nuxt-api-party.byjohann.dev/essentials/getting-started#configure-your-first-api-endpoint)
+- 🦾 Fully typed API clients from [OpenAPI specifications](https://nuxt-api-party.byjohann.dev/guides/openapi-integration)
+- 🗃 Smart caching & hydration
 
 ## Setup
 

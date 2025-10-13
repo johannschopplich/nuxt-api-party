@@ -1,17 +1,17 @@
 ---
 layout: home
-titleTemplate: Server Proxy and Generated API Composables
+titleTemplate: Auto-generated composables for secure API access
 hero:
   name: Nuxt API Party
-  text: Server Proxy and Generated API Composables
-  tagline: Like useFetch and $fetch, but for all your APIs
+  text: The Easiest Rest API Client Generator
+  tagline: Auto-generated composables for secure API access
   image:
     src: /logo-shadow.svg
     alt: Nuxt API Party Logo
   actions:
     - theme: brand
       text: Get Started
-      link: /guide/getting-started
+      link: /essentials/what-is-nuxt-api-party
     - theme: alt
       text: API
       link: /api/
@@ -20,7 +20,7 @@ hero:
       link: https://github.com/johannschopplich/nuxt-api-party
 
 features:
-  - title: Generated composables
+  - title: API Composables
     icon: <span class="i-carbon:magic-wand-filled"></span>
     details: Auto-generated composables for each API endpoint.
     link: /api/
@@ -28,7 +28,7 @@ features:
   - title: Protected API Credentials
     icon: <span class="i-carbon:ibm-cloud-hyper-protect-dbaas"></span>
     details: A Nuxt server route proxies your requests. No CORS issues!
-    link: /guide/how-it-works
+    link: /advanced/how-it-works
     linkText: How It Works
   - title: Familiar Data Handling
     icon: <span class="i-carbon:noodle-bowl"></span>
@@ -38,26 +38,26 @@ features:
   - title: Connect Multiple APIs
     icon: <span class="i-carbon:ibm-watson-query"></span>
     details: Configure all your APIs once and use them throughout your app.
-    link: /guide/getting-started.html#step-3-set-up-api-endpoints
+    link: /essentials/getting-started#configure-your-first-api-endpoint
     linkText: Set up API Endpoints
   - title: OpenAPI Support
     icon: <span class="i-devicon-plain:openapi"></span>
     details: Create fully typed API clients from OpenAPI specifications.
-    link: /guide/openapi-types
+    link: /guides/openapi-integration
     linkText: Generate Clients
   - title: TypeScript
     icon: <span class="i-devicon-plain:typescript"></span>
-    details: Type-safe parameters, request bodies and responses for OpenAPI endpoints.
-    link: /guide/openapi-types
-    linkText: Leaverage Typings
+    details: Fully type-safe requests and responses for OpenAPI endpoints.
+    link: /guides/openapi-integration
+    linkText: Leverage Typings
   - title: Hooks
     icon: <span class="i-carbon:tools-alt"></span>
-    details: Customize the module's behavior with hooks.
-    link: /guide/hooks
+    details: Extend and customize requests and responses.
+    link: /guides/hooks
     linkText: Customize at Build-Time
   - title: Proxy Errors
-    icon: <span class="i-carbon:error-outline"></span>
+    icon: <span class="i-carbon:server-proxy"></span>
     details: Pass-through errors from your API to your app.
-    link: /guide/error-handling
+    link: /guides/error-handling
     linkText: Log and Handle Errors
 ---

@@ -34,14 +34,14 @@ export interface ModuleOptions {
    *
    * @remarks
    * Each key represents an endpoint ID, which is used to generate the composables. The value is an object with the following properties:
-   * - `url`: The URL of the API endpoint
-   * - `token`: The API token to use for the endpoint (optional)
-   * - `query`: Query parameters to send with each request (optional)
-   * - `headers`: Headers to send with each request (optional)
-   * - `cookies`: Whether to send cookies with each request (optional)
-   * - `allowedUrls`: A list of allowed URLs to change the [backend URL at runtime](https://nuxt-api-party.byjohann.dev/guide/dynamic-backend-url) (optional)
-   * - `schema`: A URL, file path, object, or async function pointing to an [OpenAPI Schema](https://swagger.io/resources/open-api) used to [generate types](/guide/openapi-types) (optional)
-   * - `openAPITS`: [Configuration options](https://openapi-ts.pages.dev/node/#options) for `openapi-typescript`. Options defined here will override the global `openAPITS`
+   * - `url` (required): Base URL of the API
+   * - `token` (optional): Bearer token for authentication
+   * - `query` (optional): Default query parameters to send with each request
+   * - `headers` (optional): Default headers to send with each request
+   * - `cookies` (optional): Whether to forward cookies in requests
+   * - `allowedUrls` (optional): URLs allowed for [dynamic backend switching](https://nuxt-api-party.byjohann.dev/guides/dynamic-backend-url)
+   * - `schema` (optional): [OpenAPI Schema](https://swagger.io/resources/open-api) schema URL or file path for [type generation](https://nuxt-api-party.byjohann.dev/guides/openapi-integration)
+   * - `openAPITS` (optional): Endpoint-specific configuration options for [`openapi-typescript`](https://openapi-ts.dev/node/#options). Will override the global `openAPITS` options if provided.
    *
    * @example
    * export default defineNuxtConfig({
@@ -65,7 +65,7 @@ export interface ModuleOptions {
    * Allow client-side requests besides server-side ones
    *
    * @remarks
-   * By default, API requests are only made on the server-side. This option allows you to make requests on the client-side as well. Keep in mind that this will expose your API credentials to the client.
+   * By default, API requests are only initiated server-side. This option allows you to make requests on the client-side as well. Keep in mind that this will expose your API credentials to the client.
    * Note: If Nuxt SSR is disabled, all requests are made on the client-side by default.
    *
    * @example
@@ -76,7 +76,7 @@ export interface ModuleOptions {
   client: boolean | 'allow' | 'always'
 
   /**
-   * Global options for openapi-typescript
+   * Global options for [`openapi-typescript`](https://openapi-ts.dev/node/#options)
    */
   openAPITS: OpenAPITSOptions
 

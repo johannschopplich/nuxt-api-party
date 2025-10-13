@@ -1,6 +1,6 @@
 # Hooks
 
-Nuxt API Party provides a set of powerful hooks that allow you to customize the behavior of the module at various stages. The hook system supports both Nuxt and Nitro environments with fully typed, merged hooks that ensure both generic and endpoint-specific handlers are executed in the correct order.
+Nuxt API Party allows you to customize the behavior of the module at various stages. The hook system supports both Nuxt and Nitro environments with fully typed, merged hooks that ensure both generic and endpoint-specific handlers are executed in the correct order.
 
 For more information on how to work with hooks, see the [Nuxt documentation](https://nuxt.com/docs/guide/going-further/hooks).
 
@@ -15,7 +15,7 @@ For more information on how to work with hooks, see the [Nuxt documentation](htt
 | `api-party:response:${endpointId}` | `ctx, [event]`      | Called for the specific endpoint response. Merged with the generic response hook. |
 
 ::: info Merging Hooks
-Both generic and endpoint-specific hooks are merged so that:
+Both generic and endpoint-specific hooks are merged and executed in sequence.
 
 - For requests: The generic `api-party:request` hook executes first, followed by `api-party:request:${endpointId}`.
 - For responses: The endpoint-specific `api-party:response:${endpointId}` hook executes first, followed by `api-party:response`.
@@ -23,9 +23,9 @@ Both generic and endpoint-specific hooks are merged so that:
 
 ## Nuxt Runtime Hooks
 
-Register Nuxt runtime hooks either in your `nuxt.config.ts` file, in a client plugin or at runtime. These hooks are useful for extending [API endpoints](/config/#apiparty-endpoints) with additional configuration or for intercepting API calls for tasks like logging, metrics, or dynamically adding headers.
+Register Nuxt runtime hooks either in your `nuxt.config.ts` file, in a client plugin or at runtime. These hooks are useful for extending [API endpoints](/essentials/module-configuration#apiparty-endpoints) with additional configuration or for intercepting API calls for tasks like logging, metrics, or dynamically adding headers.
 
-The only hook called at module initialization is `api-party:extend`. This hook is useful for modifying endpoint configuration before the module is fully initialized. For example, you can log the resolved server endpoints:
+The only hook called at module initialization is `api-party:extend`, useful for modifying endpoint configuration before the module is fully initialized. For example, you can log the resolved server endpoints:
 
 ```ts [nuxt.config.ts]
 export default defineNuxtConfig({
@@ -51,7 +51,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 })
 ```
 
-::: warning
+::: warning Client-Side Execution
 All of the Nuxt hooks are executed on the client side by default. Do not use them for sensitive operations like authentication or authorization. Instead, use Nitro hooks for server-side processing.
 :::
 
