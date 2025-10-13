@@ -1,57 +1,39 @@
 import type { H3Event$Fetch } from 'nitropack/types'
 
 import { useRequestFetch } from '#app'
-import { withBase, withQuery } from 'ufo'
+import { hash } from 'ohash'
+import { createStorage } from 'unstorage'
+import indexedDbDriver from 'unstorage/drivers/indexedb'
+
 import { mergeFetchHooks } from '../../../src/runtime/hooks'
 
-export function useCacheStorageFetch(): H3Event$Fetch {
+export function useIDBCacheFetch({ dbName, storeName = 'cache', base }: { dbName?: string, storeName?: string, base?: string }): H3Event$Fetch {
   if (import.meta.server) {
     return useRequestFetch()
   }
-
-  let _c: Cache
-  async function useCache() {
-    return _c ||= await window.caches.open('api-party')
-  }
-
+  const storage = createStorage({
+    driver: indexedDbDriver({ dbName, storeName, base }),
+  })
   return async (request, options) => {
-    const { responseType = 'json', cache } = options ?? {}
+    const { cache = 'default' } = options ?? {}
 
     const canCache = ['get', 'head'].includes(options?.method?.toLowerCase() ?? 'get')
-    if (canCache && responseType !== 'stream' && cache !== 'no-cache') {
-      // rebuild the full url using the options query and baseURL
-      let url = typeof request === 'string' ? request : request.url
-      if (options?.baseURL) {
-        url = withBase(url, options.baseURL)
-      }
-      const query = options?.query || options?.params
-      if (query) {
-        url = withQuery(url, query)
-      }
-      const c = await useCache()
-      const response = await c.match(url)
+    const key = hash([request, options?.method?.toUpperCase() ?? 'GET', options?.baseURL, options?.query || options?.params])
+    if (canCache && !['no-cache', 'reload'].includes(cache)) {
+      const response = await storage.getItemRaw(key)
       if (response) {
-        return await response[responseType]()
+        return response.data
       }
     }
 
     return await $fetch(request, {
       ...options,
       ...mergeFetchHooks(options ?? {}, {
-        async onResponse({ request, response, options }) {
-          if (!canCache || responseType === 'stream' || cache === 'no-store') {
+        async onResponse({ response }) {
+          if (!canCache || cache === 'no-store') {
             return
           }
-          const c = await useCache()
-          // ofetch consumes the Response, so make a new one.
-          await c.put(request, new Response(
-            options.responseType === 'json' ? JSON.stringify(response?._data) : response._data,
-            {
-              headers: response.headers,
-              status: response.status,
-              statusText: response.statusText,
-            },
-          ))
+          await storage.setItemRaw(key, { data: response._data })
         },
       }),
     })

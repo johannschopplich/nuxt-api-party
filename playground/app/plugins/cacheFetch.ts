@@ -1,6 +1,6 @@
 import type { ModulePlugin } from '../../../src/module'
 import { defineNuxtPlugin } from '#app'
-import { useCacheStorageFetch } from '#imports'
+import { useIDBCacheFetch } from '#imports'
 
 export default defineNuxtPlugin(() => {
   return {
@@ -9,7 +9,7 @@ export default defineNuxtPlugin(() => {
         endpoints: {
           jsonPlaceholder: {
             defaults: {
-              $fetch: useCacheStorageFetch(),
+              $fetch: useIDBCacheFetch({ dbName: 'api-party-playground', base: 'jsonPlaceholder' }),
             },
           },
         },
