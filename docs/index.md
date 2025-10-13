@@ -56,7 +56,7 @@ features:
     link: /guides/hooks
     linkText: Customize at Build-Time
   - title: Proxy Errors
-    icon: <span class="i-carbon:i-carbon-server-proxy"></span>
+    icon: <span class="i-carbon:server-proxy"></span>
     details: Pass-through errors from your API to your app.
     link: /guides/error-handling
     linkText: Log and Handle Errors
