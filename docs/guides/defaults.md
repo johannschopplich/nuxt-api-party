@@ -14,7 +14,7 @@ The `useApiData` composables will also use these defaults, as well as the releva
 ### Minimal Example Plugin
 
 ::: code-group
-```ts {7-9,12-14} [plugins/apiparty-defaults.ts]
+```ts {7-9,12-14} [plugins/api-party-defaults.ts]
 import type { ModulePlugin as APIPartyPlugin } from 'nuxt-api-party'
 
 export default defineNuxtPlugin(() => {

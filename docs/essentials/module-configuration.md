@@ -1,9 +1,9 @@
 # Module Configuration
 
-Adapt Nuxt API Party to your needs with the following options in your `nuxt.config.ts` file:
+Configure Nuxt API Party to your needs in the `apiParty` key of your Nuxt configuration. The module options are fully typed.
 
-```ts
-// `nuxt.config.ts`
+::: code-group
+```ts [nuxt.config.ts]
 export default defineNuxtConfig({
   modules: ['nuxt-api-party'],
 
@@ -14,6 +14,7 @@ export default defineNuxtConfig({
   }
 })
 ```
+:::
 
 ## `apiParty.endpoints`
 

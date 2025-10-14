@@ -6,8 +6,8 @@ When you enable cookie forwarding, Nuxt API Party will include all cookies from 
 
 Enable cookie forwarding by setting the `cookies` option to `true` per endpoint in your `nuxt.config.ts`:
 
-```ts
-// `nuxt.config.ts`
+::: code-group
+```ts [nuxt.config.ts]
 export default defineNuxtConfig({
   modules: ['nuxt-api-party'],
 
@@ -22,6 +22,7 @@ export default defineNuxtConfig({
   }
 })
 ```
+:::
 
 ::: warning Security Consideration
 Only enable cookie forwarding for trusted APIs. Cookies will be sent to the configured endpoint URL, so ensure your API endpoints are secure and properly configured.

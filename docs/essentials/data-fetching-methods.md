@@ -105,8 +105,8 @@ async function submitPost() {
 
 In plugins or middleware, you can also use `$myApi` for initial data fetching:
 
-```ts
-// `plugins/api-setup.ts`
+::: code-group
+```ts [plugins/api-setup.ts]
 export default defineNuxtPlugin(async () => {
   const settings = useState('app.settings', () => ({}))
 
@@ -120,6 +120,7 @@ export default defineNuxtPlugin(async () => {
   }
 })
 ```
+:::
 
 ## Next Steps
 

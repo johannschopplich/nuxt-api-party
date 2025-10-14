@@ -10,8 +10,8 @@ You must specify the allowed backend URLs for each endpoint in the `allowedUrls`
 
 Add the `allowedUrls` option to your endpoint configuration in `nuxt.config`:
 
-```ts
-// `nuxt.config.ts`
+::: code-group
+```ts [nuxt.config.ts]
 export default defineNuxtConfig({
   modules: ['nuxt-api-party'],
 
@@ -25,6 +25,7 @@ export default defineNuxtConfig({
   }
 })
 ```
+:::
 
 With the above configuration, you can change the backend URL at runtime by sending the `jsonPlaceholder-Endpoint-Url` header with your request to change the backend URL to `https://v2.jsonplaceholder.typicode.com`:
 

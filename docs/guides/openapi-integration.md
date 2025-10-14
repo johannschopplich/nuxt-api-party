@@ -92,10 +92,10 @@ components:
 
 :::
 
-Reference the schema file in your endpoint config:
+Reference the schema file in your endpoint configuration:
 
-```ts
-// `nuxt.config.ts`
+::: code-group
+```ts [nuxt.config.ts]
 export default defineNuxtConfig({
   apiParty: {
     myApi: {
@@ -105,6 +105,7 @@ export default defineNuxtConfig({
   }
 })
 ```
+:::
 
 ::: tip
 If the [`enableSchemaFileWatcher`](/essentials/module-configuration#enableschemafilewatcher) experimental option is enabled (it is by default), changes to local schema files will automatically regenerate the types. When disabled or using a remote schema, you will need to restart the Nuxt dev server to pick up changes.

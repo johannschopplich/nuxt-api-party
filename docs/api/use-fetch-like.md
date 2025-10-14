@@ -51,8 +51,8 @@ See the [caching guide](/guides/caching-strategies) for more information on cach
 ::: info Demo Setup
 These examples assume that you have set up an API endpoint called `jsonPlaceholder`:
 
-```ts
-// `nuxt.config.ts`
+::: code-group
+```ts [nuxt.config.ts]
 export default defineNuxtConfig({
   modules: ['nuxt-api-party'],
 
@@ -65,6 +65,7 @@ export default defineNuxtConfig({
   }
 })
 ```
+:::
 
 :::
 
@@ -133,8 +134,8 @@ Note: If Nuxt SSR is disabled, all requests are made on the client-side by defau
 
 To fetch data directly from your API and skip the Nuxt server proxy, set the `apiParty` module option `client` to `true`:
 
-```ts{9}
-// `nuxt.config.ts`
+::: code-group
+```ts{9} [nuxt.config.ts]
 export default defineNuxtConfig({
   modules: ['nuxt-api-party'],
 
@@ -146,6 +147,7 @@ export default defineNuxtConfig({
   }
 })
 ```
+:::
 
 Now you can make client-side requests by setting the `client` option to `true` in the composable.
 

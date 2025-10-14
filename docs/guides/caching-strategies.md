@@ -82,8 +82,8 @@ For reference, here is a table summarizing the behavior of each cache option:
 ::: info Demo Setup
 These examples assume that you have set up an API endpoint called `jsonPlaceholder`:
 
-```ts
-// `nuxt.config.ts`
+::: code-group
+```ts [nuxt.config.ts]
 export default defineNuxtConfig({
   modules: ['nuxt-api-party'],
 
@@ -96,6 +96,7 @@ export default defineNuxtConfig({
   }
 })
 ```
+:::
 
 :::
 

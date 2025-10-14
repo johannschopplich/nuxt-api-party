@@ -18,19 +18,20 @@ npx nuxt module add api-party
 
 Add the module to your Nuxt configuration:
 
-```ts
-// `nuxt.config.ts`
+::: code-group
+```ts [nuxt.config.ts]
 export default defineNuxtConfig({
   modules: ['nuxt-api-party']
 })
 ```
+:::
 
 ## Configure Your First API Endpoint
 
 Configure an API endpoint in your Nuxt configuration. Each endpoint you define will generate two composables for data fetching:
 
-```ts
-// `nuxt.config.ts`
+::: code-group
+```ts [nuxt.config.ts]
 export default defineNuxtConfig({
   modules: ['nuxt-api-party'],
 
@@ -48,6 +49,7 @@ export default defineNuxtConfig({
   }
 })
 ```
+:::
 
 ### Endpoint Configuration Options
 
@@ -88,8 +90,8 @@ JSON_PLACEHOLDER_API_TOKEN=your-secret-token
 
 You can also use Nuxt's [runtime config](https://nuxt.com/docs/api/nuxt-config#runtimeconfig) for automatic environment variable mapping:
 
-```ts
-// `nuxt.config.ts`
+::: code-group
+```ts [nuxt.config.ts]
 export default defineNuxtConfig({
   modules: ['nuxt-api-party'],
 
@@ -105,8 +107,10 @@ export default defineNuxtConfig({
   }
 })
 ```
+:::
 
 Environment variable mapping follows this pattern:
+
 ```bash
 NUXT_API_PARTY_ENDPOINTS_{ENDPOINT_ID}_{OPTION}
 ```
