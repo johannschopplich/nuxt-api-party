@@ -1,7 +1,8 @@
 import type { OpenAPI3, OpenAPITSOptions } from 'openapi-typescript'
 import type { EndpointConfiguration } from './module'
+import { pathToFileURL } from 'node:url'
 import { useNuxt } from '@nuxt/kit'
-import { resolve } from 'pathe'
+import { isAbsolute, resolve } from 'pathe'
 import { pascalCase } from 'scule'
 
 /** @deprecated Hooks should be used instead */
@@ -193,26 +194,27 @@ export type operations = Record<string, never>
 }
 
 async function resolveSchema(id: string, { schema }: SchemaEndpoint): Promise<string | URL | OpenAPI3> {
-  const nuxt = useNuxt()
-
   if (typeof schema === 'function') {
     console.warn(`[nuxt-api-party] Passing a function to "apiParty.endpoints.${id}.schema" is deprecated. Use the "api-party:extend" hook instead.`)
     return await schema()
   }
 
-  if (typeof schema === 'string' && !isValidUrl(schema))
-    return new URL(resolve(nuxt.options.rootDir, schema), import.meta.url)
+  if (typeof schema === 'string') {
+    if (/^https?:\/\//i.test(schema))
+      return schema
+
+    if (schema.startsWith('file://'))
+      return new URL(schema)
+
+    const nuxt = useNuxt()
+    const resolvedPath = isAbsolute(schema)
+      ? schema
+      : resolve(nuxt.options.rootDir, schema)
+
+    return pathToFileURL(resolvedPath)
+  }
 
   return schema!
-}
-
-function isValidUrl(url: string) {
-  try {
-    return Boolean(new URL(url))
-  }
-  catch {
-    return false
-  }
 }
 
 async function interopDefault<T>(
