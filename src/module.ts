@@ -151,26 +151,23 @@ declare module '@nuxt/schema' {
   }
 }
 
-export type Defaults = Omit<
+export type FetchOptionsDefaults = Omit<
   ApiClientFetchOptions & SharedFetchOptions,
   | 'key'
-  | 'method'
   | 'path'
+  | 'method'
   | 'body'
 >
 
 export interface ModuleInjections {
-  defaults?: Defaults
+  defaults?: FetchOptionsDefaults
   endpoints?: Record<string, {
-    defaults?: Defaults
+    defaults?: FetchOptionsDefaults
   }>
 }
 
-export type ModulePlugin = Plugin<{
-  apiParty: ModuleInjections
-}> & ObjectPlugin<{
-  apiParty: ModuleInjections
-}>
+export type ModulePlugin = Plugin<{ apiParty: ModuleInjections }>
+  & ObjectPlugin<{ apiParty: ModuleInjections }>
 
 declare module '#app' {
   interface NuxtApp {
