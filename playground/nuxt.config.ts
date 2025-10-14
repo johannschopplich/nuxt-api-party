@@ -1,10 +1,11 @@
+import { consola } from 'consola'
 import { defineNuxtConfig } from 'nuxt/config'
 import NuxtApiParty from '../src/module'
 
 export default defineNuxtConfig({
   modules: [NuxtApiParty],
 
-  compatibilityDate: '2025-08-01',
+  compatibilityDate: '2025-09-01',
 
   experimental: {
     granularCachedData: true,
@@ -12,7 +13,8 @@ export default defineNuxtConfig({
 
   hooks: {
     'api-party:extend': async (options) => {
-      console.log(`[Build] Resolved endpoints:`, options.endpoints)
+      consola.info('[Build] Resolved endpoints:')
+      console.table(options.endpoints)
     },
   },
 
