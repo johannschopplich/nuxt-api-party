@@ -7,13 +7,26 @@ import indexedDbDriver from 'unstorage/drivers/indexedb'
 
 import { mergeFetchHooks } from '../../../src/runtime/hooks'
 
-export function useIDBCacheFetch({ dbName, storeName = 'cache', base }: { dbName?: string, storeName?: string, base?: string }): H3Event$Fetch {
+export function useIDBCacheFetch(
+  {
+    dbName,
+    storeName = 'cache',
+    base,
+  }:
+  {
+    dbName?: string
+    storeName?: string
+    base?: string
+  },
+): H3Event$Fetch {
   if (import.meta.server) {
     return useRequestFetch()
   }
+
   const storage = createStorage({
     driver: indexedDbDriver({ dbName, storeName, base }),
   })
+
   return async (request, options) => {
     const { cache = 'default' } = options ?? {}
 
