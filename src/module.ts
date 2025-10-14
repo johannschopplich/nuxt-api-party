@@ -1,6 +1,8 @@
+import type { ObjectPlugin, Plugin } from '#app'
 import type { HookResult, Nuxt } from '@nuxt/schema'
 import type { OpenAPI3, OpenAPITSOptions } from 'openapi-typescript'
 import type { QueryObject } from 'ufo'
+import type { ApiClientFetchOptions, SharedFetchOptions } from './runtime/composables/$api'
 import { fileURLToPath } from 'node:url'
 import { addImportsSources, addServerHandler, addTemplate, addTypeTemplate, createResolver, defineNuxtModule, updateTemplates, useLogger } from '@nuxt/kit'
 import { watch } from 'chokidar'
@@ -146,6 +148,30 @@ declare module '@nuxt/schema' {
 
   interface NuxtHooks {
     'api-party:extend': (options: ModuleOptions) => HookResult
+  }
+}
+
+export type FetchOptionsDefaults = Omit<
+  ApiClientFetchOptions & SharedFetchOptions,
+  | 'key'
+  | 'path'
+  | 'method'
+  | 'body'
+>
+
+export interface ModuleInjections {
+  defaults?: FetchOptionsDefaults
+  endpoints?: Record<string, {
+    defaults?: FetchOptionsDefaults
+  }>
+}
+
+export type ModulePlugin = Plugin<{ apiParty: ModuleInjections }>
+  & ObjectPlugin<{ apiParty: ModuleInjections }>
+
+declare module '#app' {
+  interface NuxtApp {
+    $apiParty?: ModuleInjections
   }
 }
 

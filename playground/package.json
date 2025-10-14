@@ -6,5 +6,8 @@
     "dev": "nuxt dev",
     "build": "nuxt build",
     "generate": "nuxt generate"
+  },
+  "devDependencies": {
+    "idb-keyval": "^6.2.2"
   }
 }

@@ -109,6 +109,7 @@ export function _useApiData<T = unknown>(
     path: pathParams,
     client = allowClient === 'always',
     cache,
+    $fetch,
     ...fetchOptions
   } = opts
 
@@ -130,6 +131,7 @@ export function _useApiData<T = unknown>(
     key: _key,
     $fetch: ((request: string, opts) => _$api(endpointId, request, {
       ...opts,
+      $fetch: toValue($fetch),
       cache: toValue(cache),
       client: toValue(client),
       key: _key.value,
