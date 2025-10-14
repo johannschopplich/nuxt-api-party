@@ -19,7 +19,7 @@ import type { ModulePlugin as APIPartyPlugin } from 'nuxt-api-party'
 
 export default defineNuxtPlugin(() => {
   return {
-    provides: {
+    provide: {
       apiParty: {
         defaults: {
           // ...
