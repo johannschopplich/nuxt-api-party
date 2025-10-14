@@ -11,7 +11,7 @@ Make sure you have [Nuxt 3.18+](https://nuxt.com/docs/getting-started/installati
 Install Nuxt API Party via the Nuxt CLI:
 
 ```bash
-npx nuxt module add nuxt-api-party
+npx nuxt module add api-party
 ```
 
 ## Add to Nuxt Configuration
