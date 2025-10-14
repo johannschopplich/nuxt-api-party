@@ -1,7 +1,7 @@
 {
   "name": "nuxt-api-party",
   "type": "module",
-  "version": "3.3.0",
+  "version": "3.4.0",
   "packageManager": "pnpm@10.18.2",
   "description": "Auto-generated composables for secure API access, with OpenAPI support",
   "author": "Johann Schopplich <hello@johannschopplich.com>",
