@@ -1,9 +1,9 @@
 # `$fetch`-Like Composable
 
-Returns the raw response of the API endpoint. Intended for actions inside methods, e.g. when sending form data to the API when clicking a submit button.
+Returns the raw API response. Intended for actions inside methods, e.g. when sending form data on submit.
 
 ::: info Placeholder
-`$myApi` is a placeholder used as an example in the documentation. The composable is generated based on your API endpoint ID. For example, if you were to call an endpoint `jsonPlaceholder`, the composable will be called `$jsonPlaceholder`.
+`$myApi` is a placeholder. The composable is generated based on your API endpoint ID. For example, endpoint `jsonPlaceholder` generates `$jsonPlaceholder`.
 :::
 
 ## Type Declarations
@@ -12,15 +12,12 @@ Returns the raw response of the API endpoint. Intended for actions inside method
 
 ## Caching
 
-You can customize the caching behavior by passing the `cache` option to the composable.
+Customize caching behavior by passing the `cache` option:
 
 ```ts
-const data = await $myApi(
-  'posts',
-  {
-    cache: 'no-store' // or 'default', 'reload', 'no-cache', 'force-cache', 'only-if-cached'
-  }
-)
+const data = await $myApi('posts', {
+  cache: 'no-store' // or 'default', 'reload', 'no-cache', 'force-cache', 'only-if-cached'
+})
 ```
 
 ::: tip
@@ -124,22 +121,19 @@ Set the `client` module option to `always` to make all requests on the client-si
 
 ## Custom Fetch
 
-You can pass a custom fetch function to the composable. This is useful if you want to use a different HTTP client or implement custom caching logic.
+Pass a custom fetch function for different HTTP clients or custom caching logic:
 
 ```ts
-const data = await $jsonPlaceholder(
-  'posts',
-  {
-    fetch(url, options) {
-      // Support fetching local routes during SSR
-      const fetch = useRequestFetch()
-      // Custom fetch logic here
-      return fetch(url, options)
-    }
+const data = await $jsonPlaceholder('posts', {
+  fetch(url, options) {
+    // Support fetching local routes during SSR
+    const fetch = useRequestFetch()
+    // Custom fetch logic here
+    return fetch(url, options)
   }
-)
+})
 ```
 
 ::: warning
-Using a custom fetch function will interfere with fetching local routes during SSR, which is required for the proxy to function. If you need to use a custom fetch function, be sure you either wrap `useRequestFetch()` as in the example, or only use it for client-side requests.
+Custom fetch functions interfere with fetching local routes during SSR, which is required for the proxy to function. Either wrap `useRequestFetch()` as shown, or use custom fetch only for client-side requests.
 :::

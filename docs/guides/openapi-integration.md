@@ -1,6 +1,6 @@
-# OpenAPI Types
+# OpenAPI Integration
 
-Nuxt API Party can integrate with an [OpenAPI schema](https://swagger.io/resources/open-api/) to provide full type safety for your API requests. The generated types include:
+Nuxt API Party integrates with an [OpenAPI schema](https://swagger.io/resources/open-api/) to provide full type safety for your API requests. Generated types include:
 
 - Request path with path parameters
 - Query parameters
@@ -27,9 +27,9 @@ If your framework doesn't directly support it, there may also be an additional l
 
 ## Configuring the Schema
 
-To take advantage of these type features, add the `schema` property to your endpoint config. It should be set to a file path or URL of the OpenAPI schema or an async function returning the parsed OpenAPI schema. The file can be in either JSON or YAML format.
+Add the `schema` property to your endpoint config. Set it to a file path or URL of the OpenAPI schema, or an async function returning the parsed OpenAPI schema. The file can be JSON or YAML format.
 
-The following schema will be used for the code examples on this page:
+The following schema is used for code examples on this page:
 
 ::: details
 
@@ -113,15 +113,15 @@ If the [`enableSchemaFileWatcher`](/essentials/module-configuration#enableschema
 
 ## Using the Types
 
-For most usages, no further intervention is needed. Nuxt API Party will use the types generated from this configuration to infer the correct types automatically when [`useFetch`-like](/api/use-fetch-like) and [`$fetch`-like](/api/dollarfetch-like) composables are used.
+For most use cases, no further configuration is needed. Nuxt API Party uses the generated types to infer correct types automatically when [`useFetch`-like](/api/use-fetch-like) and [`$fetch`-like](/api/dollarfetch-like) composables are used.
 
-However, there may be a few things you may want to do now that you have type information.
+However, you may want to leverage type information in additional ways.
 
 ### Extract Schema Types
 
-The exported `components` interface of the virtual module for your API contains all the schema types defined in your OpenAPI schema. Use it to extract models for your API.
+The exported `components` interface of the virtual module for your API contains all schema types defined in your OpenAPI schema. Use it to extract models for your API.
 
-Using the schema above, you can extract the `Foo` type like so:
+Using the schema above, extract the `Foo` type:
 
 ```ts
 import { components } from '#nuxt-api-party/myApi'
@@ -132,9 +132,9 @@ type FooModel = components['schemas']['FooModel']
 
 ### Use OpenAPI Defined Path Parameters
 
-OpenAPI can define path parameters on some endpoints. They are declared as `/foo/{id}`. Unfortunately, the endpoint is not defined as `/foo/10`, so using that as the path will break type inference.
+OpenAPI can define path parameters on endpoints. They're declared as `/foo/{id}`. The endpoint isn't defined as `/foo/10`, so using that as the path breaks type inference.
 
-To get around this, set an object of the parameters to the property `path`. You can then use the declared path for type inference, and the type checker will ensure you provide all required path parameters. The parameters will be interpolated into the path before the request is made.
+To work with path parameters, set an object of parameters to the `path` property. Use the declared path for type inference, and the type checker ensures you provide all required path parameters. Parameters are interpolated into the path before the request is made.
 
 ```ts
 const data = await $myApi('/foo/{id}', {
@@ -144,7 +144,7 @@ const data = await $myApi('/foo/{id}', {
 })
 ```
 
-For reactive `path` parameters, pass a ref or getter function instead of a plain object.
+For reactive `path` parameters, pass a ref or getter function:
 
 ```ts
 const id = ref(10)
@@ -162,7 +162,7 @@ Issues will **NOT** be reported at runtime by Nuxt API Party if the wrong parame
 
 ### Route Method Overloading
 
-Some routes may be overloaded with multiple HTTP methods. The typing supports this natively and chooses the type based on the `method` property. When the property is omitted, the typing is smart enough to know `GET` is the default.
+Some routes support multiple HTTP methods. The typing chooses the type based on the `method` property. When omitted, typing defaults to `GET`.
 
 In the example schema, `GET /foo` will return a `Foo[]` array, but `POST /foo` will return a `Foo` object.
 
@@ -185,7 +185,7 @@ const resultPost = await $myApi('/foo', {
 For more details and examples, see the [OpenAPI Type Helpers](/api/openapi-types) documentation.
 :::
 
-Instead of writing types manually for each API endpoint, you can extract them directly from your OpenAPI schema. This approach ensures your types are always synchronized with your API specification and reduces the risk of type mismatches:
+Extract types directly from your OpenAPI schema instead of writing them manually. This approach ensures types stay synchronized with your API specification and reduces the risk of type mismatches:
 
 ```ts
 // ❌ Manual type definition (error-prone, out of sync)

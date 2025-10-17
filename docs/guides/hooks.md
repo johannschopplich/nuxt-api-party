@@ -1,6 +1,6 @@
 # Hooks
 
-Nuxt API Party allows you to customize the behavior of the module at various stages. The hook system supports both Nuxt and Nitro environments with fully typed, merged hooks that ensure both generic and endpoint-specific handlers are executed in the correct order.
+Nuxt API Party lets you customize module behavior at various stages. The hook system supports both Nuxt and Nitro environments with fully typed, merged hooks that ensure both generic and endpoint-specific handlers execute in the correct order.
 
 For more information on how to work with hooks, see the [Nuxt documentation](https://nuxt.com/docs/guide/going-further/hooks).
 
@@ -23,9 +23,9 @@ Both generic and endpoint-specific hooks are merged and executed in sequence.
 
 ## Nuxt Runtime Hooks
 
-Register Nuxt runtime hooks either in your `nuxt.config.ts` file, in a client plugin or at runtime. These hooks are useful for extending [API endpoints](/essentials/module-configuration#apiparty-endpoints) with additional configuration or for intercepting API calls for tasks like logging, metrics, or dynamically adding headers.
+Register Nuxt runtime hooks in your `nuxt.config.ts` file, in a client plugin, or at runtime. Use these hooks for extending [API endpoints](/essentials/module-configuration#apiparty-endpoints) with additional configuration or for intercepting API calls for logging, metrics, or dynamically adding headers.
 
-The only hook called at module initialization is `api-party:extend`, useful for modifying endpoint configuration before the module is fully initialized. For example, you can log the resolved server endpoints:
+The only hook called at module initialization is `api-party:extend`, useful for modifying endpoint configuration before the module is fully initialized. For example, log the resolved server endpoints:
 
 ```ts [nuxt.config.ts]
 export default defineNuxtConfig({
@@ -39,7 +39,7 @@ export default defineNuxtConfig({
 })
 ```
 
-All other hooks are called at runtime, either on the client side (or the server side on SSR requests). For example, you can add headers to all requests using the `api-party:request` hook:
+All other hooks are called at runtime, either client-side (or server-side on SSR requests). For example, add headers to all requests using the `api-party:request` hook:
 
 ```ts [plugins/my-plugin.ts]
 export default defineNuxtPlugin((nuxtApp) => {
@@ -57,9 +57,9 @@ All of the Nuxt hooks are executed on the client side by default. Do not use the
 
 ## Nitro Runtime Hooks
 
-For server-side processing, register these hooks in a server plugin. They are geared for tasks like dynamically fetching tokens or logging responses.
+For server-side processing, register these hooks in a server plugin. Use them for tasks like dynamically fetching tokens or logging responses.
 
-The most common use case for Nitro hooks is to attach a token to a request before it is sent. For example, you can attach a user token to a specific endpoint request:
+The most common use case for Nitro hooks is attaching a token to a request before it's sent. For example, attach a user token to a specific endpoint request:
 
 ```ts [server/plugins/my-plugin.ts]
 export default defineNitroPlugin((nitroApp) => {

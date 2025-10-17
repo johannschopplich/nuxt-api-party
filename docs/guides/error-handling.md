@@ -1,6 +1,6 @@
 # Error Handling
 
-Nuxt API Party provides comprehensive error handling that preserves error details from your API while keeping your credentials secure through the [server proxy](/advanced/how-it-works). Whether an API returns a 404, validation error, or server failure, you get complete error information to handle gracefully in your application.
+Nuxt API Party provides comprehensive error handling that preserves error details from your API while keeping credentials secure through the [server proxy](/advanced/how-it-works). Whether an API returns a 404, validation error, or server failure, you get complete error information to handle gracefully.
 
 ## Error Types
 
@@ -36,7 +36,7 @@ if (error.value) {
 
 ### Functions – `$myApi`
 
-The `$myApi` functions throw errors directly since they are designed for programmatic use (like form submissions or other one-time actions):
+The `$myApi` functions throw errors directly since they're designed for programmatic use (like form submissions or one-time actions):
 
 ```vue
 <script setup lang="ts">
@@ -73,8 +73,6 @@ Both error types preserve essential information from your API response:
 - **HTTP Status Code** – Standard HTTP status codes (401, 404, 500, etc.)
 - **HTTP Status Message** – Human-readable status text
 - **Headers** – Response headers from your API
-
-## Practical Examples
 
 ## Type Declaration
 

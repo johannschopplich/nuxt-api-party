@@ -2,18 +2,18 @@
 
 Effective caching is crucial for building performant applications that minimize network requests while keeping data fresh. Nuxt API Party provides two complementary caching mechanisms: **in-memory caching** for rapid data access and **browser HTTP caching** for persistent storage across sessions.
 
-Understanding these caching strategies helps you optimize your application's performance while ensuring users see up-to-date information when needed.
+Understanding these caching strategies helps you optimize application performance while ensuring users see up-to-date information when needed.
 
 ## In-Memory Caching
 
-In-Memory caching is the default caching behavior for data composables. It uses a custom caching mechanism that stores the response in memory and updates it with the latest response from the server.
+In-memory caching is the default caching behavior for data composables. It uses a custom caching mechanism that stores responses in memory and updates them with the latest response from the server.
 
 Benefits of in-memory caching over browser caching include:
 
 - Support for caching non-GET requests.
 - Does not require the server to respond with `Cache-Control`, `ETag`, or `Last-Modified` headers.
 
-Downsides of legacy caching include:
+Downsides of in-memory caching include:
 
 - Cache does not persist across page reloads.
 - Cache is not shared across tabs or windows.
@@ -21,13 +21,13 @@ Downsides of legacy caching include:
 
 ## Built-in Browser Caching
 
-To enable persistent caching across page reloads, you can leverage the browser's [built-in caching mechanism](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Caching) if your endpoint supports it.
+To enable persistent caching across page reloads, leverage the browser's [built-in caching mechanism](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Caching) if your endpoint supports it.
 
-If your endpoint supports client caching, the response will be cached by the browser. Subsequent GET requests to the same endpoint will return the cached response, if available, without making a new request to the server.
+If your endpoint supports client caching, the response is cached by the browser. Subsequent GET requests to the same endpoint return the cached response, if available, without making a new request to the server.
 
-The cached response will be used until it expires.
+The cached response is used until it expires.
 
-To enable built-in browser caching in your data composable, set the `cache` option to one of the values in the [options](#cache-options) section below.
+To enable built-in browser caching, set the `cache` option to one of the values in the [options](#cache-options) section below.
 
 ::: tip HTTP Caching
 To support HTTP caching, you must enable the [`enablePrefixedProxy`](/essentials/module-configuration#enableprefixedproxy) experimental option in your `nuxt.config` file. This allows GET requests to be GET requests, which is required for caching to work correctly.
@@ -53,7 +53,7 @@ To support HTTP client caching, your endpoint must meet the following requiremen
 
 ## Cache Options
 
-Caching is enabled by default for all requests. You can control the caching behavior by setting the `cache` option in the request options. The `cache` option accepts the same values as [`Request.cache`](https://developer.mozilla.org/en-US/docs/Web/API/Request/cache).
+Caching is enabled by default for all requests. Control caching behavior by setting the `cache` option in request options. The `cache` option accepts the same values as [`Request.cache`](https://developer.mozilla.org/en-US/docs/Web/API/Request/cache).
 
 The available options are:
 
@@ -114,7 +114,7 @@ const { data } = await useJsonPlaceholderData('posts', {
 
 ### Refresh Cached Data
 
-When using in-memory caching, to refresh cached data, you need to call the `clear` function to invalidate the cache, then call the `refresh` function to fetch fresh data from the server.
+When using in-memory caching, call the `clear` function to invalidate the cache, then call `refresh` to fetch fresh data from the server.
 
 ```ts
 // Refresh cached data
@@ -151,7 +151,7 @@ const { data } = await useJsonPlaceholderData('posts/1', {
 
 ### Refresh Browser Cached Data
 
-For resources that may change frequently, use the `'reload'` option to ensure that the browser checks with the server for a fresh response before returning the cached response.
+For resources that may change frequently, use the `'reload'` option to ensure the browser checks with the server for a fresh response before returning the cached response.
 
 ::: info
 This mode will make a conditional request to the server, and if the resource has not changed, it should return a `304 Not Modified` response, allowing the browser to reuse the cached response.
@@ -171,9 +171,9 @@ async function invalidateAndRefresh() {
 
 ### Reload Button
 
-Sometimes a button is used to reload data on demand. In this case, you may want to set the cache option to `'reload'` to ensure that the data is revalidated with the server on refresh. Unfortunately, this makes the first request also use the `'reload'` option, even when there's data in the cache.
+Sometimes a button is used to reload data on demand. In this case, you may want to set the cache option to `'reload'` to ensure data is revalidated with the server on refresh. Unfortunately, this makes the first request also use the `'reload'` option, even when there's data in the cache.
 
-There is no builtin way to make the cache use `'default'` for the first request and `'reload'` for manual refreshes, but you can achieve this by using a `ref`. Set it to `'default'` initially, then before you call `refresh()`, set it to `'reload'`.
+There's no builtin way to make the cache use `'default'` for the first request and `'reload'` for manual refreshes, but you can achieve this using a `ref`. Set it to `'default'` initially, then before calling `refresh()`, set it to `'reload'`.
 
 ```vue
 <script setup lang="ts">

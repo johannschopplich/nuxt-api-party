@@ -1,8 +1,8 @@
 # Interceptors
 
-Interceptors are hooks to customize the behavior of your API requests at different stages of the fetch lifecycle. They allow you to modify requests, handle responses, log activities, and implement cross-cutting concerns like authentication, caching, or error tracking.
+Interceptors customize API request behavior at different stages of the fetch lifecycle. Use them to modify requests, handle responses, log activities, and implement cross-cutting concerns like authentication, caching, or error tracking.
 
-Nuxt API Party leverages [`ofetch`](https://github.com/unjs/ofetch) interceptors, giving you access to the same interception capabilities across all your API endpoints. Interceptors work with both `useMyApiData` and `$myApi` composables, enabling consistent behavior across your application.
+Nuxt API Party leverages [`ofetch`](https://github.com/unjs/ofetch) interceptors, giving you access to the same interception capabilities across all API endpoints. Interceptors work with both `useMyApiData` and `$myApi` composables, enabling consistent behavior across your application.
 
 ## Available Interceptors
 
@@ -15,7 +15,7 @@ Nuxt API Party provides four interceptor hooks that correspond to different stag
 
 ## `onRequest({ request, options })`
 
-The `onRequest` interceptor is called before the request is sent, allowing you to modify the request or options. This is perfect for adding authentication headers, query parameters, or implementing request logging.
+The `onRequest` interceptor is called before the request is sent, letting you modify the request or options. Perfect for adding authentication headers, query parameters, or implementing request logging.
 
 ```ts
 const { data } = await useMyApiData('posts', {
@@ -35,7 +35,7 @@ const { data } = await useMyApiData('posts', {
 
 ## `onRequestError({ request, options, error })`
 
-The `onRequestError` interceptor is called when the request fails before being sent (network issues, timeout, etc.). This is useful for logging infrastructure problems or implementing fallback strategies.
+The `onRequestError` interceptor is called when the request fails before being sent (network issues, timeout, etc.). Useful for logging infrastructure problems or implementing fallback strategies.
 
 ```ts
 const { data } = await useMyApiData('posts', {
@@ -48,7 +48,7 @@ const { data } = await useMyApiData('posts', {
 
 ## `onResponse({ request, options, response })`
 
-The `onResponse` interceptor is called for all responses, including both successful and error responses. Use this for response processing, caching, or analytics.
+The `onResponse` interceptor is called for all responses, including both successful and error responses. Use for response processing, caching, or analytics.
 
 ```ts
 const { data } = await useMyApiData('posts', {
@@ -66,7 +66,7 @@ const { data } = await useMyApiData('posts', {
 
 ## `onResponseError({ request, options, response })`
 
-The `onResponseError` interceptor is called when the response indicates an error (status codes 4xx, 5xx). This is perfect for centralized error handling, retry logic, or user notifications.
+The `onResponseError` interceptor is called when the response indicates an error (status codes 4xx, 5xx). Perfect for centralized error handling, retry logic, or user notifications.
 
 ```ts
 const { data } = await useMyApiData('posts', {

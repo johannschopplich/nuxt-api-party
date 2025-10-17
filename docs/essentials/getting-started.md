@@ -28,7 +28,7 @@ export default defineNuxtConfig({
 
 ## Configure Your First API Endpoint
 
-Configure an API endpoint in your Nuxt configuration. Each endpoint you define will generate two composables for data fetching:
+Configure an API endpoint in your Nuxt configuration. Each endpoint generates two composables for data fetching:
 
 ::: code-group
 ```ts [nuxt.config.ts]
@@ -53,15 +53,15 @@ export default defineNuxtConfig({
 
 ### Endpoint Configuration Options
 
-Each endpoint accepts the following configuration options:
+Each endpoint accepts the following options:
 
 - `url` (required): Base URL of the API
 - `token` (optional): Bearer token for authentication
-- `query` (optional): Default query parameters to send with each request
-- `headers` (optional): Default headers sent with every request
+- `query` (optional): Default query parameters sent with each request
+- `headers` (optional): Default headers sent with each request
 - `cookies` (optional): Whether to forward cookies in requests
 - `allowedUrls` (optional): URLs allowed for [dynamic backend switching](/guides/dynamic-backend-url)
-- `schema` (optional): [OpenAPI Schema](https://swagger.io/resources/open-api) schema URL or file path for [type generation](/guides/openapi-integration)
+- `schema` (optional): [OpenAPI Schema](https://swagger.io/resources/open-api) URL or file path for [type generation](/guides/openapi-integration)
 
 ::: tip Dynamic Configuration
 For dynamic headers or runtime configuration, use [runtime hooks](/guides/hooks) or [environment variables](#environment-variables).
@@ -80,7 +80,7 @@ You can configure as many endpoints as you need. Each endpoint generates its own
 
 ## Environment Variables
 
-For secure configuration, use environment variables instead of hardcoding sensitive values:
+Use environment variables instead of hardcoding sensitive values:
 
 ```bash
 # `.env`
@@ -88,7 +88,7 @@ JSON_PLACEHOLDER_API_BASE_URL=https://jsonplaceholder.typicode.com
 JSON_PLACEHOLDER_API_TOKEN=your-secret-token
 ```
 
-You can also use Nuxt's [runtime config](https://nuxt.com/docs/api/nuxt-config#runtimeconfig) for automatic environment variable mapping:
+Or use Nuxt's [runtime config](https://nuxt.com/docs/api/nuxt-config#runtimeconfig) for automatic environment variable mapping:
 
 ::: code-group
 ```ts [nuxt.config.ts]

@@ -1,6 +1,6 @@
 # OpenAPI Type Helpers
 
-Nuxt API Party generates a powerful unified type interface for each service that provides comprehensive access to all endpoint information. This interface follows the pattern `Service<Path, Method>` and serves as your single source of truth for API type information:
+Nuxt API Party generates a unified type interface for each service that provides comprehensive access to all endpoint information. This interface follows the pattern `Service<Path, Method>` and serves as your single source of truth for API type information:
 
 ```ts
 import type { PetStore } from '#nuxt-api-party'
@@ -18,7 +18,7 @@ type ErrorResponse = UserEndpoint['responses'][404] // Specific status code
 
 ## Core Type Properties
 
-Every endpoint type provides these essential properties that give you complete control over API interactions. These properties are automatically inferred from your OpenAPI schema:
+Every endpoint type provides these properties for complete control over API interactions. Properties are automatically inferred from your OpenAPI schema:
 
 | Property    | Description            | Example                                          |
 | ----------- | ---------------------- | ------------------------------------------------ |
@@ -33,11 +33,11 @@ Every endpoint type provides these essential properties that give you complete c
 
 ## Practical Examples
 
-Here are common patterns for extracting type information from your OpenAPI schema. These examples demonstrate how to leverage the unified type interface for different use cases:
+Common patterns for extracting type information from your OpenAPI schema:
 
 ### Basic Type Extraction
 
-Extract individual type components for use in your application logic, form validation, or component props:
+Extract individual type components for application logic, form validation, or component props:
 
 ```ts
 import type { PetStore } from '#nuxt-api-party'
@@ -61,7 +61,7 @@ type PetResponse = PetStore<'/pet/{petId}', 'get'>['response']
 
 ### Error Handling Types
 
-Properly type your error handling by extracting specific error response types. This ensures robust error handling with full type safety:
+Extract specific error response types for robust error handling with full type safety:
 
 ```ts
 // Extract specific error response types
@@ -75,7 +75,7 @@ type AllPetResponses = PetStore<'/pet/{petId}', 'get'>['responses']
 
 ## Schema Discovery
 
-Nuxt API Party generates helper types for exploring your API structure programmatically. These types are useful for building dynamic UI components or API documentation:
+Nuxt API Party generates helper types for exploring your API structure programmatically. Useful for building dynamic UI components or API documentation:
 
 ```ts
 import type { PetStoreApiMethods, PetStoreApiPaths } from '#nuxt-api-party'
@@ -91,7 +91,7 @@ type PetMethods = PetStoreApiMethods<'/pet'>
 
 ## Schema Model Types
 
-Nuxt API Party also generates a dedicated helper for extracting OpenAPI schema models directly. This provides access to your data models without needing to reference specific endpoints:
+Nuxt API Party generates a dedicated helper for extracting OpenAPI schema models directly. This provides access to data models without referencing specific endpoints:
 
 ```ts
 import type { PetStoreModel } from '#nuxt-api-party'
@@ -107,4 +107,4 @@ type User = PetStoreModel<'User'>
 //   ^? { id?: number; username?: string; firstName?: string; lastName?: string; email?: string; password?: string; phone?: string; userStatus?: number }
 ```
 
-This is particularly useful when you need to work with schema models independently of specific endpoints, such as for creating reusable components, utility functions, or when building forms that work with multiple related endpoints.
+Particularly useful when working with schema models independently of specific endpoints, such as creating reusable components, utility functions, or building forms that work with multiple related endpoints.

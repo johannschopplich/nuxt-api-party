@@ -1,30 +1,29 @@
 # `useFetch`-Like Composable
 
-Returns the raw response of the API endpoint. Intended for data which requires reactive updates, e.g. when using the data in a template.
+Returns the raw API response. Intended for data that requires reactive updates, e.g. when using data in templates.
 
-Responses are **cached** between function calls for the same path based on a calculated hash. You can disable this behavior by setting `cache` to `false`.
+Responses are **cached** between function calls for the same path based on a calculated hash. Disable this by setting `cache` to `false`.
 
-The composable supports every [`useAsyncData` option](https://nuxt.com/docs/api/composables/use-async-data/#params).
+Supports every [`useAsyncData` option](https://nuxt.com/docs/api/composables/use-async-data/#params).
 
 ::: info Placeholder
-`useMyApiData` is a placeholder used as an example in the documentation. The composable is generated based on your API endpoint ID. For example, if you were to call an endpoint `jsonPlaceholder`, the composable will be called `useJsonPlaceholderData`.
+`useMyApiData` is a placeholder. The composable is generated based on your API endpoint ID. For example, endpoint `jsonPlaceholder` generates `useJsonPlaceholderData`.
 :::
 
 ## Return Values
 
-- **`data`**: the result of the asynchronous function that is passed in.
-- **`refresh`/`execute`**: a function that can be used to refresh the data returned by the handler function.
-- **`error`**: an error object if the data fetching failed.
-- **`status`**: a string indicating the status of the data request:
+- **`data`**: result of the asynchronous function.
+- **`refresh`/`execute`**: function to refresh the data returned by the handler.
+- **`error`**: error object if data fetching failed.
+- **`status`**: string indicating the status of the data request:
   - `idle`: when the request has not started, such as:
     - when `execute` has not yet been called and `{ immediate: false }` is set
     - when rendering HTML on the server and `{ server: false }` is set
   - `pending`: the request is in progress
   - `success`: the request has completed successfully
   - `error`: the request has failed
-- **`clear`**: a function that can be used to set `data` to `undefined` (or the value of `options.default()` if provided), set `error` to `undefined`, set `status` to `idle`, and mark any currently pending requests as cancelled.
+- **`clear`**: function to set `data` to `undefined` (or `options.default()` value if provided), set `error` to `undefined`, set `status` to `idle`, and mark pending requests as cancelled.
 
-By default, Nuxt waits until a `refresh` is finished before it can be executed again.
 By default, Nuxt waits until a `refresh` is finished before it can be executed again.
 
 ## Type Declarations
@@ -33,12 +32,11 @@ By default, Nuxt waits until a `refresh` is finished before it can be executed a
 
 ## Caching
 
-You can customize the caching behavior by passing the `cache` option to the composable.
+Customize caching behavior by passing the `cache` option:
 
 ```ts
 const { data } = await useMyApiData('posts', {
-  cache: 'no-store', // or 'default', 'reload', 'no-cache', 'force-cache', 'only-if-cached'
-  // other options...
+  cache: 'no-store' // or 'default', 'reload', 'no-cache', 'force-cache', 'only-if-cached'
 })
 ```
 

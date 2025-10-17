@@ -1,6 +1,6 @@
 # Data Fetching Methods
 
-Nuxt API Party provides two distinct approaches to fetch data from your APIs. Understanding when to use each method will help you build more efficient and maintainable applications.
+Nuxt API Party provides two approaches to fetch data from your APIs. Understanding when to use each method helps you build more efficient and maintainable applications.
 
 ::: tip
 The generated composables follow the exact same patterns as Nuxt's native `useFetch` and `$fetch`. If you are familiar with Nuxt data fetching, you already know how to use Nuxt API Party!
@@ -21,7 +21,7 @@ Choose between reactive data fetching and direct API calls based on your use cas
 
 ## Method 1: Reactive Data Fetching
 
-Use `useMyApiData` composables in your components and pages to fetch and reactively update data. These composables integrate seamlessly with Nuxt's hydration and caching systems.
+Use `useMyApiData` composables in components and pages to fetch and reactively update data. These composables integrate seamlessly with Nuxt's hydration and caching systems.
 
 ```vue
 <script setup lang="ts">
@@ -49,9 +49,9 @@ function nextPost() {
 
 ## Method 2: Direct API Calls
 
-Use `$myApi` composables for programmatic API interactions, form submissions, and one-time actions where you need direct control over the request timing.
+Use `$myApi` composables for programmatic API interactions, form submissions, and one-time actions where you need direct control over request timing.
 
-A common pattern is handling form submissions:
+Common pattern for handling form submissions:
 
 ```vue
 <script setup lang="ts">
@@ -103,7 +103,7 @@ async function submitPost() {
 </template>
 ```
 
-In plugins or middleware, you can also use `$myApi` for initial data fetching:
+In plugins or middleware, use `$myApi` for initial data fetching:
 
 ::: code-group
 ```ts [plugins/api-setup.ts]
