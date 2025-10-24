@@ -79,6 +79,47 @@ const data = await $jsonPlaceholder(
 </template>
 ```
 
+## Using with `useAsyncData`
+
+::: warning Nuxt Context Issue
+Calling `$myApi` multiple times sequentially inside `useAsyncData` causes server-side errors related to Nuxt context loss. This happens because async operations break the context chain that Nuxt uses to track composable calls.
+:::
+
+When you need to make multiple API calls inside `useAsyncData`, use one of these workarounds:
+
+### Option 1: Use `callWithNuxt` Helper
+
+Wrap subsequent calls with `callWithNuxt` to restore the Nuxt context:
+
+```ts
+import { callWithNuxt } from '#app'
+
+const { data } = await useAsyncData(async (nuxt) => {
+  const firstResult = await $myApi('/path1')
+
+  // Wrap the second call to restore context
+  const secondResult = await callWithNuxt(nuxt!, async () =>
+    await $myApi('/path2')
+  )
+
+  return { firstResult, secondResult }
+})
+```
+
+### Option 2: Use `useMyApiData` Instead
+
+For reactive data fetching within components, prefer `useMyApiData` composables which handle Nuxt context automatically:
+
+```ts
+// Instead of using $myApi inside useAsyncData...
+const { data: posts } = await useMyApiData('posts')
+const { data: comments } = await useMyApiData('comments')
+```
+
+::: tip Best Practice
+Use `useMyApiData` for component data and `$myApi` for programmatic actions (form submissions, mutations). This avoids context issues and provides better caching and reactivity.
+:::
+
 ## Client Requests
 
 ::: warning

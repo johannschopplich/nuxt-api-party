@@ -51,6 +51,10 @@ function nextPost() {
 
 Use `$myApi` composables for programmatic API interactions, form submissions, and one-time actions where you need direct control over request timing.
 
+::: warning Using `$myApi` with `useAsyncData`
+Calling `$myApi` multiple times inside `useAsyncData` causes Nuxt context errors on the server. Use `useMyApiData` composables instead for reactive data, or see the [`$myApi` documentation](/api/dollarfetch-like#using-with-useasyncdata) for workarounds.
+:::
+
 Common pattern for handling form submissions:
 
 ```vue
