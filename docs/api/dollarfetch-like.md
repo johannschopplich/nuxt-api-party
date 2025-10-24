@@ -99,8 +99,7 @@ const { data } = await useAsyncData(async (nuxt) => {
 
   // Wrap the second call to restore context
   const secondResult = await callWithNuxt(nuxt!, async () =>
-    await $myApi('/path2')
-  )
+    await $myApi('/path2'))
 
   return { firstResult, secondResult }
 })
