@@ -84,7 +84,7 @@ const { data, refresh, error, status, clear } = await useJsonPlaceholderData('po
 ## Special Thanks
 
 - [Dennis Baum](https://github.com/dennisbaum) for sponsoring the initial version of this package.
-- [Maronbeere](https://maronbeere.carrd.co) for his logo pixel art.
+- [Konkon](https://konkon.zip) for his logo pixel art.
 
 ## License
 

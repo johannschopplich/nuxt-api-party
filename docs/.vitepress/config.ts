@@ -88,7 +88,7 @@ export default defineConfig({
 
     footer: {
       message: 'Released under the MIT License.',
-      copyright: 'Copyright © 2022-PRESENT Johann Schopplich & Matthew Messinger.<br>Icon by <a href="https://maronbeere.carrd.co">Maronbeere</a>',
+      copyright: 'Copyright © 2022-PRESENT Johann Schopplich & Matthew Messinger.<br>Icon by <a href="https://konkon.zip">Konkon</a>',
     },
 
     search: {
