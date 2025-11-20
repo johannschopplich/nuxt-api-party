@@ -101,6 +101,10 @@ export default defineEventHandler(async (event) => {
           // @ts-expect-error: Types will be generated on Nuxt prepare
           await nitro.hooks.callHook(`api-party:response:${endpointId}`, ctx, event)
           await nitro.hooks.callHook('api-party:response', ctx, event)
+
+          if (ctx.response.redirected) {
+            ctx.response.headers.set('x-redirected-to', ctx.response.url)
+          }
         },
       },
     )

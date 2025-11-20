@@ -35,6 +35,9 @@ export default defineNuxtConfig({
         url: 'https://petstore3.swagger.io/api/v3',
         schema: './schemas/petStore.yaml',
       },
+      custom: {
+        url: '/api/custom',
+      },
     },
   },
 })

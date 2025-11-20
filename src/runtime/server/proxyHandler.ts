@@ -1,15 +1,19 @@
-import type { H3Error } from 'h3'
+import type { H3Error, H3Event } from 'h3'
+import { experimentalRewriteProxyRedirects } from '#nuxt-api-party.nitro-config'
 import {
   createError,
   defineEventHandler,
   getQuery,
   getRequestHeader,
+  getRequestURL,
   getRouterParam,
   isError,
   proxyRequest,
 } from 'h3'
 import { useNitroApp, useRuntimeConfig } from 'nitropack/runtime'
-import { joinURL, withQuery } from 'ufo'
+import { hasLeadingSlash, joinURL, parsePath, parseURL, withoutBase, withQuery } from 'ufo'
+
+const REDIRECT_CODES = new Set([201, 301, 302, 303, 307, 308])
 
 export default defineEventHandler(async (event) => {
   const nitro = useNitroApp()
@@ -56,6 +60,7 @@ export default defineEventHandler(async (event) => {
     hookErrorPromise,
     proxyRequest(event, url, {
       fetch: globalThis.$fetch.create({
+        redirect: experimentalRewriteProxyRedirects ? 'manual' : 'follow',
         onRequest: hookErrorPromise.wrap(async (ctx) => {
           await nitro.hooks.callHook('api-party:request', ctx, event)
           // @ts-expect-error: Types will be generated on Nuxt prepare
@@ -65,16 +70,78 @@ export default defineEventHandler(async (event) => {
           // @ts-expect-error: Types will be generated on Nuxt prepare
           await nitro.hooks.callHook(`api-party:response:${endpointId}`, ctx, event)
           await nitro.hooks.callHook('api-party:response', ctx, event)
+
+          if (ctx.response.redirected) {
+            ctx.response.headers.set('x-redirected-to', ctx.response.url)
+          }
         }),
       }).raw,
       onResponse: (event) => {
         if (!endpoint.cookies && event.node.res.hasHeader('set-cookie')) {
           event.node.res.removeHeader('set-cookie')
         }
+
+        if (experimentalRewriteProxyRedirects) {
+          const status = event.node.res.statusCode
+          if (REDIRECT_CODES.has(status)) {
+            rewriteProxyRedirects(event, { baseURL, path })
+          }
+        }
       },
     }),
   ])
 })
+
+/**
+ * Rewrite redirects for proxied requests.
+ *
+ * This rewrites relative redirects to be relative to the proxied
+ * endpoint path, and absolute redirects to be relative to the
+ * proxied endpoint base URL. If a relative redirect would point
+ * outside of the proxied endpoint path, an error is thrown.
+ *
+ * Cross-origin redirects are not rewritten.
+ *
+ * @param event The H3 event
+ * @param opts
+ * @param opts.baseURL The base URL of the proxied endpoint
+ * @param opts.path The path of the proxied request
+ */
+function rewriteProxyRedirects(event: H3Event, { baseURL, path }: { baseURL: string, path: string }) {
+  const location = event.node.res.getHeader('location') as string | undefined
+  if (location) {
+    const reqUrl = getRequestURL(event)
+    const locUrl = parseURL(location)
+    const baseUrl = parseURL(baseURL)
+    baseUrl.host ||= reqUrl.host
+
+    let cleanRedirect
+    if (locUrl.host === baseUrl.host) {
+      // same origin full URL
+      cleanRedirect = withoutBase(`${locUrl.pathname}${locUrl.search}${locUrl.hash}`, baseUrl.pathname)
+    }
+    else if (hasLeadingSlash(location)) {
+      // rewrite absolute paths to be relative to the proxied endpoint path
+      cleanRedirect = withoutBase(location, parsePath(baseURL).pathname)
+    }
+    else {
+      // relative path or cross-origin URL, leave as-is
+      return
+    }
+
+    if (cleanRedirect === location) {
+      throw createError({
+        statusCode: 500,
+        message: `Cannot rewrite redirect '${location}' as it is outside of the endpoint path.`,
+      })
+    }
+
+    const routePrefix = reqUrl.pathname.slice(0, reqUrl.pathname.length - path.length)
+    const newLocation = joinURL(routePrefix, cleanRedirect)
+    event.node.res.setHeader('x-original-location', location)
+    event.node.res.setHeader('location', newLocation)
+  }
+}
 
 interface HookErrorPromise extends Promise<never> {
   wrap: <P extends any[]>(fn: (...args: P) => Promise<void>) => (...args: P) => Promise<void>

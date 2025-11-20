@@ -4,7 +4,7 @@ import type { OpenAPI3, OpenAPITSOptions } from 'openapi-typescript'
 import type { QueryObject } from 'ufo'
 import type { ApiClientFetchOptions, SharedFetchOptions } from './runtime/composables/$api'
 import { fileURLToPath } from 'node:url'
-import { addImportsSources, addServerHandler, addTemplate, addTypeTemplate, createResolver, defineNuxtModule, updateTemplates, useLogger } from '@nuxt/kit'
+import { addImportsSources, addServerHandler, addServerTemplate, addTemplate, addTypeTemplate, createResolver, defineNuxtModule, updateTemplates, useLogger } from '@nuxt/kit'
 import { watch } from 'chokidar'
 import { defu } from 'defu'
 import { createJiti } from 'jiti'
@@ -129,6 +129,23 @@ export interface ModuleOptions {
      * @default true
      */
     enableSchemaFileWatcher?: boolean
+
+    /**
+     * Enable proxy redirect rewriting.
+     *
+     * When enabled, redirect responses from API endpoints through the proxy will be rewritten, then
+     * forwarded to the client. This ensures that redirects are properly handled in both SSR and
+     * client-side contexts.
+     *
+     * When disabled, requests going through the proxy that result in redirects will be followed
+     * transparently, and the client will not know that a redirect occurred.
+     *
+     * Because of the way some redirects are handled by clients on POST requests, this option will be
+     * ignored if `enablePrefixedProxy` is disabled.
+     *
+     * @default true
+     */
+    rewriteProxyRedirects?: boolean
   }
 }
 // #endregion options
@@ -195,6 +212,7 @@ export default defineNuxtModule<ModuleOptions>().with({
       enablePrefixedProxy: false,
       disableClientPayloadCache: false,
       enableSchemaFileWatcher: true,
+      rewriteProxyRedirects: true,
     },
   },
   async setup(options, nuxt) {
@@ -462,15 +480,10 @@ export const experimentalDisableClientPayloadCache = ${JSON.stringify(options.ex
 `.trimStart(),
     })
 
-    addTemplate({
-      filename: `module/${moduleName}.config.d.ts`,
-      write: false, // Internal config, no need to write to disk
+    addServerTemplate({
+      filename: `#${moduleName}.nitro-config`,
       getContents: () => `
-export declare const allowClient: boolean | 'allow' | 'always'
-export declare const serverBasePath: string
-
-export declare const experimentalEnablePrefixedProxy: boolean
-export declare const experimentalDisableClientPayloadCache: boolean
+export const experimentalRewriteProxyRedirects = ${JSON.stringify(options.experimental.rewriteProxyRedirects)}
 `.trimStart(),
     })
 
