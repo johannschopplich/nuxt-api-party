@@ -113,6 +113,7 @@ function rewriteProxyRedirects(event: H3Event, { baseURL, path }: { baseURL: str
     const reqUrl = getRequestURL(event)
     const locUrl = parseURL(location)
     const baseUrl = parseURL(baseURL)
+    baseUrl.protocol ||= reqUrl.protocol
     baseUrl.host ||= reqUrl.host
 
     let cleanRedirect
@@ -122,7 +123,7 @@ function rewriteProxyRedirects(event: H3Event, { baseURL, path }: { baseURL: str
     }
     else if (hasLeadingSlash(location)) {
       // rewrite absolute paths to be relative to the proxied endpoint path
-      cleanRedirect = cleanRedirectLocation(location, parsePath(baseURL).pathname)
+      cleanRedirect = cleanRedirectLocation(location, baseUrl.pathname)
     }
     else {
       // relative path or cross-origin URL, leave as-is
