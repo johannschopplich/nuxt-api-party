@@ -118,22 +118,15 @@ function rewriteProxyRedirects(event: H3Event, { baseURL, path }: { baseURL: str
     let cleanRedirect
     if (locUrl.host === baseUrl.host) {
       // same origin full URL
-      cleanRedirect = withoutBase(`${locUrl.pathname}${locUrl.search}${locUrl.hash}`, baseUrl.pathname)
+      cleanRedirect = cleanRedirectLocation(`${locUrl.pathname}${locUrl.search}${locUrl.hash}`, baseUrl.pathname)
     }
     else if (hasLeadingSlash(location)) {
       // rewrite absolute paths to be relative to the proxied endpoint path
-      cleanRedirect = withoutBase(location, parsePath(baseURL).pathname)
+      cleanRedirect = cleanRedirectLocation(location, parsePath(baseURL).pathname)
     }
     else {
       // relative path or cross-origin URL, leave as-is
       return
-    }
-
-    if (cleanRedirect === location) {
-      throw createError({
-        statusCode: 500,
-        message: `Cannot rewrite redirect '${location}' as it is outside of the endpoint path.`,
-      })
     }
 
     const routePrefix = reqUrl.pathname.slice(0, reqUrl.pathname.length - path.length)
@@ -141,6 +134,17 @@ function rewriteProxyRedirects(event: H3Event, { baseURL, path }: { baseURL: str
     event.node.res.setHeader('x-original-location', location)
     event.node.res.setHeader('location', newLocation)
   }
+}
+
+function cleanRedirectLocation(location: string, baseURL: string) {
+  const newLocation = withoutBase(location, baseURL)
+  if (newLocation === location) {
+    throw createError({
+      statusCode: 500,
+      message: `Cannot rewrite redirect '${location}' as it is outside of the endpoint base URL.`,
+    })
+  }
+  return newLocation
 }
 
 interface HookErrorPromise extends Promise<never> {
