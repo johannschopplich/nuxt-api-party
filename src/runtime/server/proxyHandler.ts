@@ -116,7 +116,7 @@ function rewriteProxyRedirects(event: H3Event, { baseURL, path }: { baseURL: str
     baseUrl.host ||= reqUrl.host
 
     let cleanRedirect
-    if (locUrl.host === baseUrl.host) {
+    if (locUrl.host === baseUrl.host && locUrl.protocol === baseUrl.protocol) {
       // same origin full URL
       cleanRedirect = cleanRedirectLocation(`${locUrl.pathname}${locUrl.search}${locUrl.hash}`, baseUrl.pathname)
     }
