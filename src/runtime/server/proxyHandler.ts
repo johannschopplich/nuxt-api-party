@@ -11,7 +11,7 @@ import {
   proxyRequest,
 } from 'h3'
 import { useNitroApp, useRuntimeConfig } from 'nitropack/runtime'
-import { hasLeadingSlash, joinURL, parsePath, parseURL, withoutBase, withQuery } from 'ufo'
+import { hasLeadingSlash, joinURL, parseURL, withoutBase, withQuery } from 'ufo'
 
 const REDIRECT_CODES = new Set([201, 301, 302, 303, 307, 308])
 
