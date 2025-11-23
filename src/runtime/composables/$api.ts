@@ -93,7 +93,7 @@ export type OpenAPIClient<Paths> = <
   ResT = Methods[DefaultMethod] extends Record<PropertyKey, any> ? FetchResponseData<Methods[DefaultMethod]> : never,
 >(
   path: ReqT,
-  options?: OpenAPIClientFetchOptions<Method, LowercasedMethod, Methods>
+  options?: OpenAPIClientFetchOptions<Method, LowercasedMethod, Methods>,
 ) => Promise<ResT>
 
 declare module '#app' {

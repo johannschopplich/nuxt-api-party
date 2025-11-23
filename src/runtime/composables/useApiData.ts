@@ -61,7 +61,7 @@ export type UseApiDataOptions<T> = Pick<
 export type UseApiData = <T = unknown>(
   path: MaybeRefOrGetter<string>,
   opts?: UseApiDataOptions<T>,
-  autoKey?: string
+  autoKey?: string,
 ) => AsyncData<T | undefined, NuxtError>
 // #endregion options
 
@@ -90,7 +90,7 @@ export type UseOpenAPIData<Paths> = <
 >(
   path: MaybeRefOrGetter<ReqT>,
   options?: UseOpenAPIDataOptions<Method, LowercasedMethod, Methods, ResT, DataT>,
-  autoKey?: string
+  autoKey?: string,
 ) => AsyncData<DataT | undefined, NuxtError<ErrorT>>
 
 export function _useApiData<T = unknown>(
