@@ -73,7 +73,7 @@ export interface ModuleOptions {
    *
    * @default false
    */
-  client: boolean | 'allow' | 'always'
+  client?: boolean | 'allow' | 'always'
 
   /**
    * Global options for [`openapi-typescript`](https://openapi-ts.dev/node/#options)
@@ -185,7 +185,7 @@ export default defineNuxtModule<ModuleOptions>().with({
   },
   defaults: {
     endpoints: {},
-    client: false,
+    client: undefined,
     openAPITS: {},
     server: {
       basePath: '__api_party',
@@ -203,10 +203,13 @@ export default defineNuxtModule<ModuleOptions>().with({
     const getRawComposableName = (endpointId: string) => `$${camelCase(endpointId)}`
     const getDataComposableName = (endpointId: string) => `use${pascalCase(endpointId)}Data`
 
-    if (!nuxt.options.ssr) {
+    if (!nuxt.options.ssr && options.client == null) {
       logger.info('Enabling Nuxt API Party client requests by default because SSR is disabled.')
       options.client = 'always'
     }
+
+    // Fallback for default behavior
+    options.client ??= false
 
     await nuxt.callHook('api-party:extend', options)
 
