@@ -203,15 +203,13 @@ export default defineNuxtModule<ModuleOptions>().with({
     const getRawComposableName = (endpointId: string) => `$${camelCase(endpointId)}`
     const getDataComposableName = (endpointId: string) => `use${pascalCase(endpointId)}Data`
 
-    if (!nuxt.options.ssr && options.client === undefined) {
+    if (!nuxt.options.ssr && options.client == null) {
       logger.info('Enabling Nuxt API Party client requests by default because SSR is disabled.')
       options.client = 'always'
     }
 
     // Fallback for default behavior
-    if (options.client === undefined) {
-      options.client = false
-    }
+    options.client ??= false
 
     await nuxt.callHook('api-party:extend', options)
 
