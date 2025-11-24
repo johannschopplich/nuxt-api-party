@@ -104,8 +104,8 @@ export default defineEventHandler(async (event) => {
  *
  * @param event The H3 event
  * @param opts
- * @param opts.baseURL The base URL of the proxied endpoint
- * @param opts.path The path of the proxied request
+ * @param opts.baseURL The base URL of the proxied endpoint, used to build a full URL for absolute redirects
+ * @param opts.path The path of the proxied request, used to determine the route prefix
  */
 function rewriteProxyRedirects(event: H3Event, { baseURL, path }: { baseURL: string, path: string }) {
   const location = event.node.res.getHeader('location') as string | undefined
@@ -137,11 +137,20 @@ function rewriteProxyRedirects(event: H3Event, { baseURL, path }: { baseURL: str
   }
 }
 
+/**
+ * Clean a redirect location by removing the base URL.
+ *
+ * If the location is outside of the base URL, a 500 error is thrown.
+ *
+ * @param location The location to clean
+ * @param baseURL The base url to remove from location
+ * @returns The cleaned location
+ */
 function cleanRedirectLocation(location: string, baseURL: string) {
   const newLocation = withoutBase(location, baseURL)
   if (newLocation === location) {
     throw createError({
-      statusCode: 500,
+      statusCode: 502, // Bad Gateway
       message: `Cannot rewrite redirect '${location}' as it is outside of the endpoint base URL.`,
     })
   }

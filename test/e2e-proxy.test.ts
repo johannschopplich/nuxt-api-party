@@ -41,7 +41,6 @@ describe('nuxt-api-party proxy', async () => {
     it('throws error for redirect outside of proxied path', async () => {
       const response = await fetch('/api/__api_party/testApi/proxy/redirect?mode=outside', {
         redirect: 'manual',
-
       })
       expect(response.status).toBe(500)
       const data = await response.json()
