@@ -42,7 +42,7 @@ describe('nuxt-api-party proxy', async () => {
       const response = await fetch('/api/__api_party/testApi/proxy/redirect?mode=outside', {
         redirect: 'manual',
       })
-      expect(response.status).toBe(500)
+      expect(response.status).toBe(502)
       const data = await response.json()
       expect(data.message).toBe('Cannot rewrite redirect \'/\' as it is outside of the endpoint base URL.')
     })
