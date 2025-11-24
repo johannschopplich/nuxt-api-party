@@ -3,9 +3,9 @@ declare module '#nuxt-api-party.nitro-config' {
 }
 
 declare module '#build/module/nuxt-api-party.config' {
-  export declare const allowClient: boolean | 'allow' | 'always'
-  export declare const serverBasePath: string
+  export const allowClient: boolean | 'allow' | 'always'
+  export const serverBasePath: string
 
-  export declare const experimentalEnablePrefixedProxy: boolean
-  export declare const experimentalDisableClientPayloadCache: boolean
+  export const experimentalEnablePrefixedProxy: boolean
+  export const experimentalDisableClientPayloadCache: boolean
 }
