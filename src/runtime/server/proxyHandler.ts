@@ -140,7 +140,7 @@ function rewriteProxyRedirects(event: H3Event, { baseURL, path }: { baseURL: str
 /**
  * Clean a redirect location by removing the base URL.
  *
- * If the location is outside of the base URL, a 500 error is thrown.
+ * If the location is outside of the base URL, a 502 error is thrown.
  *
  * @param location The location to clean
  * @param baseURL The base url to remove from location
