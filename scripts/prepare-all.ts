@@ -1,4 +1,5 @@
 #!/usr/bin/env zx
+
 /*
 * Prepare all Nuxt projects in the repository using glob patterns.
 */
