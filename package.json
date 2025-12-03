@@ -35,7 +35,7 @@
     "prepack": "nuxt-module-build build",
     "dev": "nuxt dev playground",
     "dev:build": "nuxt build playground",
-    "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxt prepare playground && nuxt prepare test/fixture",
+    "dev:prepare": "zx ./scripts/prepare-all.ts",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
@@ -77,6 +77,7 @@
     "openapi-typescript": "^7.10.1",
     "typescript": "^5.9.3",
     "vitest": "^3.2.4",
-    "vue-tsc": "^3.1.5"
+    "vue-tsc": "^3.1.5",
+    "zx": "^8.8.5"
   }
 }
