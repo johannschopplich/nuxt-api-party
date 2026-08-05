@@ -138,12 +138,10 @@ export async function _$api<T = unknown>(
     consola.error('[nuxt-api-party] Payload caching is disabled. Set `experimental.disableClientPayloadCache: false` in the module options to enable it.')
   }
 
-  // Local caching support
   const enablePayloadCache = (!experimentalDisableClientPayloadCache && typeof _cache === 'boolean') ? _cache : false
-  // Request cache mode
   const cache = typeof _cache === 'boolean' ? _cache ? 'default' : 'no-store' : _cache
 
-  // TODO: Remove caching support from $api composable
+  // TODO: Remove caching support from the `$api` composable.
   let _key: string | undefined
   const getCacheKey = () => {
     if (_key)
@@ -180,11 +178,11 @@ export async function _$api<T = unknown>(
   const fetchHooks = mergeFetchHooks(fetchOptions, {
     async onRequest(ctx) {
       await nuxt.callHook('api-party:request', ctx)
-      // @ts-expect-error: Types will be generated on Nuxt prepare
+      // @ts-expect-error: Types will be generated on Nuxt prepare.
       await nuxt.callHook(`api-party:request:${endpointId}`, ctx)
     },
     async onResponse(ctx) {
-      // @ts-expect-error: Types will be generated on Nuxt prepare
+      // @ts-expect-error: Types will be generated on Nuxt prepare.
       await nuxt.callHook(`api-party:response:${endpointId}`, ctx)
       await nuxt.callHook('api-party:response', ctx)
     },
@@ -239,7 +237,7 @@ export async function _$api<T = unknown>(
       }
       return response
     })
-    // Invalidate cache if request fails
+    // Invalidate cache if request fails.
     .catch((error) => {
       if (!experimentalDisableClientPayloadCache && (import.meta.server || enablePayloadCache)) {
         const k = getCacheKey()

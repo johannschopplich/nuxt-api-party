@@ -1,15 +1,12 @@
-/**
- * Colors Theme
- * -------------------------------------------------------------------------- */
+/* #region Colors Theme */
 :root {
   --vp-c-brand-1: #73A4C2;
   --vp-c-brand-2: #5E96B9;
   --vp-c-brand-3: #4B88AD;
 }
 
-/**
- * Component: Home
- * -------------------------------------------------------------------------- */
+/* #endregion */
+/* #region Component: Home */
 :root {
   --vp-home-hero-name-color: transparent;
   --vp-home-hero-name-background: -webkit-linear-gradient(
@@ -36,3 +33,4 @@
     --vp-home-hero-image-filter: blur(72px);
   }
 }
+/* #endregion */

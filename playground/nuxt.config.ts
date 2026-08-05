@@ -19,9 +19,7 @@ export default defineNuxtConfig({
   },
 
   apiParty: {
-    // client: 'allow',
     experimental: {
-      // disableClientPayloadCache: true,
       enablePrefixedProxy: true,
     },
     endpoints: {

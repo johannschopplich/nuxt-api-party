@@ -34,7 +34,7 @@ watch(error, value => console.error(value))
 
 async function updateUser() {
   try {
-    // Will error because of authentication
+    // Will error because of authentication.
     await $petStore('/user/{username}', {
       method: 'PUT',
       path: { username: 'user1' },
@@ -68,7 +68,7 @@ async function fetchPetData(petId: number) {
 const createdPet = ref<Pet>()
 
 async function abandonGarfield() {
-  // Put the fat lazy cat up for adoption
+  // Put the fat lazy cat up for adoption.
   try {
     createdPet.value = await $petStore('/pet', {
       method: 'POST',
@@ -87,7 +87,7 @@ async function abandonGarfield() {
   }
   catch (error) {
     console.error(error as NuxtError)
-    // Log the API response body
+    // Log the API response body.
     console.error('Response body:', (error as NuxtError).data)
   }
 }

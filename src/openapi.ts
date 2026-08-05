@@ -5,7 +5,7 @@ import { useNuxt } from '@nuxt/kit'
 import { isAbsolute, resolve } from 'pathe'
 import { pascalCase } from 'scule'
 
-/** @deprecated Hooks should be used instead */
+/** @deprecated Hooks should be used instead. */
 type SchemaFn = () => Promise<NonNullable<EndpointConfiguration['schema']>>
 
 type SchemaEndpoint = EndpointConfiguration & {
@@ -153,20 +153,20 @@ async function generateSchemaTypes(options: {
   endpoint: SchemaEndpoint
   openAPITSOptions?: OpenAPITSOptions
 }) {
-  // openapi-typescript < 7 does not have named exports
+  // openapi-typescript < 7 does not have named exports.
   const openAPITS = await interopDefault(import('openapi-typescript'))
   const schema = await resolveSchema(options.id, options.endpoint)
 
   try {
     const ast = await openAPITS(schema, {
-      // @ts-expect-error: openapi-typescript >= 7 dropped this option
+      // @ts-expect-error: openapi-typescript >= 7 dropped this option.
       commentHeader: '',
       ...options.openAPITSOptions,
       ...options.endpoint.openAPITS,
     })
 
     if (typeof ast !== 'string') {
-      // Required for openapi-typescript v7+
+      // Required for openapi-typescript v7+.
       const { astToString } = await import('openapi-typescript')
       return astToString!(ast)
     }
@@ -225,10 +225,10 @@ async function interopDefault<T>(
 }
 
 function normalizeIndentation(code: string): string {
-  // Replace each cluster of four spaces with two spaces
+  // Replace each cluster of four spaces with two spaces.
   const replacedCode = code.replace(/^( {4})+/gm, match => '  '.repeat(match.length / 4))
 
-  // Ensure each line starts with exactly two spaces
+  // Ensure each line starts with exactly two spaces.
   const normalizedCode = replacedCode.replace(/^/gm, '  ')
 
   return normalizedCode

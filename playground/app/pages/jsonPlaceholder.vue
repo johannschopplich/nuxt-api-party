@@ -7,17 +7,17 @@ const route = useRoute()
 
 const cache = ref<RequestCache>('default')
 
-// Intended for similar use cases as `useFetch`
+// Intended for similar use cases as `useFetch`.
 const { data, status, error, execute } = useJsonPlaceholderData<JsonPlaceholderComment>(
   '/comments',
   {
     query: computed(() => ({
       postId: `${route.query.postId || 1}`,
     })),
-    // `no-cache` will check the server for a fresh response
+    // `no-cache` will check the server for a fresh response.
     cache,
     onRequest() {
-      // Reset cache mode to default after a manual trigger
+      // Reset cache mode to default after a manual trigger.
       if (cache.value === 'reload') {
         cache.value = 'default'
       }
@@ -59,7 +59,7 @@ async function incrementPostId() {
 
 const formResponse = ref()
 
-// Intended for similar use cases as `$fetch`
+// Intended for similar use cases as `$fetch`.
 async function onSubmit() {
   try {
     formResponse.value = await $jsonPlaceholder('posts', {
@@ -78,7 +78,7 @@ async function onSubmit() {
   }
   catch (error) {
     console.error(error as NuxtError)
-    // Log the API response body
+    // Log the API response body.
     console.error('Response body:', (error as NuxtError).data)
   }
 }

@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Check if the path is an absolute URL
+  // Check if the path is an absolute URL.
   if (new URL(path, 'http://localhost').origin !== 'http://localhost') {
     throw createError({
       statusCode: 400,
@@ -35,7 +35,7 @@ export default defineEventHandler(async (event) => {
   }
   const baseURL = getRequestHeader(event, `${endpointId}-Endpoint-Url`) || endpoint.url
 
-  // Check if the base URL is in the allow list
+  // Check if the base URL is in the allow list.
   if (
     baseURL !== endpoint.url
     && !endpoint.allowedUrls?.includes(baseURL)
@@ -58,11 +58,11 @@ export default defineEventHandler(async (event) => {
       fetch: globalThis.$fetch.create({
         onRequest: hookErrorPromise.wrap(async (ctx) => {
           await nitro.hooks.callHook('api-party:request', ctx, event)
-          // @ts-expect-error: Types will be generated on Nuxt prepare
+          // @ts-expect-error: Types will be generated on Nuxt prepare.
           await nitro.hooks.callHook(`api-party:request:${endpointId}`, ctx, event)
         }),
         onResponse: hookErrorPromise.wrap(async (ctx) => {
-          // @ts-expect-error: Types will be generated on Nuxt prepare
+          // @ts-expect-error: Types will be generated on Nuxt prepare.
           await nitro.hooks.callHook(`api-party:response:${endpointId}`, ctx, event)
           await nitro.hooks.callHook('api-party:response', ctx, event)
         }),
@@ -81,7 +81,7 @@ interface HookErrorPromise extends Promise<never> {
 }
 
 /**
- * This is a hack to bypass proxyRequest's server error handling.
+ * Creates a promise that rejects when a hook throws an H3 error, a hack to bypass `proxyRequest`'s server error handling.
  *
  * H3 is configured to treat all errors in fetch as 503 errors, but hooks
  * allow additional error handling, such as 403 errors.
@@ -105,7 +105,7 @@ function createHookErrorPromise(): HookErrorPromise {
           if (isError(error)) {
             reject(error)
           }
-          throw error // Rethrow to preserve the original error stack
+          throw error // Rethrow to preserve the original error stack.
         }
       }
     },

@@ -30,7 +30,7 @@ export interface EndpointConfiguration {
 
 export interface ModuleOptions {
   /**
-   * API endpoints
+   * API endpoints.
    *
    * @remarks
    * Each key represents an endpoint ID, which is used to generate the composables. The value is an object with the following properties:
@@ -62,7 +62,7 @@ export interface ModuleOptions {
   endpoints: Record<string, EndpointConfiguration>
 
   /**
-   * Allow client-side requests besides server-side ones
+   * Allow client-side requests besides server-side ones.
    *
    * @remarks
    * By default, API requests are only initiated server-side. This option allows you to make requests on the client-side as well. Keep in mind that this will expose your API credentials to the client.
@@ -76,13 +76,13 @@ export interface ModuleOptions {
   client?: boolean | 'allow' | 'always'
 
   /**
-   * Global options for [`openapi-typescript`](https://openapi-ts.dev/node/#options)
+   * Global options for [`openapi-typescript`](https://openapi-ts.dev/node/#options).
    */
   openAPITS: OpenAPITSOptions
 
   server: {
     /**
-     * The API base route for the Nuxt server handler
+     * The API base route for the Nuxt server handler.
      *
      * @default '__api_party'
      */
@@ -208,12 +208,10 @@ export default defineNuxtModule<ModuleOptions>().with({
       options.client = 'always'
     }
 
-    // Fallback for default behavior
     options.client ??= false
 
     await nuxt.callHook('api-party:extend', options)
 
-    // Private runtime config
     nuxt.options.runtimeConfig.apiParty = defu(
       nuxt.options.runtimeConfig.apiParty,
       { endpoints: options.endpoints },
@@ -225,15 +223,15 @@ export default defineNuxtModule<ModuleOptions>().with({
       logger.warn('No API endpoints found. Nuxt API Party requires at least one defined endpoint.')
     }
 
-    // Write options to public runtime config if client requests are enabled
+    // Write options to public runtime config if client requests are enabled.
     // eslint-disable-next-line ts/ban-ts-comment
-    // @ts-ignore: `client` types are not compatible
+    // @ts-ignore: `client` types are not compatible.
     nuxt.options.runtimeConfig.public.apiParty = defu(
       nuxt.options.runtimeConfig.public.apiParty,
       options.client
         ? resolvedOptions
         : {
-            // Only expose cookies endpoint option to the client
+            // Only expose cookies endpoint option to the client.
             endpoints: Object.fromEntries(
               Object.entries(resolvedOptions.endpoints).map(
                 ([endpointId, endpoint]) => [endpointId, { cookies: endpoint.cookies }],
@@ -242,7 +240,6 @@ export default defineNuxtModule<ModuleOptions>().with({
           },
     )
 
-    // Transpile runtime
     const { resolve } = createResolver(import.meta.url)
     nuxt.options.build.transpile.push(resolve('runtime'))
 
@@ -266,12 +263,12 @@ export default defineNuxtModule<ModuleOptions>().with({
     }
 
     if (options.experimental.enablePrefixedProxy) {
-      // Add Nuxt server route to proxy the API request server-side
+      // Add Nuxt server route to proxy the API request server-side.
       addServerHandler({
         route: joinURL('/api', options.server.basePath, ':endpointId/proxy/**:path'),
         handler: resolve('runtime/server/proxyHandler'),
       })
-      // Duplicated server handler because empty path will respond with 404
+      // Duplicated server handler because empty path will respond with 404.
       addServerHandler({
         route: joinURL('/api', options.server.basePath, ':endpointId/proxy/'),
         handler: resolve('runtime/server/proxyHandler'),
@@ -296,7 +293,7 @@ export default defineNuxtModule<ModuleOptions>().with({
         resolve('runtime/server/$api'),
       )
 
-      // Provide `#nuxt-api-party/server` module alias for Nitro
+      // Provide `#nuxt-api-party/server` module alias for Nitro.
       config.alias ||= {}
       config.alias[`#${moduleName}/server`] = resolve(nuxt.options.buildDir, `module/${moduleName}.nitro`)
 
@@ -317,7 +314,7 @@ export const ${getRawComposableName(i)} = (...args) => _$api('${i}', ...args)
         )
       }
 
-      // Add Nitro auto-imports for generated composables
+      // Add Nitro auto-imports for generated composables.
       config.imports = defu(config.imports, {
         presets: [{
           from: `#${moduleName}/server`,
@@ -326,16 +323,16 @@ export const ${getRawComposableName(i)} = (...args) => _$api('${i}', ...args)
       })
     })
 
-    // Add Nuxt auto-imports for generated composables
+    // Add Nuxt auto-imports for generated composables.
     addImportsSources({
       from: resolve(nuxt.options.buildDir, `module/${moduleName}`),
       imports: endpointKeys.flatMap(i => [getRawComposableName(i), getDataComposableName(i)]),
     })
 
-    // Add `#nuxt-api-party` module alias for generated composables
+    // Add `#nuxt-api-party` module alias for generated composables.
     nuxt.options.alias[`#${moduleName}`] = resolve(nuxt.options.buildDir, `module/${moduleName}`)
 
-    // Add module template for generated composables
+    // Add module template for generated composables.
     const modTemplate = addTemplate({
       filename: `module/${moduleName}.mjs`,
       getContents() {
@@ -350,7 +347,7 @@ export const ${getDataComposableName(i)} = (...args) => _useApiData('${i}', ...a
     })
 
     if (options.experimental.enableAutoKeyInjection) {
-      // Register composables for Nuxt autokey
+      // Register composables for Nuxt autokey.
       nuxt.options.optimization.keyedComposables.push(
         ...endpointKeys.map(i => ({
           name: getDataComposableName(i),
@@ -360,7 +357,7 @@ export const ${getDataComposableName(i)} = (...args) => _useApiData('${i}', ...a
       )
     }
 
-    // Add types for Nuxt auto-imports and the `#nuxt-api-party` module alias
+    // Add types for Nuxt auto-imports and the `#nuxt-api-party` module alias.
     addTemplate({
       filename: `module/${moduleName}.d.ts`,
       getContents() {
@@ -390,7 +387,7 @@ type PathMethods<T, P extends keyof T> = Exclude<NonNeverKeys<T[P]>, 'parameters
       },
     })
 
-    // Add types for Nitro auto-imports and the `#nuxt-api-party/server` module alias
+    // Add types for Nitro auto-imports and the `#nuxt-api-party/server` module alias.
     addTemplate({
       filename: `module/${moduleName}.nitro.d.ts`,
       getContents() {
@@ -401,7 +398,7 @@ export { ${endpointKeys.map(getRawComposableName).join(', ')} } from './${module
       },
     })
 
-    // Add types for Nuxt and Nitro runtime hooks
+    // Add types for Nuxt and Nitro runtime hooks.
     addTypeTemplate({
       filename: `module/${moduleName}.hooks.d.ts`,
       getContents() {
@@ -436,7 +433,7 @@ declare module 'nitropack/types' {
       },
     })
 
-    // Add type references for endpoints with OpenAPI schemas
+    // Add type references for endpoints with OpenAPI schemas.
     if (schemaEndpointIds.length) {
       addTemplate({
         filename: `module/${moduleName}.schema.d.ts`,
@@ -453,7 +450,7 @@ ${await generateOpenAPITypes(schemaEndpoints, options.openAPITS)}
       })
     }
 
-    // Provide module options as constants
+    // Provide module options as constants.
     addTemplate({
       filename: `module/${moduleName}.config.mjs`,
       getContents: () => `
@@ -467,7 +464,7 @@ export const experimentalDisableClientPayloadCache = ${JSON.stringify(options.ex
 
     addTemplate({
       filename: `module/${moduleName}.config.d.ts`,
-      write: false, // Internal config, no need to write to disk
+      write: false, // Internal config, no need to write to disk.
       getContents: () => `
 export declare const allowClient: boolean | 'allow' | 'always'
 export declare const serverBasePath: string
@@ -478,7 +475,7 @@ export declare const experimentalDisableClientPayloadCache: boolean
     })
 
     if (nuxt.options.dev && options.experimental.enableSchemaFileWatcher) {
-      // Watch for changes in local schema files
+      // Watch for changes in local schema files.
       const schemaFiles = Object.values(schemaEndpoints)
         .map(({ schema }) => schema)
         .filter((schema): schema is string => typeof schema === 'string' && !/^https?:\/\//.test(schema))
@@ -492,14 +489,13 @@ export declare const experimentalDisableClientPayloadCache: boolean
 
 function createSchemaWatcher(schemaFiles: string[], nuxt: Nuxt) {
   if (!schemaFiles.length) {
-    // No local schema files to watch
     return
   }
 
   const watcher = watch(schemaFiles)
   const watcherCallback = () => {
-    // Update the schema types template, which will trigger a types regeneration
-    // Ignore the file path since only the watched files will trigger this
+    // Update the schema types template, which will trigger a types regeneration.
+    // Ignore the file path since only the watched files will trigger this.
     updateTemplates({ filter: t => t.filename === `module/${name}.schema.d.ts` })
   }
 
@@ -507,6 +503,6 @@ function createSchemaWatcher(schemaFiles: string[], nuxt: Nuxt) {
   watcher.on('add', watcherCallback)
   watcher.on('unlink', watcherCallback)
 
-  // Close watcher on Nuxt `close`, otherwise reloads may leave orphaned watchers and duplicate events
+  // Close watcher on Nuxt `close`, otherwise reloads may leave orphaned watchers and duplicate events.
   nuxt.hooks.hook('close', () => watcher.close())
 }

@@ -42,7 +42,7 @@ export default defineEventHandler(async (event) => {
     body,
   } = await readBody<EndpointFetchOptions>(event)
 
-  // Check if the path is an absolute URL
+  // Check if the path is an absolute URL.
   if (new URL(path, 'http://localhost').origin !== 'http://localhost') {
     throw createError({
       statusCode: 400,
@@ -51,10 +51,10 @@ export default defineEventHandler(async (event) => {
   }
 
   // Allows to overwrite the backend URL with a custom header
-  // (e.g. `jsonPlaceholder` endpoint becomes `jsonPlaceholder-Endpoint-Url`)
+  // (e.g. `jsonPlaceholder` endpoint becomes `jsonPlaceholder-Endpoint-Url`).
   const baseURL = new Headers(headers).get(`${endpointId}-Endpoint-Url`) || endpoint.url
 
-  // Check if the base URL is in the allow list
+  // Check if the base URL is in the allow list.
   if (
     baseURL !== endpoint.url
     && !endpoint.allowedUrls?.includes(baseURL)
@@ -94,11 +94,11 @@ export default defineEventHandler(async (event) => {
         ignoreResponseError: true,
         async onRequest(ctx) {
           await nitro.hooks.callHook('api-party:request', ctx, event)
-          // @ts-expect-error: Types will be generated on Nuxt prepare
+          // @ts-expect-error: Types will be generated on Nuxt prepare.
           await nitro.hooks.callHook(`api-party:request:${endpointId}`, ctx, event)
         },
         async onResponse(ctx) {
-          // @ts-expect-error: Types will be generated on Nuxt prepare
+          // @ts-expect-error: Types will be generated on Nuxt prepare.
           await nitro.hooks.callHook(`api-party:response:${endpointId}`, ctx, event)
           await nitro.hooks.callHook('api-party:response', ctx, event)
         },
