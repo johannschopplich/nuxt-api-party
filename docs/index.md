@@ -25,39 +25,29 @@ features:
     details: Auto-generated composables for each API endpoint.
     link: /api/
     linkText: API Reference
-  - title: Protected API Credentials
+  - title: Credentials Stay on the Server
     icon: <span class="i-carbon:ibm-cloud-hyper-protect-dbaas"></span>
-    details: A Nuxt server route proxies your requests. No CORS issues!
+    details: A Nuxt server route proxies each request, so tokens never reach the browser and CORS never applies.
     link: /advanced/how-it-works
     linkText: How It Works
   - title: Familiar Data Handling
     icon: <span class="i-carbon:noodle-bowl"></span>
-    details: Handle requests just like Nuxt <code>useFetch</code> and <code>$fetch</code>.
+    details: Requests behave like Nuxt's own <code>useFetch</code> and <code>$fetch</code>.
     link: /api/use-fetch-like
     linkText: Async Data Composable
-  - title: Connect Multiple APIs
+  - title: Several APIs Side by Side
     icon: <span class="i-carbon:ibm-watson-query"></span>
-    details: Configure all your APIs once and use them throughout your app.
+    details: Configure each API once and reach all of them from anywhere in your app.
     link: /essentials/getting-started#configure-your-first-api-endpoint
     linkText: Set up API Endpoints
   - title: OpenAPI Support
     icon: <span class="i-devicon-plain:openapi"></span>
-    details: Create fully typed API clients from OpenAPI specifications.
+    details: Typed paths, parameters, request bodies and responses, generated from your schema.
     link: /guides/openapi-integration
     linkText: Generate Clients
-  - title: TypeScript
-    icon: <span class="i-devicon-plain:typescript"></span>
-    details: Fully type-safe requests and responses for OpenAPI endpoints.
-    link: /guides/openapi-integration
-    linkText: Leverage Typings
-  - title: Hooks
-    icon: <span class="i-carbon:tools-alt"></span>
-    details: Extend and customize requests and responses.
-    link: /guides/hooks
-    linkText: Customize at Build-Time
-  - title: Proxy Errors
+  - title: Errors Reach Your App
     icon: <span class="i-carbon:server-proxy"></span>
-    details: Pass-through errors from your API to your app.
+    details: The proxy passes the upstream status code and error payload through unchanged.
     link: /guides/error-handling
     linkText: Log and Handle Errors
 ---

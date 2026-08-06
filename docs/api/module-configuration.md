@@ -96,9 +96,13 @@ The path segment the module's server routes live under, below `/api`. Change it 
 How the server handler forwards a request to your API.
 
 - `'wrapped'` – Every call becomes a `POST` request that carries the original request in its body.
-- `'prefixed'` – The original request is mirrored: path, method, headers, query and body travel as they are, through h3's `sendProxy` utility.
+- `'passthrough'` – The original request is mirrored: path, method, headers, query and body travel as they are, through h3's `sendProxy` utility.
 
-Choose `'prefixed'` when you want the browser's network tab to match the upstream request, or when you need HTTP cache control – a `POST` wrapper cannot be cached.
+Choose `'passthrough'` when you want the browser's network tab to match the upstream request, or when you need HTTP cache control – a `POST` wrapper cannot be cached.
+
+::: warning `'passthrough'` adds no credentials
+The name is literal: the request travels as it stands, and nothing from the endpoint configuration is attached. The endpoint's `token`, `headers` and `query` are applied by the `'wrapped'` handler only. Authenticate the upstream service in a [request hook](/guides/hooks) instead.
+:::
 
 **Default value**: `'wrapped'`
 

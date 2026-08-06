@@ -1,8 +1,8 @@
 # Interceptors
 
-Interceptors customize API request behavior at different stages of the fetch lifecycle. Use them to modify requests, handle responses, log activities, and implement cross-cutting concerns like authentication, caching, or error tracking.
+Interceptors are the [`ofetch`](https://github.com/unjs/ofetch) callbacks `onRequest`, `onResponse`, `onRequestError` and `onResponseError`, passed to a single call. They see that call's fetch lifecycle and nothing else, which makes them the place for per-request concerns – a retry on one endpoint, a log line for one query. Both `useMyApiData` and `$myApi` accept them.
 
-Nuxt API Party leverages [`ofetch`](https://github.com/unjs/ofetch) interceptors, giving you access to the same interception capabilities across all API endpoints. Interceptors work with both `useMyApiData` and `$myApi` composables, enabling consistent behavior across your application.
+To cover every request instead, reach for a [hook](/guides/hooks).
 
 ## Available Interceptors
 

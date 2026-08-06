@@ -1,6 +1,8 @@
 # Hooks
 
-Nuxt API Party lets you customize module behavior at various stages. The hook system supports both Nuxt and Nitro environments with fully typed, merged hooks that ensure both generic and endpoint-specific handlers execute in the correct order.
+Hooks run inside your app – in a Nuxt plugin or a Nitro plugin – and see every request the module sends, whichever endpoint it belongs to. Use them for behavior that spans endpoints, such as attaching credentials in the passthrough proxy mode or logging failures centrally. A generic handler and an endpoint-specific one both run, the generic one first.
+
+To change a single call instead, reach for an [interceptor](/guides/interceptors).
 
 For more information on how to work with hooks, see the [Nuxt documentation](https://nuxt.com/docs/guide/going-further/hooks).
 
@@ -23,7 +25,7 @@ Both generic and endpoint-specific hooks are merged and executed in sequence.
 
 ## Nuxt Runtime Hooks
 
-Register Nuxt runtime hooks in your `nuxt.config.ts` file, in a client plugin, or at runtime. Use these hooks for extending [API endpoints](/essentials/module-configuration#apiparty-endpoints) with additional configuration or for intercepting API calls for logging, metrics, or dynamically adding headers.
+Register Nuxt runtime hooks in your `nuxt.config.ts` file, in a client plugin, or at runtime. Use these hooks for extending [API endpoints](/api/module-configuration#apiparty-endpoints) with additional configuration or for intercepting API calls for logging, metrics, or dynamically adding headers.
 
 The only hook called at module initialization is `api-party:extend`, useful for modifying endpoint configuration before the module is fully initialized. For example, log the resolved server endpoints:
 

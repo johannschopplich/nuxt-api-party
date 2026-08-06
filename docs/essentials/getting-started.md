@@ -51,7 +51,7 @@ export default defineNuxtConfig({
 ```
 :::
 
-`url` is the only required option. See [Module Configuration](/essentials/module-configuration#apiparty-endpoints) for the rest, including authentication, default headers and OpenAPI schemas.
+`url` is the only required option. See [Module Configuration](/api/module-configuration#apiparty-endpoints) for the rest, including authentication, default headers and OpenAPI schemas.
 
 ::: tip Dynamic Configuration
 For dynamic headers or runtime configuration, use [runtime hooks](/guides/hooks) or [environment variables](#environment-variables).
@@ -168,7 +168,7 @@ It throws on a failed request rather than exposing an `error` value, so wrap it 
 ## Next Steps
 
 - [Data Fetching Methods](/essentials/data-fetching-methods) – Choose between `useMyApiData` and `$myApi`.
-- [Module Configuration](/essentials/module-configuration) – Every option an endpoint accepts.
+- [Module Configuration](/api/module-configuration) – Every option an endpoint accepts.
 - [Error Handling](/guides/error-handling) – What a failed request gives you.
 - [OpenAPI Integration](/guides/openapi-integration) – Infer request and response types from a schema.
 - [Caching Strategies](/guides/caching-strategies) – Cache in memory or in the browser.

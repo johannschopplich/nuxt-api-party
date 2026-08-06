@@ -12,7 +12,7 @@ Its four flags moved out and two of them changed their default:
 
 | Before                                       | Now                                | Default  |
 | -------------------------------------------- | ---------------------------------- | -------- |
-| `experimental.enablePrefixedProxy: true`      | `server.proxyMode: 'prefixed'`     | Unchanged |
+| `experimental.enablePrefixedProxy: true`      | `server.proxyMode: 'passthrough'`     | Unchanged |
 | `experimental.disableClientPayloadCache: true`| `payloadCache: false`              | Unchanged |
 | `experimental.enableAutoKeyInjection: true`   | `autoKeyInjection`                 | Now on   |
 | `experimental.enableSchemaFileWatcher`        | Removed                            | Always on in dev |
@@ -36,13 +36,13 @@ const { data } = await useMyApiData('posts', {
 
 ### The Wrapped Proxy Reports `502` for an Unreachable API
 
-An API that cannot be reached used to yield `503 Service Unavailable` from the default proxy and `502 Bad Gateway` from the prefixed one. Both report `502` now.
+An API that cannot be reached used to yield `503 Service Unavailable` from the default proxy and `502 Bad Gateway` from the passthrough one. Both report `502` now.
 
 ### The Prefixed Proxy No Longer Forwards `authorization`
 
-With [`server.proxyMode`](/essentials/module-configuration#proxymode) set to `'prefixed'`, a browser request's `authorization` header used to travel on to your API. It no longer does: the header carries the caller's credentials for *your* app, not your app's credentials for the upstream service.
+With [`server.proxyMode`](/api/module-configuration#proxymode) set to `'passthrough'`, a browser request's `authorization` header used to travel on to your API. It no longer does: the header carries the caller's credentials for *your* app, not your app's credentials for the upstream service.
 
-A cookie still travels, but only for endpoints that set `cookies: true`. Note that the prefixed proxy forwards the request as it stands and does not add the endpoint's `token`, `headers` or `query` – only the default `/api/__api_party/{endpointId}` handler does. If you relied on the old behavior to pass a bearer token through, attach it in a [request hook](/guides/hooks).
+A cookie still travels, but only for endpoints that set `cookies: true`. Note that the passthrough proxy forwards the request as it stands and does not add the endpoint's `token`, `headers` or `query` – only the default `/api/__api_party/{endpointId}` handler does. If you relied on the old behavior to pass a bearer token through, attach it in a [request hook](/guides/hooks).
 
 ### Endpoint Types Resolve Through the Client
 

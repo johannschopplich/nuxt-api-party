@@ -125,5 +125,5 @@ export default defineNuxtPlugin(async () => {
 
 ## Next Steps
 
-- [Module Configuration](/essentials/module-configuration) – Every option an endpoint accepts.
+- [Module Configuration](/api/module-configuration) – Every option an endpoint accepts.
 - [OpenAPI Integration](/guides/openapi-integration) – Infer request and response types from a schema.

@@ -4,7 +4,7 @@ Nuxt API Party caches in two places: in the Nuxt payload, which is fast and live
 
 ## In-Memory Caching
 
-Payload caching is the default for data composables. A response is stored in the Nuxt payload under a key derived from the request, so a repeated request for the same resource resolves without a round trip. Turn it off per call with `payloadCache: false`, or for the whole app with the [`payloadCache`](/essentials/module-configuration#apiparty-payloadcache) module option.
+Payload caching is the default for data composables. A response is stored in the Nuxt payload under a key derived from the request, so a repeated request for the same resource resolves without a round trip. Turn it off per call with `payloadCache: false`, or for the whole app with the [`payloadCache`](/api/module-configuration#apiparty-payloadcache) module option.
 
 Benefits of in-memory caching over browser caching include:
 
@@ -28,14 +28,14 @@ The cached response is used until it expires.
 To enable built-in browser caching, set the `cache` option to one of the values in the [options](#cache-options) section below.
 
 ::: tip HTTP Caching
-To support HTTP caching, you must set [`server.proxyMode`](/essentials/module-configuration#proxymode) to `'prefixed'` in your `nuxt.config` file. This allows GET requests to be GET requests, which is required for caching to work correctly.
+To support HTTP caching, you must set [`server.proxyMode`](/api/module-configuration#proxymode) to `'passthrough'` in your `nuxt.config` file. This allows GET requests to be GET requests, which is required for caching to work correctly.
 
 ```ts
 export default defineNuxtConfig({
   modules: ['nuxt-api-party'],
   apiParty: {
     server: {
-      proxyMode: 'prefixed'
+      proxyMode: 'passthrough'
     }
   }
 })

@@ -45,7 +45,6 @@ export default defineConfig({
           { text: 'What is Nuxt API Party?', link: '/essentials/what-is-nuxt-api-party' },
           { text: 'Getting Started', link: '/essentials/getting-started' },
           { text: 'Data Fetching Methods', link: '/essentials/data-fetching-methods' },
-          { text: 'Module Configuration', link: '/essentials/module-configuration' },
         ],
       },
       {
@@ -105,7 +104,6 @@ function sidebarCore(): DefaultTheme.SidebarItem[] {
         { text: 'What is Nuxt API Party?', link: '/essentials/what-is-nuxt-api-party' },
         { text: 'Getting Started', link: '/essentials/getting-started' },
         { text: 'Data Fetching Methods', link: '/essentials/data-fetching-methods' },
-        { text: 'Module Configuration', link: '/essentials/module-configuration' },
       ],
     },
     {
@@ -138,6 +136,10 @@ function sidebarApi(): DefaultTheme.SidebarItem[] {
     {
       text: 'Overview',
       link: '/api/',
+    },
+    {
+      text: 'Module Configuration',
+      link: '/api/module-configuration',
     },
     {
       text: 'Generated Composables',

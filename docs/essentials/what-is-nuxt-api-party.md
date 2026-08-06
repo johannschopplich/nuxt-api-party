@@ -43,5 +43,5 @@ const post = await $jsonPlaceholder('posts', {
 
 - [Getting Started](/essentials/getting-started) – Install the module and make a first request.
 - [Data Fetching Methods](/essentials/data-fetching-methods) – Choose between the two generated composables.
-- [Module Configuration](/essentials/module-configuration) – Every option an endpoint accepts.
+- [Module Configuration](/api/module-configuration) – Every option an endpoint accepts.
 - [How It Works](/advanced/how-it-works) – What the proxy route does with a request.

@@ -16,10 +16,10 @@ The proxy passes through your API's response body, HTTP status code, status mess
 
 ## The Prefixed Proxy
 
-With [`server.proxyMode`](/essentials/module-configuration#proxymode) set to `'prefixed'`, requests instead go to `/api/__api_party/{endpointId}/proxy/{path}` under their own HTTP method, and the path, query, headers and body are forwarded as they are. This is the mode to choose when you want the browser's network tab to mirror the upstream request, or when you need HTTP cache control – a POST wrapper cannot be cached.
+With [`server.proxyMode`](/api/module-configuration#proxymode) set to `'passthrough'`, requests instead go to `/api/__api_party/{endpointId}/proxy/{path}` under their own HTTP method, and the path, query, headers and body are forwarded as they are. This is the mode to choose when you want the browser's network tab to mirror the upstream request, or when you need HTTP cache control – a POST wrapper cannot be cached.
 
 The proxy withholds the browser's `authorization` header from your API, since it carries credentials meant for your app rather than for the upstream service. A cookie travels only for endpoints that set `cookies: true`.
 
 ::: tip
-Rename the `__api_party` segment with the [`server.basePath`](/essentials/module-configuration#basepath) option.
+Rename the `__api_party` segment with the [`server.basePath`](/api/module-configuration#basepath) option.
 :::
