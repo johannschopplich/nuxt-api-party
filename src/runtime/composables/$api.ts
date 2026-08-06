@@ -102,10 +102,6 @@ declare module '#app' {
   }
 }
 
-function getPromiseMap(nuxt: NuxtApp) {
-  return (nuxt._pendingRequests ||= new Map()) as Map<string, Promise<any>>
-}
-
 export async function _$api<T = unknown>(
   endpointId: string,
   path: string,
@@ -252,4 +248,8 @@ export async function _$api<T = unknown>(
   }
 
   return request
+}
+
+function getPromiseMap(nuxt: NuxtApp) {
+  return (nuxt._pendingRequests ||= new Map()) as Map<string, Promise<any>>
 }

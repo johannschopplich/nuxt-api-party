@@ -26,18 +26,13 @@ export function mergeHeaders(...headers: (HeadersInit | undefined)[]) {
   return new Headers(headers.filter(Boolean).flatMap(h => [...new Headers(h)]))
 }
 
-function isEndpointUrlOverride(header: string, endpointId: string) {
-  return header === `${endpointId.toLowerCase()}-endpoint-url`
-}
-
 /**
  * Decides whether a header the browser sent to the proxy may travel on to the
  * upstream API.
  *
- * The browser attaches `authorization` and `cookie` on its own, and neither is
- * meant for a third party: the cookie travels only for endpoints that opt in,
- * the credentials never. The endpoint URL override is api-party's own control
- * header and is consumed here.
+ * A cookie travels only for endpoints that opt in, and `authorization` never –
+ * forwarding it would hand the caller's own credentials to a third party. The
+ * endpoint URL override has already been read by the time this runs.
  */
 export function isForwardableProxyHeader(
   name: string,
@@ -56,10 +51,9 @@ export function isForwardableProxyHeader(
  * Decides whether a header a composable put in the request body may travel on
  * to the upstream API.
  *
- * These headers are the developer's own, so they pass unless api-party needs
- * them for itself: the endpoint URL override is a control header, and a cookie
- * is read off the server handler's request instead, where it can be weighed
- * against the endpoint's `cookies` option.
+ * Only `cookie` is dropped: the server handler reads one off its own request,
+ * where the endpoint's `cookies` option decides. The endpoint URL override has
+ * already been read by the time this runs.
  */
 export function isForwardableBodyHeader(name: string, { endpointId }: { endpointId: string }) {
   const header = name.toLowerCase()
@@ -75,4 +69,8 @@ export function omitUndefinedValues<T extends object>(object: T) {
     Object.entries(object)
       .filter(([, value]) => value !== undefined),
   ) as FilteredObject<T>
+}
+
+function isEndpointUrlOverride(header: string, endpointId: string) {
+  return header === `${endpointId.toLowerCase()}-endpoint-url`
 }
