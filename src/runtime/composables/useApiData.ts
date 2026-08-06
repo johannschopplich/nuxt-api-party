@@ -26,6 +26,16 @@ type ComputedMethodOption<M, P> = 'get' extends keyof P ? ComputedOptions<{ meth
 // #region options
 export type SharedAsyncDataOptions<ResT, DataT = ResT> = ComputedOptions<SharedFetchOptions> & Omit<AsyncDataOptions<ResT, DataT>, 'watch'> & {
   /**
+   * Serve a repeated request from the Nuxt payload instead of sending it again.
+   *
+   * @remarks
+   * Follows the module option of the same name, which is where turning payload caching off for the whole app
+   * belongs. Set it here to opt a single call out.
+   *
+   * @default true
+   */
+  payloadCache?: MaybeRef<boolean>
+  /**
    * The key passed to `useAsyncData`. By default, will be generated from the request options.
    * @default undefined
    */
