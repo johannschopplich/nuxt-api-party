@@ -24,9 +24,9 @@ const data = await $myApi('posts', {
 See the [caching guide](/guides/caching-strategies) for more information on caching.
 :::
 
-## Example
+## Examples
 
-::: info Demo Setup
+:::: info Demo Setup
 These examples assume that you have set up an API endpoint called `jsonPlaceholder`:
 
 ::: code-group
@@ -44,8 +44,7 @@ export default defineNuxtConfig({
 })
 ```
 :::
-
-:::
+::::
 
 ```vue
 <script setup lang="ts">

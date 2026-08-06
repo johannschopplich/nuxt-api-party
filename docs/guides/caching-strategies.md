@@ -68,18 +68,18 @@ The available options are:
 
 For reference, here is a table summarizing the behavior of each cache option:
 
-| Cache Option      | Loads Cache | Stores Cache | Reuses Stale | Makes Request |
-| ------------------|-------------|--------------|--------------|---------------|
-| `'default'`       | ✅          | ✅           | ❌           | ✅
-| `'no-store'`      | ❌          | ❌           | ❌           | ✅
-| `'reload'`        | ❌          | ✅           | ❌           | ✅
-| `'no-cache'`      | ✅          | ❌           | ❌           | ✅
-| `'force-cache'`   | ✅          | ❌           | ✅           | ✅
-| `'only-if-cached'`| ✅          | ❌           | ✅           | ❌
+| Cache Option       | Loads Cache | Stores Cache | Reuses Stale | Makes Request |
+| ------------------ | ----------- | ------------ | ------------ | ------------- |
+| `'default'`        | ✅          | ✅           | ❌           | ✅            |
+| `'no-store'`       | ❌          | ❌           | ❌           | ✅            |
+| `'reload'`         | ❌          | ✅           | ❌           | ✅            |
+| `'no-cache'`       | ✅          | ❌           | ❌           | ✅            |
+| `'force-cache'`    | ✅          | ❌           | ✅           | ✅            |
+| `'only-if-cached'` | ✅          | ❌           | ✅           | ❌            |
 
 ## Examples
 
-::: info Demo Setup
+:::: info Demo Setup
 These examples assume that you have set up an API endpoint called `jsonPlaceholder`:
 
 ::: code-group
@@ -97,10 +97,9 @@ export default defineNuxtConfig({
 })
 ```
 :::
+::::
 
-:::
-
-### In-Memory Caching
+### Cache in Memory
 
 Omitting or passing `true` to the `cache` option enables in-memory caching behavior.
 
@@ -127,7 +126,7 @@ async function invalidateAndRefresh() {
 }
 ```
 
-### Built-in Browser Caching
+### Cache in the Browser
 
 Passing a string value to the `cache` option enables built-in browser caching behavior. This mode only works for GET requests and requires proper cache headers on the endpoint response.
 

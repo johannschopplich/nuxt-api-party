@@ -46,7 +46,7 @@ See the [caching guide](/guides/caching-strategies) for more information on cach
 
 ## Examples
 
-::: info Demo Setup
+:::: info Demo Setup
 These examples assume that you have set up an API endpoint called `jsonPlaceholder`:
 
 ::: code-group
@@ -64,8 +64,7 @@ export default defineNuxtConfig({
 })
 ```
 :::
-
-:::
+::::
 
 ### Basic
 
@@ -84,7 +83,7 @@ const { data, refresh, error, status, clear } = await useJsonPlaceholderData('po
 </template>
 ```
 
-### Extended example
+### Extended Example
 
 ```vue
 <script setup lang="ts">
