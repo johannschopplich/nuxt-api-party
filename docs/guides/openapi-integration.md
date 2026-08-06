@@ -210,7 +210,7 @@ type UserEndpoint = PetStore<'/user/{username}', 'get'>
 type PathParams = UserEndpoint['path'] // { username: string }
 type QueryParams = UserEndpoint['query'] // Query parameters
 type RequestBody = UserEndpoint['request'] // Request body type
-type Response = UserEndpoint['response'] // Success response (200)
+type Response = UserEndpoint['response'] // Success response
 type ErrorResponse = UserEndpoint['responses'][404] // Specific status code
 ```
 

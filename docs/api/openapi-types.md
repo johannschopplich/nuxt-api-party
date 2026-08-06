@@ -12,24 +12,30 @@ type UserEndpoint = PetStore<'/user/{username}', 'get'>
 type PathParams = UserEndpoint['path'] // { username: string }
 type QueryParams = UserEndpoint['query'] // Query parameters
 type RequestBody = UserEndpoint['request'] // Request body type
-type Response = UserEndpoint['response'] // Success response (200)
+type Response = UserEndpoint['response'] // Success response
 type ErrorResponse = UserEndpoint['responses'][404] // Specific status code
 ```
+
+Both parameters are required, and both are checked against the schema. A path the endpoint doesn't declare is a compile error, and so is a method the path doesn't allow – `PetStore<'/pet', 'get'>` doesn't compile, because the Petstore declares only `post` and `put` there.
 
 ## Core Type Properties
 
 Every endpoint type provides these properties for complete control over API interactions. Properties are automatically inferred from your OpenAPI schema:
 
-| Property    | Description            | Example                                          |
-| ----------- | ---------------------- | ------------------------------------------------ |
-| `path`      | Path parameters        | `{ petId: number }`                              |
-| `query`     | Query parameters       | `{ status: 'available' \| 'pending' }`           |
-| `request`   | Request body type      | `{ name: string; category: Category }`           |
-| `response`  | Default response (200) | `{ id: number; name: string }`                   |
-| `responses` | All status responses   | `{ 200: Pet; 404: Error; 400: ValidationError }` |
-| `fullPath`  | Complete path string   | `'/pet/{petId}'`                                 |
-| `method`    | HTTP method            | `'get'`                                          |
-| `operation` | Full OpenAPI operation | Complete operation object                        |
+| Property    | Description                                                              | Example                                            |
+| ----------- | ------------------------------------------------------------------------ | -------------------------------------------------- |
+| `path`      | Path parameters                                                          | `{ petId: number }`                                |
+| `query`     | Query parameters                                                         | `{ status?: 'available' \| 'pending' \| 'sold' }`  |
+| `request`   | Request body, for whichever media type the operation declares            | `{ name: string, photoUrls: string[] }`            |
+| `response`  | Body of the successful response, for whichever 2xx status it declares    | `{ id?: number, name: string }`                    |
+| `responses` | Every status code the operation declares, mapped to the body it returns  | `{ 200: Pet, 400: undefined, 404: undefined }`     |
+| `fullPath`  | Complete path string                                                     | `'/pet/{petId}'`                                   |
+| `method`    | HTTP method                                                              | `'get'`                                            |
+| `operation` | Full OpenAPI operation                                                   | Complete operation object                          |
+
+Where an operation declares nothing at all for a property, the type says so rather than inventing an empty object: `path` and `query` are `never`, `request` is `undefined`, and `response` is `never` for an operation whose success carries no body.
+
+`request` and `response` resolve through the same helpers a request resolves through, so a value annotated with `Service<Path, Method>['response']` is exactly what `$petStore` hands back for that call.
 
 ## Practical Examples
 
@@ -52,11 +58,18 @@ type StatusQuery = PetStore<'/pet/findByStatus', 'get'>['query']
 
 // Extract request body
 type CreatePetBody = PetStore<'/pet', 'post'>['request']
-//   ^? { id?: number; name: string; category: Category }
+//   ^? { id?: number; name: string; category?: Category; photoUrls: string[]; tags?: Tag[]; status?: 'available' | 'pending' | 'sold' }
 
 // Extract response type
 type PetResponse = PetStore<'/pet/{petId}', 'get'>['response']
-//   ^? { id?: number; name: string; status: string }
+//   ^? { id?: number; name: string; category?: Category; photoUrls: string[]; tags?: Tag[]; status?: 'available' | 'pending' | 'sold' }
+```
+
+A request body the schema marks optional comes back widened with `undefined`, matching what the composables accept:
+
+```ts
+type PlaceOrderBody = PetStore<'/store/order', 'post'>['request']
+//   ^? Order | undefined
 ```
 
 ### Error Handling Types
@@ -64,14 +77,18 @@ type PetResponse = PetStore<'/pet/{petId}', 'get'>['response']
 Extract specific error response types for robust error handling with full type safety:
 
 ```ts
-// Extract specific error response types
-type NotFoundError = PetStore<'/pet/{petId}', 'get'>['responses'][404]
-type ValidationError = PetStore<'/pet', 'post'>['responses'][400]
-
-// All possible responses for an endpoint
+// All responses the endpoint declares
 type AllPetResponses = PetStore<'/pet/{petId}', 'get'>['responses']
-//   ^? { 200: Pet; 404: NotFoundError; 400: ValidationError }
+//   ^? { 200: Pet; 400: undefined; 404: undefined }
+
+// A single status code
+type PetNotFound = PetStore<'/pet/{petId}', 'get'>['responses'][404]
+//   ^? undefined
 ```
+
+Only the codes the operation itself declares are available, so `PetStore<'/pet', 'post'>['responses']` offers `200` and `405` and nothing else. A status declared without a response body – which is every error in the Petstore schema – resolves to `undefined`.
+
+This is the body a status maps to. To type the error a failed request actually throws, see [Error Handling](/guides/error-handling).
 
 ## Schema Discovery
 
@@ -86,8 +103,10 @@ type AllPaths = PetStoreApiPaths
 
 // Get all available methods for a specific path
 type PetMethods = PetStoreApiMethods<'/pet'>
-//   ^? 'get' | 'post' | 'put'
+//   ^? 'post' | 'put'
 ```
+
+Only the methods the path declares are listed. `openapi-typescript` gives every path item a key for all eight verbs and sets the unused ones aside, so reaching for `keyof` yourself would answer with the whole alphabet of HTTP.
 
 ## Schema Model Types
 
@@ -98,7 +117,7 @@ import type { PetStoreModel } from '#nuxt-api-party'
 
 // Extract schema models directly
 type Pet = PetStoreModel<'Pet'>
-//   ^? { id?: number; name: string; category: Category; photoUrls: string[]; tags?: Tag[]; status?: 'available' | 'pending' | 'sold' }
+//   ^? { id?: number; name: string; category?: Category; photoUrls: string[]; tags?: Tag[]; status?: 'available' | 'pending' | 'sold' }
 
 type Category = PetStoreModel<'Category'>
 //   ^? { id?: number; name?: string }
