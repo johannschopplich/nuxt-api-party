@@ -182,7 +182,7 @@ export default defineNuxtModule<ModuleOptions>().with({
     name,
     configKey: 'apiParty',
     compatibility: {
-      nuxt: '>=3.18',
+      nuxt: '>=4.0.0',
     },
   },
   defaults: {
