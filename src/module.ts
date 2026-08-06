@@ -65,8 +65,14 @@ export interface ModuleOptions {
    * Allow client-side requests besides server-side ones.
    *
    * @remarks
-   * By default, API requests are only initiated server-side. This option allows you to make requests on the client-side as well. Keep in mind that this will expose your API credentials to the client.
-   * Note: If Nuxt SSR is disabled, all requests are made on the client-side by default.
+   * By default, API requests are only initiated server-side. Keep in mind that a
+   * client-side request exposes your API credentials to the client.
+   *
+   * - `false` keeps every request on the server.
+   * - `'allow'` (or `true`) lets a call opt in with `client: true`, but still defaults to the server.
+   * - `'always'` sends every call from the client unless it opts out with `client: false`.
+   *
+   * If Nuxt SSR is disabled, this defaults to `'always'`.
    *
    * @example
    * useJsonPlaceholderData('/posts/1', { client: true })
