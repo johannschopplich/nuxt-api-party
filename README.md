@@ -2,7 +2,7 @@
 
 # Nuxt API Party
 
-[Nuxt](https://nuxt.com) module that provides seamless integration with multiple API endpoints. It generates **type-safe composables** for each API endpoint you configure, offering a familiar developer experience similar to Nuxt's `useFetch` and `$fetch` while keeping your **API credentials secure** and eliminating **CORS issues** through a server proxy.
+[Nuxt](https://nuxt.com) module to talk to APIs you don't control, with generated type-safe composables and a server proxy that keeps credentials off the client.
 
 - [✨ &nbsp;Release Notes](https://github.com/johannschopplich/nuxt-api-party/releases)
 - [📖 &nbsp;Read the documentation](https://nuxt-api-party.byjohann.dev)

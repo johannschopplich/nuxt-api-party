@@ -4,9 +4,9 @@
 
 ### The Prefixed Proxy No Longer Forwards `authorization`
 
-With [`experimental.enablePrefixedProxy`](/essentials/module-configuration#enableprefixedproxy) enabled, a browser request's `authorization` header used to travel on to your API. It no longer does: the header carries the caller's credentials for *your* app, and the endpoint's own `token` or `headers` configuration is what authenticates against the upstream service.
+With [`experimental.enablePrefixedProxy`](/essentials/module-configuration#enableprefixedproxy) enabled, a browser request's `authorization` header used to travel on to your API. It no longer does: the header carries the caller's credentials for *your* app, not your app's credentials for the upstream service.
 
-A cookie still travels, but only for endpoints that set `cookies: true`. If you relied on the old behavior to pass a bearer token through, send it under a header of your own and map it in a [request hook](/guides/hooks).
+A cookie still travels, but only for endpoints that set `cookies: true`. Note that the prefixed proxy forwards the request as it stands and does not add the endpoint's `token`, `headers` or `query` – only the default `/api/__api_party/{endpointId}` handler does. If you relied on the old behavior to pass a bearer token through, attach it in a [request hook](/guides/hooks).
 
 ### Endpoint Types Resolve Through the Client
 
@@ -15,8 +15,8 @@ A cookie still travels, but only for endpoints that set `cookies: true`. If you 
 Three consequences, all at type level:
 
 - A method the path doesn't declare is now a compile error. `PetStore<'/pet', 'get'>` fails where the schema declares only `post` and `put`; likewise `PetStoreApiMethods<'/pet'>` narrows from every HTTP verb to `'post' | 'put'`.
-- An operation that declares no path or query parameters reports `never`, and one that declares no request body reports `undefined`, where both used to report `Record<string, never>`.
-- A status code that carries no response body reports `undefined` in `responses`, again in place of `Record<string, never>`.
+- An operation that declares no path or query parameters reports `never`, where the old logic answered `undefined`, and one that declares no request body reports `undefined`, where the old logic answered `unknown`.
+- A status code that carries no response body reports `undefined` in `responses`, in place of `Record<string, never>`. So does `response` for an operation whose success carries no body – `PetStore<'/pet/{petId}', 'delete'>['response']` is now `never`.
 
 See [OpenAPI Type Helpers](/api/openapi-types) for what each property now reports.
 

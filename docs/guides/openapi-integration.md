@@ -54,6 +54,7 @@ paths:
     post:
       operationId: createFoo
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -100,9 +101,11 @@ Reference the schema file in your endpoint configuration:
 ```ts [nuxt.config.ts]
 export default defineNuxtConfig({
   apiParty: {
-    myApi: {
-      url: process.env.MY_API_API_BASE_URL!,
-      schema: './schemas/myApi.yaml'
+    endpoints: {
+      myApi: {
+        url: process.env.MY_API_API_BASE_URL!,
+        schema: './schemas/myApi.yaml'
+      }
     }
   }
 })
@@ -126,7 +129,7 @@ The exported `components` interface of the virtual module for your API contains 
 Using the schema above, extract the `Foo` type:
 
 ```ts
-import { components } from '#nuxt-api-party/myApi'
+import type { components } from '#nuxt-api-party/myApi'
 
 type Foo = components['schemas']['Foo']
 //   ^? { id?: number; bar: string }

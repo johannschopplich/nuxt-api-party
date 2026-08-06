@@ -3,8 +3,8 @@ layout: home
 titleTemplate: Auto-generated composables for secure API access
 hero:
   name: Nuxt API Party
-  text: The Easiest REST API Client Generator
-  tagline: Auto-generated composables for secure API access
+  text: Type-Safe API Clients for Nuxt
+  tagline: Configure an endpoint once and call it through composables that keep your credentials on the server.
   image:
     src: /logo-shadow.svg
     alt: Nuxt API Party Logo

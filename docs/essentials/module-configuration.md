@@ -57,7 +57,7 @@ export default defineNuxtConfig({
           Authorization: `Basic ${globalThis.btoa(`${process.env.CMS_API_USERNAME}:${process.env.CMS_API_PASSWORD}`)}`
         }
       },
-      // Will generate `$petStore` and `usePetStore` as well as types for each path
+      // Will generate `$petStore` and `usePetStoreData` as well as types for each path
       petStore: {
         url: process.env.PET_STORE_API_BASE_URL!,
         schema: `${process.env.PET_STORE_API_BASE_URL!}/openapi.json`
