@@ -96,7 +96,7 @@ function isSerializedBlob(obj: unknown): obj is SerializedBlob {
   )
 }
 
-/** Widest slice that `String.fromCharCode` can take before the argument list overflows the stack. */
+/** Kept well below the argument count at which spreading into `String.fromCharCode` overflows the stack. */
 const BINARY_STRING_CHUNK_SIZE = 8192
 
 async function serializeBlob(blob: Blob) {

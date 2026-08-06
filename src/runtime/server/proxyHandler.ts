@@ -40,7 +40,6 @@ export default defineEventHandler(async (event) => {
   }
   const baseURL = getRequestHeader(event, `${endpointId}-Endpoint-Url`) || endpoint.url
 
-  // Check if the base URL is in the allow list.
   if (
     baseURL !== endpoint.url
     && !endpoint.allowedUrls?.includes(baseURL)
