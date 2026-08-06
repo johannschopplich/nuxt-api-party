@@ -58,6 +58,19 @@ describe('nuxt-api-party', async () => {
       expect(todos).toHaveLength(3)
       expect(todos.every(todo => todo.isTransformed)).toBe(true)
     })
+
+    it('keeps each call site on its own transform when two request the same resource', async () => {
+      const result = await fetchTestResult<{ firstTodoCount: number, firstTwoTodosCount: number }>('/auto-key')
+
+      expect(result.firstTodoCount).toBe(1)
+      expect(result.firstTwoTodosCount).toBe(2)
+    })
+
+    it('sends a single request when two call sites ask for the same resource', async () => {
+      const result = await fetchTestResult<{ firstHits: number, secondHits: number }>('/shared-request')
+
+      expect(result.secondHits).toBe(result.firstHits)
+    })
   })
 })
 
