@@ -19,19 +19,13 @@
 
 ## Setup
 
-> [!TIP]
-> [📖 Read the documentation](https://nuxt-api-party.byjohann.dev)
-
 ```bash
 npx nuxt module add api-party
 ```
 
 ## Basic Usage
 
-> [!TIP]
-> [📖 Read the documentation](https://nuxt-api-party.byjohann.dev)
-
-Add the Nuxt API Party to your Nuxt config and prepare your first API connection by setting an endpoint object with the following properties for the `apiParty` module option:
+Add Nuxt API Party to your Nuxt configuration and describe your first API under the `apiParty` module option:
 
 ```ts
 // `nuxt.config.ts`
@@ -55,7 +49,7 @@ export default defineNuxtConfig({
 If you were to call your API `jsonPlaceholder`, the generated composables are:
 
 - `$jsonPlaceholder` – Returns the response data, similar to [`$fetch`](https://nuxt.com/docs/api/utils/dollarfetch#fetch)
-- `useJsonPlaceholderData` – Returns [multiple values](https://nuxt-api-party.byjohann.dev/api/use-fetch-like.html#return-values) similar to [`useFetch`](https://nuxt.com/docs/api/composables/use-fetch)
+- `useJsonPlaceholderData` – Returns [multiple values](https://nuxt-api-party.byjohann.dev/api/use-fetch-like#return-values) similar to [`useFetch`](https://nuxt.com/docs/api/composables/use-fetch)
 
 Use these composables in your templates or components:
 
@@ -81,13 +75,11 @@ const { data, refresh, error, status, clear } = await useJsonPlaceholderData('po
 4. Run `pnpm run dev:prepare`
 5. Start development server using `pnpm run dev`
 
-## Special Thanks
+## Credits
 
 - [Dennis Baum](https://github.com/dennisbaum) for sponsoring the initial version of this package.
 - [Konkon](https://konkon.zip) for his logo pixel art.
 
 ## License
 
-[MIT](./LICENSE) License © 2022-PRESENT [Johann Schopplich](https://github.com/johannschopplich)
-
-[MIT](./LICENSE) License © 2025-PRESENT [Matthew Messinger](https://github.com/mattmess1221)
+[MIT](./LICENSE) License © 2022-PRESENT [Johann Schopplich](https://github.com/johannschopplich) and © 2025-PRESENT [Matthew Messinger](https://github.com/mattmess1221)
