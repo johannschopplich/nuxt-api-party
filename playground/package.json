@@ -8,6 +8,6 @@
     "generate": "nuxt generate"
   },
   "devDependencies": {
-    "idb-keyval": "^6.2.2"
+    "idb-keyval": "^6.3.0"
   }
 }
