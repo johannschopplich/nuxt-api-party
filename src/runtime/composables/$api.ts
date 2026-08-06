@@ -6,7 +6,7 @@ import { defu } from 'defu'
 import { hash } from 'ohash'
 import { joinURL } from 'ufo'
 import { allowClient, experimentalDisableClientPayloadCache, experimentalEnablePrefixedProxy, serverBasePath } from '#build/module/nuxt-api-party.config'
-import { useNuxtApp, useRequestFetch, useRequestHeaders, useRuntimeConfig } from '#imports'
+import { useNuxtApp, useRequestFetch, useRuntimeConfig } from '#imports'
 import { CACHE_KEY_PREFIX } from '../constants'
 import { isFormData } from '../form-data'
 import { mergeFetchHooks } from '../hooks'
@@ -215,10 +215,9 @@ export async function _$api<T = unknown>(
       body: {
         path: resolvePathParams(path, pathParams),
         query,
-        headers: [...mergeHeaders(
-          headers,
-          endpoint.cookies ? useRequestHeaders(['cookie']) : undefined,
-        )],
+        // The server handler reads the cookie off its own request, so sending
+        // one along here would only duplicate it.
+        headers: [...mergeHeaders(headers)],
         method,
         body: await serializeMaybeEncodedBody(body),
       },

@@ -11,6 +11,10 @@ export default defineNuxtConfig({
       forbidden: {
         url: '/api',
       },
+      cookieApi: {
+        url: '/api',
+        cookies: true,
+      },
     },
   },
 })

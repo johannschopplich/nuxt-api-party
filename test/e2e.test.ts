@@ -34,6 +34,18 @@ describe('nuxt-api-party', async () => {
     })
   })
 
+  describe('cookie forwarding', () => {
+    it('forwards the cookie only for the endpoint that sets cookies to true', async () => {
+      const html = await $fetch<string>('/cookies', {
+        headers: { cookie: 'session=secret' },
+      })
+      const result = readTestResult<{ withCookies?: string, withoutCookies?: string }>(html)
+
+      expect(result.withCookies).toBe('session=secret')
+      expect(result.withoutCookies).toBeUndefined()
+    })
+  })
+
   describe('useTestApiData', () => {
     it('applies transform to the resolved data', async () => {
       const todos = await fetchTestResult<{ isTransformed: boolean }[]>('/useTestApiData')
@@ -45,7 +57,10 @@ describe('nuxt-api-party', async () => {
 })
 
 async function fetchTestResult<T = any>(path: string): Promise<T> {
-  const html = await $fetch<string>(path)
+  return readTestResult<T>(await $fetch<string>(path))
+}
+
+function readTestResult<T = any>(html: string): T {
   const content = html.match(/<script\s+type="text\/test-result">(.*?)<\/script>/s)?.[1]
   return destr(content)
 }
