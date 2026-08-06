@@ -1,9 +1,9 @@
 import type { H3Event$Fetch } from 'nitropack/types'
 
-import { useRequestFetch } from '#app'
 import { hash } from 'ohash'
 import { createStorage } from 'unstorage'
 import indexedDbDriver from 'unstorage/drivers/indexedb'
+import { useRequestFetch } from '#app'
 
 import { mergeFetchHooks } from '../../../src/runtime/hooks'
 
