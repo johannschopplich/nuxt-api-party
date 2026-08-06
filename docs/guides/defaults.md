@@ -11,7 +11,7 @@ The `ModulePlugin` type ensures your plugin provides correct defaults.
 The `useApiData` composables also use these defaults, as well as relevant Nuxt configuration set in [`experimental.defaults`](https://nuxt.com/docs/4.x/guide/going-further/experimental-features#defaults).
 :::
 
-### Minimal Example Plugin
+## Minimal Example Plugin
 
 ::: code-group
 ```ts {7-9,12-14} [plugins/api-party-defaults.ts]

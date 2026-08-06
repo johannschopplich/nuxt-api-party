@@ -63,7 +63,7 @@ The available options are:
 - `'no-cache'`: Use the cache, but revalidate with the server before returning the cached response.
 - `'force-cache'`: Use the cache, even if it is stale.
 - `'only-if-cached'`: Use the cache, but do not make a request to the server if the resource is not in the cache. If the resource is not in the cache, will respond with a 504 Gateway Timeout error.
-- `true`: Enables default caching behavior. See the [Default Caching Behavior](#default-caching-behavior) section for more details.
+- `true`: Enables default caching behavior. See the [Built-in Browser Caching](#built-in-browser-caching) section for more details.
 - `false`: Equivalent to `'no-store'`
 
 For reference, here is a table summarizing the behavior of each cache option:
