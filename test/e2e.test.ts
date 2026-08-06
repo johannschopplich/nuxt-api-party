@@ -34,6 +34,15 @@ describe('nuxt-api-party', async () => {
     })
   })
 
+  describe('header forwarding', () => {
+    it('forwards the headers option to the API', async () => {
+      const result = await fetchTestResult<{ authorization?: string, traceId?: string }>('/request-headers')
+
+      expect(result.authorization).toBe('Bearer developer-token')
+      expect(result.traceId).toBe('abc')
+    })
+  })
+
   describe('cookie forwarding', () => {
     it('forwards the cookie only for the endpoint that sets cookies to true', async () => {
       const html = await $fetch<string>('/cookies', {

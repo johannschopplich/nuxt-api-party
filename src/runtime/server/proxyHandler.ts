@@ -10,7 +10,7 @@ import {
 } from 'h3'
 import { useNitroApp, useRuntimeConfig } from 'nitropack/runtime'
 import { joinURL, withQuery } from 'ufo'
-import { isForwardableClientHeader } from '../utils'
+import { isForwardableProxyHeader } from '../utils'
 
 export default defineEventHandler(async (event) => {
   const nitro = useNitroApp()
@@ -48,7 +48,7 @@ export default defineEventHandler(async (event) => {
   }
 
   for (const name of Object.keys(event.node.req.headers)) {
-    if (!isForwardableClientHeader(name, { endpointId, cookies: endpoint.cookies })) {
+    if (!isForwardableProxyHeader(name, { endpointId, cookies: endpoint.cookies })) {
       delete event.node.req.headers[name]
     }
   }

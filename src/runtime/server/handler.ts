@@ -13,7 +13,7 @@ import {
   splitCookiesString,
 } from 'h3'
 import { useNitroApp, useRuntimeConfig } from 'nitropack/runtime'
-import { deserializeMaybeEncodedBody, isForwardableClientHeader, mergeHeaders, omitUndefinedValues } from '../utils'
+import { deserializeMaybeEncodedBody, isForwardableBodyHeader, mergeHeaders, omitUndefinedValues } from '../utils'
 
 const ALLOWED_REQUEST_HEADERS = [
   'Origin',
@@ -87,11 +87,9 @@ export default defineEventHandler(async (event) => {
             ...(endpoint.cookies && { cookie: getRequestHeader(event, 'cookie') }),
           }),
           endpoint.headers,
-          // A cookie the client put in the body would be appended to the one
-          // read from the event above, so it never counts as forwardable here.
           new Headers(
             [...new Headers(headers)].filter(
-              ([name]) => isForwardableClientHeader(name, { endpointId }),
+              ([name]) => isForwardableBodyHeader(name, { endpointId }),
             ),
           ),
         ),

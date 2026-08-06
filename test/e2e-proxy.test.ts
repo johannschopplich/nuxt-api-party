@@ -43,7 +43,7 @@ describe('nuxt-api-party proxy', async () => {
     expect(received.cookie).toBe('session=secret')
   })
 
-  it('withholds authorization from every endpoint', async () => {
+  it('withholds authorization even from an endpoint that forwards cookies', async () => {
     const received = await echoHeaders('cookieApi', { authorization: 'Bearer client-token' })
 
     expect(received.authorization).toBeUndefined()
