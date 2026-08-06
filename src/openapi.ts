@@ -30,22 +30,6 @@ export async function generateOpenAPITypes(
       ([id, types]) => `
 declare module "#nuxt-api-party/${id}" {
 ${normalizeIndentation(types).trimEnd()}
-
-  /** @deprecated Use \`import { ${pascalCase(id)} } from '#nuxt-api-party'\` instead */
-  export type Response<
-    T extends keyof operations,
-    R extends keyof operations[T]['responses'] = 200 extends keyof operations[T]['responses'] ? 200 : never
-  > = operations[T]['responses'][R] extends { content: { 'application/json': infer U } } ? U : never
-
-  /** @deprecated Use \`import { ${pascalCase(id)} } from '#nuxt-api-party'\` instead */
-  export type RequestBody<
-    T extends keyof operations
-  > = operations[T]['requestBody'] extends { content: { 'application/json': infer U } } ? U : never
-
-  /** @deprecated Use \`import { ${pascalCase(id)} } from '#nuxt-api-party'\` instead */
-  export type RequestQuery<
-    T extends keyof operations
-  > = operations[T]['parameters'] extends { query?: infer U } ? U : never
 }`.trimStart(),
     )
     .join('\n\n')
