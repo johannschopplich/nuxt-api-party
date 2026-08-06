@@ -94,25 +94,16 @@ async function generateSchemaTypes(options: {
   endpoint: SchemaEndpoint
   openAPITSOptions?: OpenAPITSOptions
 }) {
-  // openapi-typescript < 7 does not have named exports.
-  const openAPITS = await interopDefault(import('openapi-typescript'))
+  const { default: openAPITS, astToString } = await import('openapi-typescript')
   const schema = await resolveSchema(options.id, options.endpoint)
 
   try {
     const ast = await openAPITS(schema, {
-      // @ts-expect-error: openapi-typescript >= 7 dropped this option.
-      commentHeader: '',
       ...options.openAPITSOptions,
       ...options.endpoint.openAPITS,
     })
 
-    if (typeof ast !== 'string') {
-      // Required for openapi-typescript v7+.
-      const { astToString } = await import('openapi-typescript')
-      return astToString!(ast)
-    }
-
-    return ast
+    return astToString(ast)
   }
   catch (error) {
     console.error(`Failed to generate types for ${options.id}`)
@@ -158,13 +149,6 @@ async function resolveSchema(id: string, { schema }: SchemaEndpoint): Promise<st
   }
 
   return schema!
-}
-
-async function interopDefault<T>(
-  m: T | Promise<T>,
-): Promise<T extends { default: infer U } ? U : T> {
-  const resolved = await m
-  return (resolved as any).default || resolved
 }
 
 function normalizeIndentation(code: string): string {

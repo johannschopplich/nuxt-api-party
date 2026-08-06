@@ -10,7 +10,12 @@ Nuxt API Party integrates with an [OpenAPI schema](https://swagger.io/resources/
 - Error responses
 
 ::: info Mandatory Dependency
-Usage of this feature requires [`openapi-typescript`](https://www.npmjs.com/package/openapi-typescript) to generate TypeScript definitions from your OpenAPI schema file. It is installed alongside Nuxt API Party.
+This feature generates TypeScript definitions from your OpenAPI schema with [`openapi-typescript`](https://www.npmjs.com/package/openapi-typescript) v7. It is an optional peer dependency, so install it yourself:
+
+```sh
+npm install -D openapi-typescript
+```
+
 :::
 
 ## Schema Generation
