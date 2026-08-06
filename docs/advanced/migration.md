@@ -2,9 +2,45 @@
 
 ## v4.0.0
 
+### Nuxt 4 Is Required
+
+The module no longer supports Nuxt 3.
+
+### The `experimental` Namespace Is Gone
+
+Its four flags moved out and two of them changed their default:
+
+| Before                                       | Now                                | Default  |
+| -------------------------------------------- | ---------------------------------- | -------- |
+| `experimental.enablePrefixedProxy: true`      | `server.proxyMode: 'prefixed'`     | Unchanged |
+| `experimental.disableClientPayloadCache: true`| `payloadCache: false`              | Unchanged |
+| `experimental.enableAutoKeyInjection: true`   | `autoKeyInjection`                 | Now on   |
+| `experimental.enableSchemaFileWatcher`        | Removed                            | Always on in dev |
+
+`autoKeyInjection` gives every `useMyApiData` call its own async data state, keyed by its position in your source, the way Nuxt keys `useFetch` and `useAsyncData`. Two components asking for the same resource therefore no longer share a `data` ref, and no longer collide when their `transform`, `pick` or `default` options differ. They do still share the underlying request. Pass the same explicit `key` to put two call sites back on one instance.
+
+The schema file watcher no longer has a switch. Nuxt's own builder watcher cannot stand in for it – it covers each layer's `app` and `server` directories only, and a path registered through `nuxt.options.watch` restarts the dev server rather than regenerating the types.
+
+### `cache` Only Means the Browser Cache Now
+
+`cache` used to accept a boolean alongside the [`RequestInit.cache`](https://developer.mozilla.org/en-US/docs/Web/API/Request/cache) values, and the boolean drove the payload cache. Payload caching now has its own option:
+
+```ts
+const { data } = await useMyApiData('posts', {
+  cache: false, // [!code --]
+  payloadCache: false // [!code ++]
+})
+```
+
+`cache: true` and `cache: false` are compile errors, so they surface on upgrade. One change is silent, though: a string value used to turn payload caching off as a side effect. `cache: 'no-store'` now only sets the browser cache mode, and the payload cache stays on unless you add `payloadCache: false`.
+
+### The Wrapped Proxy Reports `502` for an Unreachable API
+
+An API that cannot be reached used to yield `503 Service Unavailable` from the default proxy and `502 Bad Gateway` from the prefixed one. Both report `502` now.
+
 ### The Prefixed Proxy No Longer Forwards `authorization`
 
-With [`experimental.enablePrefixedProxy`](/essentials/module-configuration#enableprefixedproxy) enabled, a browser request's `authorization` header used to travel on to your API. It no longer does: the header carries the caller's credentials for *your* app, not your app's credentials for the upstream service.
+With [`server.proxyMode`](/essentials/module-configuration#proxymode) set to `'prefixed'`, a browser request's `authorization` header used to travel on to your API. It no longer does: the header carries the caller's credentials for *your* app, not your app's credentials for the upstream service.
 
 A cookie still travels, but only for endpoints that set `cookies: true`. Note that the prefixed proxy forwards the request as it stands and does not add the endpoint's `token`, `headers` or `query` – only the default `/api/__api_party/{endpointId}` handler does. If you relied on the old behavior to pass a bearer token through, attach it in a [request hook](/guides/hooks).
 

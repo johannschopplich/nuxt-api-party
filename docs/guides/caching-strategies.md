@@ -1,10 +1,10 @@
 # Caching Strategies
 
-Nuxt API Party caches in two places: in memory, which is fast and lives for the page, and in the browser's HTTP cache, which survives reloads. They complement each other, and the `cache` option picks between them.
+Nuxt API Party caches in two places: in the Nuxt payload, which is fast and lives for the page, and in the browser's HTTP cache, which survives reloads. They are independent and each has its own option – `payloadCache` for the former, `cache` for the latter.
 
 ## In-Memory Caching
 
-In-memory caching is the default caching behavior for data composables. It uses a custom caching mechanism that stores responses in memory and updates them with the latest response from the server.
+Payload caching is the default for data composables. A response is stored in the Nuxt payload under a key derived from the request, so a repeated request for the same resource resolves without a round trip. Turn it off per call with `payloadCache: false`, or for the whole app with the [`payloadCache`](/essentials/module-configuration#apiparty-payloadcache) module option.
 
 Benefits of in-memory caching over browser caching include:
 
@@ -28,14 +28,14 @@ The cached response is used until it expires.
 To enable built-in browser caching, set the `cache` option to one of the values in the [options](#cache-options) section below.
 
 ::: tip HTTP Caching
-To support HTTP caching, you must enable the [`enablePrefixedProxy`](/essentials/module-configuration#enableprefixedproxy) experimental option in your `nuxt.config` file. This allows GET requests to be GET requests, which is required for caching to work correctly.
+To support HTTP caching, you must set [`server.proxyMode`](/essentials/module-configuration#proxymode) to `'prefixed'` in your `nuxt.config` file. This allows GET requests to be GET requests, which is required for caching to work correctly.
 
 ```ts
 export default defineNuxtConfig({
   modules: ['nuxt-api-party'],
   apiParty: {
-    experimental: {
-      enablePrefixedProxy: true
+    server: {
+      proxyMode: 'prefixed'
     }
   }
 })
@@ -51,7 +51,7 @@ To support HTTP client caching, your endpoint must meet the following requiremen
 
 ## Cache Options
 
-Caching is enabled by default for all requests. Control caching behavior by setting the `cache` option in request options. The `cache` option accepts the same values as [`Request.cache`](https://developer.mozilla.org/en-US/docs/Web/API/Request/cache).
+The `cache` option controls the browser's HTTP cache and accepts the same values as [`Request.cache`](https://developer.mozilla.org/en-US/docs/Web/API/Request/cache).
 
 The available options are:
 
@@ -61,8 +61,8 @@ The available options are:
 - `'no-cache'`: Use the cache, but revalidate with the server before returning the cached response.
 - `'force-cache'`: Use the cache, even if it is stale.
 - `'only-if-cached'`: Use the cache, but do not make a request to the server if the resource is not in the cache. If the resource is not in the cache, will respond with a 504 Gateway Timeout error.
-- `true`: Enables default caching behavior. See the [Built-in Browser Caching](#built-in-browser-caching) section for more details.
-- `false`: Equivalent to `'no-store'`
+
+Payload caching is a separate switch: `payloadCache` takes a boolean and leaves the HTTP cache alone.
 
 For reference, here is a table summarizing the behavior of each cache option:
 
@@ -97,21 +97,20 @@ export default defineNuxtConfig({
 :::
 ::::
 
-### Cache in Memory
+### Cache in the Payload
 
-Omitting or passing `true` to the `cache` option enables in-memory caching behavior.
+Payload caching is on unless you turn it off.
 
 ```ts
-// In-Memory caching behavior
 const { data } = await useJsonPlaceholderData('posts', {
   // The default value is `true`
-  cache: true // [!code ++]
+  payloadCache: true // [!code ++]
 })
 ```
 
 ### Refresh Cached Data
 
-When using in-memory caching, call the `clear` function to invalidate the cache, then call `refresh` to fetch fresh data from the server.
+When using payload caching, call the `clear` function to invalidate the cache, then call `refresh` to fetch fresh data from the server.
 
 ```ts
 // Refresh cached data
@@ -137,12 +136,12 @@ const { data } = await useJsonPlaceholderData('posts', {
 
 ### Disable Caching
 
-Passing `false` or `'no-store'` to the `cache` option disables caching for that request.
+Each cache has its own switch, so turn off whichever a request should skip.
 
 ```ts
-// Disable caching for a single request
 const { data } = await useJsonPlaceholderData('posts/1', {
-  cache: false // 'no-store' // [!code ++]
+  payloadCache: false, // [!code ++]
+  cache: 'no-store' // [!code ++]
 })
 ```
 

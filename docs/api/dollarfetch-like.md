@@ -12,7 +12,7 @@ Returns the raw API response. Intended for actions inside methods, e.g. when sen
 
 ## Caching
 
-Customize caching behavior by passing the `cache` option:
+Payload caching is off by default here; `payloadCache: true` turns it on. The `cache` option controls the browser's HTTP cache separately:
 
 ```ts
 const data = await $myApi('posts', {

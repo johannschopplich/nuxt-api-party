@@ -91,39 +91,32 @@ The path segment the module's server routes live under, below `/api`. Change it 
 
 **Default value**: `'__api_party'`
 
-## `apiParty.experimental`
+### `proxyMode`
 
-These feature flags enable experimental features which change the default behavior of the module that may become the default in the future.
+How the server handler forwards a request to your API.
 
-### `enableAutoKeyInjection`
+- `'wrapped'` – Every call becomes a `POST` request that carries the original request in its body.
+- `'prefixed'` – The original request is mirrored: path, method, headers, query and body travel as they are, through h3's `sendProxy` utility.
 
-When enabled, Nuxt generates a unique key for each composable call based on its location in the code, similar to `useFetch` and `useAsyncData`.
+Choose `'prefixed'` when you want the browser's network tab to match the upstream request, or when you need HTTP cache control – a `POST` wrapper cannot be cached.
 
-To share data between multiple calls to the same resource, provide a `key` option to the composable call. The same restrictions apply as with `useFetch` and `useAsyncData`: each call must share the same `pick`, `transform`, and `getCachedData` options.
+**Default value**: `'wrapped'`
 
-### `enablePrefixedProxy`
+## `apiParty.payloadCache`
 
-When enabled, globally enables direct API proxying using h3's `requestProxy` utility.
+Whether a response may be cached in the Nuxt payload, keyed by the request. Turning it off also drops the caching logic from the client bundle.
 
-By default, all API requests go through an internal `POST` endpoint that passes the request to the backend service. This can be confusing when inspecting the browser network tab if you don't expect it. Since it uses a `POST` request, it isn't compatible with cache control.
+An individual call opts out with `payloadCache: false`.
 
-Enable this option if you prefer matching HTTP methods or want to use cache control.
+**Default value**: `true`
 
-### `disableClientPayloadCache`
+## `apiParty.autoKeyInjection`
 
-When enabled, disables client-side payload cache for all generated composables.
+Whether every `useMyApiData` call gets a build-time key derived from its position in the source, the way Nuxt does for `useFetch` and `useAsyncData`.
 
-This has the same effect as setting `cache: false` in each composable call and enforces it globally. Additionally, in-memory caching logic is completely removed from composables, resulting in smaller bundle sizes.
+Each call site then owns its async data, so two components asking for the same resource no longer collide over differing `transform`, `pick` or `default` options. They still share the underlying request. To put two call sites back on one shared instance, give them the same `key` – the same restrictions apply as with Nuxt's own composables.
 
-### `enableSchemaFileWatcher`
-
-::: tip
-This option is enabled by default in development mode.
-:::
-
-When enabled, watches local OpenAPI schema files using `chokidar`.
-
-Changes to local schema files automatically regenerate types. When disabled, restart the Nuxt dev server to pick up changes to local schema files. Has no effect on remote schemas.
+**Default value**: `true`
 
 ## Type Declaration
 

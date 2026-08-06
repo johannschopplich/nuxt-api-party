@@ -2,7 +2,7 @@
 
 Returns the raw API response. Intended for data that requires reactive updates, e.g. when using data in templates.
 
-Responses are **cached** between function calls for the same path based on a calculated hash. Disable this by setting `cache` to `false`.
+Responses are **cached** in the Nuxt payload between calls for the same request. Disable this by setting `payloadCache` to `false`.
 
 Supports every [`useAsyncData` option](https://nuxt.com/docs/api/composables/use-async-data/#params).
 
@@ -32,7 +32,7 @@ By default, Nuxt waits until a `refresh` is finished before it can be executed a
 
 ## Caching
 
-Customize caching behavior by passing the `cache` option:
+Payload caching is on by default; `payloadCache: false` turns it off. The `cache` option controls the browser's HTTP cache separately:
 
 ```ts
 const { data } = await useMyApiData('posts', {

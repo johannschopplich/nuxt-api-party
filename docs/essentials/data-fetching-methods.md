@@ -12,7 +12,7 @@ Both follow the same patterns as Nuxt's native `useFetch` and `$fetch`. If you k
 | ------------------- | --------------------------------------------------------------------------------- | --------------------------------- |
 | **Returns**         | [`AsyncData`](https://nuxt.com/docs/api/composables/use-async-data#return-values)  | A promise of the response data    |
 | **On failure**      | A reactive `error` value                                                          | Throws                            |
-| **Caching**         | Automatic, with deduplication                                                     | Per call, via the `cache` option  |
+| **Caching**         | Payload cache on by default, with deduplication                                   | Payload cache off unless opted in |
 | **Server rendering**| Hydrates automatically                                                            | You decide where it runs          |
 | **Reach for it**    | Page and component data                                                           | Mutations and programmatic calls  |
 

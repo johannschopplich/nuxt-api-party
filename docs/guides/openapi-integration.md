@@ -118,7 +118,7 @@ export default defineNuxtConfig({
 :::
 
 ::: tip
-If the [`enableSchemaFileWatcher`](/essentials/module-configuration#enableschemafilewatcher) experimental option is enabled (it is by default), changes to local schema files will automatically regenerate the types. When disabled or using a remote schema, you will need to restart the Nuxt dev server to pick up changes.
+In development, changes to a local schema file regenerate the types right away. A remote schema is read once, so pick up changes there by restarting the Nuxt dev server.
 :::
 
 ## Using the Types
