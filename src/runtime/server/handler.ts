@@ -139,9 +139,10 @@ export default defineEventHandler(async (event) => {
     }
     console.error(error)
 
+    // Matches what h3's `sendProxy` reports for the same condition in the prefixed proxy mode.
     throw createError({
-      statusCode: 503,
-      statusMessage: 'Service Unavailable',
+      statusCode: 502,
+      statusMessage: 'Bad Gateway',
     })
   }
 })
