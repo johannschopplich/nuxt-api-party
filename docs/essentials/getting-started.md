@@ -165,16 +165,11 @@ const post = await $jsonPlaceholder('posts', {
 
 It throws on a failed request rather than exposing an `error` value, so wrap it where you need to react to failure. [Data Fetching Methods](/essentials/data-fetching-methods) walks through a complete form.
 
-## What's Next?
+## Next Steps
 
-### Explore More Features
-
-- [Data Fetching Methods](/essentials/data-fetching-methods) – Learn when to use `useMyApiData` vs `$myApi`
-- [Module Configuration](/essentials/module-configuration) – Explore all configuration options
-- [Error Handling](/guides/error-handling) – Handle API errors gracefully
-- [OpenAPI Integration](/guides/openapi-integration) – Add full type safety with OpenAPI schemas
-
-### Advanced Topics
-
-- [Caching Strategies](/guides/caching-strategies) – Optimize performance with smart caching
-- [Runtime Hooks](/guides/hooks) – Customize behavior with request/response hooks
+- [Data Fetching Methods](/essentials/data-fetching-methods) – Choose between `useMyApiData` and `$myApi`.
+- [Module Configuration](/essentials/module-configuration) – Every option an endpoint accepts.
+- [Error Handling](/guides/error-handling) – What a failed request gives you.
+- [OpenAPI Integration](/guides/openapi-integration) – Infer request and response types from a schema.
+- [Caching Strategies](/guides/caching-strategies) – Cache in memory or in the browser.
+- [Runtime Hooks](/guides/hooks) – Change a request or a response as it passes through.

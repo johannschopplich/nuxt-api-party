@@ -124,7 +124,7 @@ function sidebarCore(): DefaultTheme.SidebarItem[] {
     {
       text: 'Advanced',
       items: [
-        { text: 'How Does It Work?', link: '/advanced/how-it-works' },
+        { text: 'How It Works', link: '/advanced/how-it-works' },
         { text: 'Migration', link: '/advanced/migration' },
       ],
     },
