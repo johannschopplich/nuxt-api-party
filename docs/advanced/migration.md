@@ -1,5 +1,39 @@
 # Migration
 
+## v4.0.0
+
+### The Prefixed Proxy No Longer Forwards `authorization`
+
+With [`experimental.enablePrefixedProxy`](/essentials/module-configuration#enableprefixedproxy) enabled, a browser request's `authorization` header used to travel on to your API. It no longer does: the header carries the caller's credentials for *your* app, and the endpoint's own `token` or `headers` configuration is what authenticates against the upstream service.
+
+A cookie still travels, but only for endpoints that set `cookies: true`. If you relied on the old behavior to pass a bearer token through, send it under a header of your own and map it in a [request hook](/guides/hooks).
+
+### Endpoint Types Resolve Through the Client
+
+`Service<Path, Method>` used to compute `request`, `response` and `responses` with its own type logic, which disagreed with what the composables returned. Both now resolve through the same helpers, so the type you extract is the type you get back.
+
+Three consequences, all at type level:
+
+- A method the path doesn't declare is now a compile error. `PetStore<'/pet', 'get'>` fails where the schema declares only `post` and `put`; likewise `PetStoreApiMethods<'/pet'>` narrows from every HTTP verb to `'post' | 'put'`.
+- An operation that declares no path or query parameters reports `never`, and one that declares no request body reports `undefined`, where both used to report `Record<string, never>`.
+- A status code that carries no response body reports `undefined` in `responses`, again in place of `Record<string, never>`.
+
+See [OpenAPI Type Helpers](/api/openapi-types) for what each property now reports.
+
+### Removed Deprecated Type Helpers
+
+`Response`, `RequestBody` and `RequestQuery` are gone from `#nuxt-api-party/{endpointId}`. They were keyed by operation ID; the endpoint interface is keyed by path and method, which is what the composables take:
+
+```ts
+import type { Response } from '#nuxt-api-party/petStore' // [!code --]
+import type { PetStore } from '#nuxt-api-party' // [!code ++]
+
+type Pet = Response<'getPetById'> // [!code --]
+type Pet = PetStore<'/pet/{petId}', 'get'>['response'] // [!code ++]
+```
+
+`RequestBody<'addPet'>` becomes `PetStore<'/pet', 'post'>['request']`, and `RequestQuery<'findPetsByStatus'>` becomes `PetStore<'/pet/findByStatus', 'get'>['query']`.
+
 ## v3.0.0
 
 Caching has been completely refactored in Nuxt API Party v3. If you are using caching, please read the [caching documentation](/guides/caching-strategies) to understand the new caching system.
