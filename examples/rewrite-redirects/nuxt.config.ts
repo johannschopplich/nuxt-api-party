@@ -3,8 +3,8 @@ export default defineNuxtConfig({
     'nuxt-api-party',
   ],
   apiParty: {
-    experimental: {
-      enablePrefixedProxy: true,
+    server: {
+      proxyMode: 'prefixed',
     },
     endpoints: {
       myApi: {

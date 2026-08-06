@@ -5,7 +5,7 @@ This example showcases a Nitropack plugin that rewrites redirect locations.
 The default behavior is to follow redirects automatically, which can obscure the original redirect location from the client. This plugin allows redirects to be forwarded to the client transparently.
 
 > [!WARNING]
-> In order to use this plugin, you need to enable the experimental api party option `enablePrefixedProxy`. Due to how clients implement redirects, supporting non-prefixed proxy requests is not possible.
+> In order to use this plugin, you need to set the API Party option `server.proxyMode` to `'prefixed'`. Due to how clients implement redirects, supporting the wrapped proxy is not possible.
 
 ## Usage
 

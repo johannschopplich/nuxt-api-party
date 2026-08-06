@@ -7,9 +7,9 @@ const REDIRECT_MODES = new Set(['follow', 'error', 'manual'])
 /**
  * Nitro plugin to rewrite API request and response redirect behavior.
  *
- * This plugin requires that the `experimental.enablePrefixedProxy` option is enabled.
- * Having this option disabled would cause some redirects to change from POST to GET, which
- * would result in a 405 error on the proxy.
+ * This plugin requires the `server.proxyMode` option set to `'prefixed'`. The wrapped proxy
+ * would cause some redirects to change from POST to GET, which would result in a 405 error
+ * on the proxy.
  *
  * Request headers:
  * - `x-proxy-redirect`: Sets the redirect mode for the proxy request. Valid values are 'follow', 'error', and 'manual'.
