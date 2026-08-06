@@ -2,15 +2,19 @@ import type { H3Error } from 'h3'
 import {
   createError,
   defineEventHandler,
+  getProxyRequestHeaders,
   getQuery,
   getRequestHeader,
   getRouterParam,
   isError,
-  proxyRequest,
+  readRawBody,
+  sendProxy,
 } from 'h3'
 import { useNitroApp, useRuntimeConfig } from 'nitropack/runtime'
 import { joinURL, withQuery } from 'ufo'
 import { isForwardableProxyHeader } from '../utils'
+
+const PAYLOAD_METHODS = new Set(['PATCH', 'POST', 'PUT', 'DELETE'])
 
 export default defineEventHandler(async (event) => {
   const nitro = useNitroApp()
@@ -47,17 +51,29 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  for (const name of Object.keys(event.node.req.headers)) {
-    if (!isForwardableProxyHeader(name, { endpointId, cookies: endpoint.cookies })) {
-      delete event.node.req.headers[name]
-    }
+  // `proxyRequest` forwards every incoming header, and its `headers` option can only add to that set, never drop one.
+  const proxyHeaders: Record<string, string | undefined> = getProxyRequestHeaders(event)
+  const headers = new Headers()
+  for (const [name, value] of Object.entries(proxyHeaders)) {
+    if (value != null && isForwardableProxyHeader(name, { endpointId, cookies: endpoint.cookies }))
+      headers.set(name, value)
   }
+
+  const rawBody = PAYLOAD_METHODS.has(event.method)
+    ? await readRawBody(event, false).catch(() => undefined)
+    : undefined
 
   const hookErrorPromise = createHookErrorPromise()
   const url = withQuery(joinURL(baseURL, path), getQuery(event))
   return await Promise.race([
     hookErrorPromise,
-    proxyRequest(event, url, {
+    sendProxy(event, url, {
+      fetchOptions: {
+        method: event.method,
+        headers,
+        // A view rather than a copy, since an upload can be large. Node never backs a buffer with shared memory.
+        body: rawBody && new Uint8Array(rawBody.buffer as ArrayBuffer, rawBody.byteOffset, rawBody.byteLength),
+      },
       fetch: globalThis.$fetch.create({
         onRequest: hookErrorPromise.wrap(async (ctx) => {
           await nitro.hooks.callHook('api-party:request', ctx, event)
@@ -84,10 +100,10 @@ interface HookErrorPromise extends Promise<never> {
 }
 
 /**
- * Creates a promise that rejects when a hook throws an H3 error, a hack to bypass `proxyRequest`'s server error handling.
+ * Creates a promise that rejects when a hook throws an H3 error, a hack to bypass `sendProxy`'s error handling.
  *
- * H3 is configured to treat all errors in fetch as 503 errors, but hooks
- * allow additional error handling, such as 403 errors.
+ * `sendProxy` turns every fetch rejection into a 502, but a hook may want to answer
+ * with a status of its own, such as 403.
  *
  * When combined with `Promise.race`, this allows us to handle errors
  * in hooks without triggering the default error handling of H3.
