@@ -142,6 +142,12 @@ export async function _$api<T = unknown>(
     consola.error('[nuxt-api-party] Payload caching is disabled. Set `payloadCache: true` in the module options to enable it.')
   }
 
+  // The wrapped proxy turns every call into a POST to the Nuxt server route, and a POST is never served from the
+  // browser's HTTP cache, so the option would quietly do nothing.
+  if (import.meta.dev && cache && !client && serverProxyMode === 'wrapped') {
+    consola.warn('[nuxt-api-party] The `cache` option has no effect while `server.proxyMode` is `wrapped`. Set it to `passthrough`, or send the request from the client.')
+  }
+
   // The payload always carries an SSR response over to the client, so a write is due there regardless of the option.
   const cachesPayload = allowPayloadCache && (import.meta.server || payloadCache)
 
@@ -229,7 +235,7 @@ export async function _$api<T = unknown>(
 
   const request = (allowClient && client
     ? clientFetcher(endpoint.url!)
-    : serverProxyMode === 'prefixed'
+    : serverProxyMode === 'passthrough'
       ? clientFetcher(joinURL('/api', serverBasePath, endpointId, 'proxy'))
       : serverFetcher())
     .then((response) => {

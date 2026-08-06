@@ -98,12 +98,14 @@ export interface ModuleOptions {
      * How the Nuxt server handler forwards a request to the API.
      *
      * @remarks
-     * - `'wrapped'` sends every call as a POST request carrying the original request in its body.
-     * - `'prefixed'` mirrors the original request – path, method, headers, query and body travel as they are.
+     * - `'wrapped'` sends every call as a POST request carrying the original request in its body, and adds the
+     *   endpoint's `token`, `headers` and `query` along the way.
+     * - `'passthrough'` mirrors the original request – path, method, headers, query and body travel as they are,
+     *   and nothing from the endpoint configuration is added. Attach credentials in a request hook instead.
      *
      * @default 'wrapped'
      */
-    proxyMode?: 'wrapped' | 'prefixed'
+    proxyMode?: 'wrapped' | 'passthrough'
   }
 
   /**
@@ -260,8 +262,7 @@ export default defineNuxtModule<ModuleOptions>().with({
       schemaEndpointIds.length = 0
     }
 
-    if (options.server.proxyMode === 'prefixed') {
-      // Add Nuxt server route to proxy the API request server-side.
+    if (options.server.proxyMode === 'passthrough') {
       addServerHandler({
         route: joinURL('/api', options.server.basePath, ':endpointId/proxy/**:path'),
         handler: resolve('runtime/server/proxyHandler'),
@@ -281,8 +282,7 @@ export default defineNuxtModule<ModuleOptions>().with({
     }
 
     nuxt.hooks.hook('nitro:config', (config) => {
-      // Inline local server handler dependencies into Nitro bundle
-      // Needed to circumvent "cannot find module" error in `server.ts` for the `utils` import
+      // Inlined because Nitro would otherwise fail to resolve the `utils` import from `server.ts`.
       config.externals ||= {}
       config.externals.inline ||= []
       config.externals.inline.push(
@@ -291,7 +291,6 @@ export default defineNuxtModule<ModuleOptions>().with({
         resolve('runtime/server/$api'),
       )
 
-      // Provide `#nuxt-api-party/server` module alias for Nitro.
       config.alias ||= {}
       config.alias[`#${moduleName}/server`] = resolve(nuxt.options.buildDir, `module/${moduleName}.nitro`)
 
@@ -312,7 +311,6 @@ export const ${getRawComposableName(i)} = (...args) => _$api('${i}', ...args)
         )
       }
 
-      // Add Nitro auto-imports for generated composables.
       config.imports = defu(config.imports, {
         presets: [{
           from: `#${moduleName}/server`,
@@ -321,16 +319,13 @@ export const ${getRawComposableName(i)} = (...args) => _$api('${i}', ...args)
       })
     })
 
-    // Add Nuxt auto-imports for generated composables.
     addImportsSources({
       from: resolve(nuxt.options.buildDir, `module/${moduleName}`),
       imports: endpointKeys.flatMap(i => [getRawComposableName(i), getDataComposableName(i)]),
     })
 
-    // Add `#nuxt-api-party` module alias for generated composables.
     nuxt.options.alias[`#${moduleName}`] = resolve(nuxt.options.buildDir, `module/${moduleName}`)
 
-    // Add module template for generated composables.
     const modTemplate = addTemplate({
       filename: `module/${moduleName}.mjs`,
       getContents() {
@@ -345,7 +340,6 @@ export const ${getDataComposableName(i)} = (...args) => _useApiData('${i}', ...a
     })
 
     if (options.autoKeyInjection) {
-      // Register composables for Nuxt autokey.
       nuxt.options.optimization.keyedComposables.push(
         ...endpointKeys.map(i => ({
           name: getDataComposableName(i),
@@ -355,7 +349,6 @@ export const ${getDataComposableName(i)} = (...args) => _useApiData('${i}', ...a
       )
     }
 
-    // Add types for Nuxt auto-imports and the `#nuxt-api-party` module alias.
     addTemplate({
       filename: `module/${moduleName}.d.ts`,
       getContents() {
@@ -382,7 +375,6 @@ ${schemaEndpointIds.map(generateOpenAPITypeHelpers).join('\n\n')}
       },
     })
 
-    // Add types for Nitro auto-imports and the `#nuxt-api-party/server` module alias.
     addTemplate({
       filename: `module/${moduleName}.nitro.d.ts`,
       getContents() {
@@ -393,7 +385,6 @@ export { ${endpointKeys.map(getRawComposableName).join(', ')} } from './${module
       },
     })
 
-    // Add types for Nuxt and Nitro runtime hooks.
     addTypeTemplate({
       filename: `module/${moduleName}.hooks.d.ts`,
       getContents() {
@@ -428,7 +419,6 @@ declare module 'nitropack/types' {
       },
     })
 
-    // Add type references for endpoints with OpenAPI schemas.
     if (schemaEndpointIds.length) {
       addTemplate({
         filename: `module/${moduleName}.schema.d.ts`,
@@ -445,7 +435,6 @@ ${await generateOpenAPITypes(schemaEndpoints, options.openAPITS)}
       })
     }
 
-    // Provide module options as constants.
     addTemplate({
       filename: `module/${moduleName}.config.mjs`,
       getContents: () => `
@@ -462,13 +451,12 @@ export const allowPayloadCache = ${JSON.stringify(options.payloadCache)}
       getContents: () => `
 export declare const allowClient: boolean | 'allow' | 'always'
 export declare const serverBasePath: string
-export declare const serverProxyMode: 'wrapped' | 'prefixed'
+export declare const serverProxyMode: 'wrapped' | 'passthrough'
 export declare const allowPayloadCache: boolean
 `.trimStart(),
     })
 
     if (nuxt.options.dev) {
-      // Watch for changes in local schema files.
       const schemaFiles = Object.values(schemaEndpoints)
         .map(({ schema }) => schema)
         .filter((schema): schema is string => typeof schema === 'string' && !/^https?:\/\//.test(schema))

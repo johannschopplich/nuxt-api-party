@@ -4,7 +4,7 @@ export default defineNuxtConfig({
   ],
   apiParty: {
     server: {
-      proxyMode: 'prefixed',
+      proxyMode: 'passthrough',
     },
     endpoints: {
       myApi: {

@@ -54,7 +54,6 @@ export default defineEventHandler(async (event) => {
   // (e.g. `jsonPlaceholder` endpoint becomes `jsonPlaceholder-Endpoint-Url`).
   const baseURL = new Headers(headers).get(`${endpointId}-Endpoint-Url`) || endpoint.url
 
-  // Check if the base URL is in the allow list.
   if (
     baseURL !== endpoint.url
     && !endpoint.allowedUrls?.includes(baseURL)
@@ -139,7 +138,7 @@ export default defineEventHandler(async (event) => {
     }
     console.error(error)
 
-    // Matches what h3's `sendProxy` reports for the same condition in the prefixed proxy mode.
+    // Matches what h3's `sendProxy` reports for the same condition in the passthrough proxy mode.
     throw createError({
       statusCode: 502,
       statusMessage: 'Bad Gateway',

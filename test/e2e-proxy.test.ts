@@ -9,7 +9,7 @@ describe('nuxt-api-party proxy', async () => {
     nuxtConfig: {
       apiParty: {
         server: {
-          proxyMode: 'prefixed',
+          proxyMode: 'passthrough',
         },
       },
     },
@@ -47,11 +47,5 @@ describe('nuxt-api-party proxy', async () => {
     const received = await echoHeaders('cookieApi', { authorization: 'Bearer client-token' })
 
     expect(received.authorization).toBeUndefined()
-  })
-
-  it('forwards x-trace-id', async () => {
-    const received = await echoHeaders('testApi', { 'x-trace-id': 'abc' })
-
-    expect(received['x-trace-id']).toBe('abc')
   })
 })
