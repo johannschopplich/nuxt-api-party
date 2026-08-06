@@ -5,7 +5,7 @@ import type { FetchResponseData, FetchResponseError, FilterMethods, ParamsOption
 import type { SharedFetchOptions } from './$api'
 import { hash } from 'ohash'
 import { computed, toValue } from 'vue'
-import { allowClient, experimentalDisableClientPayloadCache } from '#build/module/nuxt-api-party.config'
+import { allowClient, allowPayloadCache } from '#build/module/nuxt-api-party.config'
 import { useFetch } from '#imports'
 import { CACHE_KEY_PREFIX } from '../constants'
 import { isFormData } from '../form-data'
@@ -101,40 +101,40 @@ export function _useApiData<T = unknown>(
 ) {
   const [opts = {}, autoKey] = typeof arg1 === 'string' ? [{}, arg1] : [arg1, arg2]
 
-  if (!experimentalDisableClientPayloadCache) {
-    opts.cache ??= true
-  }
-
   const {
     path: pathParams,
     client = allowClient === 'always',
-    cache,
+    payloadCache = allowPayloadCache,
     $fetch,
     ...fetchOptions
   } = opts
 
   const _path = computed(() => resolvePathParams(toValue(path), toValue(pathParams)))
-  const _key = computed(() => toValue(opts.key) || (CACHE_KEY_PREFIX + hash([
-    autoKey,
+
+  // Identifies the request, so concurrent calls for the same resource resolve from a single fetch.
+  const _requestKey = computed(() => CACHE_KEY_PREFIX + hash([
     endpointId,
     _path.value,
     toValue(opts.query),
     toValue(opts.method),
     ...(isFormData(toValue(opts.body)) ? [] : [toValue(opts.body)]),
-  ])))
+  ]))
+
+  // An explicit `key` merges two call sites back into one async data instance, as with Nuxt's own composables.
+  const _asyncDataKey = computed(() => toValue(opts.key) || (autoKey ? `${_requestKey.value}${autoKey}` : _requestKey.value))
 
   if (toValue(client) && !allowClient)
     throw new Error('Client-side API requests are disabled. Set "client: true" in the module options to enable them.')
 
   return useFetch(_path, {
     ...fetchOptions,
-    key: _key,
+    key: _asyncDataKey,
     $fetch: ((request: string, opts) => _$api(endpointId, request, {
       ...opts,
       $fetch: toValue($fetch),
-      cache: toValue(cache),
+      payloadCache: toValue(payloadCache),
       client: toValue(client),
-      key: _key.value,
+      key: _requestKey.value,
     })) as typeof globalThis.$fetch,
   }) as AsyncData<T | undefined, NuxtError>
 }

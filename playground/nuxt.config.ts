@@ -19,8 +19,8 @@ export default defineNuxtConfig({
   },
 
   apiParty: {
-    experimental: {
-      enablePrefixedProxy: true,
+    server: {
+      proxyMode: 'prefixed',
     },
     endpoints: {
       jsonPlaceholder: {

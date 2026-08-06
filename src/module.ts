@@ -93,49 +93,40 @@ export interface ModuleOptions {
      * @default '__api_party'
      */
     basePath?: string
+
+    /**
+     * How the Nuxt server handler forwards a request to the API.
+     *
+     * @remarks
+     * - `'wrapped'` sends every call as a POST request carrying the original request in its body.
+     * - `'prefixed'` mirrors the original request – path, method, headers, query and body travel as they are.
+     *
+     * @default 'wrapped'
+     */
+    proxyMode?: 'wrapped' | 'prefixed'
   }
 
-  experimental: {
-    /**
-     * Enable key injection for `useMyApiData` composables like Nuxt's `useAsyncData` and `useFetch` composables.
-     *
-     * With an auto-generated default key, payload caching will be unique for each instance without an explicit key option.
-     *
-     * @default false
-     */
-    enableAutoKeyInjection?: boolean
-    /**
-     * Set to `true` to enable prefixed proxy endpoints.
-     *
-     * Prefixed endpoints more closely match the target endpoint's request by forwarding the path, method, headers,
-     * query, and body directly to the backend. It uses h3's `proxyRequest` utility. The default behavior is to wrap
-     * each endpoint in a POST request.
-     *
-     * @default false
-     */
-    enablePrefixedProxy?: boolean
+  /**
+   * Cache a response in the Nuxt payload, keyed by the request.
+   *
+   * @remarks
+   * Turn this off to run your own caching strategy or to rely on the browser's HTTP cache through the `cache` option.
+   *
+   * @default true
+   */
+  payloadCache?: boolean
 
-    /**
-     * Set to `true` to disable the built-in payload caching mechanism by default.
-     *
-     * Disabling this can be useful if you want to implement your own caching strategy or reuse the browser's HTTP
-     * cache by setting the `cache` option on requests.
-     *
-     * @default false
-     */
-    disableClientPayloadCache?: boolean
-
-    /**
-     * Enable the file watcher for local OpenAPI schema files using chokidar.
-     *
-     * When enabled, changes to local schema files will automatically regenerate the types. When disabled, you will
-     * need to restart the Nuxt dev server to pick up changes to local schema files. Has no effect if no local schema
-     * files are used or for remote schemas.
-     *
-     * @default true
-     */
-    enableSchemaFileWatcher?: boolean
-  }
+  /**
+   * Inject a build-time key into every `useMyApiData` call, the way Nuxt does for `useAsyncData` and `useFetch`.
+   *
+   * @remarks
+   * Each call site then owns its async data state, so two components asking for the same resource no longer collide
+   * over differing `transform`, `pick` or `default` options. They still share the underlying request. Turn this off
+   * to key async data by the request instead, which makes every call site with equal options one shared instance.
+   *
+   * @default true
+   */
+  autoKeyInjection?: boolean
 }
 // #endregion options
 
@@ -197,13 +188,10 @@ export default defineNuxtModule<ModuleOptions>().with({
     openAPITS: {},
     server: {
       basePath: '__api_party',
+      proxyMode: 'wrapped',
     },
-    experimental: {
-      enableAutoKeyInjection: false,
-      enablePrefixedProxy: false,
-      disableClientPayloadCache: false,
-      enableSchemaFileWatcher: true,
-    },
+    payloadCache: true,
+    autoKeyInjection: true,
   },
   async setup(options, nuxt) {
     const moduleName = name
@@ -272,7 +260,7 @@ export default defineNuxtModule<ModuleOptions>().with({
       schemaEndpointIds.length = 0
     }
 
-    if (options.experimental.enablePrefixedProxy) {
+    if (options.server.proxyMode === 'prefixed') {
       // Add Nuxt server route to proxy the API request server-side.
       addServerHandler({
         route: joinURL('/api', options.server.basePath, ':endpointId/proxy/**:path'),
@@ -356,7 +344,7 @@ export const ${getDataComposableName(i)} = (...args) => _useApiData('${i}', ...a
       },
     })
 
-    if (options.experimental.enableAutoKeyInjection) {
+    if (options.autoKeyInjection) {
       // Register composables for Nuxt autokey.
       nuxt.options.optimization.keyedComposables.push(
         ...endpointKeys.map(i => ({
@@ -463,9 +451,8 @@ ${await generateOpenAPITypes(schemaEndpoints, options.openAPITS)}
       getContents: () => `
 export const allowClient = ${JSON.stringify(options.client)}
 export const serverBasePath = ${JSON.stringify(options.server.basePath)}
-
-export const experimentalEnablePrefixedProxy = ${JSON.stringify(options.experimental.enablePrefixedProxy)}
-export const experimentalDisableClientPayloadCache = ${JSON.stringify(options.experimental.disableClientPayloadCache)}
+export const serverProxyMode = ${JSON.stringify(options.server.proxyMode)}
+export const allowPayloadCache = ${JSON.stringify(options.payloadCache)}
 `.trimStart(),
     })
 
@@ -475,13 +462,12 @@ export const experimentalDisableClientPayloadCache = ${JSON.stringify(options.ex
       getContents: () => `
 export declare const allowClient: boolean | 'allow' | 'always'
 export declare const serverBasePath: string
-
-export declare const experimentalEnablePrefixedProxy: boolean
-export declare const experimentalDisableClientPayloadCache: boolean
+export declare const serverProxyMode: 'wrapped' | 'prefixed'
+export declare const allowPayloadCache: boolean
 `.trimStart(),
     })
 
-    if (nuxt.options.dev && options.experimental.enableSchemaFileWatcher) {
+    if (nuxt.options.dev) {
       // Watch for changes in local schema files.
       const schemaFiles = Object.values(schemaEndpoints)
         .map(({ schema }) => schema)
@@ -499,7 +485,9 @@ function createSchemaWatcher(schemaFiles: string[], nuxt: Nuxt) {
     return
   }
 
-  const watcher = watch(schemaFiles)
+  // Nuxt's own builder watcher cannot stand in here: it only covers each layer's `app` and `server` directories,
+  // and a path added through `nuxt.options.watch` restarts the dev server instead of refreshing the template.
+  const watcher = watch(schemaFiles, nuxt.options.watchers.chokidar)
   const watcherCallback = () => {
     // Update the schema types template, which will trigger a types regeneration.
     // Ignore the file path since only the watched files will trigger this.

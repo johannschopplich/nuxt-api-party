@@ -11,7 +11,7 @@ const status = ref<typeof availableStatus[number]>('pending')
 
 const { data: user, execute } = await usePetStoreData('/user/{username}', {
   path: { username: 'user1' },
-  cache: true,
+  payloadCache: true,
   headers: {
     'api_key': 'special',
     'x-test-header': 'test',

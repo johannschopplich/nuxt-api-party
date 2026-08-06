@@ -5,7 +5,7 @@ import { consola } from 'consola'
 import { defu } from 'defu'
 import { hash } from 'ohash'
 import { joinURL } from 'ufo'
-import { allowClient, experimentalDisableClientPayloadCache, experimentalEnablePrefixedProxy, serverBasePath } from '#build/module/nuxt-api-party.config'
+import { allowClient, allowPayloadCache, serverBasePath, serverProxyMode } from '#build/module/nuxt-api-party.config'
 import { useNuxtApp, useRequestFetch, useRuntimeConfig } from '#imports'
 import { CACHE_KEY_PREFIX } from '../constants'
 import { isFormData } from '../form-data'
@@ -26,9 +26,6 @@ export interface SharedFetchOptions {
   /**
    * The browser cache behavior.
    *
-   * It accepts the same values as {@linkcode RequestInit.cache}. For backwards
-   * compatibility, you can also use `true` or `false` to control payload caching.
-   *
    * @remarks
    * This option is forwarded to the `fetch` API as the `cache` option.
    *
@@ -36,7 +33,17 @@ export interface SharedFetchOptions {
    * @see https://developer.mozilla.org/en-US/docs/Web/API/Request/cache
    * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching
    */
-  cache?: RequestInit['cache'] | boolean
+  cache?: RequestInit['cache']
+  /**
+   * Serve a repeated request from the Nuxt payload instead of sending it again.
+   *
+   * @remarks
+   * A response fetched during SSR is always handed to the client through the payload. This option decides whether
+   * the client keeps caching on its own afterwards. Requires the module option of the same name.
+   *
+   * @default false
+   */
+  payloadCache?: boolean
   /**
    * By default, a cache key will be generated from the request options.
    * With this option, you can provide a custom cache key.
@@ -118,7 +125,8 @@ export async function _$api<T = unknown>(
     body,
     client = allowClient === 'always',
     key,
-    cache: _cache,
+    cache,
+    payloadCache = false,
     $fetch = useRequestFetch(),
     ...fetchOptions
   } = defu(
@@ -130,12 +138,12 @@ export async function _$api<T = unknown>(
   if (client && !allowClient)
     throw new Error('Client-side API requests are disabled. Set "client: true" in the module options to enable them.')
 
-  if (import.meta.dev && experimentalDisableClientPayloadCache && typeof _cache === 'boolean') {
-    consola.error('[nuxt-api-party] Payload caching is disabled. Set `experimental.disableClientPayloadCache: false` in the module options to enable it.')
+  if (import.meta.dev && !allowPayloadCache && payloadCache) {
+    consola.error('[nuxt-api-party] Payload caching is disabled. Set `payloadCache: true` in the module options to enable it.')
   }
 
-  const enablePayloadCache = (!experimentalDisableClientPayloadCache && typeof _cache === 'boolean') ? _cache : false
-  const cache = typeof _cache === 'boolean' ? _cache ? 'default' : 'no-store' : _cache
+  // The payload always carries an SSR response over to the client, so a write is due there regardless of the option.
+  const cachesPayload = allowPayloadCache && (import.meta.server || payloadCache)
 
   // TODO: Remove caching support from the `$api` composable.
   let _key: string | undefined
@@ -157,13 +165,13 @@ export async function _$api<T = unknown>(
 
   const endpoint = apiParty.endpoints[endpointId]!
 
-  if (!experimentalDisableClientPayloadCache) {
+  if (allowPayloadCache) {
     const k = getCacheKey()
-    if ((nuxt.isHydrating || enablePayloadCache) && nuxt.payload.data[k]) {
+    if ((nuxt.isHydrating || payloadCache) && nuxt.payload.data[k]) {
       return nuxt.payload.data[k]
     }
 
-    if (enablePayloadCache) {
+    if (payloadCache) {
       const result = getPromiseMap(nuxt).get(k)
       if (result) {
         return result
@@ -221,11 +229,11 @@ export async function _$api<T = unknown>(
 
   const request = (allowClient && client
     ? clientFetcher(endpoint.url!)
-    : experimentalEnablePrefixedProxy
+    : serverProxyMode === 'prefixed'
       ? clientFetcher(joinURL('/api', serverBasePath, endpointId, 'proxy'))
       : serverFetcher())
     .then((response) => {
-      if (!experimentalDisableClientPayloadCache && (import.meta.server || enablePayloadCache)) {
+      if (cachesPayload) {
         const k = getCacheKey()
         nuxt.payload.data[k] = response
         getPromiseMap(nuxt).delete(k)
@@ -234,7 +242,7 @@ export async function _$api<T = unknown>(
     })
     // Invalidate cache if request fails.
     .catch((error) => {
-      if (!experimentalDisableClientPayloadCache && (import.meta.server || enablePayloadCache)) {
+      if (cachesPayload) {
         const k = getCacheKey()
         nuxt.payload.data[k] = undefined
         getPromiseMap(nuxt).delete(k)
@@ -242,7 +250,7 @@ export async function _$api<T = unknown>(
       throw error
     }) as Promise<T>
 
-  if (!experimentalDisableClientPayloadCache && (import.meta.server || enablePayloadCache)) {
+  if (cachesPayload) {
     const k = getCacheKey()
     getPromiseMap(nuxt).set(k, request)
   }

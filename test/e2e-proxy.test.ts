@@ -8,8 +8,8 @@ describe('nuxt-api-party proxy', async () => {
     rootDir: fileURLToPath(new URL('./fixture', import.meta.url)),
     nuxtConfig: {
       apiParty: {
-        experimental: {
-          enablePrefixedProxy: true,
+        server: {
+          proxyMode: 'prefixed',
         },
       },
     },
