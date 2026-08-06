@@ -25,8 +25,8 @@ See [OpenAPI Type Helpers](/api/openapi-types) for what each property now report
 `Response`, `RequestBody` and `RequestQuery` are gone from `#nuxt-api-party/{endpointId}`. They were keyed by operation ID; the endpoint interface is keyed by path and method, which is what the composables take:
 
 ```ts
-import type { Response } from '#nuxt-api-party/petStore' // [!code --]
 import type { PetStore } from '#nuxt-api-party' // [!code ++]
+import type { Response } from '#nuxt-api-party/petStore' // [!code --]
 
 type Pet = Response<'getPetById'> // [!code --]
 type Pet = PetStore<'/pet/{petId}', 'get'>['response'] // [!code ++]

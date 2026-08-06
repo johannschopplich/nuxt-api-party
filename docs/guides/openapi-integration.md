@@ -70,7 +70,9 @@ paths:
       parameters:
         - name: id
           in: path
-          type: number
+          required: true
+          schema:
+            type: number
       responses:
         200:
           content:
@@ -81,7 +83,7 @@ components:
   schemas:
     Foo:
       type: object
-      items:
+      properties:
         id:
           type: number
         bar:
@@ -126,7 +128,7 @@ Using the schema above, extract the `Foo` type:
 ```ts
 import { components } from '#nuxt-api-party/myApi'
 
-type FooModel = components['schemas']['FooModel']
+type Foo = components['schemas']['Foo']
 //   ^? { id?: number; bar: string }
 ```
 
@@ -185,33 +187,19 @@ const resultPost = await $myApi('/foo', {
 For more details and examples, see the [OpenAPI Type Helpers](/api/openapi-types) documentation.
 :::
 
-Extract types directly from your OpenAPI schema instead of writing them manually. This approach ensures types stay synchronized with your API specification and reduces the risk of type mismatches:
+Beyond inferring the composables, the module generates one type per endpoint that carries everything an operation declares. It is named after the endpoint ID and takes a path and a method:
 
 ```ts
-// ❌ Manual type definition (error-prone, out of sync)
-interface CreateUserRequest {
-  name: string
-  email: string
-}
+import type { MyApi } from '#nuxt-api-party'
 
-// ✅ Extract from OpenAPI schema (always up-to-date)
-type CreateUserRequest = PetStore<'/user', 'post'>['request']
+type CreateFoo = MyApi<'/foo', 'post'>
+
+type PathParams = CreateFoo['path'] // `never`, the operation declares none
+type RequestBody = CreateFoo['request'] // { id?: number; bar: string }
+type Response = CreateFoo['response'] // { id?: number; bar: string }
+type ByStatus = CreateFoo['responses'] // { 200: { id?: number; bar: string } }
 ```
 
-Nuxt API Party generates a powerful [unified type interface](/api/openapi-types) for each service that provides comprehensive access to all endpoint information. This interface follows the pattern `Service<Path, Method>` and serves as your single source of truth for API type information:
+Extracting from the schema this way beats writing the same shape by hand, which drifts the moment the API changes.
 
-```ts
-import type { PetStore } from '#nuxt-api-party'
-
-// The unified interface: Service<Path, Method>
-type UserEndpoint = PetStore<'/user/{username}', 'get'>
-
-// Extract any part of the endpoint
-type PathParams = UserEndpoint['path'] // { username: string }
-type QueryParams = UserEndpoint['query'] // Query parameters
-type RequestBody = UserEndpoint['request'] // Request body type
-type Response = UserEndpoint['response'] // Success response
-type ErrorResponse = UserEndpoint['responses'][404] // Specific status code
-```
-
-Follow the [OpenAPI Type Helpers](/api/openapi-types) documentation for more details and practical examples of using these types in your application.
+Follow the [OpenAPI Type Helpers](/api/openapi-types) documentation for every property the type carries.
