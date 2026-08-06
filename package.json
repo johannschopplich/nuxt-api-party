@@ -41,7 +41,7 @@
     "docs:preview": "vitepress preview docs",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "test": "vitest --typecheck",
+    "test": "vitest",
     "test:types": "tsc --noEmit",
     "release": "bumpp"
   },
