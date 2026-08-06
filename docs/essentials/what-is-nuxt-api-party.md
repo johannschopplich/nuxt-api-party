@@ -55,18 +55,9 @@ Provide an OpenAPI schema to get **fully typed** request bodies, query parameter
 
 Built-in payload caching prevents duplicate requests. Server-rendered data seamlessly hydrates to the client, avoiding unnecessary re-fetching.
 
-## How It Works
-
-Nuxt API Party creates an internal server route `/api/__api_party/{endpointId}` that proxies requests to your configured APIs:
-
-1. **Server-side**: Direct function calls (no HTTP overhead)
-2. **Client-side**: POST request to the proxy, which forwards to your API
-3. **Response**: Full error details, status codes, and headers pass through transparently
-
-This architecture combines the security of server-side API calls with the convenience of client-side data fetching.
-
 ## Next Steps
 
-- **New to Nuxt API Party?** Start with [Getting Started](/essentials/getting-started).
-- **Choose your approach:** Learn about [Data Fetching Methods](/essentials/data-fetching-methods).
-- **Secure setup:** Review [Module Configuration](/essentials/module-configuration) options.
+- [Getting Started](/essentials/getting-started) – Install the module and make a first request.
+- [Data Fetching Methods](/essentials/data-fetching-methods) – Choose between the two generated composables.
+- [Module Configuration](/essentials/module-configuration) – Every option an endpoint accepts.
+- [How It Works](/advanced/how-it-works) – What the proxy route does with a request.

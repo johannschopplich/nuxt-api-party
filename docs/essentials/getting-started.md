@@ -51,17 +51,7 @@ export default defineNuxtConfig({
 ```
 :::
 
-### Endpoint Configuration Options
-
-Each endpoint accepts the following options:
-
-- `url` (required): Base URL of the API
-- `token` (optional): Bearer token for authentication
-- `query` (optional): Default query parameters sent with each request
-- `headers` (optional): Default headers sent with each request
-- `cookies` (optional): Whether to forward cookies in requests
-- `allowedUrls` (optional): URLs allowed for [dynamic backend switching](/guides/dynamic-backend-url)
-- `schema` (optional): [OpenAPI Schema](https://swagger.io/resources/open-api) URL or file path for [type generation](/guides/openapi-integration)
+`url` is the only required option. See [Module Configuration](/essentials/module-configuration#apiparty-endpoints) for the rest, including authentication, default headers and OpenAPI schemas.
 
 ::: tip Dynamic Configuration
 For dynamic headers or runtime configuration, use [runtime hooks](/guides/hooks) or [environment variables](#environment-variables).
@@ -74,9 +64,7 @@ For the endpoint `jsonPlaceholder` configured above, Nuxt API Party generates tw
 - `$jsonPlaceholder` – Direct API calls, similar to [`$fetch`](https://nuxt.com/docs/api/utils/dollarfetch)
 - `useJsonPlaceholderData` – Reactive data fetching, similar to [`useFetch`](https://nuxt.com/docs/api/composables/use-fetch)
 
-::: tip Multiple Endpoints
-You can configure as many endpoints as you need. Each endpoint generates its own pair of composables based on the endpoint ID.
-:::
+Configure as many endpoints as you need; each gets its own pair, named after its endpoint ID.
 
 ## Environment Variables
 
@@ -168,43 +156,14 @@ const { data: posts } = await useJsonPlaceholderData('posts', {
 
 Use the `$jsonPlaceholder` composable for programmatic requests, form submissions, and one-time actions:
 
-```vue
-<script setup lang="ts">
-import type { FetchError } from 'ofetch'
-
-const newPost = ref({
-  title: '',
-  body: '',
-  userId: 1
+```ts
+const post = await $jsonPlaceholder('posts', {
+  method: 'POST',
+  body: { title: 'Hello', body: 'World', userId: 1 }
 })
-
-async function createPost() {
-  try {
-    const post = await $jsonPlaceholder('posts', {
-      method: 'POST',
-      body: newPost.value
-    })
-
-    console.log('Created post:', post)
-    // Handle success (show notification, redirect, etc.)
-  }
-  catch (error) {
-    console.error('Failed to create post:', error as FetchError)
-    // Handle error
-  }
-}
-</script>
-
-<template>
-  <form @submit.prevent="createPost">
-    <input v-model="newPost.title" placeholder="Post title" required>
-    <textarea v-model="newPost.body" placeholder="Post content" required />
-    <button type="submit">
-      Create Post
-    </button>
-  </form>
-</template>
 ```
+
+It throws on a failed request rather than exposing an `error` value, so wrap it where you need to react to failure. [Data Fetching Methods](/essentials/data-fetching-methods) walks through a complete form.
 
 ## What's Next?
 

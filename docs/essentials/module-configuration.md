@@ -67,9 +67,29 @@ export default defineNuxtConfig({
 })
 ```
 
+## `apiParty.client`
+
+Whether composables may bypass the proxy and call your API straight from the browser. Doing so exposes the endpoint's credentials, so it is off by default.
+
+- `false` – Every request goes through the server proxy.
+- `true` or `'allow'` – A composable call may opt in with `client: true`.
+- `'always'` – Every request is made client-side unless a call opts out.
+
+**Default value**: `false`, or `'always'` when Nuxt runs with `ssr: false`, where there is no server to proxy through.
+
+See [Client Requests](/api/dollarfetch-like#client-requests) for what a call looks like.
+
 ## `apiParty.openAPITS`
 
 Global [configuration options](https://openapi-ts.dev/node/#options) for `openapi-typescript`. Options set here apply to every endpoint schema but can be overridden per endpoint.
+
+## `apiParty.server`
+
+### `basePath`
+
+The path segment the module's server routes live under, below `/api`. Change it if `__api_party` collides with a route of your own.
+
+**Default value**: `'__api_party'`
 
 ## `apiParty.experimental`
 

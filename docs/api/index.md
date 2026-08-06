@@ -9,11 +9,13 @@ Nuxt API Party provides two composable types for fetching data from your APIs. A
 - [Plain fetch composable](/api/dollarfetch-like) – Returns response data, similar to [`$fetch`](https://nuxt.com/docs/api/utils/dollarfetch#fetch).
   Generated name: `$myApi`.
 
-Composable names are generated based on your API endpoint ID.
-
 ## Generated Composables
 
-Composables are generated from your API endpoint ID. For example, an endpoint `jsonPlaceholder` generates:
+Composable names come from your API endpoint ID. An endpoint `jsonPlaceholder` generates:
 
 - `$jsonPlaceholder`
 - `useJsonPlaceholderData`
+
+## Types
+
+- [OpenAPI Type Helpers](/api/openapi-types) – Extract request, response and parameter types from an endpoint's OpenAPI schema.

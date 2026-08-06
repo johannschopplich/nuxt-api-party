@@ -1,10 +1,8 @@
 # Cookie Forwarding
 
-Many APIs require authentication through cookies rather than headers. This is common with Single Sign-On (SSO) systems, session-based authentication, or APIs that use HTTP-only cookies for security. Nuxt API Party automatically forwards cookies from the client request to your API endpoints.
+Many APIs authenticate through cookies rather than headers – Single Sign-On systems, session-based authentication, or APIs that keep their session in an HTTP-only cookie. Nuxt API Party can forward the cookies of the incoming browser request to such an endpoint.
 
-When enabled, Nuxt API Party includes all cookies from the original request when making proxy calls to your API. This ensures authentication cookies, session IDs, and other cookie-based data are properly transmitted to your backend services.
-
-Enable cookie forwarding by setting the `cookies` option to `true` per endpoint:
+Cookie forwarding is off by default and enabled per endpoint:
 
 ::: code-group
 ```ts [nuxt.config.ts]
@@ -25,5 +23,7 @@ export default defineNuxtConfig({
 :::
 
 ::: warning Security Consideration
-Only enable cookie forwarding for trusted APIs. Cookies will be sent to the configured endpoint URL, so ensure your API endpoints are secure and properly configured.
+Enable this only for APIs you trust. Every cookie the browser sent – session cookies for your own app included – travels to the configured endpoint URL.
 :::
+
+The cookie is the only thing the module takes off the incoming request. An `authorization` header the browser sent is never passed on – it authenticates the caller against your app, not your app against the API. Authenticate the upstream service through the endpoint's own `token` or `headers` option, or through a `headers` option on the call itself.

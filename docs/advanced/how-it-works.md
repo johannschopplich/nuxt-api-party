@@ -1,15 +1,25 @@
 # How It Works
 
 ::: info tl;dr
-The internal `/api/__api_party` server route acts as a proxy between your Nuxt application and your API. This keeps your API credentials safe from the client and eliminates CORS issues.
+An internal server route proxies between your Nuxt application and your API. This keeps your API credentials safe from the client and eliminates CORS issues.
 :::
 
-The generated composables initiate a POST request to the Nuxt server route `/api/__api_party`. Request details are sent in the request body as JSON, including the target API route, HTTP method, headers, and body.
+The generated composables send a POST request to `/api/__api_party/{endpointId}`, carrying the target API route, HTTP method, headers and body as JSON in the request body.
 
-This internal server route initiates the actual request to your API. The response is passed back to the client. This way, every API request is made server-side, protecting your API credentials and avoiding CORS issues.
+That server route makes the actual request to your API and passes the response back to the client. Every API request therefore leaves from the server, which is what protects your credentials and avoids CORS.
 
-During server-side rendering, calls to the Nuxt server route directly call the relevant function (emulating the request), saving an additional API call.
+During server-side rendering, a call to the route invokes the handler directly instead of going over HTTP, saving a round trip.
 
 ::: tip API Response Metadata
-The proxy layer passes through your API's response body, HTTP status code, HTTP status message, and headers. This lets you handle errors gracefully and access metadata like rate limit headers.
+The proxy passes through your API's response body, HTTP status code, status message, and headers. Errors stay intact, and metadata such as rate limit headers reaches your app.
+:::
+
+## The Prefixed Proxy
+
+With [`experimental.enablePrefixedProxy`](/essentials/module-configuration#enableprefixedproxy) enabled, requests instead go to `/api/__api_party/{endpointId}/proxy/{path}` under their own HTTP method, and the path, query, headers and body are forwarded as they are. This is the mode to choose when you want the browser's network tab to mirror the upstream request, or when you need HTTP cache control – a POST wrapper cannot be cached.
+
+The proxy withholds the browser's `authorization` header from your API, since it carries credentials meant for your app rather than for the upstream service. A cookie travels only for endpoints that set `cookies: true`.
+
+::: tip
+Rename the `__api_party` segment with the [`server.basePath`](/essentials/module-configuration#basepath) option.
 :::
