@@ -1,7 +1,7 @@
-import type { ObjectPlugin, Plugin } from '#app'
 import type { HookResult, Nuxt } from '@nuxt/schema'
 import type { OpenAPI3, OpenAPITSOptions } from 'openapi-typescript'
 import type { QueryObject } from 'ufo'
+import type { ObjectPlugin, Plugin } from '#app'
 import type { ApiClientFetchOptions, SharedFetchOptions } from './runtime/composables/$api'
 import { fileURLToPath } from 'node:url'
 import { addImportsSources, addServerHandler, addTemplate, addTypeTemplate, createResolver, defineNuxtModule, updateTemplates, useLogger } from '@nuxt/kit'
@@ -133,11 +133,13 @@ export interface ModuleOptions {
 }
 // #endregion options
 
+export interface APIPartyRuntimeConfig {
+  endpoints: Record<string, EndpointConfiguration>
+}
+
 declare module '@nuxt/schema' {
   interface RuntimeConfig {
-    apiParty: {
-      endpoints: Record<string, EndpointConfiguration>
-    }
+    apiParty: APIPartyRuntimeConfig
   }
 
   interface PublicRuntimeConfig {
@@ -217,7 +219,9 @@ export default defineNuxtModule<ModuleOptions>().with({
       { endpoints: options.endpoints },
     )
 
-    const resolvedOptions = nuxt.options.runtimeConfig.apiParty
+    // Annotated because `defu`'s return type widens the endpoint values to
+    // `unknown` through the assignment above.
+    const resolvedOptions: APIPartyRuntimeConfig = nuxt.options.runtimeConfig.apiParty
 
     if (!Object.keys(resolvedOptions.endpoints).length) {
       logger.warn('No API endpoints found. Nuxt API Party requires at least one defined endpoint.')
