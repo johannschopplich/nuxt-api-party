@@ -5,11 +5,8 @@ import { useNuxt } from '@nuxt/kit'
 import { isAbsolute, resolve } from 'pathe'
 import { pascalCase } from 'scule'
 
-/** @deprecated Hooks should be used instead. */
-type SchemaFn = () => Promise<NonNullable<EndpointConfiguration['schema']>>
-
 type SchemaEndpoint = EndpointConfiguration & {
-  schema: NonNullable<EndpointConfiguration['schema']> | SchemaFn
+  schema: NonNullable<EndpointConfiguration['schema']>
 }
 
 export async function generateOpenAPITypes(
@@ -138,9 +135,11 @@ export type operations = Record<string, never>
 }
 
 async function resolveSchema(id: string, { schema }: SchemaEndpoint): Promise<string | URL | OpenAPI3> {
+  // `nuxt.config` is transpiled without typechecking, so a function left over
+  // from before v4 reaches this unchecked and would otherwise fail as an
+  // unexplained generation error.
   if (typeof schema === 'function') {
-    console.warn(`[nuxt-api-party] Passing a function to "apiParty.endpoints.${id}.schema" is deprecated. Use the "api-party:extend" hook instead.`)
-    return await schema()
+    throw new TypeError(`[nuxt-api-party] "apiParty.endpoints.${id}.schema" no longer accepts a function. Resolve the schema in the "api-party:extend" hook instead.`)
   }
 
   if (typeof schema === 'string') {

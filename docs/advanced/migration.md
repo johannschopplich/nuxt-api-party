@@ -20,6 +20,22 @@ Three consequences, all at type level:
 
 See [OpenAPI Type Helpers](/api/openapi-types) for what each property now reports.
 
+### `schema` No Longer Accepts a Function
+
+An endpoint's `schema` takes a file path, a URL or the parsed schema object. Resolve a schema you have to build yourself in the [`api-party:extend` hook](/guides/hooks) instead, which runs at module initialization and can await:
+
+```ts
+export default defineNuxtConfig({
+  hooks: {
+    'api-party:extend': async (options) => {
+      options.endpoints!.myApi!.schema = await buildSchema()
+    },
+  },
+})
+```
+
+Passing a function was deprecated in v2.1.0 and now throws.
+
 ### Removed Deprecated Type Helpers
 
 `Response`, `RequestBody` and `RequestQuery` are gone from `#nuxt-api-party/{endpointId}`. They were keyed by operation ID; the endpoint interface is keyed by path and method, which is what the composables take:

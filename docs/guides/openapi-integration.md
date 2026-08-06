@@ -27,7 +27,7 @@ If your framework doesn't directly support it, there may also be an additional l
 
 ## Configuring the Schema
 
-Add the `schema` property to your endpoint config. Set it to a file path or URL of the OpenAPI schema, or an async function returning the parsed OpenAPI schema. The file can be JSON or YAML format.
+Add the `schema` property to your endpoint config. Set it to a file path or URL of the OpenAPI schema, or to the parsed schema object. The file can be JSON or YAML format.
 
 The following schema is used for code examples on this page:
 
