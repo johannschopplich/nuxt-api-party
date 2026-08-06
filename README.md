@@ -67,6 +67,8 @@ const { data, refresh, error, status, clear } = await useJsonPlaceholderData('po
 > [!TIP]
 > You can connect as many APIs as you want, just add them to the `endpoints` object.
 
+The [documentation](https://nuxt-api-party.byjohann.dev) covers the OpenAPI integration, caching and every module option.
+
 ## 💻 Development
 
 1. Clone this repository
