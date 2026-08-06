@@ -96,14 +96,18 @@ function isSerializedBlob(obj: unknown): obj is SerializedBlob {
   )
 }
 
+/** Widest slice that `String.fromCharCode` can take before the argument list overflows the stack. */
+const BINARY_STRING_CHUNK_SIZE = 8192
+
 async function serializeBlob(blob: Blob) {
-  const arrayBuffer = await blob.arrayBuffer()
-  const byteArray = new Uint8Array(arrayBuffer)
-  const binary = byteArray.reduce((acc, byte) => acc + String.fromCharCode(byte), '')
-  const base64 = globalThis.btoa(binary)
+  const byteArray = new Uint8Array(await blob.arrayBuffer())
+  const chunks: string[] = []
+
+  for (let offset = 0; offset < byteArray.length; offset += BINARY_STRING_CHUNK_SIZE)
+    chunks.push(String.fromCharCode(...byteArray.subarray(offset, offset + BINARY_STRING_CHUNK_SIZE)))
 
   return {
-    data: base64,
+    data: globalThis.btoa(chunks.join('')),
     type: blob.type,
     size: blob.size,
   }
