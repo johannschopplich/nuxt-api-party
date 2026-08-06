@@ -62,48 +62,8 @@ export function generateOpenAPITypeHelpers(id: string) {
  */
 export type ${pascalCase(id)}<
   Path extends keyof ${pascalCase(id)}Paths,
-  Method extends PathMethods<${pascalCase(id)}Paths, Path> = PathMethods<${pascalCase(id)}Paths, Path> extends string ? PathMethods<${pascalCase(id)}Paths, Path> : never
-> = {
-  /** Path parameters for this endpoint */
-  path: ${pascalCase(id)}Paths[Path][Method] extends { parameters?: { path?: infer P } } ? P : Record<string, never>
-
-  /** Query parameters for this endpoint */
-  query: ${pascalCase(id)}Paths[Path][Method] extends { parameters?: { query?: infer Q } } ? Q : Record<string, never>
-
-  /** Request body for this endpoint */
-  request: ${pascalCase(id)}Paths[Path][Method] extends { requestBody?: { content: { 'application/json': infer R } } } ? R : Record<string, never>
-
-  /** Success response for this endpoint (defaults to 200 status code) */
-  response: ${pascalCase(id)}Paths[Path][Method] extends { responses: infer R }
-    ? 200 extends keyof R
-      ? R[200] extends { content: { 'application/json': infer S } } ? S : Record<string, never>
-      : Record<string, never>
-    : Record<string, never>
-
-  /** All possible responses for this endpoint by status code */
-  responses: ${pascalCase(id)}Paths[Path][Method] extends { responses: infer T }
-    ? {
-        [Status in keyof T]:
-          T[Status] extends { content: { 'application/json': infer R } }
-            ? R
-            : Record<string, never>
-      }
-    : Record<string, never>
-
-  /** Full path with typed parameters for this endpoint (useful for route builders) */
-  fullPath: Path
-
-  /** HTTP method for this endpoint */
-  method: Method
-
-  /**
-   * Full operation object for this endpoint
-   *
-   * @remarks
-   * Useful for accessing additional metadata, such as tags or security requirements.
-   */
-  operation: ${pascalCase(id)}Paths[Path][Method]
-}
+  Method extends OpenAPIPathMethods<${pascalCase(id)}Paths, Path>
+> = OpenAPIEndpoint<${pascalCase(id)}Paths, Path, Method>
 
 /**
  * Type helper to list all available paths of the ${pascalCase(id)} API
@@ -119,7 +79,7 @@ export type ${pascalCase(id)}ApiPaths = keyof ${pascalCase(id)}Paths
  * @example
  * type UserMethods = ${pascalCase(id)}ApiMethods<'/users/{id}'> // Returns 'get' | 'put' | 'delete' etc.
  */
-export type ${pascalCase(id)}ApiMethods<P extends keyof ${pascalCase(id)}Paths> = PathMethods<${pascalCase(id)}Paths, P>
+export type ${pascalCase(id)}ApiMethods<Path extends keyof ${pascalCase(id)}Paths> = OpenAPIPathMethods<${pascalCase(id)}Paths, Path>
 
 /**
  * Type helper to extract schema models from the ${pascalCase(id)} API
