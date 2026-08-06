@@ -1,6 +1,6 @@
 # Error Handling
 
-Nuxt API Party provides comprehensive error handling that preserves error details from your API while keeping credentials secure through the [server proxy](/advanced/how-it-works). Whether an API returns a 404, validation error, or server failure, you get complete error information to handle gracefully.
+The [server proxy](/advanced/how-it-works) passes your API's error through untouched – status code, status message, headers and body all reach your app, so a 404, a validation error and a 500 stay distinguishable.
 
 ## Error Types
 

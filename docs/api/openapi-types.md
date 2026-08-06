@@ -1,11 +1,10 @@
 # OpenAPI Type Helpers
 
-Nuxt API Party generates a unified type interface for each service that provides comprehensive access to all endpoint information. This interface follows the pattern `Service<Path, Method>` and serves as your single source of truth for API type information:
+For each endpoint with an OpenAPI schema, Nuxt API Party generates a type carrying everything one operation declares. It is named after the endpoint ID and takes a path and a method:
 
 ```ts
 import type { PetStore } from '#nuxt-api-party'
 
-// The unified interface: Service<Path, Method>
 type UserEndpoint = PetStore<'/user/{username}', 'get'>
 
 // Extract any part of the endpoint
@@ -20,7 +19,7 @@ Both parameters are required, and both are checked against the schema. A path th
 
 ## Core Type Properties
 
-Every endpoint type provides these properties for complete control over API interactions. Properties are automatically inferred from your OpenAPI schema:
+Each property is read off the operation in your schema:
 
 | Property    | Description                                                              | Example                                            |
 | ----------- | ------------------------------------------------------------------------ | -------------------------------------------------- |
@@ -35,15 +34,13 @@ Every endpoint type provides these properties for complete control over API inte
 
 Where an operation declares nothing at all for a property, the type says so rather than inventing an empty object: `path` and `query` are `never`, `request` is `undefined`, and `response` is `never` for an operation whose success carries no body.
 
-`request` and `response` resolve through the same helpers a request resolves through, so a value annotated with `Service<Path, Method>['response']` is exactly what `$petStore` hands back for that call.
+`request` and `response` resolve through the same helpers a request resolves through, so a value annotated with `PetStore<Path, Method>['response']` is exactly what `$petStore` hands back for that call.
 
-## Practical Examples
-
-Common patterns for extracting type information from your OpenAPI schema:
+## Examples
 
 ### Basic Type Extraction
 
-Extract individual type components for application logic, form validation, or component props:
+Pull out a single part of an operation for a form, a component prop, or a function signature:
 
 ```ts
 import type { PetStore } from '#nuxt-api-party'
@@ -74,7 +71,7 @@ type PlaceOrderBody = PetStore<'/store/order', 'post'>['request']
 
 ### Error Handling Types
 
-Extract specific error response types for robust error handling with full type safety:
+Extract the body a particular status code carries:
 
 ```ts
 // All responses the endpoint declares
@@ -92,7 +89,7 @@ This is the body a status maps to. To type the error a failed request actually t
 
 ## Schema Discovery
 
-Nuxt API Party generates helper types for exploring your API structure programmatically. Useful for building dynamic UI components or API documentation:
+Two further types enumerate what the schema declares, for code that walks the API rather than calling one path:
 
 ```ts
 import type { PetStoreApiMethods, PetStoreApiPaths } from '#nuxt-api-party'
@@ -110,7 +107,7 @@ Only the methods the path declares are listed. `openapi-typescript` gives every 
 
 ## Schema Model Types
 
-Nuxt API Party generates a dedicated helper for extracting OpenAPI schema models directly. This provides access to data models without referencing specific endpoints:
+Models are also reachable on their own, without going through an endpoint:
 
 ```ts
 import type { PetStoreModel } from '#nuxt-api-party'
@@ -126,4 +123,4 @@ type User = PetStoreModel<'User'>
 //   ^? { id?: number; username?: string; firstName?: string; lastName?: string; email?: string; password?: string; phone?: string; userStatus?: number }
 ```
 
-Particularly useful when working with schema models independently of specific endpoints, such as creating reusable components, utility functions, or building forms that work with multiple related endpoints.
+Reach for this where a type belongs to your domain rather than to one request – a shared component, a form, a helper used by several endpoints.

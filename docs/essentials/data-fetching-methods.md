@@ -1,27 +1,24 @@
 # Data Fetching Methods
 
-Nuxt API Party provides two approaches to fetch data from your APIs. Understanding when to use each method helps you build more efficient and maintainable applications.
+Each endpoint gives you two composables. They differ in what they return and in who decides when the request goes out.
 
 ::: tip
-The generated composables follow the exact same patterns as Nuxt's native `useFetch` and `$fetch`. If you are familiar with Nuxt data fetching, you already know how to use Nuxt API Party!
+Both follow the same patterns as Nuxt's native `useFetch` and `$fetch`. If you know Nuxt data fetching, you know these.
 :::
 
-## Methods Comparison
+## Comparison
 
-Choose between reactive data fetching and direct API calls based on your use case:
+|                     | `useMyApiData`                                                                    | `$myApi`                          |
+| ------------------- | --------------------------------------------------------------------------------- | --------------------------------- |
+| **Returns**         | [`AsyncData`](https://nuxt.com/docs/api/composables/use-async-data#return-values)  | A promise of the response data    |
+| **On failure**      | A reactive `error` value                                                          | Throws                            |
+| **Caching**         | Automatic, with deduplication                                                     | Per call, via the `cache` option  |
+| **Server rendering**| Hydrates automatically                                                            | You decide where it runs          |
+| **Reach for it**    | Page and component data                                                           | Mutations and programmatic calls  |
 
-| Feature | **`useMyApiData` Composables** | **`$myApi` Composables** |
-|---------|------------------------------|-------------------------|
-| **Use case** | Components, reactive data | One-time actions |
-| **Return type** | [`AsyncData`](https://nuxt.com/docs/api/composables/use-async-data#return-values) interface | Direct Promise with response data |
-| **Error handling** | Reactive `error` property | Try/catch with thrown errors |
-| **Caching** | Automatic with deduplication | Manual with cache option |
-| **Server rendering** | Automatic hydration | Manual server/client handling |
-| **Best for** | Page data, reactive components | API mutations, programmatic calls |
+## Reactive Data Fetching
 
-## Method 1: Reactive Data Fetching
-
-Use `useMyApiData` composables in components and pages to fetch and reactively update data. These composables integrate seamlessly with Nuxt's hydration and caching systems.
+Use `useMyApiData` composables in components and pages. They hook into Nuxt's hydration and caching, so server-rendered data is not fetched a second time on the client.
 
 ```vue
 <script setup lang="ts">
@@ -47,7 +44,7 @@ function nextPost() {
 </template>
 ```
 
-## Method 2: Direct API Calls
+## Direct API Calls
 
 Use `$myApi` composables for programmatic API interactions, form submissions, and one-time actions where you need direct control over request timing.
 
@@ -128,5 +125,5 @@ export default defineNuxtPlugin(async () => {
 
 ## Next Steps
 
-- **Need API configuration?** Review [Module Configuration](/essentials/module-configuration)
-- **Want type safety?** Learn about [OpenAPI Integration](/guides/openapi-integration)
+- [Module Configuration](/essentials/module-configuration) – Every option an endpoint accepts.
+- [OpenAPI Integration](/guides/openapi-integration) – Infer request and response types from a schema.

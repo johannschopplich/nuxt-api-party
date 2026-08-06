@@ -1,8 +1,6 @@
 # Caching Strategies
 
-Effective caching is crucial for building performant applications that minimize network requests while keeping data fresh. Nuxt API Party provides two complementary caching mechanisms: **in-memory caching** for rapid data access and **browser HTTP caching** for persistent storage across sessions.
-
-Understanding these caching strategies helps you optimize application performance while ensuring users see up-to-date information when needed.
+Nuxt API Party caches in two places: in memory, which is fast and lives for the page, and in the browser's HTTP cache, which survives reloads. They complement each other, and the `cache` option picks between them.
 
 ## In-Memory Caching
 
