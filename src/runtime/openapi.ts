@@ -49,7 +49,8 @@ export type OpenAPIParameters<Operation, Kind extends 'path' | 'query'> = Operat
 /**
  * Every type one operation carries, keyed for extraction – `Service<'/pet/{petId}', 'get'>['response']`.
  * `request` and `response` reach for the same helpers `OpenAPIClient` reaches for, so
- * both report the same type; a test pins that against a call through an actual client.
+ * both report the same type; `test/openapi.test-d.ts` pins that against a call through
+ * an actual client.
  */
 export interface OpenAPIEndpoint<Paths, Path extends keyof Paths, Method extends keyof Paths[Path]> {
   path: OpenAPIParameters<Paths[Path][Method], 'path'>
