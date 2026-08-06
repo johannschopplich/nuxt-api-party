@@ -32,23 +32,23 @@ describe('nuxt-api-party', async () => {
         data: { reason: 'anything' },
       })
     })
-  })
 
-  it('forwards the headers option to the API', async () => {
-    const result = await fetchTestResult<{ authorization?: string, traceId?: string }>('/request-headers')
+    it('forwards the headers option to the API', async () => {
+      const result = await fetchTestResult<{ authorization?: string, traceId?: string }>('/request-headers')
 
-    expect(result.authorization).toBe('Bearer developer-token')
-    expect(result.traceId).toBe('abc')
-  })
-
-  it('forwards the cookie only for the endpoint that sets cookies to true', async () => {
-    const html = await $fetch<string>('/cookies', {
-      headers: { cookie: 'session=secret' },
+      expect(result.authorization).toBe('Bearer developer-token')
+      expect(result.traceId).toBe('abc')
     })
-    const result = readTestResult<{ withCookies?: string, withoutCookies?: string }>(html)
 
-    expect(result.withCookies).toBe('session=secret')
-    expect(result.withoutCookies).toBeUndefined()
+    it('forwards the cookie only for the endpoint that sets cookies to true', async () => {
+      const html = await $fetch<string>('/cookies', {
+        headers: { cookie: 'session=secret' },
+      })
+      const result = readTestResult<{ withCookies?: string, withoutCookies?: string }>(html)
+
+      expect(result.withCookies).toBe('session=secret')
+      expect(result.withoutCookies).toBeUndefined()
+    })
   })
 
   describe('useTestApiData', () => {
@@ -69,6 +69,7 @@ describe('nuxt-api-party', async () => {
     it('sends a single request when two call sites ask for the same resource', async () => {
       const result = await fetchTestResult<{ firstHits: number, secondHits: number }>('/shared-request')
 
+      expect(result.firstHits).toBeGreaterThan(0)
       expect(result.secondHits).toBe(result.firstHits)
     })
   })
