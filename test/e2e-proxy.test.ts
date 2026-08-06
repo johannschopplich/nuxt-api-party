@@ -49,7 +49,7 @@ describe('nuxt-api-party proxy', async () => {
     expect(received.authorization).toBeUndefined()
   })
 
-  it('passes an unremarkable header through', async () => {
+  it('forwards x-trace-id', async () => {
     const received = await echoHeaders('testApi', { 'x-trace-id': 'abc' })
 
     expect(received['x-trace-id']).toBe('abc')

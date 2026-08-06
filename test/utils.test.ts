@@ -27,7 +27,7 @@ describe('mergeHeaders', () => {
 describe('isForwardableProxyHeader', () => {
   const endpointId = 'jsonPlaceholder'
 
-  it('forwards an unremarkable header', () => {
+  it('forwards accept', () => {
     expect(isForwardableProxyHeader('accept', { endpointId })).toBe(true)
   })
 
