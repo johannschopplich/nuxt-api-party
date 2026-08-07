@@ -433,7 +433,7 @@ export const allowPayloadCache = ${JSON.stringify(options.payloadCache)}
 
     addTemplate({
       filename: `module/${moduleName}.config.d.ts`,
-      write: false, // Internal config, no need to write to disk.
+      write: false, // Read through the virtual import alone, so no file has to exist.
       getContents: () => `
 export declare const allowClient: boolean | 'allow' | 'always'
 export declare const serverBasePath: string

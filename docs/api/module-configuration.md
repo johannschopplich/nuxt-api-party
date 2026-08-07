@@ -25,14 +25,14 @@ The APIs the module generates composables for. Each key is an endpoint ID and na
 - `token` – Bearer token sent with each request.
 - `query` – Query parameters added to each request.
 - `headers` – Headers sent with each request.
-- `cookies` – Whether the browser's cookie travels on to this API. See [Cookie Forwarding](/guides/cookie-forwarding).
+- `cookies` – Whether the browser's cookies travel on to this API. See [Cookie Forwarding](/guides/cookie-forwarding).
 - `allowedUrls` – Base URLs a request may switch to at runtime. See [Dynamic Backend URL](/guides/dynamic-backend-url).
 - `schema` – URL or file path of an [OpenAPI schema](https://swagger.io/resources/open-api) to infer types from. See [OpenAPI Integration](/guides/openapi-integration).
 - `openAPITS` – [`openapi-typescript` options](https://openapi-ts.dev/node/#options) for this endpoint's schema, overriding the global `openAPITS`.
 
-`token`, `query` and `headers` are attached by the server handler, so they never reach the browser – but only in the default `'wrapped'` proxy mode. See [`proxyMode`](#proxymode).
+`token`, `query` and `headers` never reach the browser: the server handler attaches them, and only in the default `'wrapped'` proxy mode. See [`proxyMode`](#proxymode).
 
-**Default value**: `{}`
+**Default Value**: `{}`
 
 **Type Declarations**
 
@@ -74,7 +74,7 @@ Whether composables may bypass the proxy and call your API straight from the bro
 - `true` or `'allow'` – A composable call may opt in with `client: true`.
 - `'always'` – Every request is made client-side unless a call opts out.
 
-**Default value**: `false`, or `'always'` when Nuxt runs with `ssr: false`, where there is no server to proxy through.
+**Default Value**: `false`, or `'always'` when Nuxt runs with `ssr: false`, where there is no server to proxy through.
 
 See [Client Requests](/api/dollarfetch-like#client-requests) for what a call looks like.
 
@@ -88,7 +88,7 @@ Global [configuration options](https://openapi-ts.dev/node/#options) for `openap
 
 The path segment the module's server routes live under, below `/api`. Change it if `__api_party` collides with a route of your own.
 
-**Default value**: `'__api_party'`
+**Default Value**: `'__api_party'`
 
 ### `proxyMode`
 
@@ -103,7 +103,7 @@ Choose `'passthrough'` when you want the browser's network tab to match the upst
 The name is literal: the request travels as it stands, and nothing from the endpoint configuration is attached. The endpoint's `token`, `headers` and `query` are applied by the `'wrapped'` handler only. Authenticate the upstream service in a [request hook](/guides/hooks) instead.
 :::
 
-**Default value**: `'wrapped'`
+**Default Value**: `'wrapped'`
 
 ## `apiParty.payloadCache`
 
@@ -111,7 +111,7 @@ Whether a response may be cached in the Nuxt payload, keyed by the request. Turn
 
 An individual call opts out with `payloadCache: false`.
 
-**Default value**: `true`
+**Default Value**: `true`
 
 ## Type Declarations
 

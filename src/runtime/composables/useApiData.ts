@@ -29,8 +29,8 @@ export type SharedAsyncDataOptions<ResT, DataT = ResT> = ComputedOptions<Omit<Sh
    * Serve a repeated request from the Nuxt payload instead of sending it again.
    *
    * @remarks
-   * Set this to opt a single call out. To turn payload caching off for the whole app, use the module option of
-   * the same name, which is what this follows.
+   * Set this to opt a single call out. The module option of the same name turns payload caching off
+   * for the whole app.
    *
    * @default the `payloadCache` module option
    */

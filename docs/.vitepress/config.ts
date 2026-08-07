@@ -75,9 +75,9 @@ export default defineConfig({
     ],
 
     sidebar: {
-      '/essentials/': sidebarCore(),
-      '/guides/': sidebarCore(),
-      '/advanced/': sidebarCore(),
+      '/essentials/': sidebarMain(),
+      '/guides/': sidebarMain(),
+      '/advanced/': sidebarMain(),
       '/api/': sidebarApi(),
     },
 
@@ -96,7 +96,7 @@ export default defineConfig({
   },
 })
 
-function sidebarCore(): DefaultTheme.SidebarItem[] {
+function sidebarMain(): DefaultTheme.SidebarItem[] {
   return [
     {
       text: 'Essentials',
