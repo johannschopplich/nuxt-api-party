@@ -118,17 +118,6 @@ export interface ModuleOptions {
    */
   payloadCache?: boolean
 
-  /**
-   * Inject a build-time key into every `useMyApiData` call, the way Nuxt does for `useAsyncData` and `useFetch`.
-   *
-   * @remarks
-   * Each call site then owns its async data state, so two components asking for the same resource no longer collide
-   * over differing `transform`, `pick` or `default` options. They still share the underlying request. Turn this off
-   * to key async data by the request instead, which makes every call site with equal options one shared instance.
-   *
-   * @default true
-   */
-  autoKeyInjection?: boolean
 }
 // #endregion options
 
@@ -193,7 +182,6 @@ export default defineNuxtModule<ModuleOptions>().with({
       proxyMode: 'wrapped',
     },
     payloadCache: true,
-    autoKeyInjection: true,
   },
   async setup(options, nuxt) {
     const moduleName = name
@@ -339,15 +327,13 @@ export const ${getDataComposableName(i)} = (...args) => _useApiData('${i}', ...a
       },
     })
 
-    if (options.autoKeyInjection) {
-      nuxt.options.optimization.keyedComposables.push(
-        ...endpointKeys.map(i => ({
-          name: getDataComposableName(i),
-          argumentLength: 3,
-          source: modTemplate.dst,
-        })),
-      )
-    }
+    nuxt.options.optimization.keyedComposables.push(
+      ...endpointKeys.map(i => ({
+        name: getDataComposableName(i),
+        argumentLength: 3,
+        source: modTemplate.dst,
+      })),
+    )
 
     addTemplate({
       filename: `module/${moduleName}.d.ts`,

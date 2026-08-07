@@ -113,14 +113,6 @@ An individual call opts out with `payloadCache: false`.
 
 **Default value**: `true`
 
-## `apiParty.autoKeyInjection`
-
-Whether every `useMyApiData` call gets a build-time key derived from its position in the source, the way Nuxt does for `useFetch` and `useAsyncData`.
-
-Each call site then owns its async data, so two components asking for the same resource no longer collide over differing `transform`, `pick` or `default` options. They still share the underlying request. To put two call sites back on one shared instance, give them the same `key` – the same restrictions apply as with Nuxt's own composables.
-
-**Default value**: `true`
-
 ## Type Declarations
 
 <<< @/../src/module.ts#options

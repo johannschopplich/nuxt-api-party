@@ -14,10 +14,10 @@ Its four flags moved out and two of them changed their default:
 | -------------------------------------------- | ---------------------------------- | -------- |
 | `experimental.enablePrefixedProxy: true`      | `server.proxyMode: 'passthrough'`     | Unchanged |
 | `experimental.disableClientPayloadCache: true`| `payloadCache: false`              | Unchanged |
-| `experimental.enableAutoKeyInjection: true`   | `autoKeyInjection`                 | Now on   |
+| `experimental.enableAutoKeyInjection: true`   | Removed                            | Always on |
 | `experimental.enableSchemaFileWatcher`        | Removed                            | Always on in dev |
 
-`autoKeyInjection` gives every `useMyApiData` call its own async data state, keyed by its position in your source, the way Nuxt keys `useFetch` and `useAsyncData`. Two components asking for the same resource therefore no longer share a `data` ref, and no longer collide when their `transform`, `pick` or `default` options differ. They do still share the underlying request. Pass the same explicit `key` to put two call sites back on one instance.
+Every `useMyApiData` call now gets its own async data state, keyed by its position in your source, the way Nuxt keys `useFetch` and `useAsyncData` – with no switch either way, as Nuxt has none. Two components asking for the same resource therefore no longer share a `data` ref, and no longer collide when their `transform`, `pick` or `default` options differ. They do still share the underlying request. Pass the same explicit `key` to put two call sites back on one instance.
 
 The schema file watcher no longer has a switch. Nuxt's own builder watcher cannot stand in for it – it covers each layer's `app` and `server` directories only, and a path registered through `nuxt.options.watch` restarts the dev server rather than regenerating the types.
 
