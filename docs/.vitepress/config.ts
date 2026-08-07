@@ -146,6 +146,7 @@ function sidebarApi(): DefaultTheme.SidebarItem[] {
       items: [
         { text: 'useFetch-like Composables', link: '/api/use-fetch-like' },
         { text: '$fetch-like Composables', link: '/api/dollarfetch-like' },
+        { text: 'Server Imports', link: '/api/server-imports' },
       ],
     },
     {
