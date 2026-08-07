@@ -168,11 +168,9 @@ Pass a custom fetch function for different HTTP clients or custom caching logic:
 
 ```ts
 const data = await $jsonPlaceholder('posts', {
-  fetch(url, options) {
-    // Support fetching local routes during SSR
-    const fetch = useRequestFetch()
-    // Custom fetch logic here
-    return fetch(url, options)
+  $fetch(request, options) {
+    // Wrapping `useRequestFetch()` keeps local routes fetchable during SSR
+    return useRequestFetch()(request, options)
   }
 })
 ```
