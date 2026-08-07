@@ -18,28 +18,23 @@ export default defineNuxtConfig({
 
 ## `apiParty.endpoints`
 
-Main module configuration for your API endpoints. Each key is an endpoint ID used to generate composables. The value is an object with the following properties:
+The APIs the module generates composables for. Each key is an endpoint ID and names the pair it yields, so `jsonPlaceholder` gives you `$jsonPlaceholder` and `useJsonPlaceholderData`.
 
-- `url` (required): Base URL of the API
-- `token` (optional): Bearer token for authentication
-- `query` (optional): Default query parameters to send with each request
-- `headers` (optional): Default headers sent with each request
-- `cookies` (optional): Whether to forward cookies in requests
-- `allowedUrls` (optional): URLs allowed for [dynamic backend switching](/guides/dynamic-backend-url)
-- `schema` (optional): [OpenAPI Schema](https://swagger.io/resources/open-api) schema URL or file path for [type generation](/guides/openapi-integration)
-- `openAPITS` (optional): Endpoint-specific configuration options for [`openapi-typescript`](https://openapi-ts.dev/node/#options). Will override the global `openAPITS` options if provided.
+`url` is the base URL every request is resolved against, and the only required option. The rest are optional:
+
+- `token` – Bearer token sent with each request.
+- `query` – Query parameters added to each request.
+- `headers` – Headers sent with each request.
+- `cookies` – Whether the browser's cookie travels on to this API. See [Cookie Forwarding](/guides/cookie-forwarding).
+- `allowedUrls` – Base URLs a request may switch to at runtime. See [Dynamic Backend URL](/guides/dynamic-backend-url).
+- `schema` – URL or file path of an [OpenAPI schema](https://swagger.io/resources/open-api) to infer types from. See [OpenAPI Integration](/guides/openapi-integration).
+- `openAPITS` – [`openapi-typescript` options](https://openapi-ts.dev/node/#options) for this endpoint's schema, overriding the global `openAPITS`.
+
+`token`, `query` and `headers` are attached by the server handler, so they never reach the browser – but only in the default `'wrapped'` proxy mode. See [`proxyMode`](#proxymode).
 
 **Default value**: `{}`
 
-::: info Placeholders
-Composables are generated based on your API endpoint ID. For example, an endpoint `jsonPlaceholder` generates `useJsonPlaceholderData` and `$jsonPlaceholder`.
-:::
-
-**Type Declaration:**
-
 <<< @/../src/module.ts#endpoints
-
-**Example:**
 
 ```ts
 export default defineNuxtConfig({
@@ -122,6 +117,6 @@ Each call site then owns its async data, so two components asking for the same r
 
 **Default value**: `true`
 
-## Type Declaration
+## Type Declarations
 
 <<< @/../src/module.ts#options
