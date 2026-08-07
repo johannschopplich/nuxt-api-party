@@ -1,15 +1,18 @@
 export interface SerializedBlob {
   data: string
   type: string
-  size: number
-  name?: string
+  name: string
   __type: 'blob'
 }
 
-export type SerializedFormDataValue = string | SerializedBlob | (string | SerializedBlob)[]
+export type SerializedFormDataEntry = [key: string, value: string | SerializedBlob]
 
 export interface SerializedFormData {
-  [key: string]: SerializedFormDataValue
+  /**
+   * The form's fields in their original order. Repeated field names survive as
+   * separate entries, and no field can collide with `__type`.
+   */
+  entries: SerializedFormDataEntry[]
   __type: 'form-data'
 }
 
@@ -23,65 +26,35 @@ export function isSerializedFormData(obj: unknown): obj is SerializedFormData {
     && obj !== null
     && '__type' in obj
     && obj.__type === 'form-data'
+    && 'entries' in obj
+    && Array.isArray(obj.entries)
   )
 }
 
-export async function formDataToObject(formData: FormData) {
-  const obj: SerializedFormData = {
+export async function formDataToObject(formData: FormData): Promise<SerializedFormData> {
+  const entries = await Promise.all(
+    [...formData.entries()].map(
+      async ([key, value]): Promise<SerializedFormDataEntry> => [
+        key,
+        value instanceof Blob ? await serializeBlob(value) : value,
+      ],
+    ),
+  )
+
+  return {
+    entries,
     __type: 'form-data',
   }
-
-  for (const [key, value] of formData.entries()) {
-    if (value instanceof Blob) {
-      const serializedBlob: SerializedBlob = {
-        ...(await serializeBlob(value)),
-        name: value.name,
-        __type: 'blob',
-      }
-
-      if (Array.isArray(obj[key]))
-        (obj[key] as SerializedBlob[]).push(serializedBlob)
-      else if (obj[key])
-        obj[key] = [obj[key] as SerializedBlob, serializedBlob]
-      else
-        obj[key] = serializedBlob
-    }
-    else {
-      if (Array.isArray(obj[key]))
-        (obj[key] as string[]).push(value)
-      else if (obj[key])
-        obj[key] = [obj[key] as string, value]
-      else
-        obj[key] = value
-    }
-  }
-
-  return obj
 }
 
 export async function objectToFormData(obj: SerializedFormData) {
   const formData = new FormData()
-  const entries = Object.entries(obj).filter(([key]) => key !== '__type')
 
-  for (const [key, value] of entries) {
-    if (Array.isArray(value)) {
-      for (const item of value) {
-        if (isSerializedBlob(item)) {
-          const blob = await deserializeBlob(item)
-          formData.append(key, blob, item.name)
-        }
-        else {
-          formData.append(key, item)
-        }
-      }
-    }
-    else if (isSerializedBlob(value)) {
-      const blob = await deserializeBlob(value)
-      formData.append(key, blob, value.name)
-    }
-    else {
+  for (const [key, value] of obj.entries) {
+    if (isSerializedBlob(value))
+      formData.append(key, deserializeBlob(value), value.name)
+    else
       formData.append(key, value)
-    }
   }
 
   return formData
@@ -104,8 +77,8 @@ function isSerializedBlob(obj: unknown): obj is SerializedBlob {
  */
 const BASE64_CHUNK_SIZE = 32_766
 
-async function serializeBlob(blob: Blob) {
-  const byteArray = new Uint8Array(await blob.arrayBuffer())
+async function serializeBlob(file: File): Promise<SerializedBlob> {
+  const byteArray = new Uint8Array(await file.arrayBuffer())
   let data = ''
 
   for (let offset = 0; offset < byteArray.length; offset += BASE64_CHUNK_SIZE) {
@@ -115,12 +88,13 @@ async function serializeBlob(blob: Blob) {
 
   return {
     data,
-    type: blob.type,
-    size: blob.size,
+    type: file.type,
+    name: file.name,
+    __type: 'blob',
   }
 }
 
-async function deserializeBlob(serializedBlob: SerializedBlob) {
+function deserializeBlob(serializedBlob: SerializedBlob) {
   const binaryString = globalThis.atob(serializedBlob.data)
   const byteArray = new Uint8Array(binaryString.length)
 
