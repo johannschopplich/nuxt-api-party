@@ -1,6 +1,6 @@
 # `useFetch`-Like Composable
 
-Returns the raw API response. Intended for data that requires reactive updates, e.g. when using data in templates.
+Returns the API response as Nuxt async data. Intended for data that requires reactive updates, e.g. when using data in templates.
 
 Responses are **cached** in the Nuxt payload between calls for the same request. Disable this by setting `payloadCache` to `false`.
 

@@ -30,7 +30,7 @@ The APIs the module generates composables for. Each key is an endpoint ID and na
 - `schema` – URL or file path of an [OpenAPI schema](https://swagger.io/resources/open-api) to infer types from. See [OpenAPI Integration](/guides/openapi-integration).
 - `openAPITS` – [`openapi-typescript` options](https://openapi-ts.dev/node/#options) for this endpoint's schema, overriding the global `openAPITS`.
 
-`token`, `query` and `headers` never reach the browser: the server handler attaches them, and only in the default `'wrapped'` proxy mode. See [`proxyMode`](#proxymode).
+`token`, `query` and `headers` stay on the server as long as [`client`](#apiparty-client) is off: the handler attaches them, and only in the default `'wrapped'` proxy mode. See [`proxyMode`](#proxymode).
 
 **Default Value**: `{}`
 
@@ -75,6 +75,10 @@ Whether composables may bypass the proxy and call your API straight from the bro
 - `'always'` – Every request is made client-side unless a call opts out.
 
 **Default Value**: `false`, or `'always'` when Nuxt runs with `ssr: false`, where there is no server to proxy through.
+
+::: warning
+Any value other than `false` writes every endpoint's `token`, `query` and `headers` into the public runtime config, because the browser has to send them itself. They are readable in the delivered HTML. `'allow'` is no safer than `'always'` here: the credentials ship whether or not a single call opts in. Reserve this for APIs whose credentials may be public.
+:::
 
 See [Client Requests](/api/dollarfetch-like#client-requests) for what a call looks like.
 

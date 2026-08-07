@@ -15,7 +15,6 @@ Downsides of in-memory caching include:
 
 - Cache does not persist across page reloads.
 - Cache is not shared across tabs or windows.
-- Refreshing data requires a call to `clear` then `refresh` functions.
 
 ## Built-in Browser Caching
 
