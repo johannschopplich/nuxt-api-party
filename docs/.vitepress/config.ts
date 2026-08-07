@@ -7,7 +7,7 @@ import { github, name, ogImage, ogUrl, releases } from './meta'
 export default defineConfig({
   lang: 'en-US',
   title: name,
-  description: 'Auto-generated composables for secure API access',
+  description: 'Composables for any API, with credentials on the server and types from OpenAPI',
   head: [
     ['link', { rel: 'icon', href: '/logo.svg', type: 'image/svg+xml' }],
     ['meta', { name: 'author', content: 'Johann Schopplich' }],
