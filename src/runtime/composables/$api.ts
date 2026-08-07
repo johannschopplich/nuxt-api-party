@@ -145,7 +145,7 @@ export async function _$api<T = unknown>(
   // The wrapped proxy turns every call into a POST to the Nuxt server route, and a POST is never served from the
   // browser's HTTP cache, so the option would quietly do nothing.
   if (import.meta.dev && cache && !client && serverProxyMode === 'wrapped') {
-    consola.warn('[nuxt-api-party] The `cache` option has no effect while `server.proxyMode` is `wrapped`. Set it to `passthrough`, or send the request from the client.')
+    consola.warn('[nuxt-api-party] The `cache` option has no effect while `server.proxyMode` is `wrapped`. Set it to `passthrough` to make the browser cache apply.')
   }
 
   // The payload always carries an SSR response over to the client, so a write is due there regardless of the option.
