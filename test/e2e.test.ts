@@ -1,4 +1,4 @@
-import { fileURLToPath } from 'node:url'
+import { join } from 'node:path'
 import { $fetch, setup } from '@nuxt/test-utils/e2e'
 import destr from 'destr'
 import { describe, expect, it } from 'vitest'
@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest'
 describe('nuxt-api-party', async () => {
   await setup({
     server: true,
-    rootDir: fileURLToPath(new URL('./fixture', import.meta.url)),
+    rootDir: join(import.meta.dirname, 'fixture'),
   })
 
   describe('$testApi', () => {
@@ -64,6 +64,12 @@ describe('nuxt-api-party', async () => {
 
       expect(result.firstTodoCount).toBe(1)
       expect(result.firstTwoTodosCount).toBe(2)
+    })
+
+    it('fetches again on refresh instead of answering from the payload', async () => {
+      const result = await fetchTestResult<{ initialHits: number, refreshedHits: number }>('/refresh')
+
+      expect(result.refreshedHits).toBe(result.initialHits + 1)
     })
 
     it('sends a single request when two call sites ask for the same resource', async () => {

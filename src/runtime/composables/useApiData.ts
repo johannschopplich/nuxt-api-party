@@ -6,7 +6,7 @@ import type { SharedFetchOptions } from './$api'
 import { hash } from 'ohash'
 import { computed, toValue } from 'vue'
 import { allowClient, allowPayloadCache } from '#build/module/nuxt-api-party.config'
-import { useFetch } from '#imports'
+import { useFetch, useNuxtApp } from '#imports'
 import { CACHE_KEY_PREFIX } from '../constants'
 import { isFormData } from '../form-data'
 import { resolvePathParams } from '../openapi'
@@ -136,7 +136,9 @@ export function _useApiData<T = unknown>(
   if (toValue(client) && !allowClient)
     throw new Error('Client-side API requests are disabled. Set "client: true" in the module options to enable them.')
 
-  return useFetch(_path, {
+  const nuxt = useNuxtApp()
+
+  const asyncData = useFetch(_path, {
     ...fetchOptions,
     key: _asyncDataKey,
     $fetch: ((request: string, opts) => _$api(endpointId, request, {
@@ -147,4 +149,18 @@ export function _useApiData<T = unknown>(
       key: _requestKey.value,
     })) as typeof globalThis.$fetch,
   }) as AsyncData<T | undefined, NuxtError>
+
+  // `refresh()`, `refreshNuxtData()` and a watched source all end up here. Nuxt keys its own cache
+  // per call site and never sees the entry under the request key, so anything but a first load
+  // would be handed the very response it was asked to replace.
+  const entry = nuxt._asyncData[_asyncDataKey.value]!
+  const execute = entry.execute
+  entry.execute = (opts = {}) => {
+    if (opts.cause !== 'initial')
+      delete nuxt.payload.data[_requestKey.value]
+
+    return execute(opts)
+  }
+
+  return asyncData
 }
