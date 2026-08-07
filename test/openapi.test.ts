@@ -2,6 +2,7 @@ import type { EndpointConfiguration } from '../src/module'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { generateOpenAPITypes } from '../src/openapi'
+import { resolvePathParams } from '../src/runtime/openapi'
 
 const rootDir = join(import.meta.dirname, '..', 'playground')
 
@@ -65,5 +66,25 @@ describe('generateOpenAPITypes', () => {
       { legacy: { url: 'https://example.com', schema: () => ({}) } },
       { rootDir },
     )).rejects.toThrow(/no longer accepts a function/)
+  })
+})
+
+describe('resolvePathParams', () => {
+  it('substitutes every occurrence of a path parameter', () => {
+    const path = resolvePathParams('/pet/{petId}/photo/{petId}', { petId: 1 })
+
+    expect(path).toBe('/pet/1/photo/1')
+  })
+
+  it('encodes a value that would otherwise start a new path segment', () => {
+    const path = resolvePathParams('/pet/{name}', { name: 'a/b' })
+
+    expect(path).toBe('/pet/a%2Fb')
+  })
+
+  it('leaves a placeholder standing when no value is given for it', () => {
+    const path = resolvePathParams('/pet/{petId}')
+
+    expect(path).toBe('/pet/{petId}')
   })
 })

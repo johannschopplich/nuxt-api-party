@@ -24,10 +24,9 @@ export type {
 export type FetchResponseError<T extends Record<PropertyKey, any>> = NuxtError<ErrorResponse<ResponseObjectMap<T>, MediaType>>
 
 export function resolvePathParams(path: string, params?: Record<string, MaybeRefOrGetter<unknown>>) {
-  // To simplify typings, OpenAPI path parameters can be expanded here.
   if (params) {
     for (const [key, value] of Object.entries(params))
-      path = path.replace(`{${key}}`, encodeURIComponent(String(toValue(value))))
+      path = path.replaceAll(`{${key}}`, encodeURIComponent(String(toValue(value))))
   }
 
   return path
