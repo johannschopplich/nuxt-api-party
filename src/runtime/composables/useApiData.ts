@@ -37,13 +37,11 @@ export type SharedAsyncDataOptions<ResT, DataT = ResT> = ComputedOptions<Omit<Sh
   payloadCache?: MaybeRef<boolean>
   /**
    * The key passed to `useAsyncData`. By default, will be generated from the request options.
-   * @default undefined
    */
   key?: MaybeRefOrGetter<string>
   /**
    * Watch an array of reactive sources and auto-refresh the fetch result when they change.
    * Fetch options and URL are watched by default. You can completely ignore reactive sources by using `watch: false`.
-   * @default undefined
    */
   watch?: MultiWatchSources | false
 }
@@ -121,7 +119,7 @@ export function _useApiData<T = unknown>(
 
   const _path = computed(() => resolvePathParams(toValue(path), toValue(pathParams)))
 
-  // Identifies the request, so concurrent calls for the same resource resolve from a single fetch.
+  // Identity of the request, so concurrent calls for the same resource resolve from a single fetch.
   const _requestKey = computed(() => CACHE_KEY_PREFIX + hash([
     endpointId,
     _path.value,
