@@ -138,29 +138,29 @@ export function _useApiData<T = unknown>(
 
   const nuxt = useNuxtApp()
 
-  const asyncData = useFetch(_path, {
+  // Nuxt hands an SSR response to the client under its own key, so an entry there means this call
+  // site starts out with a result already.
+  let hasResult = _asyncDataKey.value in nuxt.payload.data
+
+  return useFetch(_path, {
     ...fetchOptions,
     key: _asyncDataKey,
-    $fetch: ((request: string, opts) => _$api(endpointId, request, {
-      ...opts,
-      $fetch: toValue($fetch),
-      payloadCache: toValue(payloadCache),
-      client: toValue(client),
-      key: _requestKey.value,
-    })) as typeof globalThis.$fetch,
+    $fetch: ((request: string, opts) => {
+      // Every fetch past the first one replaces a result this call site already has. The request
+      // cache is invisible to Nuxt, so without this it would hand back the very response that a
+      // refresh, a watched source or a changed key asked to replace.
+      if (hasResult)
+        delete nuxt.payload.data[_requestKey.value]
+
+      hasResult = true
+
+      return _$api(endpointId, request, {
+        ...opts,
+        $fetch: toValue($fetch),
+        payloadCache: toValue(payloadCache),
+        client: toValue(client),
+        key: _requestKey.value,
+      })
+    }) as typeof globalThis.$fetch,
   }) as AsyncData<T | undefined, NuxtError>
-
-  // `refresh()`, `refreshNuxtData()` and a watched source all end up here. Nuxt keys its own cache
-  // per call site and never sees the entry under the request key, so anything but a first load
-  // would be handed the very response it was asked to replace.
-  const entry = nuxt._asyncData[_asyncDataKey.value]!
-  const execute = entry.execute
-  entry.execute = (opts = {}) => {
-    if (opts.cause !== 'initial')
-      delete nuxt.payload.data[_requestKey.value]
-
-    return execute(opts)
-  }
-
-  return asyncData
 }

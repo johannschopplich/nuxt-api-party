@@ -72,6 +72,12 @@ describe('nuxt-api-party', async () => {
       expect(result.refreshedHits).toBe(result.initialHits + 1)
     })
 
+    it('fetches again on refresh after a reactive query changed the key', async () => {
+      const result = await fetchTestResult<{ changedHits: number, refreshedHits: number }>('/refresh-after-key-change')
+
+      expect(result.refreshedHits).toBeGreaterThan(result.changedHits)
+    })
+
     it('sends a single request when two call sites ask for the same resource', async () => {
       const result = await fetchTestResult<{ firstHits: number, secondHits: number }>('/shared-request')
 
