@@ -10,6 +10,8 @@ That server route makes the actual request to your API and passes the response b
 
 During server-side rendering, a call to the route invokes the handler directly instead of going over HTTP, saving a round trip.
 
+Because that body is JSON, a `FormData` body travels base64-encoded: every file is held in memory in full and grows by a third on the wire. Reach for [`server.proxyMode: 'passthrough'`](/api/module-configuration#proxymode) when you upload files large enough for that to matter, since it streams the original request through untouched.
+
 ::: tip API Response Metadata
 The proxy passes through your API's response body, HTTP status code, status message, and headers. Errors stay intact, and metadata such as rate limit headers reaches your app.
 :::

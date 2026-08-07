@@ -96,24 +96,36 @@ function isSerializedBlob(obj: unknown): obj is SerializedBlob {
   )
 }
 
-/** Kept well below the argument count at which spreading into `String.fromCharCode` overflows the stack. */
-const BINARY_STRING_CHUNK_SIZE = 8192
+/**
+ * Bytes encoded per `btoa` call. Every byte travels as its own argument to
+ * `String.fromCharCode`, which overflows the stack past roughly 125,000 of them
+ * – fewer the deeper the call stack. Divisible by three, so each chunk encodes
+ * without padding and the base64 pieces concatenate.
+ */
+const BASE64_CHUNK_SIZE = 32_766
 
 async function serializeBlob(blob: Blob) {
   const byteArray = new Uint8Array(await blob.arrayBuffer())
-  const chunks: string[] = []
+  let data = ''
 
-  for (let offset = 0; offset < byteArray.length; offset += BINARY_STRING_CHUNK_SIZE)
-    chunks.push(String.fromCharCode(...byteArray.subarray(offset, offset + BINARY_STRING_CHUNK_SIZE)))
+  for (let offset = 0; offset < byteArray.length; offset += BASE64_CHUNK_SIZE) {
+    const chunk = byteArray.subarray(offset, offset + BASE64_CHUNK_SIZE)
+    data += globalThis.btoa(String.fromCharCode.apply(null, chunk as unknown as number[]))
+  }
 
   return {
-    data: globalThis.btoa(chunks.join('')),
+    data,
     type: blob.type,
     size: blob.size,
   }
 }
 
 async function deserializeBlob(serializedBlob: SerializedBlob) {
-  const byteArray = Uint8Array.from(globalThis.atob(serializedBlob.data), x => x.charCodeAt(0))
+  const binaryString = globalThis.atob(serializedBlob.data)
+  const byteArray = new Uint8Array(binaryString.length)
+
+  for (let index = 0; index < binaryString.length; index++)
+    byteArray[index] = binaryString.charCodeAt(index)
+
   return new Blob([byteArray], { type: serializedBlob.type })
 }
