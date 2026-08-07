@@ -66,13 +66,26 @@ describe('nuxt-api-party', async () => {
       expect(result.firstTwoTodosCount).toBe(2)
     })
 
+    it('sends a single request for two call sites with the same key', async () => {
+      const result = await fetchTestResult<{ firstHits: number, secondHits: number }>('/shared-key')
+
+      expect(result.firstHits).toBeGreaterThan(0)
+      expect(result.secondHits).toBe(result.firstHits)
+    })
+
     it('fetches again on refresh instead of answering from the payload', async () => {
       const result = await fetchTestResult<{ initialHits: number, refreshedHits: number }>('/refresh')
 
       expect(result.refreshedHits).toBe(result.initialHits + 1)
     })
 
-    it('fetches again on refresh after a reactive query changed the key', async () => {
+    it('fetches again on execute after clear', async () => {
+      const result = await fetchTestResult<{ initialHits: number, clearedHits: number }>('/clear')
+
+      expect(result.clearedHits).toBe(result.initialHits + 1)
+    })
+
+    it('fetches again on refresh after the query changed', async () => {
       const result = await fetchTestResult<{ changedHits: number, refreshedHits: number }>('/refresh-after-key-change')
 
       expect(result.refreshedHits).toBeGreaterThan(result.changedHits)
