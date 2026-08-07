@@ -1,11 +1,12 @@
 import { join } from 'node:path'
-import { $fetch, setup } from '@nuxt/test-utils/e2e'
+import { $fetch, createPage, setup } from '@nuxt/test-utils/e2e'
 import destr from 'destr'
 import { describe, expect, it } from 'vitest'
 
 describe('nuxt-api-party', async () => {
   await setup({
     server: true,
+    browser: true,
     rootDir: join(import.meta.dirname, 'fixture'),
   })
 
@@ -96,6 +97,17 @@ describe('nuxt-api-party', async () => {
 
       expect(result.firstHits).toBeGreaterThan(0)
       expect(result.secondHits).toBe(result.firstHits)
+    })
+
+    it('fetches again on refresh in the browser', async () => {
+      const page = await createPage('/refresh-in-browser')
+      const hits = page.getByTestId('hits')
+      const initialHits = Number(await hits.textContent())
+
+      await page.getByTestId('refresh').click()
+
+      await expect.poll(() => hits.textContent()).toBe(String(initialHits + 1))
+      await page.close()
     })
   })
 })

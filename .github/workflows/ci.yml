@@ -46,5 +46,6 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install
+      - run: pnpm exec playwright-core install --with-deps chromium
       - run: pnpm run dev:prepare
       - run: pnpm run test
