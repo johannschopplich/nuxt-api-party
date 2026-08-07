@@ -14,7 +14,7 @@ During server-side rendering, a call to the route invokes the handler directly i
 The proxy passes through your API's response body, HTTP status code, status message, and headers. Errors stay intact, and metadata such as rate limit headers reaches your app.
 :::
 
-## The Prefixed Proxy
+## The Passthrough Proxy
 
 With [`server.proxyMode`](/api/module-configuration#proxymode) set to `'passthrough'`, requests instead go to `/api/__api_party/{endpointId}/proxy/{path}` under their own HTTP method, and the path, query, headers and body are forwarded as they are. This is the mode to choose when you want the browser's network tab to mirror the upstream request, or when you need HTTP cache control – a POST wrapper cannot be cached.
 

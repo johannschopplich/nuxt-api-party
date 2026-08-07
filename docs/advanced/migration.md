@@ -38,7 +38,7 @@ const { data } = await useMyApiData('posts', {
 
 An API that cannot be reached used to yield `503 Service Unavailable` from the default proxy and `502 Bad Gateway` from the passthrough one. Both report `502` now.
 
-### The Prefixed Proxy No Longer Forwards `authorization`
+### The Passthrough Proxy No Longer Forwards `authorization`
 
 With [`server.proxyMode`](/api/module-configuration#proxymode) set to `'passthrough'`, a browser request's `authorization` header used to travel on to your API. It no longer does: the header carries the caller's credentials for *your* app, not your app's credentials for the upstream service.
 
