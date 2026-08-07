@@ -24,15 +24,15 @@ type ComputedOptions<T> = {
 type ComputedMethodOption<M, P> = 'get' extends keyof P ? ComputedOptions<{ method?: M }> : ComputedOptions<{ method: M }>
 
 // #region options
-export type SharedAsyncDataOptions<ResT, DataT = ResT> = ComputedOptions<SharedFetchOptions> & Omit<AsyncDataOptions<ResT, DataT>, 'watch'> & {
+export type SharedAsyncDataOptions<ResT, DataT = ResT> = ComputedOptions<Omit<SharedFetchOptions, 'payloadCache'>> & Omit<AsyncDataOptions<ResT, DataT>, 'watch'> & {
   /**
    * Serve a repeated request from the Nuxt payload instead of sending it again.
    *
    * @remarks
-   * Follows the module option of the same name, which is where turning payload caching off for the whole app
-   * belongs. Set it here to opt a single call out.
+   * Set this to opt a single call out. To turn payload caching off for the whole app, use the module option of
+   * the same name, which is what this follows.
    *
-   * @default true
+   * @default the `payloadCache` module option
    */
   payloadCache?: MaybeRef<boolean>
   /**
