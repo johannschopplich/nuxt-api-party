@@ -4,4 +4,3 @@ export const ogImage = `${ogUrl}og.jpg`
 
 export const github = 'https://github.com/johannschopplich/nuxt-api-party'
 export const releases = 'https://github.com/johannschopplich/nuxt-api-party/releases'
-export const twitter = 'https://twitter.com/jschopplich'
