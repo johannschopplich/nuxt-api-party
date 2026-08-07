@@ -42,6 +42,12 @@ const { data } = await useMyApiData('posts', {
 
 `cache: true` and `cache: false` are compile errors, so they surface on upgrade. One change is silent, though: a string value used to turn payload caching off as a side effect. `cache: 'no-store'` now only sets the browser cache mode, and the payload cache stays on unless you add `payloadCache: false`.
 
+### A `FormData` Body Travels as an Ordered Entry List
+
+The wrapped proxy used to serialize a `FormData` body into an object keyed by field name, so repeated names collapsed into one array and lost their place among the other fields – and a field named `__type` overwrote the marker that identifies the payload. It now sends the entries in the order the form holds them, which is the order your API receives them in. `SerializedFormData` carries that list as `entries`, and a serialized blob carries its `name` in place of its `size`.
+
+This only concerns you if you read the proxy payload yourself, in a [request hook](/guides/hooks) or a custom handler.
+
 ### The Wrapped Proxy Reports `502` for an Unreachable API
 
 An API that cannot be reached used to yield `503 Service Unavailable` from the default proxy and `502 Bad Gateway` from the passthrough one. Both report `502` now.
