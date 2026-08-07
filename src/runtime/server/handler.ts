@@ -136,7 +136,7 @@ export default defineEventHandler(async (event) => {
     if (isError(error)) {
       throw error
     }
-    console.error(error)
+    console.error('[nuxt-api-party]', error)
 
     // Matches what h3's `sendProxy` reports for the same condition in the passthrough proxy mode.
     throw createError({

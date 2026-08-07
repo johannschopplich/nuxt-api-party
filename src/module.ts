@@ -4,7 +4,7 @@ import type { QueryObject } from 'ufo'
 import type { ObjectPlugin, Plugin } from '#app'
 import type { ApiClientFetchOptions, SharedFetchOptions } from './runtime/composables/$api'
 import { fileURLToPath } from 'node:url'
-import { addImportsSources, addServerHandler, addTemplate, addTypeTemplate, createResolver, defineNuxtModule, updateTemplates, useLogger } from '@nuxt/kit'
+import { addImportsSources, addServerHandler, addTemplate, addTypeTemplate, createResolver, defineNuxtModule, updateTemplates } from '@nuxt/kit'
 import { watch } from 'chokidar'
 import { defu } from 'defu'
 import { createJiti } from 'jiti'
@@ -12,6 +12,7 @@ import { relative } from 'pathe'
 import { camelCase, pascalCase } from 'scule'
 import { joinURL } from 'ufo'
 import { name } from '../package.json'
+import { logger } from './kit'
 import { generateOpenAPITypeHelpers, generateOpenAPITypes } from './openapi'
 
 // #region options
@@ -185,7 +186,6 @@ export default defineNuxtModule<ModuleOptions>().with({
   },
   async setup(options, nuxt) {
     const moduleName = name
-    const logger = useLogger(moduleName)
     const getRawComposableName = (endpointId: string) => `$${camelCase(endpointId)}`
     const getDataComposableName = (endpointId: string) => `use${pascalCase(endpointId)}Data`
 

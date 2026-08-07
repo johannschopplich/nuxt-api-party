@@ -4,6 +4,7 @@ import { pathToFileURL } from 'node:url'
 import { useNuxt } from '@nuxt/kit'
 import { isAbsolute, resolve } from 'pathe'
 import { pascalCase } from 'scule'
+import { logger } from './kit'
 
 type SchemaEndpoint = EndpointConfiguration & {
   schema: NonNullable<EndpointConfiguration['schema']>
@@ -106,8 +107,7 @@ async function generateSchemaTypes(options: {
     return astToString(ast)
   }
   catch (error) {
-    console.error(`Failed to generate types for ${options.id}`)
-    console.error(error)
+    logger.error(`Failed to generate types for ${options.id}`, error)
     return `
 export type paths = Record<string, never>
 export type webhooks = Record<string, never>
