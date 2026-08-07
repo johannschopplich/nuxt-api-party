@@ -30,7 +30,7 @@ The APIs the module generates composables for. Each key is an endpoint ID and na
 - `schema` – URL or file path of an [OpenAPI schema](https://swagger.io/resources/open-api) to infer types from. See [OpenAPI Integration](/guides/openapi-integration).
 - `openAPITS` – [`openapi-typescript` options](https://openapi-ts.dev/node/#options) for this endpoint's schema, overriding the global `openAPITS`.
 
-`token`, `query` and `headers` stay on the server as long as [`client`](#apiparty-client) is off: the handler attaches them, and only in the default `'wrapped'` proxy mode. See [`proxyMode`](#proxymode).
+`token`, `query` and `headers` stay on the server as long as [`client`](/api/module-configuration#apiparty-client) is off: the handler attaches them, and only in the default `'wrapped'` proxy mode. See [`proxyMode`](#proxymode).
 
 **Default Value**: `{}`
 
