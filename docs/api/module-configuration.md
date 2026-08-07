@@ -34,7 +34,11 @@ The APIs the module generates composables for. Each key is an endpoint ID and na
 
 **Default value**: `{}`
 
+**Type Declarations**
+
 <<< @/../src/module.ts#endpoints
+
+**Example**
 
 ```ts
 export default defineNuxtConfig({

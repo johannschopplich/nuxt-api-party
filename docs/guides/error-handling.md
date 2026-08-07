@@ -74,7 +74,7 @@ Both error types preserve essential information from your API response:
 - **HTTP Status Message** – Human-readable status text
 - **Headers** – Response headers from your API
 
-## Type Declaration
+## Type Declarations
 
 ### `FetchError` Interface
 
