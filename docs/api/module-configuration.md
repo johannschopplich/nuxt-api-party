@@ -28,7 +28,7 @@ The APIs the module generates composables for. Each key is an endpoint ID and na
 - `cookies` – Whether the browser's cookies travel on to this API. See [Cookie Forwarding](/guides/cookie-forwarding).
 - `allowedUrls` – Base URLs a request may switch to at runtime. See [Dynamic Backend URL](/guides/dynamic-backend-url).
 - `schema` – URL or file path of an [OpenAPI schema](https://swagger.io/resources/open-api) to infer types from. See [OpenAPI Integration](/guides/openapi-integration).
-- `openAPITS` – [`openapi-typescript` options](https://openapi-ts.dev/node/#options) for this endpoint's schema, overriding the global `openAPITS`.
+- `openAPITS` – [`openapi-typescript` options](https://openapi-ts.dev/node/#options) for this endpoint's schema, merged into the global `openAPITS` option by option.
 
 `token`, `query` and `headers` stay on the server as long as [`client`](/api/module-configuration#apiparty-client) is off: the handler attaches them, and only in the default `'wrapped'` proxy mode. See [`proxyMode`](#proxymode).
 
@@ -84,7 +84,7 @@ See [Client Requests](/api/dollarfetch-like#client-requests) for what a call loo
 
 ## `apiParty.openAPITS`
 
-Global [configuration options](https://openapi-ts.dev/node/#options) for `openapi-typescript`. Options set here apply to every endpoint schema but can be overridden per endpoint.
+Global [configuration options](https://openapi-ts.dev/node/#options) for `openapi-typescript`. Options set here apply to every endpoint schema; an endpoint's own `openAPITS` replaces the options it names and leaves the rest in place.
 
 ## `apiParty.server`
 
