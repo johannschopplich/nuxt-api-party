@@ -149,7 +149,6 @@ export async function _$api<T = unknown>(
   // The payload always carries an SSR response over to the client, so a write is due there regardless of the option.
   const cachesPayload = allowPayloadCache && (import.meta.server || payloadCache)
 
-  // TODO: Remove caching support from the `$api` composable.
   let _key: string | undefined
   const getCacheKey = () => {
     if (_key)
@@ -169,9 +168,9 @@ export async function _$api<T = unknown>(
 
   const endpoint = apiParty.endpoints[endpointId]!
 
-  if (allowPayloadCache) {
+  if (allowPayloadCache && (nuxt.isHydrating || payloadCache)) {
     const k = getCacheKey()
-    if ((nuxt.isHydrating || payloadCache) && nuxt.payload.data[k]) {
+    if (nuxt.payload.data[k]) {
       return nuxt.payload.data[k]
     }
 
