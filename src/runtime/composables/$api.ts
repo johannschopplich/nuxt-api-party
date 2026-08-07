@@ -1,7 +1,6 @@
 import type { H3Event$Fetch, NitroFetchOptions } from 'nitropack'
 import type { NuxtApp } from '#app'
 import type { FetchResponseData, FilterMethods, MethodOption, ParamsOption, RequestBodyOption } from '../openapi'
-import { consola } from 'consola'
 import { defu } from 'defu'
 import { hash } from 'ohash'
 import { joinURL } from 'ufo'
@@ -137,13 +136,13 @@ export async function _$api<T = unknown>(
     throw new Error('Client-side API requests are disabled. Set "client: true" in the module options to enable them.')
 
   if (import.meta.dev && !allowPayloadCache && payloadCache) {
-    consola.error('[nuxt-api-party] Payload caching is disabled. Set `payloadCache: true` in the module options to enable it.')
+    console.error('[nuxt-api-party] Payload caching is disabled. Set `payloadCache: true` in the module options to enable it.')
   }
 
   // The wrapped proxy turns every call into a POST to the Nuxt server route, and a POST is never served from the
   // browser's HTTP cache, so the option would quietly do nothing.
   if (import.meta.dev && cache && !client && serverProxyMode === 'wrapped') {
-    consola.warn('[nuxt-api-party] The `cache` option has no effect while `server.proxyMode` is `wrapped`. Set it to `passthrough`, or send the request with `client: true`, to make the browser cache apply.')
+    console.warn('[nuxt-api-party] The `cache` option has no effect while `server.proxyMode` is `wrapped`. Set it to `passthrough`, or send the request with `client: true`, to make the browser cache apply.')
   }
 
   // The payload always carries an SSR response over to the client, so a write is due there regardless of the option.
@@ -169,13 +168,13 @@ export async function _$api<T = unknown>(
   const endpoint = apiParty.endpoints[endpointId]!
 
   if (allowPayloadCache && (nuxt.isHydrating || payloadCache)) {
-    const k = getCacheKey()
-    if (nuxt.payload.data[k]) {
-      return nuxt.payload.data[k]
+    const cacheKey = getCacheKey()
+    if (nuxt.payload.data[cacheKey]) {
+      return nuxt.payload.data[cacheKey]
     }
 
     if (payloadCache) {
-      const result = getPromiseMap(nuxt).get(k)
+      const result = getPromiseMap(nuxt).get(cacheKey)
       if (result) {
         return result
       }
@@ -237,25 +236,24 @@ export async function _$api<T = unknown>(
       : serverFetcher())
     .then((response) => {
       if (cachesPayload) {
-        const k = getCacheKey()
-        nuxt.payload.data[k] = response
-        getPromiseMap(nuxt).delete(k)
+        const cacheKey = getCacheKey()
+        nuxt.payload.data[cacheKey] = response
+        getPromiseMap(nuxt).delete(cacheKey)
       }
       return response
     })
     // Invalidate cache if request fails.
     .catch((error) => {
       if (cachesPayload) {
-        const k = getCacheKey()
-        nuxt.payload.data[k] = undefined
-        getPromiseMap(nuxt).delete(k)
+        const cacheKey = getCacheKey()
+        nuxt.payload.data[cacheKey] = undefined
+        getPromiseMap(nuxt).delete(cacheKey)
       }
       throw error
     }) as Promise<T>
 
   if (cachesPayload) {
-    const k = getCacheKey()
-    getPromiseMap(nuxt).set(k, request)
+    getPromiseMap(nuxt).set(getCacheKey(), request)
   }
 
   return request
