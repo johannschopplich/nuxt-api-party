@@ -99,7 +99,7 @@ How the server handler forwards a request to your API.
 
 Choose `'passthrough'` when you want the browser's network tab to match the upstream request, or when you need HTTP cache control – a `POST` wrapper cannot be cached.
 
-::: warning `'passthrough'` adds no credentials
+::: warning `'passthrough'` Adds No Credentials
 The name is literal: the request travels as it stands, and nothing from the endpoint configuration is attached. The endpoint's `token`, `headers` and `query` are applied by the `'wrapped'` handler only. Authenticate the upstream service in a [request hook](/guides/hooks) instead.
 :::
 

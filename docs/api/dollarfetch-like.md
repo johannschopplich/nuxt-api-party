@@ -82,7 +82,7 @@ const data = await $jsonPlaceholder(
 </template>
 ```
 
-## Using with `useAsyncData`
+## Using With `useAsyncData`
 
 ::: warning Nuxt Context Issue
 Calling `$myApi` multiple times sequentially inside `useAsyncData` causes server-side errors related to Nuxt context loss. This happens because async operations break the context chain that Nuxt uses to track composable calls.
