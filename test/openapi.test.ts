@@ -31,13 +31,39 @@ describe('generateOpenAPITypes', () => {
     expect(types).toContain('export type paths')
   })
 
-  it('lets an endpoint override a global openAPITS option', async () => {
+  it('lets an endpoint override a single global openAPITS option', async () => {
     const types = await generateOpenAPITypes(
       { petStore: { ...petStore, openAPITS: { exportType: false } } },
       { rootDir, openAPITS: { exportType: true } },
     )
 
     expect(types).toContain('export interface paths')
+  })
+
+  it('keeps the global openAPITS option when the endpoint sets it to undefined', async () => {
+    const types = await generateOpenAPITypes(
+      { petStore: { ...petStore, openAPITS: { exportType: undefined } } },
+      { rootDir, openAPITS: { exportType: true } },
+    )
+
+    expect(types).toContain('export type paths')
+  })
+
+  it('emits one module declaration per endpoint', async () => {
+    const types = await generateOpenAPITypes(
+      { petStore, petStoreMirror: petStore },
+      { rootDir },
+    )
+
+    expect(types).toContain('declare module "#nuxt-api-party/petStore"')
+    expect(types).toContain('declare module "#nuxt-api-party/petStoreMirror"')
+    expect(types).toContain('}\n\ndeclare module')
+  })
+
+  it('indents the declaration body by two spaces', async () => {
+    const types = await generateOpenAPITypes({ petStore }, { rootDir })
+
+    expect(types).toContain('\n  export interface paths {\n    "/pet": {')
   })
 
   it('skips an endpoint that declares no schema', async () => {
