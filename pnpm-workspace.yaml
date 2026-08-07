@@ -11,6 +11,7 @@ minimumReleaseAgeExclude:
   - '@nuxt/vite-builder@4.5.2'
   - bumpp@12.2.0
   - nuxt@4.5.2
+  - apiful@5.0.1
 
 shellEmulator: true
 trustPolicy: no-downgrade
