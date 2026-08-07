@@ -110,18 +110,19 @@ const { data } = await useJsonPlaceholderData('posts', {
 
 ### Refresh Cached Data
 
-When using payload caching, call the `clear` function to invalidate the cache, then call `refresh` to fetch fresh data from the server.
+`refresh` sends the request again and replaces the cached response. So does `execute` after a `clear`, and so does a reactive request option that changes the key – asking for fresh data is never answered from the cache.
 
 ```ts
-// Refresh cached data
-const { data, clear, refresh } = await useJsonPlaceholderData('posts')
+const { data, refresh } = await useJsonPlaceholderData('posts')
 
-async function invalidateAndRefresh() {
-  // Must clear the cache before calling refresh, otherwise it will reuse the cached data
-  clear()
+async function reload() {
   await refresh()
 }
 ```
+
+::: warning
+`clearNuxtData()` empties Nuxt's own store, not the cache entry this module keeps alongside it. A component mounting afterwards can still resolve from that entry – refresh the call site instead.
+:::
 
 ### Cache in the Browser
 
