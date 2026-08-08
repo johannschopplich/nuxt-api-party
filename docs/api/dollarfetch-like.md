@@ -20,13 +20,7 @@ const data = await $myApi('posts', {
 })
 ```
 
-The `cache` option needs [`server.proxyMode`](/api/module-configuration#proxymode) set to `'passthrough'`, or the
-request sent from the client. The default `'wrapped'` mode turns every call into a `POST`, and a `POST` is never
-served from the browser's HTTP cache.
-
-::: tip
-See the [caching guide](/guides/caching-strategies) for more information on caching.
-:::
+<!--@include: ./parts/_http-cache-caveat.md-->
 
 ## Examples
 
@@ -124,43 +118,7 @@ Use `useMyApiData` for component data and `$myApi` for programmatic actions (for
 
 ## Client Requests
 
-::: warning
-Authorization credentials will be publicly visible. Also, possible CORS issues ahead if the backend is not configured properly.
-:::
-
-::: info
-Note: If Nuxt SSR is disabled, all requests are made on the client-side by default.
-:::
-
-To fetch data directly from your API and skip the Nuxt server proxy, set the `apiParty` module option `client` to `true`:
-
-::: code-group
-```ts{9} [nuxt.config.ts]
-export default defineNuxtConfig({
-  modules: ['nuxt-api-party'],
-
-  apiParty: {
-    endpoints: {
-      // ...
-    },
-    client: true
-  }
-})
-```
-:::
-
-Now you can make client-side requests by setting the `client` option to `true` in the composable.
-
-```ts{3}
-const data = await $jsonPlaceholder(
-  'posts',
-  { client: true }
-)
-```
-
-::: info
-Set the `client` module option to `always` to make all requests on the client-side.
-:::
+<!--@include: ./parts/_client-requests.md-->
 
 ## Custom Fetch
 
