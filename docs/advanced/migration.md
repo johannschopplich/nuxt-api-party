@@ -1,19 +1,5 @@
 # Migration
 
-## v4.1.0
-
-### Server Composables Reject the Browser-Only Options
-
-The generated Nitro types used to be the browser composable's types, so `client`, `payloadCache`, `key` and `$fetch` autocompleted inside a server route and did nothing – the server handler never read them. They are type errors now. Drop them from your server calls; nothing changes at runtime.
-
-```ts
-export default defineEventHandler(async () => {
-  const posts = await $myApi('posts', {
-    payloadCache: false // [!code --]
-  })
-})
-```
-
 ## v4.0.0
 
 ### Nuxt 4 Is Required
