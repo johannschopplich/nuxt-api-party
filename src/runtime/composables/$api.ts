@@ -77,7 +77,7 @@ export type ApiClient = <T = unknown>(
 ) => Promise<T>
 // #endregion options
 
-export type OpenAPIClientFetchOptions<
+export type OpenAPIRequestOptions<
   Method,
   LowercasedMethod,
   Params,
@@ -86,9 +86,15 @@ export type OpenAPIClientFetchOptions<
   & ParamsOption<Operation>
   & RequestBodyOption<Operation>
   & Omit<NitroFetchOptions<string>, 'query' | 'body' | 'method' | 'cache'>
+
+export type OpenAPIClientFetchOptions<
+  Method,
+  LowercasedMethod,
+  Params,
+> = OpenAPIRequestOptions<Method, LowercasedMethod, Params>
   & SharedFetchOptions
 
-export type OpenAPIClient<Paths> = <
+export type OpenAPIClient<Paths, ClientOnlyOptions = SharedFetchOptions> = <
   ReqT extends Extract<keyof Paths, string>,
   Methods extends FilterMethods<Paths[ReqT]>,
   Method extends Extract<keyof Methods, string> | Uppercase<Extract<keyof Methods, string>>,
@@ -97,7 +103,7 @@ export type OpenAPIClient<Paths> = <
   ResT = Methods[DefaultMethod] extends Record<PropertyKey, any> ? FetchResponseData<Methods[DefaultMethod]> : never,
 >(
   path: ReqT,
-  options?: OpenAPIClientFetchOptions<Method, LowercasedMethod, Methods>,
+  options?: OpenAPIRequestOptions<Method, LowercasedMethod, Methods> & ClientOnlyOptions,
 ) => Promise<ResT>
 
 declare module '#app' {

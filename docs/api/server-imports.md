@@ -26,4 +26,4 @@ Server code needs neither the proxy nor the browser's caches, so this is a plain
 - **No hooks.** `api-party:request` and `api-party:response` are Nuxt app hooks and do not fire here.
 - **No `client` option.** There is no browser to send from.
 
-The generated type is shared with the browser-side composable, so `client`, `payloadCache`, `key` and `$fetch` type-check on a server call. They do nothing.
+The generated type carries only what a server call acts on, so `client`, `payloadCache`, `key` and `$fetch` are type errors here rather than silent no-ops.

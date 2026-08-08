@@ -1,7 +1,14 @@
-import type { ApiClientFetchOptions } from '../composables/$api'
+import type { ApiClientFetchOptions, OpenAPIClient } from '../composables/$api'
 import { useRuntimeConfig } from 'nitropack/runtime'
 import { resolvePathParams } from '../openapi'
 import { mergeHeaders } from '../utils'
+
+export type ServerApiClient = <T = unknown>(
+  path: string,
+  opts?: ApiClientFetchOptions,
+) => Promise<T>
+
+export type ServerOpenAPIClient<Paths> = OpenAPIClient<Paths, unknown>
 
 export function _$api<T = unknown>(
   endpointId: string,
