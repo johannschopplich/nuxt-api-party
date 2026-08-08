@@ -2,7 +2,7 @@
 
 # Nuxt API Party
 
-[Nuxt](https://nuxt.com) module to talk to APIs you don't control, with generated type-safe composables and a server proxy that keeps credentials off the client.
+Auto-generated composables for any API in [Nuxt](https://nuxt.com), typed from OpenAPI and never exposing your credentials.
 
 - [✨ &nbsp;Release Notes](https://github.com/johannschopplich/nuxt-api-party/releases)
 - [📖 &nbsp;Read the documentation](https://nuxt-api-party.byjohann.dev)
@@ -10,12 +10,12 @@
 ## Features
 
 - 🪅 [Auto-generated composables](https://nuxt-api-party.byjohann.dev/api/#generated-composables) for each API endpoint
-- 🔒 Protected API credentials with Nuxt proxy route
+- 🔒 Protected API credentials with a Nuxt proxy route
 - 🌐 No CORS issues
 - 🍱 Familiar developer experience to [`useFetch`](https://nuxt.com/docs/api/composables/use-fetch) and `$fetch`
 - 🧇 [Connect all your APIs](https://nuxt-api-party.byjohann.dev/essentials/getting-started#configure-your-first-api-endpoint)
 - 🦾 Fully typed API clients from [OpenAPI specifications](https://nuxt-api-party.byjohann.dev/guides/openapi-integration)
-- 🗃 Smart caching & hydration
+- 🗃 Cached responses and hydration
 
 ## Setup
 
