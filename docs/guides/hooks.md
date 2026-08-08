@@ -1,6 +1,6 @@
 # Hooks
 
-Hooks run inside your app – in a Nuxt plugin or a Nitro plugin – and see every request the module sends, whichever endpoint it belongs to. Use them for behavior that spans endpoints, such as attaching credentials in the passthrough proxy mode or logging failures centrally. A generic handler and an endpoint-specific one both run, the generic one first.
+Hooks run inside your app – in a Nuxt plugin or a Nitro plugin – and see every request the module sends, whichever endpoint it belongs to. Use them for behavior that spans endpoints, such as attaching credentials in the passthrough proxy mode or logging failures centrally. A generic handler and an endpoint-specific one both run – generic first on the request, endpoint-specific first on the response.
 
 To change a single call instead, reach for an [interceptor](/guides/interceptors).
 

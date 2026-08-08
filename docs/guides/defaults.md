@@ -8,7 +8,7 @@ Set default options for Nuxt API Party [`$myApi`](/api/dollarfetch-like) composa
 The `ModulePlugin` type ensures your plugin provides correct defaults.
 
 ::: info Inheritance
-The `useApiData` composables also use these defaults, as well as relevant Nuxt configuration set in [`experimental.defaults`](https://nuxt.com/docs/4.x/guide/going-further/experimental-features#defaults). Two options are the exception: `client` and `payloadCache` are resolved from the module options for every `useMyApiData` call, so a default set here reaches `$myApi` only.
+The `useMyApiData` composables also use these defaults, as well as relevant Nuxt configuration set in [`experimental.defaults`](https://nuxt.com/docs/guide/going-further/experimental-features#defaults). Two options are the exception: `client` and `payloadCache` are resolved from the module options for every `useMyApiData` call, so a default set here reaches `$myApi` only.
 :::
 
 ## Minimal Example Plugin

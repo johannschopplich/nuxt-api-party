@@ -13,8 +13,8 @@ The `useMyApiData` composables integrate with Nuxt's error handling and expose e
 const { data, error } = await useJsonPlaceholderData('posts/invalid-id')
 
 if (error.value) {
-  console.error('Request failed:', error.value.statusMessage)
-  console.error('Status code:', error.value.statusCode)
+  console.error('Request failed:', error.value.statusText)
+  console.error('Status code:', error.value.status)
   console.error('Response data:', error.value.data)
 }
 </script>
@@ -22,7 +22,7 @@ if (error.value) {
 <template>
   <div>
     <div v-if="error">
-      <h3>Error: {{ error.statusMessage }}</h3>
+      <h3>Error: {{ error.statusText }}</h3>
       <p>{{ error.data?.message || 'Something went wrong' }}</p>
     </div>
 
@@ -98,8 +98,15 @@ interface FetchError<T = any> extends Error {
 The `NuxtError` type is used for errors returned by `useMyApiData` composables:
 
 ```ts
-interface NuxtError<DataT = unknown> extends H3Error<DataT> {
+interface NuxtError<DataT = unknown> extends Omit<H3Error<DataT>, 'statusCode' | 'statusMessage'>, Error {
+  readonly __nuxt_error?: true
   error?: true
+  status?: number
+  statusText?: string
+  /** @deprecated Use `status` */
+  statusCode?: H3Error<DataT>['statusCode']
+  /** @deprecated Use `statusText` */
+  statusMessage?: H3Error<DataT>['statusMessage']
 }
 
 declare class H3Error<DataT = unknown> extends Error {

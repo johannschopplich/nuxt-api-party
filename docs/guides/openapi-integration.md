@@ -26,7 +26,7 @@ Based on your configured routes, some web frameworks can generate an OpenAPI sch
 - [ElysiaJS](https://elysiajs.com/patterns/openapi.html#openapi)
 - [ASP.NET Core](https://learn.microsoft.com/en-us/aspnet/core/tutorials/web-api-help-pages-using-swagger)
 - [Spring](https://springdoc.org/)
-- [Utopia](https://docs.rs/utoipa/latest/utoipa/)
+- [utoipa](https://docs.rs/utoipa/latest/utoipa/)
 
 If your framework doesn't directly support it, there may also be an additional library that does.
 

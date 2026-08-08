@@ -70,7 +70,7 @@ export default defineConfig({
       {
         text: `v${version}`,
         items: [
-          { text: 'Release Notes ', link: releases },
+          { text: 'Release Notes', link: releases },
         ],
       },
     ],

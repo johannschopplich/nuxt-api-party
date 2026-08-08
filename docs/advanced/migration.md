@@ -122,7 +122,7 @@ See the MDN documentation on [HTTP caching](https://developer.mozilla.org/en-US/
 Breaking changes are limited to using typed OpenAPI clients. If you don't require typed clients in your Nuxt application, you can skip this migration section.
 :::
 
-With Nuxt API Party v2, the OpenAPI support has been refactored to conform to the upcoming version of the `openapi-types` package (v7). This change introduces a few breaking changes to the API Party OpenAPI client:
+With Nuxt API Party v2, the OpenAPI support has been refactored to conform to v7 of the `openapi-typescript` package. This change introduces a few breaking changes to the API Party OpenAPI client:
 
 - Dropped support for OpenAPI 2.0 (Swagger).
 - Previously, you could omit the leading slash in the API path. This is no longer possible. You must now include the leading slash in the path, just like in the OpenAPI specification.

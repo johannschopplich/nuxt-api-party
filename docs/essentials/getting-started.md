@@ -146,7 +146,7 @@ const { data: posts } = await useJsonPlaceholderData('posts', {
       Loading...
     </p>
     <p v-if="error">
-      {{ error.statusMessage }}
+      {{ error.statusText }}
     </p>
   </div>
 </template>

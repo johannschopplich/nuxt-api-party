@@ -70,8 +70,8 @@ For reference, here is a table summarizing the behavior of each cache option:
 | `'default'`        | ✅          | ✅           | ❌           | ✅            |
 | `'no-store'`       | ❌          | ❌           | ❌           | ✅            |
 | `'reload'`         | ❌          | ✅           | ❌           | ✅            |
-| `'no-cache'`       | ✅          | ❌           | ❌           | ✅            |
-| `'force-cache'`    | ✅          | ❌           | ✅           | ✅            |
+| `'no-cache'`       | ✅          | ✅           | ❌           | ✅            |
+| `'force-cache'`    | ✅          | ✅           | ✅           | ✅            |
 | `'only-if-cached'` | ✅          | ❌           | ✅           | ❌            |
 
 ## Examples

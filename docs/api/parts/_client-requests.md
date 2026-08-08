@@ -9,7 +9,7 @@ If Nuxt SSR is disabled, all requests are made on the client-side by default.
 To fetch data directly from your API and skip the Nuxt server proxy, set the `apiParty` module option `client` to `true`:
 
 ::: code-group
-```ts{9} [nuxt.config.ts]
+```ts{8} [nuxt.config.ts]
 export default defineNuxtConfig({
   modules: ['nuxt-api-party'],
 
