@@ -34,7 +34,7 @@ export default defineConfig({
     logo: '/logo.svg',
 
     editLink: {
-      pattern: 'https://github.com/johannschopplich/nuxt-api-party/edit/main/docs/:path',
+      pattern: `${github}/edit/main/docs/:path`,
       text: 'Suggest changes to this page',
     },
 
@@ -128,7 +128,7 @@ function sidebarMain(): DefaultTheme.SidebarItem[] {
       ],
     },
     { text: 'API Reference', link: '/api/' },
-    { text: 'Playground', link: 'https://github.com/johannschopplich/nuxt-api-party/tree/main/playground' },
+    { text: 'Playground', link: `${github}/tree/main/playground` },
   ]
 }
 

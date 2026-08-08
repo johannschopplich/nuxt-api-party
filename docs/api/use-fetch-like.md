@@ -2,7 +2,7 @@
 
 Returns the API response as Nuxt async data. Intended for data that requires reactive updates, e.g. when using data in templates.
 
-Responses are **cached** in the Nuxt payload between calls for the same request. Disable this by setting `payloadCache` to `false`.
+Responses are cached in the Nuxt payload between calls for the same request – see [Caching](#caching).
 
 Supports every [`useAsyncData` option](https://nuxt.com/docs/api/composables/use-async-data/#params).
 
@@ -44,25 +44,7 @@ const { data } = await useMyApiData('posts', {
 
 ## Examples
 
-:::: info Demo Setup
-These examples assume that you have set up an API endpoint called `jsonPlaceholder`:
-
-::: code-group
-```ts [nuxt.config.ts]
-export default defineNuxtConfig({
-  modules: ['nuxt-api-party'],
-
-  apiParty: {
-    endpoints: {
-      jsonPlaceholder: {
-        url: 'https://jsonplaceholder.typicode.com'
-      }
-    }
-  }
-})
-```
-:::
-::::
+<!--@include: ../parts/_demo-setup.md-->
 
 ### Basic
 

@@ -65,15 +65,6 @@ async function createPost() {
 </script>
 ```
 
-## Error Information
-
-Both error types preserve essential information from your API response:
-
-- **Response Body** – Full error details from your API
-- **HTTP Status Code** – Standard HTTP status codes (401, 404, 500, etc.)
-- **HTTP Status Message** – Human-readable status text
-- **Headers** – Response headers from your API
-
 ## Type Declarations
 
 ### `FetchError` Interface

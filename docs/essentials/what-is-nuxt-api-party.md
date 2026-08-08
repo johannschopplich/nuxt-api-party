@@ -27,9 +27,7 @@ const post = await $jsonPlaceholder('posts', {
 
 ## What You Get
 
-**Credentials stay on the server.** Tokens and keys live in the endpoint configuration and never reach the browser – not through the network tab, not through the bundle.
-
-**No CORS.** Requests go server-to-server, then server-to-client, so the browser never makes a cross-origin request in the first place.
+**One server route in front of everything.** Tokens and keys live in the endpoint configuration and never reach the browser – not through the network tab, not through the bundle – and because the browser only ever talks to your own origin, CORS never applies.
 
 **Nuxt's own patterns.** Same return values, same options, same caching behavior as `useFetch` and `$fetch` – for any API.
 
