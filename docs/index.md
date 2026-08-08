@@ -1,6 +1,6 @@
 ---
 layout: home
-titleTemplate: Auto-generated composables for secure API access
+titleTemplate: Auto-generated composables for any API
 hero:
   name: Nuxt API Party
   text: Type-Safe API Clients for Nuxt
