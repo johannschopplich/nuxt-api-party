@@ -94,10 +94,6 @@ const { data: posts } = await useMyApiData('posts')
 const { data: comments } = await useMyApiData('comments')
 ```
 
-::: tip Best Practice
-Use `useMyApiData` for component data and `$myApi` for programmatic actions (form submissions, mutations). This avoids context issues and provides better caching and reactivity.
-:::
-
 ## Client Requests
 
 <!--@include: ./parts/_client-requests.md-->

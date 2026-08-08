@@ -18,13 +18,7 @@ Downsides of in-memory caching include:
 
 ## Built-in Browser Caching
 
-To enable persistent caching across page reloads, leverage the browser's [built-in caching mechanism](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Caching) if your endpoint supports it.
-
-If your endpoint supports client caching, the response is cached by the browser. Subsequent GET requests to the same endpoint return the cached response, if available, without making a new request to the server.
-
-The cached response is used until it expires.
-
-To enable built-in browser caching, set the `cache` option to one of the values in the [options](#cache-options) section below.
+The browser's [HTTP cache](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Caching) survives page reloads. Set the `cache` option to one of the [values below](#cache-options), and a GET request whose response carries cache headers is served from the cache until it expires.
 
 ::: tip HTTP Caching
 To support HTTP caching, you must set [`server.proxyMode`](/api/module-configuration#proxymode) to `'passthrough'` in your `nuxt.config` file. This allows GET requests to be GET requests, which is required for caching to work correctly.

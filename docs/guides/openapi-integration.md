@@ -1,6 +1,6 @@
 # OpenAPI Integration
 
-Nuxt API Party integrates with an [OpenAPI schema](https://swagger.io/resources/open-api/) to provide full type safety for your API requests. Generated types include:
+Point an endpoint at an [OpenAPI schema](https://swagger.io/resources/open-api/) and the module types every request against it:
 
 - Request path with path parameters
 - Query parameters
@@ -124,8 +124,6 @@ In development, changes to a local schema file regenerate the types right away. 
 ## Using the Types
 
 For most use cases, no further configuration is needed. Nuxt API Party uses the generated types to infer correct types automatically when [`useFetch`-like](/api/use-fetch-like) and [`$fetch`-like](/api/dollarfetch-like) composables are used.
-
-However, you may want to leverage type information in additional ways.
 
 ### Extract Schema Types
 

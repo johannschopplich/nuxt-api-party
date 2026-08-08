@@ -4,18 +4,9 @@ Interceptors are the [`ofetch`](https://github.com/unjs/ofetch) callbacks `onReq
 
 To cover every request instead, reach for a [hook](/guides/hooks).
 
-## Available Interceptors
-
-Nuxt API Party provides four interceptor hooks that correspond to different stages of the fetch lifecycle:
-
-- **`onRequest`** – Called before the request is sent
-- **`onRequestError`** – Called if the request fails to send
-- **`onResponse`** – Called when a response is received (including errors)
-- **`onResponseError`** – Called when the response indicates an error (`response.ok` is `false`)
-
 ## `onRequest({ request, options })`
 
-The `onRequest` interceptor is called before the request is sent, letting you modify the request or options. Perfect for adding authentication headers, query parameters, or implementing request logging.
+The `onRequest` interceptor is called before the request is sent, letting you modify the request or options. Use for authentication headers, query parameters or request logging.
 
 ```ts
 const { data } = await useMyApiData('posts', {
@@ -66,7 +57,7 @@ const { data } = await useMyApiData('posts', {
 
 ## `onResponseError({ request, options, response })`
 
-The `onResponseError` interceptor is called when the response indicates an error (status codes 4xx, 5xx). Perfect for centralized error handling, retry logic, or user notifications.
+The `onResponseError` interceptor is called when the response indicates an error (status codes 4xx, 5xx). Use for centralized error handling, retry logic or user notifications.
 
 ```ts
 const { data } = await useMyApiData('posts', {

@@ -1,6 +1,6 @@
 # Getting Started
 
-This guide will walk you through setting up Nuxt API Party and making your first API requests with generated, type-safe composables.
+Nuxt API Party needs one configured endpoint before it generates anything.
 
 ::: tip Prerequisites
 Make sure you have [Nuxt 4](https://nuxt.com/docs/getting-started/installation) installed in your project.

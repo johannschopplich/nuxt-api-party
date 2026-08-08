@@ -2,7 +2,7 @@
 
 ## Composables
 
-Nuxt API Party provides two composable types for fetching data from your APIs. All composables are [auto-imported](https://nuxt.com/docs/guide/concepts/auto-imports) and globally available:
+Each endpoint yields two composables, both [auto-imported](https://nuxt.com/docs/guide/concepts/auto-imports):
 
 - [Async data composable](/api/use-fetch-like) – Returns multiple values similar to [`useFetch`](https://nuxt.com/docs/api/composables/use-fetch).
   Generated name: `useMyApiData`.
