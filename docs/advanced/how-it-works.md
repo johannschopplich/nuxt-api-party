@@ -18,7 +18,7 @@ The proxy passes through your API's response body, HTTP status code, status mess
 
 ## The Passthrough Proxy
 
-With [`server.proxyMode`](/api/module-configuration#proxymode) set to `'passthrough'`, requests instead go to `/api/__api_party/{endpointId}/proxy/{path}` under their own HTTP method, and the path, query, headers and body are forwarded as they are.
+With [`server.proxyMode`](/api/module-configuration#proxymode) set to `'passthrough'`, requests instead go to `/api/__api_party/{endpointId}/proxy/{path}` under their own HTTP method, and the path, query, headers and body are forwarded as they are. Pick it when the browser's network tab should mirror the upstream request, or when you need [HTTP cache control](/guides/caching-strategies) – the wrapped mode's POST is never served from the browser's cache.
 
 The proxy withholds the browser's `authorization` header from your API, since it carries credentials meant for your app rather than for the upstream service. A cookie travels only for endpoints that set `cookies: true`.
 
