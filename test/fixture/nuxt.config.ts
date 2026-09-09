@@ -11,6 +11,10 @@ export default defineNuxtConfig({
       forbidden: {
         url: '/api',
       },
+      nestedApi: {
+        url: '/api/nested',
+        allowedUrls: ['/api'],
+      },
     },
   },
 })

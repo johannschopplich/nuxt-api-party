@@ -14,6 +14,7 @@ import {
 } from 'h3'
 import { useNitroApp, useRuntimeConfig } from 'nitropack/runtime'
 import { deserializeMaybeEncodedBody, mergeHeaders, omitUndefinedValues } from '../utils'
+import { assertRelativePath } from './path'
 
 const ALLOWED_REQUEST_HEADERS = [
   'Origin',
@@ -42,13 +43,7 @@ export default defineEventHandler(async (event) => {
     body,
   } = await readBody<EndpointFetchOptions>(event)
 
-  // Check if the path is an absolute URL
-  if (new URL(path, 'http://localhost').origin !== 'http://localhost') {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Absolute URLs are not allowed',
-    })
-  }
+  assertRelativePath(path)
 
   // Allows to overwrite the backend URL with a custom header
   // (e.g. `jsonPlaceholder` endpoint becomes `jsonPlaceholder-Endpoint-Url`)

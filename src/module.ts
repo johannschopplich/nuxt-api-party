@@ -294,6 +294,7 @@ export default defineNuxtModule<ModuleOptions>().with({
         resolve('runtime/utils'),
         resolve('runtime/form-data'),
         resolve('runtime/server/$api'),
+        resolve('runtime/server/path'),
       )
 
       // Provide `#nuxt-api-party/server` module alias for Nitro
