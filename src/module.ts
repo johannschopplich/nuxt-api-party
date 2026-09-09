@@ -278,6 +278,7 @@ export default defineNuxtModule<ModuleOptions>().with({
         resolve('runtime/utils'),
         resolve('runtime/form-data'),
         resolve('runtime/server/$api'),
+        resolve('runtime/server/path'),
       )
 
       config.alias ||= {}

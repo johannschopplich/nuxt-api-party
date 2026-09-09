@@ -1,6 +1,8 @@
+import type { ForeignServer } from './helpers/foreign-server'
 import { join } from 'node:path'
-import { $fetch, setup } from '@nuxt/test-utils/e2e'
-import { describe, expect, it } from 'vitest'
+import { $fetch, fetch, setup } from '@nuxt/test-utils/e2e'
+import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { ABSOLUTE_PATH_TEMPLATES, startForeignServer } from './helpers/foreign-server'
 
 describe('nuxt-api-party proxy', async () => {
   await setup({
@@ -47,5 +49,37 @@ describe('nuxt-api-party proxy', async () => {
     const received = await echoHeaders('cookieApi', { authorization: 'Bearer client-token' })
 
     expect(received.authorization).toBeUndefined()
+  })
+
+  describe('path', () => {
+    let foreignServer: ForeignServer
+
+    beforeAll(async () => {
+      foreignServer = await startForeignServer()
+      return () => foreignServer.close()
+    })
+
+    beforeEach(() => {
+      foreignServer.requestUrls.length = 0
+    })
+
+    it.each(ABSOLUTE_PATH_TEMPLATES)('rejects %s without contacting the host it names', async (pathTemplate) => {
+      const path = encodeURI(pathTemplate.replace('{host}', foreignServer.host))
+
+      const response = await fetch(`/api/__api_party/testApi/proxy/${path}`)
+
+      expect(response.status).toBe(400)
+      expect(foreignServer.requestUrls).toEqual([])
+    })
+  })
+
+  describe('endpoint URL override', () => {
+    it('fetches from an -Endpoint-Url listed in allowedUrls', async () => {
+      const response = await fetch('/api/__api_party/nestedApi/proxy/echo-headers', {
+        headers: { 'nestedApi-Endpoint-Url': '/api' },
+      })
+
+      expect(response.status).toBe(200)
+    })
   })
 })

@@ -13,6 +13,7 @@ import {
 import { useNitroApp, useRuntimeConfig } from 'nitropack/runtime'
 import { joinURL, withQuery } from 'ufo'
 import { isForwardableProxyHeader } from '../utils'
+import { assertRelativePath } from './path'
 
 const PAYLOAD_METHODS = new Set(['PATCH', 'POST', 'PUT', 'DELETE'])
 
@@ -31,13 +32,8 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Check if the path is an absolute URL.
-  if (new URL(path, 'http://localhost').origin !== 'http://localhost') {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Absolute URLs are not allowed',
-    })
-  }
+  assertRelativePath(path)
+
   const baseURL = getRequestHeader(event, `${endpointId}-Endpoint-Url`) || endpoint.url
 
   if (
