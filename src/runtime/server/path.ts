@@ -22,3 +22,28 @@ export function assertRelativePath(path: string) {
     })
   }
 }
+
+/**
+ * Returns the pathname the backend receives for `requestURL`, relative to the pathname of
+ * `baseURL`, or throws a 400 when it lies outside it. `requestURL` must be joined onto
+ * `baseURL` the way the outgoing request joins it: the join leaves dot segments, their
+ * encoded forms and backslashes for the WHATWG parser to resolve.
+ */
+export function resolveRoutePath(requestURL: string, baseURL: string) {
+  // Relative base URLs point to the Nuxt server itself, so any origin serves to resolve them.
+  const base = new URL(baseURL, 'http://localhost')
+  const target = new URL(requestURL, base)
+  const basePath = base.pathname.replace(/\/$/, '')
+
+  if (
+    target.origin !== base.origin
+    || (target.pathname !== basePath && !target.pathname.startsWith(`${basePath}/`))
+  ) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Path leaves the endpoint base URL',
+    })
+  }
+
+  return target.pathname.slice(basePath.length) || '/'
+}
