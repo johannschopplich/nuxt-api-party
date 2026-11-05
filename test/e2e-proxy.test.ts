@@ -1,15 +1,24 @@
-import type { ForeignServer } from './helpers/foreign-server'
+import { request } from 'node:http'
 import { join } from 'node:path'
-import { $fetch, fetch, setup } from '@nuxt/test-utils/e2e'
-import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
-import { ABSOLUTE_PATH_TEMPLATES, startForeignServer } from './helpers/foreign-server'
+import { $fetch, fetch, setup, url } from '@nuxt/test-utils/e2e'
+import { afterAll, beforeEach, describe, expect, it } from 'vitest'
+import { ABSOLUTE_PATH_TEMPLATES, ESCAPING_PATHS, startRecordingServer } from './helpers/recording-server'
 
 describe('nuxt-api-party proxy', async () => {
+  const backend = await startRecordingServer()
+  afterAll(() => backend.close())
+
   await setup({
     server: true,
     rootDir: join(import.meta.dirname, 'fixture'),
     nuxtConfig: {
       apiParty: {
+        endpoints: {
+          backendApi: {
+            url: `http://${backend.host}/base`,
+            allowedUrls: [`http://${backend.host}/other`],
+          },
+        },
         server: {
           proxyMode: 'passthrough',
         },
@@ -52,24 +61,33 @@ describe('nuxt-api-party proxy', async () => {
   })
 
   describe('path', () => {
-    let foreignServer: ForeignServer
-
-    beforeAll(async () => {
-      foreignServer = await startForeignServer()
-      return () => foreignServer.close()
-    })
-
     beforeEach(() => {
-      foreignServer.requestUrls.length = 0
+      backend.requestUrls.length = 0
     })
 
     it.each(ABSOLUTE_PATH_TEMPLATES)('rejects %s without contacting the host it names', async (pathTemplate) => {
-      const path = encodeURI(pathTemplate.replace('{host}', foreignServer.host))
+      const path = encodeURI(pathTemplate.replace('{host}', backend.host))
 
       const response = await fetch(`/api/__api_party/testApi/proxy/${path}`)
 
       expect(response.status).toBe(400)
-      expect(foreignServer.requestUrls).toEqual([])
+      expect(backend.requestUrls).toEqual([])
+    })
+
+    it.each(ESCAPING_PATHS)('rejects %s for leaving the base path', async (path) => {
+      const status = await requestStatus(`/api/__api_party/backendApi/proxy/${path}`)
+
+      expect(status).toBe(400)
+      expect(backend.requestUrls).toEqual([])
+    })
+
+    it('rejects a path leaving an -Endpoint-Url base', async () => {
+      const status = await requestStatus('/api/__api_party/backendApi/proxy/../base/secret', {
+        'backendApi-Endpoint-Url': `http://${backend.host}/other`,
+      })
+
+      expect(status).toBe(400)
+      expect(backend.requestUrls).toEqual([])
     })
   })
 
@@ -83,3 +101,13 @@ describe('nuxt-api-party proxy', async () => {
     })
   })
 })
+
+/** Sends a GET with `path` as the literal request target, which `fetch` would normalize before sending. */
+function requestStatus(path: string, headers: Record<string, string> = {}) {
+  return new Promise<number>((resolve, reject) => {
+    request(url('/'), { path, headers }, (response) => {
+      response.resume()
+      resolve(response.statusCode!)
+    }).on('error', reject).end()
+  })
+}

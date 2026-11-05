@@ -1,15 +1,27 @@
-import type { ForeignServer } from './helpers/foreign-server'
 import { join } from 'node:path'
 import { $fetch, createPage, fetch, setup } from '@nuxt/test-utils/e2e'
 import destr from 'destr'
-import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
-import { ABSOLUTE_PATH_TEMPLATES, startForeignServer } from './helpers/foreign-server'
+import { afterAll, beforeEach, describe, expect, it } from 'vitest'
+import { ABSOLUTE_PATH_TEMPLATES, ESCAPING_PATHS, startRecordingServer } from './helpers/recording-server'
 
 describe('nuxt-api-party', async () => {
+  const backend = await startRecordingServer()
+  afterAll(() => backend.close())
+
   await setup({
     server: true,
     browser: true,
     rootDir: join(import.meta.dirname, 'fixture'),
+    nuxtConfig: {
+      apiParty: {
+        endpoints: {
+          backendApi: {
+            url: `http://${backend.host}/base`,
+            allowedUrls: [`http://${backend.host}/other`],
+          },
+        },
+      },
+    },
   })
 
   describe('$testApi', () => {
@@ -114,22 +126,45 @@ describe('nuxt-api-party', async () => {
   })
 
   describe('path', () => {
-    let foreignServer: ForeignServer
-
-    beforeAll(async () => {
-      foreignServer = await startForeignServer()
-      return () => foreignServer.close()
-    })
-
     beforeEach(() => {
-      foreignServer.requestUrls.length = 0
+      backend.requestUrls.length = 0
     })
 
     it.each(ABSOLUTE_PATH_TEMPLATES)('rejects %s without contacting the host it names', async (pathTemplate) => {
-      const response = await proxy('testApi', { path: pathTemplate.replace('{host}', foreignServer.host) })
+      const response = await proxy('testApi', { path: pathTemplate.replace('{host}', backend.host) })
 
       expect(response.status).toBe(400)
-      expect(foreignServer.requestUrls).toEqual([])
+      expect(backend.requestUrls).toEqual([])
+    })
+
+    it.each(ESCAPING_PATHS)('rejects %s for leaving the base path', async (path) => {
+      const response = await proxy('backendApi', { path })
+
+      expect(response.status).toBe(400)
+      expect(backend.requestUrls).toEqual([])
+    })
+
+    it('rejects a path leaving an -Endpoint-Url base', async () => {
+      const response = await proxy('backendApi', {
+        path: '../base/secret',
+        headers: { 'backendApi-Endpoint-Url': `http://${backend.host}/other` },
+      })
+
+      expect(response.status).toBe(400)
+      expect(backend.requestUrls).toEqual([])
+    })
+
+    it('rejects a ../secret escape hidden before a line break', async () => {
+      const response = await proxy('backendApi', { path: '../secret\n/../base/articles' })
+
+      expect(response.status).toBe(400)
+      expect(backend.requestUrls).toEqual([])
+    })
+
+    it('rejects a non-string path', async () => {
+      const response = await proxy('backendApi', { path: 123 as unknown as string })
+
+      expect(response.status).toBe(400)
     })
   })
 

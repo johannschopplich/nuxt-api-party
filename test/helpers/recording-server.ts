@@ -14,7 +14,16 @@ export const ABSOLUTE_PATH_TEMPLATES = [
   '　http:\\\\{host}/stolen',
 ]
 
-export interface ForeignServer {
+/** Paths that, joined onto a `/base` base URL, resolve outside it. */
+export const ESCAPING_PATHS = [
+  '../secret',
+  '../basement',
+  '%2E%2E/secret',
+  '.%2e/secret',
+  'todos/..\\..\\secret',
+]
+
+export interface RecordingServer {
   /** Host and port the server listens on. */
   host: string
   /** Request URLs the server has received, oldest first. */
@@ -23,7 +32,7 @@ export interface ForeignServer {
 }
 
 /** Starts an HTTP server on a random loopback port that records every request it receives. */
-export async function startForeignServer(): Promise<ForeignServer> {
+export async function startRecordingServer(): Promise<RecordingServer> {
   const requestUrls: string[] = []
   const server = createServer((request, response) => {
     requestUrls.push(request.url!)

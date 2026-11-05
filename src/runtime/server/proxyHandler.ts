@@ -13,7 +13,7 @@ import {
 import { useNitroApp, useRuntimeConfig } from 'nitropack/runtime'
 import { joinURL, withQuery } from 'ufo'
 import { isForwardableProxyHeader } from '../utils'
-import { assertRelativePath } from './path'
+import { assertRelativePath, resolveRoutePath } from './path'
 
 const PAYLOAD_METHODS = new Set(['PATCH', 'POST', 'PUT', 'DELETE'])
 
@@ -46,6 +46,9 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  const url = withQuery(joinURL(baseURL, path), getQuery(event))
+  resolveRoutePath(url, baseURL)
+
   // `proxyRequest` forwards every incoming header, and its `headers` option can only add to that set, never drop one.
   const proxyHeaders: Record<string, string | undefined> = getProxyRequestHeaders(event)
   const headers = new Headers()
@@ -59,7 +62,6 @@ export default defineEventHandler(async (event) => {
     : undefined
 
   const hookErrorPromise = createHookErrorPromise()
-  const url = withQuery(joinURL(baseURL, path), getQuery(event))
   return await Promise.race([
     hookErrorPromise,
     sendProxy(event, url, {
