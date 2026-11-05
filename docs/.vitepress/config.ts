@@ -60,6 +60,7 @@ export default defineConfig({
           { text: 'Error Handling', link: '/guides/error-handling' },
           { text: 'Cookie Forwarding', link: '/guides/cookie-forwarding' },
           { text: 'Dynamic Backend URL', link: '/guides/dynamic-backend-url' },
+          { text: 'Allowed Routes', link: '/guides/allowed-routes' },
         ],
       },
       {
@@ -118,6 +119,7 @@ function sidebarMain(): DefaultTheme.SidebarItem[] {
         { text: 'Error Handling', link: '/guides/error-handling' },
         { text: 'Cookie Forwarding', link: '/guides/cookie-forwarding' },
         { text: 'Dynamic Backend URL', link: '/guides/dynamic-backend-url' },
+        { text: 'Allowed Routes', link: '/guides/allowed-routes' },
       ],
     },
     {

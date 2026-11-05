@@ -27,6 +27,7 @@ The APIs the module generates composables for. Each key is an endpoint ID and na
 - `headers` – Headers sent with each request.
 - `cookies` – Whether the browser's cookies travel on to this API. See [Cookie Forwarding](/guides/cookie-forwarding).
 - `allowedUrls` – Base URLs a request may switch to at runtime. See [Dynamic Backend URL](/guides/dynamic-backend-url).
+- `allowedRoutes` – Routes the server proxy may forward to this API. See [Allowed Routes](/guides/allowed-routes).
 - `schema` – URL or file path of an [OpenAPI schema](https://swagger.io/resources/open-api) to infer types from. See [OpenAPI Integration](/guides/openapi-integration).
 - `openAPITS` – [`openapi-typescript` options](https://openapi-ts.dev/node/#options) for this endpoint's schema, merged into the global `openAPITS` option by option.
 
