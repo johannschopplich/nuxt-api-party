@@ -14,6 +14,15 @@ export const ABSOLUTE_PATH_TEMPLATES = [
   '　http:\\\\{host}/stolen',
 ]
 
+/** Paths that, joined onto a `/base` base URL, resolve outside it. */
+export const ESCAPING_PATHS = [
+  '../secret',
+  '../basement',
+  '%2E%2E/secret',
+  '.%2e/secret',
+  'todos/..\\..\\secret',
+]
+
 export interface ForeignServer {
   /** Host and port the server listens on. */
   host: string

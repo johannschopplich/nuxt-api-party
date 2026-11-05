@@ -2,13 +2,26 @@ import type { ForeignServer } from './helpers/foreign-server'
 import { fileURLToPath } from 'node:url'
 import { $fetch, fetch, setup } from '@nuxt/test-utils/e2e'
 import destr from 'destr'
-import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
-import { ABSOLUTE_PATH_TEMPLATES, startForeignServer } from './helpers/foreign-server'
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { ABSOLUTE_PATH_TEMPLATES, ESCAPING_PATHS, startForeignServer } from './helpers/foreign-server'
 
 describe('nuxt-api-party', async () => {
+  const backend = await startForeignServer()
+  afterAll(() => backend.close())
+
   await setup({
     server: true,
     rootDir: fileURLToPath(new URL('./fixture', import.meta.url)),
+    nuxtConfig: {
+      apiParty: {
+        endpoints: {
+          backendApi: {
+            url: `http://${backend.host}/base`,
+            allowedUrls: [`http://${backend.host}/other`],
+          },
+        },
+      },
+    },
   })
 
   it('fetches data with $testApi', async () => {
@@ -43,6 +56,36 @@ describe('nuxt-api-party', async () => {
 
       expect(response.status).toBe(400)
       expect(foreignServer.requestUrls).toEqual([])
+    })
+
+    it.each(ESCAPING_PATHS)('rejects %s for leaving the base path', async (path) => {
+      backend.requestUrls.length = 0
+
+      const response = await proxy('backendApi', { path })
+
+      expect(response.status).toBe(400)
+      expect(backend.requestUrls).toEqual([])
+    })
+
+    it('rejects a path leaving an -Endpoint-Url base', async () => {
+      backend.requestUrls.length = 0
+
+      const response = await proxy('backendApi', {
+        path: '../base/secret',
+        headers: { 'backendApi-Endpoint-Url': `http://${backend.host}/other` },
+      })
+
+      expect(response.status).toBe(400)
+      expect(backend.requestUrls).toEqual([])
+    })
+
+    it('rejects a line break that ufo cuts the sent URL at', async () => {
+      backend.requestUrls.length = 0
+
+      const response = await proxy('backendApi', { path: '../secret\n/../base/articles' })
+
+      expect(response.status).toBe(400)
+      expect(backend.requestUrls).toEqual([])
     })
   })
 

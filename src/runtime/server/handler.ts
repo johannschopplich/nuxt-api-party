@@ -13,8 +13,9 @@ import {
   splitCookiesString,
 } from 'h3'
 import { useNitroApp, useRuntimeConfig } from 'nitropack/runtime'
+import { withBase, withQuery } from 'ufo'
 import { deserializeMaybeEncodedBody, mergeHeaders, omitUndefinedValues } from '../utils'
-import { assertRelativePath } from './path'
+import { assertRelativePath, resolveRoutePath } from './path'
 
 const ALLOWED_REQUEST_HEADERS = [
   'Origin',
@@ -43,6 +44,13 @@ export default defineEventHandler(async (event) => {
     body,
   } = await readBody<EndpointFetchOptions>(event)
 
+  if (typeof path !== 'string') {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Path must be a string',
+    })
+  }
+
   assertRelativePath(path)
 
   // Allows to overwrite the backend URL with a custom header
@@ -60,6 +68,12 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  const requestQuery = { ...endpoint.query, ...query }
+  // `ofetch` builds the URL this way once the request hooks have run. `withQuery` cuts an absolute URL
+  // at a line break, where the WHATWG parser would drop the break and read on, so the check reads
+  // what is sent unless a hook rewrites it.
+  resolveRoutePath(withQuery(withBase(path, baseURL), requestQuery), baseURL)
+
   const requestHeaders = Object.fromEntries(
     ALLOWED_REQUEST_HEADERS.map(header => [header, getRequestHeader(event, header)]),
   )
@@ -70,10 +84,7 @@ export default defineEventHandler(async (event) => {
       {
         method,
         baseURL,
-        query: {
-          ...endpoint.query,
-          ...query,
-        },
+        query: requestQuery,
         headers: mergeHeaders(
           omitUndefinedValues({
             ...requestHeaders,

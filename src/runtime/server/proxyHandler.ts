@@ -10,7 +10,7 @@ import {
 } from 'h3'
 import { useNitroApp, useRuntimeConfig } from 'nitropack/runtime'
 import { joinURL, withQuery } from 'ufo'
-import { assertRelativePath } from './path'
+import { assertRelativePath, resolveRoutePath } from './path'
 
 export default defineEventHandler(async (event) => {
   const nitro = useNitroApp()
@@ -42,12 +42,14 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  const url = withQuery(joinURL(baseURL, path), getQuery(event))
+  resolveRoutePath(url, baseURL)
+
   if (!endpoint.cookies) {
     delete event.node.req.headers.cookies
   }
 
   const hookErrorPromise = createHookErrorPromise()
-  const url = withQuery(joinURL(baseURL, path), getQuery(event))
   return await Promise.race([
     hookErrorPromise,
     proxyRequest(event, url, {
