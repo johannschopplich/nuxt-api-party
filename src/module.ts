@@ -3,6 +3,7 @@ import type { OpenAPI3, OpenAPITSOptions } from 'openapi-typescript'
 import type { QueryObject } from 'ufo'
 import type { ObjectPlugin, Plugin } from '#app'
 import type { ApiClientFetchOptions, SharedFetchOptions } from './runtime/composables/$api'
+import type { AllowedRoute } from './runtime/types'
 import { fileURLToPath } from 'node:url'
 import { addImportsSources, addServerHandler, addTemplate, addTypeTemplate, createResolver, defineNuxtModule, updateTemplates } from '@nuxt/kit'
 import { generateTypeHelpers } from 'apiful/openapi'
@@ -25,6 +26,7 @@ export interface EndpointConfiguration {
   headers?: HeadersInit
   cookies?: boolean
   allowedUrls?: string[]
+  allowedRoutes?: AllowedRoute[]
   schema?: string | OpenAPI3
   openAPITS?: OpenAPITSOptions
 }
@@ -42,6 +44,7 @@ export interface ModuleOptions {
    * - `headers` (optional): Default headers to send with each request
    * - `cookies` (optional): Whether to forward cookies in requests
    * - `allowedUrls` (optional): URLs allowed for [dynamic backend switching](https://nuxt-api-party.byjohann.dev/guides/dynamic-backend-url)
+   * - `allowedRoutes` (optional): Routes the [server proxy may forward](https://nuxt-api-party.byjohann.dev/guides/allowed-routes)
    * - `schema` (optional): [OpenAPI Schema](https://swagger.io/resources/open-api) schema URL or file path for [type generation](https://nuxt-api-party.byjohann.dev/guides/openapi-integration)
    * - `openAPITS` (optional): Endpoint-specific configuration options for [`openapi-typescript`](https://openapi-ts.dev/node/#options). Will override the global `openAPITS` options if provided.
    *

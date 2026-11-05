@@ -1,3 +1,4 @@
+import type { AllowedRoute } from '../types'
 import { createError } from 'h3'
 import { hasProtocol } from 'ufo'
 
@@ -46,4 +47,60 @@ export function resolveRoutePath(requestURL: string, baseURL: string) {
   }
 
   return target.pathname.slice(basePath.length) || '/'
+}
+
+/**
+ * Throws a 403 unless `allowedRoutes` is unset or one of its entries admits the request;
+ * `routePath` is what `resolveRoutePath` returns.
+ */
+export function assertAllowedRoute(
+  allowedRoutes: AllowedRoute[] | undefined,
+  routePath: string,
+  method: string,
+) {
+  if (!allowedRoutes)
+    return
+
+  const requestMethod = method.toUpperCase()
+  const pathSegments = splitPath(routePath)
+  const isAllowed = allowedRoutes.some(route =>
+    (!route.methods || route.methods.some(routeMethod => routeMethod.toUpperCase() === requestMethod))
+    && matchesPattern(splitPath(route.path).map(encodePathSegment), pathSegments),
+  )
+
+  if (!isAllowed) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Route is not allowed',
+    })
+  }
+}
+
+/**
+ * Percent-encodes `segment` with the WHATWG path percent-encode set, as the pathname it is
+ * matched against is encoded. Unlike a full URL parse, it neither resolves dot segments or
+ * backslashes nor drops what follows `?` or `#`, so a pattern cannot match more than it reads.
+ */
+function encodePathSegment(segment: string) {
+  // eslint-disable-next-line no-control-regex -- The set starts with the C0 controls.
+  return segment.replace(/[\u0000-\u0020"#<>?^`{}\u007F-\u{10FFFF}]/gu, character => encodeURIComponent(character))
+}
+
+function splitPath(path: string) {
+  return path.replace(/^\/|\/$/g, '').split('/')
+}
+
+function matchesPattern(patternSegments: string[], pathSegments: string[]) {
+  for (const [index, patternSegment] of patternSegments.entries()) {
+    if (patternSegment === '**' && index === patternSegments.length - 1)
+      return true
+
+    const pathSegment = pathSegments[index]
+    if (pathSegment === undefined)
+      return false
+    if (patternSegment === '*' ? pathSegment === '' : patternSegment !== pathSegment)
+      return false
+  }
+
+  return patternSegments.length === pathSegments.length
 }

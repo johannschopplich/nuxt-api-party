@@ -15,7 +15,7 @@ import {
 import { useNitroApp, useRuntimeConfig } from 'nitropack/runtime'
 import { withBase, withQuery } from 'ufo'
 import { deserializeMaybeEncodedBody, isForwardableBodyHeader, mergeHeaders, omitUndefinedValues } from '../utils'
-import { assertRelativePath, resolveRoutePath } from './path'
+import { assertAllowedRoute, assertRelativePath, resolveRoutePath } from './path'
 
 const ALLOWED_REQUEST_HEADERS = [
   'Origin',
@@ -51,6 +51,13 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  if (method != null && typeof method !== 'string') {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Method must be a string',
+    })
+  }
+
   assertRelativePath(path)
 
   // Allows to overwrite the backend URL with a custom header
@@ -71,7 +78,8 @@ export default defineEventHandler(async (event) => {
   // `ofetch` builds the URL this way once the request hooks have run. `withQuery` cuts an absolute URL
   // at a line break, where the WHATWG parser would drop the break and read on, so the check reads
   // what is sent unless a hook rewrites it.
-  resolveRoutePath(withQuery(withBase(path, baseURL), requestQuery), baseURL)
+  const routePath = resolveRoutePath(withQuery(withBase(path, baseURL), requestQuery), baseURL)
+  assertAllowedRoute(endpoint.allowedRoutes, routePath, method ?? 'GET')
 
   const requestHeaders = Object.fromEntries(
     ALLOWED_REQUEST_HEADERS.map(header => [header, getRequestHeader(event, header)]),

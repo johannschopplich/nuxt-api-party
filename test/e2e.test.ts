@@ -2,10 +2,14 @@ import { join } from 'node:path'
 import { $fetch, createPage, fetch, setup } from '@nuxt/test-utils/e2e'
 import destr from 'destr'
 import { afterAll, beforeEach, describe, expect, it } from 'vitest'
-import { ABSOLUTE_PATH_TEMPLATES, ESCAPING_PATHS, startRecordingServer } from './helpers/recording-server'
+import { ALLOWED_REQUESTS, REFUSED_REQUESTS } from './helpers/allowed-routes'
+import { ABSOLUTE_PATH_TEMPLATES, ESCAPING_PATHS, recordingEndpoints, startRecordingServer } from './helpers/recording-server'
 
 describe('nuxt-api-party', async () => {
   const backend = await startRecordingServer()
+  beforeEach(() => {
+    backend.requestUrls.length = 0
+  })
   afterAll(() => backend.close())
 
   await setup({
@@ -14,12 +18,7 @@ describe('nuxt-api-party', async () => {
     rootDir: join(import.meta.dirname, 'fixture'),
     nuxtConfig: {
       apiParty: {
-        endpoints: {
-          backendApi: {
-            url: `http://${backend.host}/base`,
-            allowedUrls: [`http://${backend.host}/other`],
-          },
-        },
+        endpoints: recordingEndpoints(backend.host),
       },
     },
   })
@@ -126,10 +125,6 @@ describe('nuxt-api-party', async () => {
   })
 
   describe('path', () => {
-    beforeEach(() => {
-      backend.requestUrls.length = 0
-    })
-
     it.each(ABSOLUTE_PATH_TEMPLATES)('rejects %s without contacting the host it names', async (pathTemplate) => {
       const response = await proxy('testApi', { path: pathTemplate.replace('{host}', backend.host) })
 
@@ -168,6 +163,52 @@ describe('nuxt-api-party', async () => {
     })
   })
 
+  describe('allowedRoutes', () => {
+    it.each(ALLOWED_REQUESTS)('forwards %s %s', async (method, path) => {
+      const response = await proxy('guardedApi', { path, method })
+
+      expect(response.status).toBe(200)
+      expect(backend.requestUrls).toEqual([`/base/${path}`])
+    })
+
+    it.each(REFUSED_REQUESTS)('refuses %s %s without contacting the backend', async (method, path) => {
+      const response = await proxy('guardedApi', { path, method })
+
+      expect(response.status).toBe(403)
+      expect(backend.requestUrls).toEqual([])
+    })
+
+    it('forwards a request without a method to a GET-only route', async () => {
+      const response = await proxy('guardedApi', { path: 'articles/1' })
+
+      expect(response.status).toBe(200)
+    })
+
+    it('rejects a non-string method', async () => {
+      const response = await proxy('guardedApi', { path: 'articles/1', method: 123 as unknown as string })
+
+      expect(response.status).toBe(400)
+      expect(backend.requestUrls).toEqual([])
+    })
+
+    it('forwards a path below an -Endpoint-Url base', async () => {
+      const response = await proxy('guardedApi', {
+        path: 'articles/1',
+        headers: { 'guardedApi-Endpoint-Url': `http://${backend.host}/other` },
+      })
+
+      expect(response.status).toBe(200)
+      expect(backend.requestUrls).toEqual(['/other/articles/1'])
+    })
+
+    it('refuses every request with an empty list', async () => {
+      const response = await proxy('closedApi', { path: 'articles/1' })
+
+      expect(response.status).toBe(403)
+      expect(backend.requestUrls).toEqual([])
+    })
+  })
+
   describe('endpoint URL override', () => {
     it('fetches from an -Endpoint-Url listed in allowedUrls', async () => {
       const response = await proxy('nestedApi', { path: '/echo-headers', headers: { 'nestedApi-Endpoint-Url': '/api' } })
@@ -183,7 +224,7 @@ describe('nuxt-api-party', async () => {
   })
 })
 
-function proxy(endpointId: string, body: { path: string, headers?: Record<string, string> }) {
+function proxy(endpointId: string, body: { path: string, method?: string, headers?: Record<string, string> }) {
   return fetch(`/api/__api_party/${endpointId}`, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },

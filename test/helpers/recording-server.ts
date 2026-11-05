@@ -1,5 +1,6 @@
 import type { AddressInfo } from 'node:net'
 import { createServer } from 'node:http'
+import { ALLOWED_ROUTES } from './allowed-routes'
 
 /** Paths that name a host of their own, with `{host}` standing in for that host. */
 export const ABSOLUTE_PATH_TEMPLATES = [
@@ -29,6 +30,24 @@ export interface RecordingServer {
   /** Request URLs the server has received, oldest first. */
   requestUrls: string[]
   close: () => Promise<void>
+}
+
+export function recordingEndpoints(host: string) {
+  return {
+    backendApi: {
+      url: `http://${host}/base`,
+      allowedUrls: [`http://${host}/other`],
+    },
+    guardedApi: {
+      url: `http://${host}/base`,
+      allowedUrls: [`http://${host}/other`],
+      allowedRoutes: ALLOWED_ROUTES,
+    },
+    closedApi: {
+      url: `http://${host}/base`,
+      allowedRoutes: [],
+    },
+  }
 }
 
 /** Starts an HTTP server on a random loopback port that records every request it receives. */
