@@ -22,12 +22,49 @@ export default defineNuxtConfig({
         url: '/api',
         forwardCredentials: true,
       },
+      unsetSchemaApi: {
+        url: '/api',
+        schema: undefined,
+      },
       schemaApi: {
         url: '/api',
         schema: {
           openapi: '3.1.0',
           info: { title: 'Schema API', version: '1.0.0' },
           paths: {},
+        },
+      },
+    },
+  },
+
+  runtimeConfig: {
+    apiParty: {
+      endpoints: {
+        runtimeSchemaApi: {
+          url: '/api',
+          schema: {
+            openapi: '3.1.0',
+            info: { title: 'Runtime Schema API', version: '1.0.0' },
+            paths: {
+              '/todos': {
+                get: {
+                  responses: {
+                    200: {
+                      description: 'Todos',
+                      content: {
+                        'application/json': {
+                          schema: {
+                            type: 'array',
+                            items: { type: 'object', properties: { id: { type: 'integer' } }, required: ['id'] },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
       },
     },

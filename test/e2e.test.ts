@@ -171,6 +171,7 @@ describe('nuxt-api-party', async () => {
 
       expect(endpoints.schemaApi).toHaveProperty('url')
       expect(endpoints.schemaApi).not.toHaveProperty('schema')
+      expect(endpoints.runtimeSchemaApi).toEqual({ url: '/api' })
     })
 
     it('publishes only the URL, token, query and headers of the client endpoints', async () => {

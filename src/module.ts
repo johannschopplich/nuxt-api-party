@@ -14,7 +14,7 @@ import { camelCase, pascalCase } from 'scule'
 import { joinURL } from 'ufo'
 import { name } from '../package.json'
 import { logger } from './kit'
-import { generateOpenAPITypes } from './openapi'
+import { generateOpenAPITypes, hasSchema } from './openapi'
 import { assertValidOptions } from './options'
 
 // #region options
@@ -210,8 +210,8 @@ export default defineNuxtModule<ModuleOptions>().with({
 
     const endpointKeys = Object.keys(resolvedOptions.endpoints)
     const schemaEndpoints = Object.fromEntries(
-      Object.entries(options.endpoints)
-        .filter(([, endpoint]) => 'schema' in endpoint),
+      Object.entries(mergedOptions.endpoints)
+        .filter(([, endpoint]) => hasSchema(endpoint)),
     )
     const schemaEndpointIds = Object.keys(schemaEndpoints)
 

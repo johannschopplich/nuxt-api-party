@@ -17,11 +17,15 @@ export async function generateOpenAPITypes(
 ): Promise<string> {
   const declarations = await Promise.all(
     Object.entries(endpoints)
-      .filter((entry): entry is [string, SchemaEndpoint] => Boolean(entry[1].schema))
+      .filter((entry): entry is [string, SchemaEndpoint] => hasSchema(entry[1]))
       .map(async ([id, endpoint]) => declareModule(`#nuxt-api-party/${id}`, await generateEndpointTypes(id, endpoint, options))),
   )
 
   return declarations.join('\n')
+}
+
+export function hasSchema(endpoint: EndpointConfiguration): endpoint is SchemaEndpoint {
+  return Boolean(endpoint.schema)
 }
 
 async function generateEndpointTypes(
