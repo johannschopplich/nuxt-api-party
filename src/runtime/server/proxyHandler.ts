@@ -10,7 +10,7 @@ import {
 } from 'h3'
 import { useNitroApp, useRuntimeConfig } from 'nitropack/runtime'
 import { joinURL, withQuery } from 'ufo'
-import { assertNoDotSegments, assertRelativePath, resolveRoutePath } from './path'
+import { assertPathBelowBase, resolveRoutePath } from './path'
 
 export default defineEventHandler(async (event) => {
   const nitro = useNitroApp()
@@ -27,8 +27,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  assertRelativePath(path)
-  assertNoDotSegments(path)
+  assertPathBelowBase(path)
 
   const baseURL = getRequestHeader(event, `${endpointId}-Endpoint-Url`) || endpoint.url
 
