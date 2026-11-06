@@ -178,6 +178,13 @@ describe('nuxt-api-party', async () => {
       expect(backend.requestUrls).toEqual([])
     })
 
+    it('rejects articles/../admin before matching the list', async () => {
+      const response = await proxy('guardedApi', { path: 'articles/../admin' })
+
+      expect(response.status).toBe(400)
+      expect(backend.requestUrls).toEqual([])
+    })
+
     it('forwards a request without a method to a GET-only route', async () => {
       const response = await proxy('guardedApi', { path: 'articles/1' })
 

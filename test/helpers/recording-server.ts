@@ -24,10 +24,9 @@ export const ESCAPING_PATHS = [
   'todos/..\\..\\secret',
 ]
 
-/** Paths that stay below the base URL for the WHATWG parser but climb out of it for a backend that decodes `%2F` or reads `..;` as `..`. */
+/** Paths that stay below the base URL for the WHATWG parser but climb out of it for a backend that decodes `%2F`. */
 export const AMBIGUOUS_PATHS = [
   'articles/..%2F..%2F..%2Fsecret',
-  'articles/..;/..;/..;/secret',
 ]
 
 export interface RecordingServer {

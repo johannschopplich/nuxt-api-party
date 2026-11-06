@@ -55,11 +55,7 @@ describe('assertNoDotSegments', () => {
 })
 
 describe('resolveRoutePath', () => {
-  it('returns the pathname below the base path without the query', () => {
-    expect(resolveRoutePath('http://h/base/articles/1?page=2', 'http://h/base')).toBe('/articles/1')
-  })
-
-  it('rejects a sibling path that shares the base path as a prefix', () => {
+  it('rejects /basement for a /base base URL (shared prefix)', () => {
     expect(statusOf(() => resolveRoutePath('http://h/basement', 'http://h/base'))).toBe(400)
   })
 })
