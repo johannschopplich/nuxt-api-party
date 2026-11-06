@@ -13,7 +13,7 @@ import {
 import { useNitroApp, useRuntimeConfig } from 'nitropack/runtime'
 import { joinURL, withQuery } from 'ufo'
 import { isForwardableProxyHeader } from '../utils'
-import { assertAllowedRoute, assertNoDotSegments, assertRelativePath, resolveRoutePath } from './path'
+import { assertAllowedRoute, assertPathBelowBase, resolveRoutePath } from './path'
 
 const PAYLOAD_METHODS = new Set(['PATCH', 'POST', 'PUT', 'DELETE'])
 
@@ -32,8 +32,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  assertRelativePath(path)
-  assertNoDotSegments(path)
+  assertPathBelowBase(path)
 
   const baseURL = getRequestHeader(event, `${endpointId}-Endpoint-Url`) || endpoint.url
 

@@ -1,46 +1,26 @@
 import type { AllowedRoute } from '../types'
 import { createError } from 'h3'
-import { hasProtocol } from 'ufo'
+
+/* eslint-disable no-control-regex -- URL parsers strip leading and trailing C0 controls and percent-encode the rest, so the checks name them. */
 
 /**
- * Throws a 400 for a path that would leave the endpoint's host once `$fetch` joins it
- * onto `baseURL`.
- *
- * `ofetch` skips that join whenever `ufo`'s `hasProtocol` finds a scheme, and it finds
- * one in `http:host/x` and in `http://` behind any `\s` character. `new URL` against an
- * `http:` base reads `http:host/x` and `x http://host` as relative, so a path has to count
- * as relative under both checks before it is fetched.
+ * Throws a 400 for a path that a URL parser or the backend behind it could read as absolute or as
+ * climbing above the base URL: a scheme, an authority, a tab or line break, or a dot segment, also
+ * percent-encoded or with a `;` parameter.
  */
-export function assertRelativePath(path: string) {
-  // TODO: Drop the `hasProtocol` check once Nitro ships `ofetch` 2, which no longer joins through `ufo`.
-  if (
-    hasProtocol(path, { acceptRelative: true })
-    || new URL(path, 'http://localhost').origin !== 'http://localhost'
-  ) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Absolute URLs are not allowed',
-    })
-  }
-}
-
-/**
- * Throws a 400 for a path with a tab, a line break, or a dot segment, even one that is encoded,
- * delimited by `#`, `%2F` or `%5C`, or followed by `;` or by nothing but spaces and C0 controls.
- * The WHATWG parser, Nitro's in-process fetch and backends each resolve a different subset of
- * these dot segments, and `ufo` cuts a URL at a line break.
- */
-export function assertNoDotSegments(path: string) {
-  const segments = path.split('?', 1)[0]!.replace(/%2e/gi, '.').replace(/%3b/gi, ';').replace(/%2f|%5c/gi, '/').split(/[/\\#]/)
+export function assertPathBelowBase(path: string) {
+  const segments = path.split('?', 1)[0]!.replace(/%2e/gi, '.').replace(/%3b/gi, ';').split(/[/\\#]|%2f|%5c/i)
 
   if (
     /[\t\n\r\u2028\u2029]/.test(path)
-    // eslint-disable-next-line no-control-regex -- A reader may strip spaces and C0 controls after the dots.
+    // RFC 3986 forbids a colon in the first segment of a relative path.
+    || /^[^/?#]*:/.test(path)
+    || /^[\s\u0000-\u001F]*(?:[/\\]\s*){2}/.test(path)
     || segments.some(segment => /^\.{1,2}(?:;|[\u0000-\u0020]*$)/.test(segment))
   ) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Path must not contain tabs, line breaks or dot segments',
+      statusMessage: 'Path must stay below the base URL',
     })
   }
 }
@@ -63,7 +43,7 @@ export function resolveRoutePath(requestURL: string, baseURL: string) {
   ) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Path leaves the endpoint base URL',
+      statusMessage: 'Path must stay below the base URL',
     })
   }
 
@@ -103,7 +83,6 @@ export function assertAllowedRoute(
  * backslashes nor drops what follows `?` or `#`, so a pattern cannot match more than it reads.
  */
 function encodePathSegment(segment: string) {
-  // eslint-disable-next-line no-control-regex -- The set starts with the C0 controls.
   return segment.replace(/[\u0000-\u0020"#<>?^`{}\u007F-\u{10FFFF}]/gu, character => encodeURIComponent(character))
 }
 

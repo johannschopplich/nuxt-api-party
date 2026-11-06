@@ -15,16 +15,12 @@ export const ABSOLUTE_PATH_TEMPLATES = [
   '　http:\\\\{host}/stolen',
 ]
 
-/** Paths that, joined onto a `/base` base URL, resolve outside it. */
+/** Paths that, joined onto a `/base` base URL, resolve outside it for the WHATWG parser or for a backend that decodes `%2F`. */
 export const ESCAPING_PATHS = [
   '../secret',
   '%2E%2E/secret',
   '.%2e/secret',
   'todos/..\\..\\secret',
-]
-
-/** Paths that stay below the base URL for the WHATWG parser but climb out of it for a backend that decodes `%2F`. */
-export const AMBIGUOUS_PATHS = [
   'articles/..%2F..%2F..%2Fsecret',
 ]
 

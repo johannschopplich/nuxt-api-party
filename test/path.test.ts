@@ -1,6 +1,6 @@
 import type { AllowedRoute } from '../src/runtime/types'
 import { describe, expect, it } from 'vitest'
-import { assertAllowedRoute, assertNoDotSegments, resolveRoutePath } from '../src/runtime/server/path'
+import { assertAllowedRoute, assertPathBelowBase, resolveRoutePath } from '../src/runtime/server/path'
 
 const ROUTES: AllowedRoute[] = [
   { path: '/articles/**', methods: ['GET'] },
@@ -26,8 +26,14 @@ function statusOf(check: () => unknown) {
   }
 }
 
-describe('assertNoDotSegments', () => {
+describe('assertPathBelowBase', () => {
   it.each([
+    '1:2/x',
+    'a%2Fb:c',
+    ' \\\\h.test/x',
+    'x http://h.test/x',
+    '\u0001//h.test/x',
+    '/ /h.test/x',
     'articles/../admin',
     'articles/./1',
     'articles/%2e%2e/admin',
@@ -45,16 +51,17 @@ describe('assertNoDotSegments', () => {
     'articles#/../admin',
     'articles/..#x',
   ])('rejects %j', (path) => {
-    expect(statusOf(() => assertNoDotSegments(path))).toBe(400)
+    expect(statusOf(() => assertPathBelowBase(path))).toBe(400)
   })
 
   it.each([
     'comments/group%2Fname',
     'files/a..',
+    'v1/files:copy',
     '.well-known/openid-configuration',
     'articles?next=/../admin',
   ])('accepts %j', (path) => {
-    expect(statusOf(() => assertNoDotSegments(path))).toBe(200)
+    expect(statusOf(() => assertPathBelowBase(path))).toBe(200)
   })
 })
 
