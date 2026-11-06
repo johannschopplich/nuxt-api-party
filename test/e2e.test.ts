@@ -130,6 +130,12 @@ describe('nuxt-api-party', async () => {
 
       expect(response.status).toBe(400)
     })
+
+    it.each([['x'], [null], [[['a']]]])('rejects %j as headers', async (headers) => {
+      const response = await proxy('backendApi', { path: 'articles/1', headers })
+
+      expect(response.status).toBe(400)
+    })
   })
 
   describe('path', () => {

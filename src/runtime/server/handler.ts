@@ -60,7 +60,18 @@ export default defineEventHandler(async (event) => {
 
   assertPathBelowBase(path)
 
-  const baseURL = new Headers(headers).get(`${endpointId}-Endpoint-Url`) || endpoint.url
+  let bodyHeaders: Headers
+  try {
+    bodyHeaders = new Headers(headers)
+  }
+  catch {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Headers are invalid',
+    })
+  }
+
+  const baseURL = bodyHeaders.get(`${endpointId}-Endpoint-Url`) || endpoint.url
 
   if (
     baseURL !== endpoint.url
@@ -97,7 +108,7 @@ export default defineEventHandler(async (event) => {
           }),
           endpoint.headers,
           new Headers(
-            [...new Headers(headers)].filter(
+            [...bodyHeaders].filter(
               ([name]) => isForwardableBodyHeader(name, { endpointId }),
             ),
           ),
