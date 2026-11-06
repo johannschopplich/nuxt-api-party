@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url'
 import { $fetch, fetch, setup } from '@nuxt/test-utils/e2e'
 import destr from 'destr'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
-import { ABSOLUTE_PATH_TEMPLATES, ESCAPING_PATHS, startForeignServer } from './helpers/foreign-server'
+import { ABSOLUTE_PATH_TEMPLATES, AMBIGUOUS_PATHS, ESCAPING_PATHS, startForeignServer } from './helpers/foreign-server'
 
 describe('nuxt-api-party', async () => {
   const backend = await startForeignServer()
@@ -58,7 +58,7 @@ describe('nuxt-api-party', async () => {
       expect(foreignServer.requestUrls).toEqual([])
     })
 
-    it.each(ESCAPING_PATHS)('rejects %s for leaving the base path', async (path) => {
+    it.each([...ESCAPING_PATHS, ...AMBIGUOUS_PATHS])('rejects %s for leaving the base path', async (path) => {
       backend.requestUrls.length = 0
 
       const response = await proxy('backendApi', { path })
