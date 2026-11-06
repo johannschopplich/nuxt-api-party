@@ -24,6 +24,12 @@ describe('nuxt-api-party', async () => {
       expect(blob).toBe('Foo')
     })
 
+    it('leaves the Nuxt payload empty', async () => {
+      const { payloadDataKeys } = await fetchTestResult<{ payloadDataKeys: string[] }>('/$testApi')
+
+      expect(payloadDataKeys).toEqual([])
+    })
+
     it('throws with the upstream error payload attached', async () => {
       const error = await fetchTestResult('/$testApi-error')
 
@@ -32,6 +38,12 @@ describe('nuxt-api-party', async () => {
         statusMessage: 'Not Found',
         data: { reason: 'anything' },
       })
+    })
+
+    it('rejects a lone surrogate path parameter instead of throwing', async () => {
+      const { errorName } = await fetchTestResult<{ errorName: string }>('/$testApi-rejection')
+
+      expect(errorName).toBe('URIError')
     })
 
     it('forwards a Headers instance passed as the headers option to the API', async () => {
@@ -134,13 +146,6 @@ describe('nuxt-api-party', async () => {
       const result = await fetchTestResult<{ changedHits: number, refreshedHits: number }>('/refresh-after-key-change')
 
       expect(result.refreshedHits).toBeGreaterThan(result.changedHits)
-    })
-
-    it('sends a single request when two call sites ask for the same resource', async () => {
-      const result = await fetchTestResult<{ firstHits: number, secondHits: number }>('/shared-request')
-
-      expect(result.firstHits).toBeGreaterThan(0)
-      expect(result.secondHits).toBe(result.firstHits)
     })
 
     it('fetches again on refresh in the browser', async () => {

@@ -3,6 +3,7 @@ const REMOVED_MODULE_OPTIONS: Record<string, string> = {
   server: 'The server proxy is served below `nitro.apiBaseURL` and forwards every request as it is, so neither `server.basePath` nor `server.proxyMode` applies any more.',
   client: 'Set `client: true` on each endpoint whose requests should skip the server proxy.',
   openAPITS: 'The types are generated with apiful, which takes no generator options.',
+  payloadCache: 'Pass `getCachedData` to `use<Name>Data` to serve a repeated request from the payload, or wrap a `$<name>` call in `useAsyncData`.',
 }
 
 const REMOVED_ENDPOINT_OPTIONS: Record<string, string> = {

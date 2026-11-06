@@ -6,6 +6,7 @@ describe('assertValidOptions', () => {
     ['server', 'nitro.apiBaseURL'],
     ['client', 'client: true'],
     ['openAPITS', 'apiful'],
+    ['payloadCache', 'getCachedData'],
   ])('rejects the removed module option %s, naming %s as its replacement', (key, replacement) => {
     const message = readErrorMessage(() => assertValidOptions({ endpoints: {}, [key]: {} }))
 

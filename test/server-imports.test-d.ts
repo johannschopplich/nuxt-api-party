@@ -23,15 +23,6 @@ describe('$jsonPlaceholder', () => {
       body: { title: 'Hello' },
     })
   })
-
-  it('rejects the options that only a browser-side call acts on', () => {
-    // @ts-expect-error: there is no Nuxt payload on the server.
-    jsonPlaceholder('posts/1', { payloadCache: true })
-    // @ts-expect-error: `key` addresses the payload cache.
-    jsonPlaceholder('posts/1', { key: 'posts' })
-    // @ts-expect-error: the server handler calls `globalThis.$fetch` directly.
-    jsonPlaceholder('posts/1', { $fetch: undefined })
-  })
 })
 
 describe('$petStore', () => {
@@ -39,10 +30,5 @@ describe('$petStore', () => {
     expectTypeOf(petStore('/pet/{petId}', { path: { petId: 1 } }))
       .resolves
       .toEqualTypeOf<PetStoreComponents['schemas']['Pet']>()
-  })
-
-  it('rejects the options that only a browser-side call acts on', () => {
-    // @ts-expect-error: there is no Nuxt payload on the server.
-    petStore('/pet/{petId}', { path: { petId: 1 }, payloadCache: true })
   })
 })

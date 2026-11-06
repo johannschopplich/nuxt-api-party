@@ -2,14 +2,12 @@ import type { NitroFetchOptions } from 'nitropack'
 import type { AsyncData, AsyncDataOptions, NuxtError } from 'nuxt/app'
 import type { MaybeRef, MaybeRefOrGetter, MultiWatchSources } from 'vue'
 import type { FetchResponseData, FetchResponseError, ParamsOption, PathItem, RequestBodyOption } from '../openapi'
-import type { SharedFetchOptions } from './$api'
 import { hash } from 'ohash'
 import { computed, toValue } from 'vue'
-import { allowPayloadCache } from '#build/module/nuxt-api-party.config'
-import { useFetch, useNuxtApp } from '#imports'
+import { useFetch } from '#imports'
 import { CACHE_KEY_PREFIX } from '../constants'
 import { resolvePathParams } from '../openapi'
-import { _$api } from './$api'
+import { createEndpointFetch } from './$api'
 
 type ComputedOptions<T> = {
   // eslint-disable-next-line ts/no-unsafe-function-type
@@ -23,17 +21,7 @@ type ComputedOptions<T> = {
 type ComputedMethodOption<M, P> = 'get' extends keyof P ? ComputedOptions<{ method?: M }> : ComputedOptions<{ method: M }>
 
 // #region options
-export type SharedAsyncDataOptions<ResT, DataT = ResT> = ComputedOptions<Omit<SharedFetchOptions, 'payloadCache'>> & Omit<AsyncDataOptions<ResT, DataT>, 'watch'> & {
-  /**
-   * Serve a repeated request from the Nuxt payload instead of sending it again.
-   *
-   * @remarks
-   * Set this to opt a single call out. The module option of the same name turns payload caching off
-   * for the whole app.
-   *
-   * @default the `payloadCache` module option
-   */
-  payloadCache?: MaybeRef<boolean>
+export type SharedAsyncDataOptions<ResT, DataT = ResT> = ComputedOptions<Pick<NitroFetchOptions<string>, 'cache'>> & Omit<AsyncDataOptions<ResT, DataT>, 'watch'> & {
   /**
    * The key passed to `useAsyncData`. By default, will be generated from the request options.
    */
@@ -108,16 +96,11 @@ export function _useApiData<T = unknown>(
 ) {
   const [opts = {}, autoKey] = typeof arg1 === 'string' ? [{}, arg1] : [arg1, arg2]
 
-  const {
-    path: pathParams,
-    payloadCache = allowPayloadCache,
-    $fetch,
-    ...fetchOptions
-  } = opts
+  const { path: pathParams, ...fetchOptions } = opts
 
   const _path = computed(() => resolvePathParams(toValue(path), toValue(pathParams)))
 
-  // Identity of the request, so concurrent calls for the same resource resolve from a single fetch.
+  // Identity of the request, which keys the async data.
   const _requestKey = computed(() => CACHE_KEY_PREFIX + hash([
     endpointId,
     _path.value,
@@ -129,30 +112,9 @@ export function _useApiData<T = unknown>(
   // An explicit `key` merges two call sites back into one async data instance, as with Nuxt's own composables.
   const _asyncDataKey = computed(() => toValue(opts.key) || (autoKey ? `${_requestKey.value}${autoKey}` : _requestKey.value))
 
-  const nuxt = useNuxtApp()
-
-  // Nuxt hands an SSR response to the client under its own key, so an entry there means this call
-  // site starts out with a result already.
-  let hasResult = _asyncDataKey.value in nuxt.payload.data
-
   return useFetch(_path, {
     ...fetchOptions,
     key: _asyncDataKey,
-    $fetch: ((request: string, opts) => {
-      // Every fetch past the first one replaces a result this call site already has. The request
-      // cache is invisible to Nuxt, so without this it would hand back the very response that a
-      // refresh, a watched source or a changed key asked to replace.
-      if (hasResult)
-        delete nuxt.payload.data[_requestKey.value]
-
-      hasResult = true
-
-      return _$api(endpointId, request, {
-        ...opts,
-        $fetch: toValue($fetch),
-        payloadCache: toValue(payloadCache),
-        key: _requestKey.value,
-      })
-    }) as typeof globalThis.$fetch,
+    $fetch: ((request: string, opts) => createEndpointFetch(endpointId).$fetch(request, opts)) as typeof globalThis.$fetch,
   }) as AsyncData<T | undefined, NuxtError>
 }

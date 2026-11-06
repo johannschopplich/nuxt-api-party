@@ -98,7 +98,7 @@ async function onSubmit() {
     <hr>
 
     <h2>useJsonPlaceholderData</h2>
-    <p>Responses are cached by default.</p>
+    <p>The response fetched during SSR is reused on hydration.</p>
     <p>
       Status: <mark>{{ status }}</mark>
     </p>

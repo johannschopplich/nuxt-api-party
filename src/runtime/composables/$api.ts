@@ -1,75 +1,31 @@
-import type { H3Event$Fetch, NitroFetchOptions } from 'nitropack'
-import type { NuxtApp } from '#app'
+import type { NitroFetchOptions } from 'nitropack'
+import type { $Fetch, ResponseType } from 'ofetch'
 import type { FetchResponseData, MethodOption, ParamsOption, PathItem, RequestBodyOption } from '../openapi'
 import { defu } from 'defu'
-import { hash } from 'ohash'
+import { camelCase, pascalCase } from 'scule'
 import { joinURL } from 'ufo'
-import { allowPayloadCache, proxyRoute } from '#build/module/nuxt-api-party.config'
+import { proxyRoute } from '#build/module/nuxt-api-party.config'
 import { useNuxtApp, useRequestFetch, useRuntimeConfig } from '#imports'
-import { CACHE_KEY_PREFIX } from '../constants'
 import { mergeFetchHooks } from '../hooks'
 import { resolvePathParams } from '../openapi'
 import { mergeHeaders } from '../utils'
 
-// #region options
-export interface SharedFetchOptions {
-  /**
-   * The browser cache behavior.
-   *
-   * @remarks
-   * This option is forwarded to the `fetch` API as the `cache` option.
-   *
-   * @default 'default'
-   * @see https://developer.mozilla.org/en-US/docs/Web/API/Request/cache
-   * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching
-   */
-  cache?: RequestInit['cache']
-  /**
-   * Serve a repeated request from the Nuxt payload instead of sending it again.
-   *
-   * @remarks
-   * A response fetched during SSR is always handed to the client through the payload. This option decides whether
-   * the client keeps caching on its own afterwards. Requires the module option of the same name.
-   *
-   * @default false
-   */
-  payloadCache?: boolean
-  /**
-   * Cache key, generated from the request options by default.
-   */
-  key?: string
-  /**
-   * A custom `$fetch` function to use.
-   *
-   * @remarks
-   * Implementers supporting server-side should wrap `useRequestFetch()` for a request through the server proxy,
-   * and keep a direct request off it, so the visitor's headers stay with the app.
-   *
-   * @default `useRequestFetch()` through the server proxy, `globalThis.$fetch` for a direct request
-   * @example
-   * ```ts
-   * async (request, options) => {
-   *   return await useRequestFetch()(request, options)
-   * }
-   * ```
-   */
-  $fetch?: H3Event$Fetch
-}
+let hasWarnedAboutHydration = false
 
+// #region options
 export type ApiClientFetchOptions
-  = Omit<NitroFetchOptions<string>, 'body' | 'cache'>
+  = NitroFetchOptions<string>
     & {
       path?: Record<string, string>
-      body?: string | Record<string, any> | FormData | null
     }
 
 export type ApiClient = <T = unknown>(
   path: string,
-  opts?: ApiClientFetchOptions & SharedFetchOptions,
+  opts?: ApiClientFetchOptions,
 ) => Promise<T>
 // #endregion options
 
-export type OpenAPIRequestOptions<
+export type OpenAPIClientFetchOptions<
   Method,
   LowercasedMethod,
   Params,
@@ -77,16 +33,9 @@ export type OpenAPIRequestOptions<
 > = MethodOption<Method, Params>
   & ParamsOption<Operation>
   & RequestBodyOption<Operation>
-  & Omit<NitroFetchOptions<string>, 'query' | 'body' | 'method' | 'cache'>
+  & Omit<NitroFetchOptions<string>, 'query' | 'body' | 'method'>
 
-export type OpenAPIClientFetchOptions<
-  Method,
-  LowercasedMethod,
-  Params,
-> = OpenAPIRequestOptions<Method, LowercasedMethod, Params>
-  & SharedFetchOptions
-
-export type OpenAPIClient<Paths, ClientOnlyOptions = SharedFetchOptions> = <
+export type OpenAPIClient<Paths> = <
   ReqT extends Extract<keyof Paths, string>,
   Methods extends PathItem<Paths[ReqT]>,
   Method extends Extract<keyof Methods, string> | Uppercase<Extract<keyof Methods, string>>,
@@ -95,150 +44,88 @@ export type OpenAPIClient<Paths, ClientOnlyOptions = SharedFetchOptions> = <
   ResT = Methods[DefaultMethod] extends Record<PropertyKey, any> ? FetchResponseData<Methods[DefaultMethod]> : never,
 >(
   path: ReqT,
-  options?: OpenAPIRequestOptions<Method, LowercasedMethod, Methods> & ClientOnlyOptions,
+  options?: OpenAPIClientFetchOptions<Method, LowercasedMethod, Methods>,
 ) => Promise<ResT>
-
-declare module '#app' {
-  interface NuxtApp {
-    _pendingRequests?: Map<string, Promise<any>>
-  }
-}
 
 export async function _$api<T = unknown>(
   endpointId: string,
   path: string,
-  opts: ApiClientFetchOptions & SharedFetchOptions = {},
+  opts: ApiClientFetchOptions = {},
 ) {
+  if (import.meta.dev && import.meta.client && !hasWarnedAboutHydration && useNuxtApp().isHydrating) {
+    hasWarnedAboutHydration = true
+    console.warn(`[nuxt-api-party] \`$${camelCase(endpointId)}\` sent a request during hydration that the server has already sent. To reuse the server's response, wrap the call in \`useAsyncData\` or use \`use${pascalCase(endpointId)}Data\`.`)
+  }
+
+  return createEndpointFetch(endpointId).$fetch<T>(path, opts)
+}
+
+/**
+ * Creates the fetch for an endpoint's requests, which go through the server proxy or, for a client endpoint,
+ * straight to the API, along with the base URL it sends them to.
+ */
+export function createEndpointFetch(endpointId: string) {
   const nuxt = useNuxtApp()
   const runtimeConfig = useRuntimeConfig()
-  const requestFetch = useRequestFetch()
-
-  const {
-    path: pathParams,
-    query,
-    headers,
-    method,
-    body,
-    key,
-    cache,
-    payloadCache = false,
-    $fetch: customFetch,
-    ...fetchOptions
-  } = defu(
-    opts,
-    nuxt.$apiParty?.endpoints?.[endpointId]?.defaults,
-    nuxt.$apiParty?.defaults,
-  )
-
-  if (import.meta.dev && !allowPayloadCache && payloadCache) {
-    console.error('[nuxt-api-party] Payload caching is disabled. Set `payloadCache: true` in the module options to enable it.')
-  }
-
-  // The payload always carries an SSR response over to the client, so a write is due there regardless of the option.
-  const cachesPayload = allowPayloadCache && (import.meta.server || payloadCache)
-
-  let _key: string | undefined
-  const getCacheKey = () => {
-    if (_key)
-      return _key
-
-    _key = key || (CACHE_KEY_PREFIX + hash([
-      endpointId,
-      path,
-      pathParams,
-      query,
-      method,
-      ...(body instanceof FormData ? [] : [body]),
-    ]))
-
-    return _key
-  }
 
   // Only a client endpoint is published.
   const clientEndpoint = runtimeConfig.public.apiParty.endpoints[endpointId]
 
-  if (allowPayloadCache && (nuxt.isHydrating || payloadCache)) {
-    const cacheKey = getCacheKey()
-    if (nuxt.payload.data[cacheKey]) {
-      return nuxt.payload.data[cacheKey]
-    }
-
-    if (payloadCache) {
-      const result = getPromiseMap(nuxt).get(cacheKey)
-      if (result) {
-        return result
-      }
-    }
-  }
-
-  const fetchHooks = mergeFetchHooks(fetchOptions, {
-    async onRequest(ctx) {
-      await nuxt.callHook('api-party:request', ctx, endpointId)
-    },
-    async onResponse(ctx) {
-      await nuxt.callHook('api-party:response', ctx, endpointId)
-    },
-  })
+  // A `baseURL` of its own replaces the `app.baseURL` that `$fetch` would prepend.
+  const baseURL = clientEndpoint ? clientEndpoint.url : joinURL(runtimeConfig.app.baseURL, proxyRoute, endpointId)
 
   // `useRequestFetch` forwards the visitor's headers, cookie included, which only the server proxy may see.
-  const $fetch = customFetch ?? (clientEndpoint ? globalThis.$fetch : requestFetch)
+  // Typed as plain ofetch: the endpoint's paths are not the app's routes that Nuxt's typed fetch checks against.
+  const endpointFetch = (clientEndpoint ? globalThis.$fetch : useRequestFetch()) as $Fetch
 
-  // Headers travel as a plain object: during SSR, `useRequestFetch` spreads them into one, which empties a `Headers` instance.
-  const targetOptions = clientEndpoint
-    ? {
-        baseURL: clientEndpoint.url,
-        query: { ...clientEndpoint.query, ...query },
-        headers: Object.fromEntries(mergeHeaders(
-          clientEndpoint.token ? { Authorization: `Bearer ${clientEndpoint.token}` } : undefined,
-          clientEndpoint.headers,
-          headers,
-        )),
-      }
-    : {
-        // A `baseURL` of its own replaces the `app.baseURL` that `$fetch` would prepend.
-        baseURL: joinURL(runtimeConfig.app.baseURL, proxyRoute, endpointId),
-        query,
-        headers: {
-          ...Object.fromEntries(mergeHeaders(headers)),
-          // During SSR, `useRequestFetch` forwards the `Sec-Fetch-Site` of the visitor's navigation, which would
-          // trip the server proxy's cross-site check, but this request comes from the app itself.
-          ...(import.meta.server && { 'sec-fetch-site': 'same-origin' }),
-        },
-      }
+  function $fetch<T = unknown>(path: string, opts: ApiClientFetchOptions = {}) {
+    const {
+      path: pathParams,
+      query,
+      headers,
+      ...fetchOptions
+    } = defu(
+      opts,
+      nuxt.$apiParty?.endpoints?.[endpointId]?.defaults,
+      nuxt.$apiParty?.defaults,
+    )
 
-  const request = ($fetch<T>(resolvePathParams(path, pathParams), {
-    ...fetchOptions,
-    ...fetchHooks,
-    ...targetOptions,
-    cache,
-    method,
-    body,
-  }) as Promise<T>)
-    .then((response) => {
-      if (cachesPayload) {
-        const cacheKey = getCacheKey()
-        nuxt.payload.data[cacheKey] = response
-        getPromiseMap(nuxt).delete(cacheKey)
-      }
-      return response
+    const fetchHooks = mergeFetchHooks(fetchOptions, {
+      async onRequest(ctx) {
+        await nuxt.callHook('api-party:request', ctx, endpointId)
+      },
+      async onResponse(ctx) {
+        await nuxt.callHook('api-party:response', ctx, endpointId)
+      },
     })
-    // Invalidate cache if request fails.
-    .catch((error) => {
-      if (cachesPayload) {
-        const cacheKey = getCacheKey()
-        nuxt.payload.data[cacheKey] = undefined
-        getPromiseMap(nuxt).delete(cacheKey)
-      }
-      throw error
-    }) as Promise<T>
 
-  if (cachesPayload) {
-    getPromiseMap(nuxt).set(getCacheKey(), request)
+    // Headers travel as a plain object: during SSR, `useRequestFetch` spreads them into one, which empties a `Headers` instance.
+    const targetOptions = clientEndpoint
+      ? {
+          query: { ...clientEndpoint.query, ...query },
+          headers: Object.fromEntries(mergeHeaders(
+            clientEndpoint.token ? { Authorization: `Bearer ${clientEndpoint.token}` } : undefined,
+            clientEndpoint.headers,
+            headers,
+          )),
+        }
+      : {
+          query,
+          headers: {
+            ...Object.fromEntries(mergeHeaders(headers)),
+            // During SSR, `useRequestFetch` forwards the `Sec-Fetch-Site` of the visitor's navigation, which would
+            // trip the server proxy's cross-site check, but this request comes from the app itself.
+            ...(import.meta.server && { 'sec-fetch-site': 'same-origin' }),
+          },
+        }
+
+    return endpointFetch<T, ResponseType>(resolvePathParams(path, pathParams), {
+      ...fetchOptions,
+      ...fetchHooks,
+      ...targetOptions,
+      baseURL,
+    }) as Promise<T>
   }
 
-  return request
-}
-
-function getPromiseMap(nuxt: NuxtApp) {
-  return (nuxt._pendingRequests ||= new Map()) as Map<string, Promise<any>>
+  return { baseURL, $fetch }
 }
