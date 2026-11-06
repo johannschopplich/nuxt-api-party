@@ -60,8 +60,6 @@ export default defineEventHandler(async (event) => {
 
   assertPathBelowBase(path)
 
-  // Allows to overwrite the backend URL with a custom header
-  // (e.g. `jsonPlaceholder` endpoint becomes `jsonPlaceholder-Endpoint-Url`).
   const baseURL = new Headers(headers).get(`${endpointId}-Endpoint-Url`) || endpoint.url
 
   if (
@@ -150,7 +148,6 @@ export default defineEventHandler(async (event) => {
     }
     console.error('[nuxt-api-party]', error)
 
-    // Matches what h3's `sendProxy` reports for the same condition in the passthrough proxy mode.
     throw createError({
       statusCode: 502,
       statusMessage: 'Bad Gateway',

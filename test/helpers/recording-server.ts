@@ -50,7 +50,6 @@ export function recordingEndpoints(host: string) {
   }
 }
 
-/** Starts an HTTP server on a random loopback port that records every request it receives. */
 export async function startRecordingServer(): Promise<RecordingServer> {
   const requestUrls: string[] = []
   const server = createServer((request, response) => {

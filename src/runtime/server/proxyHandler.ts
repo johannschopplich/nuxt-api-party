@@ -98,13 +98,8 @@ interface HookErrorPromise extends Promise<never> {
 }
 
 /**
- * Creates a promise that rejects when a hook throws an H3 error, a hack to bypass `sendProxy`'s error handling.
- *
- * `sendProxy` turns every fetch rejection into a 502, but a hook may want to answer
- * with a status of its own, such as 403.
- *
- * When combined with `Promise.race`, this allows us to handle errors
- * in hooks without triggering the default error handling of H3.
+ * Creates a promise that rejects when a hook throws an H3 error. `sendProxy` turns every fetch
+ * rejection into a 502, but a hook may want to answer with a status of its own, such as 403.
  */
 function createHookErrorPromise(): HookErrorPromise {
   let reject: (reason?: H3Error) => void = () => void 0
@@ -122,7 +117,8 @@ function createHookErrorPromise(): HookErrorPromise {
           if (isError(error)) {
             reject(error)
           }
-          throw error // Rethrow to preserve the original error stack.
+          // Rethrow so the fetch fails; an H3 error has already settled the race.
+          throw error
         }
       }
     },
