@@ -36,6 +36,14 @@ describe('nuxt-api-party proxy', async () => {
     })
   })
 
+  it('withholds the cookie from an endpoint that leaves cookies unset', async () => {
+    const received = await $fetch<Record<string, string>>('/api/__api_party/testApi/proxy/echo-headers', {
+      headers: { cookie: 'session=secret' },
+    })
+
+    expect(received.cookie).toBeUndefined()
+  })
+
   describe('path', () => {
     let foreignServer: ForeignServer
 

@@ -47,7 +47,7 @@ export default defineEventHandler(async (event) => {
   resolveRoutePath(url, baseURL)
 
   if (!endpoint.cookies) {
-    delete event.node.req.headers.cookies
+    delete event.node.req.headers.cookie
   }
 
   const hookErrorPromise = createHookErrorPromise()
