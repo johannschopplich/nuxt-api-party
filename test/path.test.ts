@@ -25,6 +25,8 @@ describe('assertNoDotSegments', () => {
     'articles/.. ',
     'articles/..\u0000',
     'articles/..\u2028/admin',
+    'articles#/../admin',
+    'articles/..#x',
   ])('rejects %j', (path) => {
     expect(statusOf(() => assertNoDotSegments(path))).toBe(400)
   })
@@ -33,7 +35,7 @@ describe('assertNoDotSegments', () => {
     'comments/group%2Fname',
     'files/a..b',
     '.well-known/openid-configuration',
-    'articles?next=../admin',
+    'articles?next=/../admin',
   ])('accepts %j', (path) => {
     expect(statusOf(() => assertNoDotSegments(path))).toBe(200)
   })
