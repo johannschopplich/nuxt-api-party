@@ -90,15 +90,18 @@ export interface APIPartyRuntimeConfig {
   endpoints: Record<string, Omit<EndpointConfiguration, 'schema'>>
 }
 
+export interface APIPartyPublicRuntimeConfig {
+  /** Client endpoints only. */
+  endpoints: Record<string, Pick<EndpointConfiguration, 'url' | 'token' | 'query' | 'headers'>>
+}
+
 declare module '@nuxt/schema' {
   interface RuntimeConfig {
     apiParty: APIPartyRuntimeConfig
   }
 
   interface PublicRuntimeConfig {
-    apiParty: {
-      endpoints: Record<string, Partial<APIPartyRuntimeConfig['endpoints'][string]>>
-    }
+    apiParty: APIPartyPublicRuntimeConfig
   }
 
   interface NuxtHooks {
@@ -167,8 +170,8 @@ export default defineNuxtModule<ModuleOptions>().with({
       logger.info(`Sending the requests of ${defaultClientEndpointIds.map(i => `\`${i}\``).join(', ')} straight to the API because SSR is disabled. Set \`client: false\` on an endpoint to keep it on the server proxy.`)
     }
 
-    // Types are generated from the schema at build time, so it stays out of the runtime config the
-    // server bundle and, for a client endpoint, the payload carry.
+    // Types are generated from the schema at build time, so it stays out of the runtime config the server bundle
+    // carries.
     const resolvedOptions: APIPartyRuntimeConfig = {
       endpoints: Object.fromEntries(
         Object.entries(mergedOptions.endpoints).map(([endpointId, { schema, ...endpoint }]) => [
@@ -183,10 +186,12 @@ export default defineNuxtModule<ModuleOptions>().with({
       logger.warn('No API endpoints found. Nuxt API Party requires at least one defined endpoint.')
     }
 
-    // Only a client endpoint sends its requests from the browser, so only its configuration is published.
+    // Only a client endpoint sends its requests from the browser, and only what such a request needs is published.
     nuxt.options.runtimeConfig.public.apiParty = {
       endpoints: Object.fromEntries(
-        Object.entries(resolvedOptions.endpoints).filter(([, endpoint]) => endpoint.client),
+        Object.entries(resolvedOptions.endpoints)
+          .filter(([, endpoint]) => endpoint.client)
+          .map(([endpointId, { url, token, query, headers }]) => [endpointId, { url, token, query, headers }]),
       ),
     }
 

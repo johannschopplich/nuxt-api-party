@@ -87,7 +87,7 @@ describe('nuxt-api-party', async () => {
 
     it('sends the request from the browser straight to the endpoint URL', async () => {
       const page = await createPage('/direct-request-in-browser')
-      const request = page.waitForRequest(request => request.url().endsWith('/todos'))
+      const request = page.waitForRequest(request => request.url().includes('/todos'))
 
       await page.getByTestId('request').click()
 
@@ -171,6 +171,19 @@ describe('nuxt-api-party', async () => {
 
       expect(endpoints.schemaApi).toHaveProperty('url')
       expect(endpoints.schemaApi).not.toHaveProperty('schema')
+    })
+
+    it('publishes only the URL, token, query and headers of the client endpoints', async () => {
+      const endpoints = await $fetch<Record<string, Record<string, unknown>>>('/api/public-runtime-endpoints')
+
+      expect(endpoints).toEqual({
+        directApi: {
+          url: '/api',
+          token: 'direct-token',
+          query: { tenant: 'a' },
+          headers: { 'x-endpoint': 'direct' },
+        },
+      })
     })
   })
 })

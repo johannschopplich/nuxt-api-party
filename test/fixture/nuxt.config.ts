@@ -14,6 +14,8 @@ export default defineNuxtConfig({
       directApi: {
         url: '/api',
         token: 'direct-token',
+        query: { tenant: 'a' },
+        headers: { 'x-endpoint': 'direct' },
         client: true,
       },
       credentialsApi: {
