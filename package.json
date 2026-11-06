@@ -3,7 +3,7 @@
   "type": "module",
   "version": "4.1.1",
   "packageManager": "pnpm@12.16.1",
-  "description": "Auto-generated composables for any API, typed from OpenAPI and never exposing your credentials",
+  "description": "Auto-generated composables for any API, typed from OpenAPI, with your credentials kept on the server",
   "author": "Johann Schopplich <hello@johannschopplich.com>",
   "license": "MIT",
   "homepage": "https://nuxt-api-party.byjohann.dev",
