@@ -123,6 +123,7 @@ function sidebarMain(): DefaultTheme.SidebarItem[] {
       items: [
         { text: 'How It Works', link: '/advanced/how-it-works' },
         { text: 'Migration', link: '/advanced/migration' },
+        { text: 'Migrating From nuxt-open-fetch', link: '/advanced/migrating-from-nuxt-open-fetch' },
       ],
     },
     { text: 'API Reference', link: '/api/' },
