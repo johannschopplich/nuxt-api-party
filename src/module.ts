@@ -22,7 +22,7 @@ export interface EndpointConfiguration {
   url: string
   token?: string
   query?: QueryObject
-  headers?: HeadersInit
+  headers?: Record<string, string>
   /**
    * Whether every request goes straight to the API, from the browser and during SSR, instead of through the server
    * proxy.

@@ -92,8 +92,8 @@ export default defineEventHandler(async (event) => {
   if (clientAddress)
     headers['x-forwarded-for'] = clientAddress
 
-  for (const [name, value] of new Headers(endpoint.headers))
-    headers[name] = value
+  for (const [name, value] of Object.entries<string>(endpoint.headers ?? {}))
+    headers[name.toLowerCase()] = value
 
   if (endpoint.token)
     headers.authorization = `Bearer ${endpoint.token}`
