@@ -1,6 +1,6 @@
 # Hooks
 
-Hooks run inside your app – in a Nuxt plugin or a Nitro plugin – and see every request the module sends, whichever endpoint it belongs to. Use them for behavior that spans endpoints, such as attaching credentials in the passthrough proxy mode or logging failures centrally. A generic handler and an endpoint-specific one both run – generic first on the request, endpoint-specific first on the response.
+Hooks run inside your app – in a Nuxt plugin or a Nitro plugin – and see every request the module sends, whichever endpoint it belongs to. Each runtime hook receives the endpoint ID, so one handler covers all endpoints and branches where they differ. Use hooks for behavior that spans endpoints, such as attaching a per-visitor token on the server, setting a timeout, or logging failures centrally.
 
 To change a single call instead, reach for an [interceptor](/guides/interceptors).
 
@@ -8,26 +8,19 @@ For more information on how to work with hooks, see the [Nuxt documentation](htt
 
 ## Available Hooks
 
-| Hook Name                          | Arguments           | Description                                                                                              |
-| ---------------------------------- | ------------------- | -------------------------------------------------------------------------------------------------------- |
-| `api-party:extend`                 | `options`           | Called during module initialization after options are resolved. Allows modifying endpoint configuration. |
-| `api-party:request`                | `ctx, [event]`      | Called before each API request. This generic hook runs on both Nuxt and Nitro platforms. |
-| `api-party:request:${endpointId}`  | `ctx, [event]`      | Called specifically for the designated endpoint. Merged with the generic request hook. |
-| `api-party:response`               | `ctx, [event]`      | Called after each API response. This generic hook is used to handle response modifications on both platforms. |
-| `api-party:response:${endpointId}` | `ctx, [event]`      | Called for the specific endpoint response. Merged with the generic response hook. |
+| Hook Name            | Runs In | Arguments                    | Description                                                                                              |
+| -------------------- | ------- | ---------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `api-party:extend`   | Build   | `options`                    | Called at module initialization, before the module reads the endpoints. Allows modifying them.          |
+| `api-party:request`  | Nuxt    | `ctx, endpointId`            | Called before each request a composable sends, in the browser and during SSR.                           |
+| `api-party:response` | Nuxt    | `ctx, endpointId`            | Called after each response a composable receives, error responses included.                            |
+| `api-party:request`  | Nitro   | `ctx, event, endpointId`     | Called before each request the server proxy or a [server import](/api/server-imports) sends to the API. |
+| `api-party:response` | Nitro   | `ctx, event, endpointId`     | Called after each response the server proxy or a server import receives from the API.                   |
 
-::: info Merging Hooks
-Both generic and endpoint-specific hooks are merged and executed in sequence.
+`ctx` is the [`ofetch`](https://github.com/unjs/ofetch) context of the request, the same object an interceptor receives: `ctx.request`, `ctx.options` and, in a response hook, `ctx.response`.
 
-- For requests: The generic `api-party:request` hook executes first, followed by `api-party:request:${endpointId}`.
-- For responses: The endpoint-specific `api-party:response:${endpointId}` hook executes first, followed by `api-party:response`.
-:::
+## Module Hook
 
-## Nuxt Runtime Hooks
-
-Register Nuxt runtime hooks in your `nuxt.config.ts` file, in a client plugin, or at runtime. Use these hooks for extending [API endpoints](/api/module-configuration#apiparty-endpoints) with additional configuration or for intercepting API calls for logging, metrics, or dynamically adding headers.
-
-The only hook called at module initialization is `api-party:extend`, useful for modifying endpoint configuration before the module is fully initialized. For example, log the resolved server endpoints:
+`api-party:extend` runs once, at module initialization, and may await. Use it to modify the endpoint configuration before the module is fully initialized. For example, log the configured endpoints:
 
 ```ts [nuxt.config.ts]
 export default defineNuxtConfig({
@@ -35,51 +28,57 @@ export default defineNuxtConfig({
 
   hooks: {
     'api-party:extend': async (options) => {
-      console.log(`Resolved server endpoints:`, options.endpoints)
+      console.log(`Configured endpoints:`, options.endpoints)
     },
   },
 })
 ```
 
-All other hooks are called at runtime, either client-side (or server-side on SSR requests). For example, add headers to all requests using the `api-party:request` hook:
+## Nuxt Runtime Hooks
 
-```ts [plugins/my-plugin.ts]
+Register Nuxt runtime hooks in a Nuxt plugin. They fire for every `$myApi` and `useMyApiData` call: in the browser, and on the server during SSR.
+
+`ctx.options` is the place for defaults that span endpoints – headers, `retry`, `retryDelay` and `timeout` all take effect when set here:
+
+```ts [plugins/api-party.ts]
 export default defineNuxtPlugin((nuxtApp) => {
-  // Generic hook: executes on every API request
-  nuxtApp.hook('api-party:request', (ctx) => {
+  nuxtApp.hook('api-party:request', (ctx, endpointId) => {
     // Add a unique request ID to each request
-    ctx.options.headers.set('X-Request-Id', Math.random().toString(36).substring(7))
+    ctx.options.headers.set('X-Request-Id', crypto.randomUUID())
+
+    if (endpointId === 'jsonPlaceholder') {
+      ctx.options.retry = 3
+      ctx.options.timeout = 5000
+    }
   })
 })
 ```
 
 ::: warning Client-Side Execution
-All of the Nuxt hooks are executed on the client side by default. Do not use them for sensitive operations like authentication or authorization. Instead, use Nitro hooks for server-side processing.
+Nuxt hooks run in the browser as well, and a request from the browser reaches the [server proxy](/advanced/how-it-works) like any visitor's. Without [credential forwarding](/guides/credential-forwarding), an `Authorization` header set here never reaches the API. Attach credentials in a Nitro hook instead.
 :::
 
 ## Nitro Runtime Hooks
 
-For server-side processing, register these hooks in a server plugin. Use them for tasks like dynamically fetching tokens or logging responses.
+Register Nitro runtime hooks in a server plugin. They fire for every request the [server proxy](/advanced/how-it-works) forwards and for every [server import](/api/server-imports) call, and are the place for credentials that depend on the visitor:
 
-The most common use case for Nitro hooks is attaching a token to a request before it's sent. For example, attach a user token to a specific endpoint request:
-
-```ts [server/plugins/my-plugin.ts]
+```ts [server/plugins/api-party.ts]
 export default defineNitroPlugin((nitroApp) => {
-  // Generic request hook: runs before any API request on the server
-  nitroApp.hooks.hook('api-party:request', async (ctx, event) => {
-    // Do something before each request
-  })
+  nitroApp.hooks.hook('api-party:request', async (ctx, event, endpointId) => {
+    if (endpointId !== 'myApi' || !event)
+      return
 
-  // Endpoint-specific request hook for `myapi`
-  nitroApp.hooks.hook('api-party:request:myapi', async (ctx, event) => {
-    // Fetch a user token and attach it to the request
+    // Fetch a token for the visitor and attach it to the request
     const token = await getUserToken(event)
     ctx.options.headers.set('Authorization', `Bearer ${token}`)
   })
-
-  // Example of a response hook to modify or log responses
-  nitroApp.hooks.hook('api-party:response:myapi', async (ctx, event) => {
-    // Custom response handling
-  })
 })
 ```
+
+`event` is the h3 event of the request the proxy is answering. A server import has no request to answer, so `event` is `undefined` there – which also tells the two apart.
+
+A request hook that throws an h3 error, such as `throw createError({ statusCode: 401 })`, answers the proxy request with that error and the API is never called.
+
+::: info Response Body in the Proxy
+The server proxy streams the API's response through, so in a Nitro response hook for a proxy request, `ctx.response._data` is a `ReadableStream`, not the parsed body. Read status and headers from `ctx.response`, and set additional response headers on `event`. The proxy copies the API's headers after the hook, so to replace one of them, answer the request in the hook and end the response – the [rewrite redirects example](https://github.com/johannschopplich/nuxt-api-party/tree/main/examples/rewrite-redirects) does this. A server import parses the body as usual.
+:::

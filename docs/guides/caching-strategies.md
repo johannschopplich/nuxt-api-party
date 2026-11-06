@@ -1,52 +1,41 @@
 # Caching Strategies
 
-Nuxt API Party caches in two places: in the Nuxt payload, which is fast and lives for the page, and in the browser's HTTP cache, which survives reloads. They are independent and each has its own option – `payloadCache` for the former, `cache` for the latter.
+A response can be reused from two places: the Nuxt payload, which is fast and lives for the page, and the browser's HTTP cache, which survives reloads. Nuxt's `getCachedData` option decides on the former, the `cache` option on the latter.
 
-## In-Memory Caching
+## Payload Caching
 
-Payload caching is the default for data composables. A response is stored in the Nuxt payload under a key derived from the request, so a repeated request for the same resource resolves without a round trip. Turn it off per call with `payloadCache: false`, or for the whole app with the [`payloadCache`](/api/module-configuration#apiparty-payloadcache) module option.
+`useMyApiData` stores its response in the Nuxt payload under its key, the way `useFetch` does. A response fetched during SSR reaches the browser that way, and hydration reuses it instead of sending the request again.
 
-Benefits of in-memory caching over browser caching include:
-
-- Support for caching non-GET requests.
-- Does not require the server to respond with `Cache-Control`, `ETag`, or `Last-Modified` headers.
-
-Downsides of in-memory caching include:
-
-- Cache does not persist across page reloads.
-- Cache is not shared across tabs or windows.
-
-## Built-in Browser Caching
-
-The browser's [HTTP cache](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Caching) survives page reloads. Set the `cache` option to one of the [values below](#cache-options), and a GET request whose response carries cache headers is served from the cache until it expires.
-
-::: tip HTTP Caching
-To support HTTP caching, you must set [`server.proxyMode`](/api/module-configuration#proxymode) to `'passthrough'` in your `nuxt.config` file. This allows GET requests to be GET requests, which is required for caching to work correctly.
+After hydration, Nuxt's default `getCachedData` sends every request again. To answer a repeated request from the payload instead – after a client-side navigation back to the page, say – pass a `getCachedData` of your own:
 
 ```ts
-export default defineNuxtConfig({
-  modules: ['nuxt-api-party'],
-  apiParty: {
-    server: {
-      proxyMode: 'passthrough'
-    }
-  }
+const { data, refresh } = await useJsonPlaceholderData('posts', {
+  // `refresh()`, `refreshNuxtData()` and a changed `watch` source still fetch.
+  getCachedData: (key, nuxtApp, { cause }) =>
+    cause === 'initial' ? nuxtApp.payload.data[key] : undefined
 })
 ```
-:::
 
-### Endpoint Requirements
+Nuxt calls `getCachedData` on a refresh and a change of a `watch` source, too, so a function that always returns the payload entry answers those from the cache as well. A `getCachedData` of your own also keeps Nuxt from purging the entry once no component uses it any more, which is what lets a navigation back to the page find it.
 
-To support HTTP client caching, your endpoint must meet the following requirements:
+`$myApi` stores nothing in the payload. Wrap it in `useAsyncData` to cache its response there – see [the `$fetch`-like composable](/api/dollarfetch-like#in-component-setup).
 
-- Support GET requests.
-- Respond with a cache supporting headers, such as `Cache-Control`, `ETag`, or `Last-Modified`.
+Payload caching works for every method and needs nothing from the API, but it does not survive a page reload and is not shared across tabs.
 
-## Cache Options
+## Browser Caching
 
-The `cache` option controls the browser's HTTP cache and accepts the same values as [`Request.cache`](https://developer.mozilla.org/en-US/docs/Web/API/Request/cache).
+The browser's [HTTP cache](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Caching) survives page reloads. A GET request through the [server proxy](/advanced/how-it-works) stays a GET request, and the proxy passes the API's cache headers through, so the browser caches it like any other response.
 
-The available options are:
+For that, the API has to:
+
+- Answer the request under `GET`.
+- Respond with cache headers, such as `Cache-Control`, `ETag` or `Last-Modified`.
+
+During SSR, the request never reaches a browser, so only calls made in the browser use the HTTP cache.
+
+### Cache Options
+
+The `cache` option is passed to `fetch` as [`Request.cache`](https://developer.mozilla.org/en-US/docs/Web/API/Request/cache) and accepts its values:
 
 - `'default'`: Checks the cache. If it is missing or stale, executes the request and stores the cached response.
 - `'no-store'`: Always fetch from the server, doesn't update the cache.
@@ -54,8 +43,6 @@ The available options are:
 - `'no-cache'`: Use the cache, but revalidate with the server before returning the cached response.
 - `'force-cache'`: Use the cache, even if it is stale.
 - `'only-if-cached'`: Use the cache, but do not make a request to the server if the resource is not in the cache. If the resource is not in the cache, will respond with a 504 Gateway Timeout error.
-
-Payload caching is a separate switch: `payloadCache` takes a boolean and leaves the HTTP cache alone.
 
 For reference, here is a table summarizing the behavior of each cache option:
 
@@ -72,20 +59,9 @@ For reference, here is a table summarizing the behavior of each cache option:
 
 <!--@include: ../parts/_demo-setup.md-->
 
-### Cache in the Payload
-
-Payload caching is on unless you turn it off.
-
-```ts
-const { data } = await useJsonPlaceholderData('posts', {
-  // The default value is `true`
-  payloadCache: true // [!code ++]
-})
-```
-
 ### Refresh Cached Data
 
-`refresh` sends the request again and replaces the cached response. So does `execute` after a `clear`, and so does a reactive request option that changes the key – asking for fresh data is never answered from the cache.
+`refresh` sends the request again, and so do `execute` after a `clear` and a reactive request option that changes the key – unless a `getCachedData` of your own answers them from the payload.
 
 ```ts
 const { data, refresh } = await useJsonPlaceholderData('posts')
@@ -95,35 +71,17 @@ async function reload() {
 }
 ```
 
-::: warning
-`clearNuxtData()` empties Nuxt's own store, not the cache entry this module keeps alongside it. A component mounting afterwards can still resolve from that entry – refresh the call site instead.
-:::
-
-### Cache in the Browser
-
-Passing a string value to the `cache` option enables built-in browser caching behavior. This mode only works for GET requests and requires proper cache headers on the endpoint response.
-
-```ts
-// Enable browser caching
-const { data } = await useJsonPlaceholderData('posts', {
-  cache: 'default' // [!code ++]
-})
-```
-
-### Disable Caching
-
-Each cache has its own switch, so turn off whichever a request should skip.
+### Skip the Browser Cache
 
 ```ts
 const { data } = await useJsonPlaceholderData('posts/1', {
-  payloadCache: false, // [!code ++]
   cache: 'no-store' // [!code ++]
 })
 ```
 
-### Refresh Browser Cached Data
+### Revalidate Browser Cached Data
 
-For resources that may change frequently, use the `'reload'` option to ensure the browser checks with the server for a fresh response before returning the cached response.
+For resources that may change frequently, use the `'no-cache'` option to make the browser check with the server before returning the cached response.
 
 ::: info
 This mode will make a conditional request to the server, and if the resource has not changed, it should return a `304 Not Modified` response, allowing the browser to reuse the cached response.
@@ -132,48 +90,9 @@ Endpoints should check for the request headers `If-None-Match` or `If-Modified-S
 :::
 
 ```ts
-const { data, refresh } = await useJsonPlaceholderData('posts', {
-  cache: 'reload' // [!code ++]
+const { data } = await useJsonPlaceholderData('posts', {
+  cache: 'no-cache' // [!code ++]
 })
-
-async function invalidateAndRefresh() {
-  await refresh()
-}
 ```
 
-### Reload Button
-
-Sometimes a button is used to reload data on demand. In this case, you may want to set the cache option to `'reload'` to ensure data is revalidated with the server on refresh. Unfortunately, this makes the first request also use the `'reload'` option, even when there's data in the cache.
-
-There's no builtin way to make the cache use `'default'` for the first request and `'reload'` for manual refreshes, but you can achieve this using a `ref`. Set it to `'default'` initially, then before calling `refresh()`, set it to `'reload'`.
-
-```vue
-<script setup lang="ts">
-const cache = ref<RequestCache>('default')
-const { data, refresh } = await useJsonPlaceholderData('posts', {
-  cache,
-  onRequest: () => {
-    // After a manual trigger, reset the cache option to 'default'
-    // allows subsequent watch-triggered requests to use the cached data
-    cache.value = 'default'
-  }
-})
-
-function onReloadButtonClick() {
-  // Change the cache option to 'reload' to force a revalidation with the server
-  cache.value = 'reload'
-  refresh()
-}
-</script>
-
-<template>
-  <div>
-    <button @click="onReloadButtonClick">
-      Reload
-    </button>
-    <div>
-      {{ data }}
-    </div>
-  </div>
-</template>
-```
+A ref passed as `cache` is watched like every other option, so changing it sends the request again under the new mode.

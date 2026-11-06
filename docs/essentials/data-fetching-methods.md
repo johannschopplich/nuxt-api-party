@@ -3,7 +3,7 @@
 Each endpoint gives you two composables. They differ in what they return and in who decides when the request goes out.
 
 ::: tip
-Both follow the same patterns as Nuxt's native `useFetch` and `$fetch`. If you know Nuxt data fetching, you know these.
+`useMyApiData` is built on Nuxt's `useFetch`, and `$myApi` is a plain `$fetch`. If you know Nuxt data fetching, you know these.
 :::
 
 ## Comparison
@@ -12,22 +12,20 @@ Both follow the same patterns as Nuxt's native `useFetch` and `$fetch`. If you k
 | ------------------- | --------------------------------------------------------------------------------- | --------------------------------- |
 | **Returns**         | [`AsyncData`](https://nuxt.com/docs/api/composables/use-async-data#return-values)  | A promise of the response data    |
 | **On failure**      | A reactive `error` value                                                          | Throws                            |
-| **Caching**         | Payload cache on by default, with deduplication                                   | Payload cache off unless opted in |
-| **Server rendering**| Hydrates automatically                                                            | You decide where it runs          |
+| **Caching**         | Nuxt payload, with `getCachedData` and deduplication                              | None of its own                   |
+| **Server rendering**| Hydrates automatically                                                            | Fetches again on hydration        |
 | **Reach for it**    | Page and component data                                                           | Mutations and programmatic calls  |
 
 ## Reactive Data Fetching
 
-Use `useMyApiData` composables in components and pages. They hook into Nuxt's hydration and caching, so server-rendered data is not fetched a second time on the client.
+Use `useMyApiData` composables in components and pages. They hook into Nuxt's hydration and caching, so server-rendered data is not fetched a second time in the browser.
 
 ```vue
 <script setup lang="ts">
 const postId = ref(1)
 
-// The request automatically updates when `postId` changes
-const { data } = await useJsonPlaceholderData(() => `posts/${postId.value}`, {
-  watch: [postId]
-})
+// The request is sent again when `postId` changes
+const { data } = await useJsonPlaceholderData(() => `posts/${postId.value}`)
 
 function nextPost() {
   postId.value++
@@ -48,8 +46,8 @@ function nextPost() {
 
 Use `$myApi` composables for programmatic API interactions, form submissions, and one-time actions where you need direct control over request timing.
 
-::: warning Using `$myApi` With `useAsyncData`
-Calling `$myApi` multiple times inside `useAsyncData` causes Nuxt context errors on the server. Use `useMyApiData` composables instead for reactive data, or see the [`$myApi` documentation](/api/dollarfetch-like#using-with-useasyncdata) for workarounds.
+::: warning `$myApi` in Component Setup
+`$myApi` is a plain fetch. Awaited in a component's setup, it runs during SSR and once more in the browser while the page hydrates. Fetch page data with `useMyApiData`, or wrap the call in `useAsyncData` – see the [`$myApi` documentation](/api/dollarfetch-like#in-component-setup).
 :::
 
 Common pattern for handling form submissions:
@@ -104,17 +102,19 @@ async function submitPost() {
 </template>
 ```
 
-In plugins or middleware, use `$myApi` for initial data fetching:
+In plugins or middleware, use `$myApi` for initial data fetching. Keep the result in `useState`, so the browser takes it from the payload instead of fetching it again:
 
 ::: code-group
 ```ts [plugins/api-setup.ts]
 export default defineNuxtPlugin(async () => {
-  const settings = useState('app.settings', () => ({}))
+  const settings = useState<Record<string, unknown> | null>('app.settings', () => null)
 
-  // Fetch app settings once and hydrate state in the client
+  // Hydrated from the server's response
+  if (settings.value)
+    return
+
   try {
-    const data = await $jsonPlaceholder('settings')
-    settings.value = data
+    settings.value = await $jsonPlaceholder('settings')
   }
   catch (error) {
     console.error('Failed to load settings:', error)

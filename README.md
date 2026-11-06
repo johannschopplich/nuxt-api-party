@@ -10,11 +10,11 @@ Auto-generated composables for any API in [Nuxt](https://nuxt.com), typed from O
 ## Features
 
 - 🪅 [Auto-generated composables](https://nuxt-api-party.byjohann.dev/api/#generated-composables) for each API endpoint
-- 🔒 Protected API credentials with a Nuxt proxy route
+- 🔒 API credentials kept on the server by a server proxy
 - 🌐 No CORS issues
-- 🍱 Familiar developer experience to [`useFetch`](https://nuxt.com/docs/api/composables/use-fetch) and `$fetch`
+- 🍱 Built on Nuxt's [`useFetch`](https://nuxt.com/docs/api/composables/use-fetch) and `$fetch`
 - 🧇 [Connect all your APIs](https://nuxt-api-party.byjohann.dev/essentials/getting-started#configure-your-first-api-endpoint)
-- 🦾 Fully typed API clients from [OpenAPI specifications](https://nuxt-api-party.byjohann.dev/guides/openapi-integration)
+- 🦾 Fully typed API clients from [OpenAPI documents](https://nuxt-api-party.byjohann.dev/guides/openapi-integration), with nothing else to install
 - 🗃 Cached responses and hydration
 
 ## Setup
@@ -22,6 +22,8 @@ Auto-generated composables for any API in [Nuxt](https://nuxt.com), typed from O
 ```bash
 npx nuxt module add api-party
 ```
+
+Nuxt API Party requires Nuxt 4.4 or later.
 
 ## Basic Usage
 
@@ -36,10 +38,8 @@ export default defineNuxtConfig({
     endpoints: {
       jsonPlaceholder: {
         url: process.env.JSON_PLACEHOLDER_API_BASE_URL!,
-        // Global headers sent with each request
-        headers: {
-          Authorization: `Bearer ${process.env.JSON_PLACEHOLDER_API_TOKEN}`
-        }
+        // Sent as a bearer token with each request, from the server
+        token: process.env.JSON_PLACEHOLDER_API_TOKEN
       }
     }
   }
@@ -67,7 +67,7 @@ const { data, refresh, error, status, clear } = await useJsonPlaceholderData('po
 > [!TIP]
 > You can connect as many APIs as you want, just add them to the `endpoints` object.
 
-The [documentation](https://nuxt-api-party.byjohann.dev) covers the OpenAPI integration, caching and every module option.
+The [documentation](https://nuxt-api-party.byjohann.dev) covers the OpenAPI integration, caching, credential forwarding and every module option. Coming from v4? See the [migration guide](https://nuxt-api-party.byjohann.dev/advanced/migration#from-v4-to-v5).
 
 ## 💻 Development
 

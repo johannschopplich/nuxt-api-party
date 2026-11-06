@@ -3,7 +3,7 @@
 Nuxt API Party needs one configured endpoint before it generates anything.
 
 ::: tip Prerequisites
-Make sure you have [Nuxt 4](https://nuxt.com/docs/getting-started/installation) installed in your project.
+Nuxt API Party requires [Nuxt](https://nuxt.com/docs/getting-started/installation) 4.4 or later.
 :::
 
 ## Installation
@@ -40,10 +40,8 @@ export default defineNuxtConfig({
       // Endpoint ID: `jsonPlaceholder`
       jsonPlaceholder: {
         url: process.env.JSON_PLACEHOLDER_API_BASE_URL!,
-        // Optional: Global headers for all requests
-        headers: {
-          Authorization: `Bearer ${process.env.JSON_PLACEHOLDER_API_TOKEN!}`
-        }
+        // Optional: Sent as a bearer token with every request, from the server
+        token: process.env.JSON_PLACEHOLDER_API_TOKEN!
       }
     }
   }
@@ -51,7 +49,7 @@ export default defineNuxtConfig({
 ```
 :::
 
-`url` is the only required option. See [Module Configuration](/api/module-configuration#apiparty-endpoints) for the rest, including authentication, default headers and OpenAPI schemas.
+`url` is the only required option. See [Module Configuration](/api/module-configuration#apiparty-endpoints) for the rest, including default headers, credential forwarding and OpenAPI schemas.
 
 ::: tip Dynamic Configuration
 For dynamic headers or runtime configuration, use [runtime hooks](/guides/hooks) or [environment variables](#environment-variables).
@@ -103,9 +101,11 @@ Environment variable mapping follows this pattern:
 NUXT_API_PARTY_ENDPOINTS_{ENDPOINT_ID}_{OPTION}
 ```
 
+A [client endpoint](/api/module-configuration#client-endpoints) is read in the browser from the public runtime config, so its variables take the `NUXT_PUBLIC_API_PARTY_ENDPOINTS_` prefix. [Server imports](/api/server-imports) keep reading the private runtime config, so set both where server code calls a client endpoint, too.
+
 ## Making Your First Request
 
-Now you can use the generated composables in your components and server routes.
+Now you can use the generated composables in your components, and their [server imports](/api/server-imports) in your Nitro routes.
 
 ### Reactive Data Fetching
 
@@ -171,5 +171,5 @@ It throws on a failed request rather than exposing an `error` value, so wrap it 
 - [Module Configuration](/api/module-configuration) – Every option an endpoint accepts.
 - [Error Handling](/guides/error-handling) – What a failed request gives you.
 - [OpenAPI Integration](/guides/openapi-integration) – Infer request and response types from a schema.
-- [Caching Strategies](/guides/caching-strategies) – Cache in memory or in the browser.
+- [Caching Strategies](/guides/caching-strategies) – Reuse responses from the payload or the browser's cache.
 - [Runtime Hooks](/guides/hooks) – Change a request or a response as it passes through.

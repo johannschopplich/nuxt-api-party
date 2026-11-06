@@ -27,12 +27,12 @@ features:
     linkText: API Reference
   - title: Credentials Stay on the Server
     icon: <span class="i-carbon:ibm-cloud-hyper-protect-dbaas"></span>
-    details: A Nuxt server route proxies each request, so tokens never reach the browser and CORS never applies.
+    details: A server proxy in your app forwards each request, so tokens never reach the browser and CORS never applies.
     link: /advanced/how-it-works
     linkText: How It Works
   - title: Familiar Data Handling
     icon: <span class="i-carbon:noodle-bowl"></span>
-    details: Requests behave like Nuxt's own <code>useFetch</code> and <code>$fetch</code>.
+    details: The composables are built on Nuxt's own <code>useFetch</code> and <code>$fetch</code>.
     link: /api/use-fetch-like
     linkText: Async Data Composable
   - title: Several APIs Side by Side
@@ -42,7 +42,7 @@ features:
     linkText: Set up API Endpoints
   - title: OpenAPI Support
     icon: <span class="i-devicon-plain:openapi"></span>
-    details: Typed paths, parameters, request bodies and responses, generated from your schema.
+    details: Typed paths, parameters, request bodies and responses, generated from your OpenAPI document.
     link: /guides/openapi-integration
     linkText: Generate Clients
   - title: Errors Reach Your App

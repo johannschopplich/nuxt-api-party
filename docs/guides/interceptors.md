@@ -1,28 +1,29 @@
 # Interceptors
 
-Interceptors are the [`ofetch`](https://github.com/unjs/ofetch) callbacks `onRequest`, `onResponse`, `onRequestError` and `onResponseError`, passed to a single call. They see that call's fetch lifecycle and nothing else, which makes them the place for per-request concerns – a retry on one endpoint, a log line for one query. Both `useMyApiData` and `$myApi` accept them.
+Interceptors are the [`ofetch`](https://github.com/unjs/ofetch) callbacks `onRequest`, `onResponse`, `onRequestError` and `onResponseError`, passed to a single call. They see that call's fetch lifecycle and nothing else, which makes them the place for per-request concerns – a retry for one call, a log line for one query. Both `useMyApiData` and `$myApi` accept them.
+
+An interceptor sees the request your app sends. For an endpoint behind the [server proxy](/advanced/how-it-works), that is the request to the proxy: `request` is the path you passed, `options.baseURL` the proxy route, and the endpoint credentials are not on it yet.
 
 To cover every request instead, reach for a [hook](/guides/hooks).
 
 ## `onRequest({ request, options })`
 
-The `onRequest` interceptor is called before the request is sent, letting you modify the request or options. Use for authentication headers, query parameters or request logging.
+The `onRequest` interceptor is called before the request is sent, letting you modify the request or options. Use for headers, query parameters or request logging.
 
 ```ts
 const { data } = await useMyApiData('posts', {
   async onRequest({ request, options }) {
-    // Add dynamic authentication
-    const token = await getAuthToken()
-
-    if (token) {
-      options.headers.set('Authorization', `Bearer ${token}`)
-    }
+    options.headers.set('X-Locale', await getLocale())
 
     // Log the request
     console.log(`Making request to: ${request}`)
   }
 })
 ```
+
+::: warning `Authorization` Needs Credential Forwarding
+An `Authorization` header set here reaches the server proxy as a visitor credential, which the proxy forwards only for an endpoint with [`forwardCredentials`](/guides/credential-forwarding). Without it, the API answers as if the header were never set.
+:::
 
 ## `onRequestError({ request, options, error })`
 

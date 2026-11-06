@@ -24,14 +24,13 @@ The APIs the module generates composables for. Each key is an endpoint ID and na
 
 - `token` – Bearer token sent with each request.
 - `query` – Query parameters added to each request.
-- `headers` – Headers sent with each request.
-- `cookies` – Whether the browser's cookies travel on to this API. See [Cookie Forwarding](/guides/cookie-forwarding).
-- `allowedUrls` – Base URLs a request may switch to at runtime. See [Dynamic Backend URL](/guides/dynamic-backend-url).
+- `headers` – Headers sent with each request, as a record of strings.
+- `client` – Whether every request goes straight to the API instead of through the server proxy. See [Client Endpoints](#client-endpoints).
+- `forwardCredentials` – Whether the server proxy forwards the visitor's cookie and `Authorization` header to the API, and the API's `Set-Cookie` back. See [Credential Forwarding](/guides/credential-forwarding).
 - `allowedRoutes` – Routes the server proxy may forward to this API. See [Allowed Routes](/guides/allowed-routes).
-- `schema` – URL or file path of an [OpenAPI schema](https://swagger.io/resources/open-api) to infer types from. See [OpenAPI Integration](/guides/openapi-integration).
-- `openAPITS` – [`openapi-typescript` options](https://openapi-ts.dev/node/#options) for this endpoint's schema, merged into the global `openAPITS` option by option.
+- `schema` – [OpenAPI document](https://swagger.io/resources/open-api) to generate types from: a file path, a `file:`, `http:` or `https:` URL, the parsed document, or an async function resolving to it. See [OpenAPI Integration](/guides/openapi-integration).
 
-`token`, `query` and `headers` stay on the server as long as [`client`](/api/module-configuration#apiparty-client) is off: the handler attaches them, and only in the default `'wrapped'` proxy mode. See [`proxyMode`](#proxymode).
+`token`, `query` and `headers` are the endpoint credentials. The [server proxy](/advanced/how-it-works) adds them to each request on the server, so they never reach the browser – unless the endpoint is a client endpoint.
 
 **Default Value**: `{}`
 
@@ -67,56 +66,53 @@ export default defineNuxtConfig({
 })
 ```
 
-## `apiParty.client`
+## Client Endpoints
 
-Whether composables may bypass the proxy and call your API straight from the browser. Doing so exposes the endpoint's credentials, so it is off by default.
+An endpoint with `client: true` sends every request straight to the API – from the browser, and from the server during SSR – and never through the server proxy:
 
-- `false` – Every request goes through the server proxy.
-- `true` or `'allow'` – A composable call may opt in with `client: true`.
-- `'always'` – Every request is made client-side unless a call opts out.
+```ts
+export default defineNuxtConfig({
+  apiParty: {
+    endpoints: {
+      publicApi: {
+        url: 'https://api.example.com',
+        client: true
+      }
+    }
+  }
+})
+```
 
-**Default Value**: `false`, or `'always'` when Nuxt runs with `ssr: false`, where there is no server to proxy through.
-
-::: warning
-Any value other than `false` writes every endpoint's `token`, `query` and `headers` into the public runtime config, because the browser has to send them itself. They are readable in the delivered HTML. `'allow'` is no safer than `'always'` here: the credentials ship whether or not a single call opts in. Reserve this for APIs whose credentials may be public.
+::: warning Endpoint Credentials Are Public
+The browser has to send the endpoint credentials itself, so a client endpoint's `url`, `token`, `query` and `headers` are written into the public runtime config, readable in the delivered HTML. Reserve `client: true` for APIs whose credentials may be public, and expect the API to answer CORS requests from your origin.
 :::
 
-See [Client Requests](/api/dollarfetch-like#client-requests) for what a call looks like.
+During SSR, a request to a client endpoint leaves the server without the visitor's cookie or `Authorization` header.
 
-## `apiParty.openAPITS`
+With `ssr: false`, there is often no server to proxy through, so every endpoint defaults to `client: true`. Two exceptions keep the server proxy: an endpoint with `client: false`, and one that sets `forwardCredentials` or `allowedRoutes`, both of which only the proxy acts on.
 
-Global [configuration options](https://openapi-ts.dev/node/#options) for `openapi-typescript`. Options set here apply to every endpoint schema; an endpoint's own `openAPITS` replaces the options it names and leaves the rest in place.
+To send some calls of one API through the proxy and others straight to it, configure the API twice, as two endpoints.
 
-## `apiParty.server`
+## Environment Variables
 
-### `basePath`
+Nuxt overrides [runtime config](https://nuxt.com/docs/guide/going-further/runtime-config#environment-variables) values from environment variables at runtime, for keys that exist at build time:
 
-The path segment the module's server routes live under, below `/api`. Change it if `__api_party` collides with a route of your own.
+```bash
+NUXT_API_PARTY_ENDPOINTS_{ENDPOINT_ID}_{OPTION}
+```
 
-**Default Value**: `'__api_party'`
+The browser reads a client endpoint from the public runtime config, so its overrides take the `PUBLIC` prefix – `NUXT_PUBLIC_API_PARTY_ENDPOINTS_PUBLIC_API_URL` for the example above. Server imports read the private runtime config, so a client endpoint that server code calls, too, needs both variables.
 
-### `proxyMode`
+## Options That Fail the Build
 
-How the server handler forwards a request to your API.
+The module refuses to start on an option that no longer exists or that contradicts another, and names each in its error:
 
-- `'wrapped'` – Every call becomes a `POST` request that carries the original request in its body.
-- `'passthrough'` – The original request is mirrored: path, method, headers, query and body travel as they are, through h3's `sendProxy` utility.
+- `server`, `client`, `openAPITS` and `payloadCache` at the module level.
+- `allowedUrls`, `cookies` and `openAPITS` on an endpoint.
+- `client: true` together with `forwardCredentials` – a client endpoint skips the server proxy, so there are no visitor credentials to forward.
+- `client: true` together with `allowedRoutes` – a client endpoint publishes its token and skips the server proxy, so the allowed routes protect nothing.
 
-Choose `'passthrough'` when you want the browser's network tab to match the upstream request, or when you need HTTP cache control – a `POST` wrapper cannot be cached.
-
-::: warning `'passthrough'` Adds No Credentials
-The name is literal: the request travels as it stands, and nothing from the endpoint configuration is attached. The endpoint's `token`, `headers` and `query` are applied by the `'wrapped'` handler only. Authenticate the upstream service in a [request hook](/guides/hooks) instead.
-:::
-
-**Default Value**: `'wrapped'`
-
-## `apiParty.payloadCache`
-
-Whether a response may be cached in the Nuxt payload, keyed by the request. Turning it off also drops the caching logic from the client bundle.
-
-An individual call opts out with `payloadCache: false`.
-
-**Default Value**: `true`
+See the [migration guide](/advanced/migration#from-v4-to-v5) for what replaces each removed option.
 
 ## Type Declarations
 

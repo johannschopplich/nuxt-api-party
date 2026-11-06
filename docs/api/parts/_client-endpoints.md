@@ -1,0 +1,1 @@
+A call to a [client endpoint](/api/module-configuration#client-endpoints) goes straight to the API – from the browser, and from the server during SSR – instead of through the server proxy. The endpoint sets this for all of its calls; no call option overrides it.

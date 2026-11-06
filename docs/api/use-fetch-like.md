@@ -2,9 +2,7 @@
 
 Returns the API response as Nuxt async data. Intended for data that requires reactive updates, e.g. when using data in templates.
 
-Responses are cached in the Nuxt payload between calls for the same request – see [Caching](#caching).
-
-Supports every [`useAsyncData` option](https://nuxt.com/docs/api/composables/use-async-data/#params).
+`useMyApiData` is built on Nuxt's own [`useFetch`](https://nuxt.com/docs/api/composables/use-fetch), so it takes every `useFetch` option – `key`, `lazy`, `server`, `immediate`, `default`, `transform`, `pick`, `watch`, `getCachedData`, `dedupe` and the rest – and returns the same `AsyncData`. Only the options that pick where a request goes – `baseURL` and `$fetch` – are the endpoint's to decide, and `params` is left out in favor of `query`.
 
 ::: info Placeholder
 `useMyApiData` is a placeholder. The composable is generated based on your API endpoint ID. For example, endpoint `jsonPlaceholder` generates `useJsonPlaceholderData`.
@@ -30,17 +28,25 @@ By default, Nuxt waits until a `refresh` is finished before it can be executed a
 
 <<< @/../src/runtime/composables/useApiData.ts#options
 
-## Caching
+The generic parameters follow `useFetch`: `ResT` types the response, `ErrorT` the error body, and `DataT` what `transform` turns the response into. `data` is typed after `transform`, `pick` and `default`.
 
-Payload caching is on by default; `payloadCache: false` turns it off. The `cache` option controls the browser's HTTP cache separately:
+## Request Options
+
+`path`, `query`, `body` and `method` accept a plain value, a ref or a getter, and `headers` a plain value or a ref. The request is sent again whenever one of them changes:
 
 ```ts
-const { data } = await useMyApiData('posts', {
-  cache: 'no-store' // or 'default', 'reload', 'no-cache', 'force-cache', 'only-if-cached'
+const postId = ref(1)
+
+const { data } = await useJsonPlaceholderData('comments', {
+  query: () => ({ postId: postId.value })
 })
 ```
 
-<!--@include: ./parts/_http-cache-caveat.md-->
+Path parameters are resolved into the request URL, so each value gets a cache key of its own.
+
+## Caching
+
+A response fetched during SSR reaches the browser in the Nuxt payload, and hydration reuses it instead of sending the request again. Beyond that, Nuxt's `getCachedData` decides when a call is answered from the payload – see [Caching Strategies](/guides/caching-strategies).
 
 ## Examples
 
@@ -67,17 +73,21 @@ const { data, refresh, error, status, clear } = await useJsonPlaceholderData('po
 
 ```vue
 <script setup lang="ts">
+interface Comment {
+  id: number
+  postId: number
+  body: string
+}
+
 const postId = ref(1)
 
-const { data, pending, refresh, error } = await useJsonPlaceholderData('comments', {
+const { data, status, refresh, error } = await useJsonPlaceholderData<Comment[]>('comments', {
   // Whether to resolve the async function after loading the route, instead of blocking client-side navigation (defaults to `false`)
   lazy: true,
   // A factory function to set the default value of the data, before the async function resolves - particularly useful with the `lazy: true` option
-  default: () => ({
-    title: ''
-  }),
+  default: () => [],
   // A function that can be used to alter handler function result after resolving
-  transform: res => res,
+  transform: comments => comments.filter(comment => comment.body.length > 0),
   // Custom query parameters to be added to the request, can be reactive
   query: computed(() => ({
     postId: postId.value
@@ -91,7 +101,9 @@ const { data, pending, refresh, error } = await useJsonPlaceholderData('comments
 
 <template>
   <div>
-    <h1>{{ data?.title }}</h1>
+    <p v-for="comment in data" :key="comment.id">
+      {{ comment.body }}
+    </p>
     <button @click="refresh()">
       Refresh
     </button>
@@ -99,6 +111,6 @@ const { data, pending, refresh, error } = await useJsonPlaceholderData('comments
 </template>
 ```
 
-## Client Requests
+## Client Endpoints
 
-<!--@include: ./parts/_client-requests.md-->
+<!--@include: ./parts/_client-endpoints.md-->

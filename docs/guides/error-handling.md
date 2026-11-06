@@ -1,6 +1,6 @@
 # Error Handling
 
-The [server proxy](/advanced/how-it-works) passes your API's error through untouched – status code, status message, headers and body all reach your app, so a 404, a validation error and a 500 stay distinguishable.
+The [server proxy](/advanced/how-it-works) passes the API's error through untouched – status code, status message, headers and body all reach your app, so a 404, a validation error and a 500 stay distinguishable. The API's error body lands at `error.data` of the thrown error, and at `error.value.data` of a `useMyApiData` call.
 
 ## Error Types
 
@@ -64,6 +64,29 @@ async function createPost() {
 }
 </script>
 ```
+
+## Rethrowing From Your Own Nitro Route
+
+A [server import](/api/server-imports) throws the same error, with the API's body at `error.data`. Rethrowing it with `createError` wraps that body once more: Nitro answers with an error object of its own and puts the body in its `data`, so the browser finds it at `error.data.data`.
+
+To hand the API's error on as it is, answer with its status and body instead of throwing:
+
+```ts [server/api/posts/[id].get.ts]
+import type { FetchError } from 'ofetch'
+
+export default defineEventHandler(async (event) => {
+  try {
+    return await $jsonPlaceholder(`posts/${getRouterParam(event, 'id')}`)
+  }
+  catch (error) {
+    const { statusCode = 500, statusMessage, data } = error as FetchError
+    setResponseStatus(event, statusCode, statusMessage)
+    return data
+  }
+})
+```
+
+A `$fetch` or `useFetch` call to this route then finds the API's body at `error.data`, as it would for a call through the server proxy.
 
 ## Type Declarations
 

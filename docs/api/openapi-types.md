@@ -1,6 +1,6 @@
 # OpenAPI Type Helpers
 
-For each endpoint with an OpenAPI schema, Nuxt API Party generates a type carrying everything one operation declares. It is named after the endpoint ID and takes a path and a method:
+For each endpoint with a schema, Nuxt API Party generates a type carrying everything one operation declares. It is named after the endpoint ID and takes a path and a method:
 
 ```ts
 import type { PetStore } from '#nuxt-api-party'
@@ -103,7 +103,7 @@ type PetMethods = PetStoreApiMethods<'/pet'>
 //   ^? 'post' | 'put'
 ```
 
-Only the methods the path declares are listed. `openapi-typescript` gives every path item a key for all eight verbs and sets the unused ones aside, so reaching for `keyof` yourself would answer with the whole alphabet of HTTP.
+Only the methods the path declares are listed.
 
 ## Schema Model Types
 

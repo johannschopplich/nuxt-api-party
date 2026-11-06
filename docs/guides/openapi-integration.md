@@ -1,6 +1,6 @@
 # OpenAPI Integration
 
-Point an endpoint at an [OpenAPI schema](https://swagger.io/resources/open-api/) and the module types every request against it:
+Point an endpoint at its [OpenAPI](https://swagger.io/resources/open-api/) schema and the module types every request against it:
 
 - Request path with path parameters
 - Query parameters
@@ -9,14 +9,7 @@ Point an endpoint at an [OpenAPI schema](https://swagger.io/resources/open-api/)
 - Response body
 - Error responses
 
-::: info Mandatory Dependency
-This feature generates TypeScript definitions from your OpenAPI schema with [`openapi-typescript`](https://www.npmjs.com/package/openapi-typescript) v7. It is an optional peer dependency, so install it yourself:
-
-```sh
-npm install -D openapi-typescript
-```
-
-:::
+The types are generated at build time by [APIful](https://apiful.land), which the module depends on, so there is nothing else to install. OpenAPI 3.0 and 3.1 are supported.
 
 ## Schema Generation
 
@@ -32,7 +25,14 @@ If your framework doesn't directly support it, there may also be an additional l
 
 ## Configuring the Schema
 
-Add the `schema` property to your endpoint config. Set it to a file path or URL of the OpenAPI schema, or to the parsed schema object. The file can be JSON or YAML format.
+Add the `schema` property to your endpoint config. It accepts:
+
+- A file path, resolved against the root directory of your app, or a `file:` URL.
+- An `http:` or `https:` URL.
+- The parsed document as an object.
+- An async function that resolves to the document, for a schema you have to build yourself.
+
+A file or URL can be JSON or YAML. External `$ref`s are bundled into the document before the types are generated.
 
 The following schema is used for code examples on this page:
 
@@ -118,7 +118,7 @@ export default defineNuxtConfig({
 :::
 
 ::: tip
-In development, changes to a local schema file regenerate the types right away. A remote schema is read once, so pick up changes there by restarting the Nuxt dev server.
+In development, changes to a local schema file regenerate the types right away. A remote schema is read once, so pick up changes there by restarting the Nuxt dev server. A schema that fails to load logs an error and leaves the endpoint untyped.
 :::
 
 ## Using the Types
@@ -127,22 +127,24 @@ For most use cases, no further configuration is needed. Nuxt API Party uses the 
 
 ### Extract Schema Types
 
-The exported `components` interface of the virtual module for your API contains all schema types defined in your OpenAPI schema. Use it to extract models for your API.
+The `#nuxt-api-party/myApi` module exports two types: `paths`, with every operation, and `components`, with every schema object your document defines. The generator emits no alias per schema object, so name the ones you use yourself.
 
 Using the schema above, extract the `Foo` type:
 
 ```ts
 import type { components } from '#nuxt-api-party/myApi'
 
-type Foo = components['schemas']['Foo']
-//   ^? { id?: number; bar: string }
+export type Foo = components['schemas']['Foo']
+//          ^? { id?: number; bar: string }
 ```
+
+The generated `MyApiModel<'Foo'>` resolves to the same type – see [Schema Model Types](/api/openapi-types#schema-model-types).
 
 ### Use OpenAPI Defined Path Parameters
 
 OpenAPI can define path parameters on endpoints. They're declared as `/foo/{id}`. The endpoint isn't defined as `/foo/10`, so using that as the path breaks type inference.
 
-To work with path parameters, set an object of parameters to the `path` property. Use the declared path for type inference, and the type checker ensures you provide all required path parameters. Parameters are interpolated into the path before the request is made.
+To work with path parameters, set an object of parameters to the `path` property. Use the declared path for type inference, and the type checker ensures you provide all required path parameters. Parameters are percent-encoded and interpolated into the path before the request is made.
 
 ```ts
 const data = await $myApi('/foo/{id}', {
@@ -152,12 +154,12 @@ const data = await $myApi('/foo/{id}', {
 })
 ```
 
-For reactive `path` parameters, pass a ref or getter function:
+For reactive `path` parameters in `useMyApiData`, pass a ref or getter function. The request is sent again whenever they change:
 
 ```ts
 const id = ref(10)
 
-const data = await $myApi('/foo/{id}', {
+const { data } = await useMyApiData('/foo/{id}', {
   path: () => ({
     id: id.value
   })
@@ -165,7 +167,7 @@ const data = await $myApi('/foo/{id}', {
 ```
 
 ::: warning
-Issues will **NOT** be reported at runtime by Nuxt API Party if the wrong parameters are used. The **incomplete** path will be sent to the backend **as-is**.
+Issues will **NOT** be reported at runtime by Nuxt API Party if the wrong parameters are used. The **incomplete** path will be sent to the API **as-is**.
 :::
 
 ### Route Method Overloading

@@ -1,0 +1,6 @@
+/guides/cookie-forwarding /guides/credential-forwarding 301
+/guides/cookie-forwarding.html /guides/credential-forwarding 301
+/guides/defaults /advanced/migration#the-defaults-plugin-is-gone 301
+/guides/defaults.html /advanced/migration#the-defaults-plugin-is-gone 301
+/guides/dynamic-backend-url /advanced/migration#the-dynamic-backend-url-is-gone 301
+/guides/dynamic-backend-url.html /advanced/migration#the-dynamic-backend-url-is-gone 301
