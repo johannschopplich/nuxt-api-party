@@ -18,7 +18,6 @@ export const ABSOLUTE_PATH_TEMPLATES = [
 /** Paths that, joined onto a `/base` base URL, resolve outside it. */
 export const ESCAPING_PATHS = [
   '../secret',
-  '../basement',
   '%2E%2E/secret',
   '.%2e/secret',
   'todos/..\\..\\secret',

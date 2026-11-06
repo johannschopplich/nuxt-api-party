@@ -101,7 +101,7 @@ describe('nuxt-api-party proxy', async () => {
       expect(backend.requestUrls).toEqual([])
     })
 
-    it('rejects articles/../admin before matching the list', async () => {
+    it('rejects articles/../admin before matching allowedRoutes', async () => {
       const status = await requestStatus('/api/__api_party/guardedApi/proxy/articles/../admin')
 
       expect(status).toBe(400)
