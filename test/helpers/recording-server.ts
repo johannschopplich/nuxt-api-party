@@ -61,7 +61,7 @@ export function recordingEndpoints(host: string) {
     tokenApi: {
       url: `http://${host}/base`,
       token: 'endpoint-token',
-      headers: { 'x-endpoint': 'endpoint' },
+      headers: { 'x-endpoint': 'endpoint', 'Authorization': 'Basic endpoint' },
       query: { tenant: 'a', locale: 'en' },
       forwardCredentials: true,
     },

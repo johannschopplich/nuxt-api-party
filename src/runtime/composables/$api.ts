@@ -7,7 +7,7 @@ import { proxyRoute } from '#build/module/nuxt-api-party.config'
 import { useNuxtApp, useRequestFetch, useRuntimeConfig } from '#imports'
 import { mergeFetchHooks } from '../hooks'
 import { resolvePathParams } from '../openapi'
-import { mergeHeaders } from '../utils'
+import { getEndpointHeaders, mergeHeaders } from '../utils'
 
 let hasWarnedAboutHydration = false
 
@@ -89,20 +89,15 @@ export function createEndpointFetch(endpointId: string) {
       },
     })
 
-    // Headers travel as a plain object: during SSR, `useRequestFetch` spreads them into one, which empties a `Headers` instance.
     const targetOptions = clientEndpoint
       ? {
           query: { ...clientEndpoint.query, ...query },
-          headers: Object.fromEntries(mergeHeaders(
-            clientEndpoint.token ? { Authorization: `Bearer ${clientEndpoint.token}` } : undefined,
-            clientEndpoint.headers,
-            headers,
-          )),
+          headers: mergeHeaders(getEndpointHeaders(clientEndpoint), headers),
         }
       : {
           query,
           headers: {
-            ...Object.fromEntries(mergeHeaders(headers)),
+            ...mergeHeaders(headers),
             // During SSR, `useRequestFetch` forwards the `Sec-Fetch-Site` of the visitor's navigation, which would
             // trip the server proxy's cross-site check, but this request comes from the app itself.
             ...(import.meta.server && { 'sec-fetch-site': 'same-origin' }),

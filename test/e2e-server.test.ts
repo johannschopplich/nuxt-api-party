@@ -28,6 +28,18 @@ describe('nuxt-api-party server', async () => {
     expect(await response.json()).toEqual({ endpointId: 'backendApi' })
   })
 
+  it('sends the endpoint token in place of the authorization in the endpoint headers', async () => {
+    await fetch('/api/server-request/tokenApi/articles')
+
+    expect(backend.requests[0]!.headers.authorization).toBe('Bearer endpoint-token')
+  })
+
+  it('lets the authorization header of a call replace the endpoint token', async () => {
+    await fetch('/api/server-request/tokenApi/articles?authorization=Basic%20call')
+
+    expect(backend.requests[0]!.headers.authorization).toBe('Basic call')
+  })
+
   it('leaves an upstream redirect unfollowed', async () => {
     await fetch('/api/server-request/backendApi/redirect')
 

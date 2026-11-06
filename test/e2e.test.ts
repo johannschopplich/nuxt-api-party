@@ -272,7 +272,7 @@ describe('nuxt-api-party', async () => {
           url: '/api',
           token: 'client-token',
           query: { tenant: 'a' },
-          headers: { 'x-endpoint': 'client' },
+          headers: { 'x-endpoint': 'client', 'Authorization': 'Basic endpoint' },
         },
       })
     })

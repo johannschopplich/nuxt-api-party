@@ -2,7 +2,7 @@ import type { ApiClientFetchOptions } from '../composables/$api'
 import { useNitroApp, useRuntimeConfig } from 'nitropack/runtime'
 import { mergeFetchHooks } from '../hooks'
 import { resolvePathParams } from '../openapi'
-import { mergeHeaders } from '../utils'
+import { getEndpointHeaders, mergeHeaders } from '../utils'
 
 export function _$api<T = unknown>(
   endpointId: string,
@@ -28,12 +28,7 @@ export function _$api<T = unknown>(
       ...endpoint.query,
       ...query,
     },
-    headers: mergeHeaders(
-      endpoint.token ? { Authorization: `Bearer ${endpoint.token}` } : undefined,
-      endpoint.headers,
-      headers,
-    ),
-    // Following a redirect would carry the endpoint credentials to wherever the API points.
+    headers: mergeHeaders(getEndpointHeaders(endpoint), headers),
     redirect: 'manual',
   }) as Promise<T>
 }

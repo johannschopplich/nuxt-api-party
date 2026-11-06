@@ -14,6 +14,7 @@ import {
 } from 'h3'
 import { useNitroApp, useRuntimeConfig } from 'nitropack/runtime'
 import { joinURL, withQuery } from 'ufo'
+import { getEndpointHeaders } from '../utils'
 import { assertAllowedRoute, assertPathBelowBase, resolveRoutePath } from './path'
 
 /** Headers that describe a single connection rather than the message, so they end at the proxy. */
@@ -92,11 +93,7 @@ export default defineEventHandler(async (event) => {
   if (clientAddress)
     headers['x-forwarded-for'] = clientAddress
 
-  for (const [name, value] of Object.entries<string>(endpoint.headers ?? {}))
-    headers[name.toLowerCase()] = value
-
-  if (endpoint.token)
-    headers.authorization = `Bearer ${endpoint.token}`
+  Object.assign(headers, getEndpointHeaders(endpoint))
 
   let response
   try {
