@@ -15,6 +15,7 @@ import { joinURL } from 'ufo'
 import { name } from '../package.json'
 import { logger } from './kit'
 import { generateOpenAPITypes } from './openapi'
+import { assertValidOptions } from './options'
 
 // #region options
 // #region endpoints
@@ -151,6 +152,9 @@ export default defineNuxtModule<ModuleOptions>().with({
     const getDataComposableName = (endpointId: string) => `use${pascalCase(endpointId)}Data`
 
     await nuxt.callHook('api-party:extend', options)
+
+    // The runtime config takes endpoints of its own, so a removed option may hide there too.
+    assertValidOptions(defu(nuxt.options.runtimeConfig.apiParty, options))
 
     // Annotated because `defu`'s return type widens the endpoint values to `unknown`.
     const mergedOptions: { endpoints: Record<string, EndpointConfiguration> } = defu(
