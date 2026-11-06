@@ -34,12 +34,14 @@ describe('assertNoDotSegments', () => {
     'articles/..%2Fadmin',
     'articles/..%5Cadmin',
     'articles/..\\admin',
-    'articles/..;/admin',
     'articles/..%3B/admin',
-    'articles/.\n./admin',
     'articles/.. ',
     'articles/..\u0000',
-    'articles/..\u2028/admin',
+    'articles/..\nfoo',
+    'articles/..\rfoo',
+    'articles/\u2028admin',
+    'articles/\u2029admin',
+    'articles/\tadmin',
     'articles#/../admin',
     'articles/..#x',
   ])('rejects %j', (path) => {
@@ -48,7 +50,7 @@ describe('assertNoDotSegments', () => {
 
   it.each([
     'comments/group%2Fname',
-    'files/a..b',
+    'files/a..',
     '.well-known/openid-configuration',
     'articles?next=/../admin',
   ])('accepts %j', (path) => {

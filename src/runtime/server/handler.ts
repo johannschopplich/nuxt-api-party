@@ -76,9 +76,8 @@ export default defineEventHandler(async (event) => {
   }
 
   const requestQuery = { ...endpoint.query, ...query }
-  // `ofetch` builds the URL this way once the request hooks have run. `withQuery` cuts an absolute URL
-  // at a line break, where the WHATWG parser would drop the break and read on, so the check reads
-  // what is sent unless a hook rewrites it.
+  // `ofetch` builds the URL this way once the request hooks have run, so the check reads what is sent
+  // unless a hook rewrites it.
   const routePath = resolveRoutePath(withQuery(withBase(path, baseURL), requestQuery), baseURL)
   assertAllowedRoute(endpoint.allowedRoutes, routePath, method ?? 'GET')
 
