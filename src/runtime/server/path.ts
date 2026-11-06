@@ -1,42 +1,25 @@
 import { createError } from 'h3'
-import { hasProtocol } from 'ufo'
+
+/* eslint-disable no-control-regex -- URL parsers strip leading and trailing C0 controls, so the checks look past them. */
 
 /**
- * Throws a 400 for a path that would leave the endpoint's host once `$fetch` joins it
- * onto `baseURL`.
- *
- * `ofetch` skips that join whenever `ufo`'s `hasProtocol` finds a scheme, and it finds
- * one in `http:host/x` and in `http://` behind any `\s` character. The WHATWG parser
- * that resolves the outgoing request reads both as relative, so a path has to count as
- * relative under both checks before it is fetched.
+ * Throws a 400 for a path that a URL parser or the backend behind it could read as absolute or as
+ * climbing above the base URL: a scheme, an authority, a tab or line break, or a dot segment, also
+ * percent-encoded or with a `;` parameter.
  */
-export function assertRelativePath(path: string) {
-  // TODO: Drop the `hasProtocol` check once Nitro ships `ofetch` 2, which no longer joins through `ufo`.
+export function assertPathBelowBase(path: string) {
+  const segments = path.split('?', 1)[0]!.replace(/%2e/gi, '.').replace(/%3b/gi, ';').split(/[/\\#]|%2f|%5c/i)
+
   if (
-    hasProtocol(path, { acceptRelative: true })
-    || new URL(path, 'http://localhost').origin !== 'http://localhost'
+    /[\t\n\r\u2028\u2029]/.test(path)
+    // RFC 3986 forbids a colon in the first segment of a relative path.
+    || /^[^/?#]*:/.test(path)
+    || /^[\s\u0000-\u001F]*(?:[/\\]\s*){2}/.test(path)
+    || segments.some(segment => /^\.{1,2}(?:;|[\u0000-\u0020]*$)/.test(segment))
   ) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Absolute URLs are not allowed',
-    })
-  }
-}
-
-/**
- * Throws a 400 for a path with a dot segment, even an encoded one, one delimited by `#` or by an
- * encoded slash or backslash, or one followed by `;`, U+2028, U+2029, or trailing spaces and controls.
- * Backends and Nitro's in-process fetch disagree on which of these they resolve.
- */
-export function assertNoDotSegments(path: string) {
-  const pathname = path.replace(/[\t\n\r]/g, '').split('?', 1)[0]!
-  const segments = pathname.replace(/%2e/gi, '.').replace(/%3b/gi, ';').replace(/%2f|%5c/gi, '/').split(/[/\\#]/)
-
-  // eslint-disable-next-line no-control-regex -- The WHATWG parser strips trailing C0 controls.
-  if (segments.some(segment => /^\.{1,2}(?:[;\u2028\u2029]|[\u0000-\u0020]*$)/.test(segment))) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Path must not contain dot segments',
+      statusMessage: 'Path must stay below the base URL',
     })
   }
 }
