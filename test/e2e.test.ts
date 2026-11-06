@@ -1,26 +1,13 @@
 import { join } from 'node:path'
-import { $fetch, createPage, fetch, setup } from '@nuxt/test-utils/e2e'
+import { $fetch, createPage, setup } from '@nuxt/test-utils/e2e'
 import destr from 'destr'
-import { afterAll, beforeEach, describe, expect, it } from 'vitest'
-import { ALLOWED_REQUESTS, REFUSED_REQUESTS } from './helpers/allowed-routes'
-import { ABSOLUTE_PATH_TEMPLATES, ESCAPING_PATHS, recordingEndpoints, startRecordingServer } from './helpers/recording-server'
+import { describe, expect, it } from 'vitest'
 
 describe('nuxt-api-party', async () => {
-  const backend = await startRecordingServer()
-  beforeEach(() => {
-    backend.requestUrls.length = 0
-  })
-  afterAll(() => backend.close())
-
   await setup({
     server: true,
     browser: true,
     rootDir: join(import.meta.dirname, 'fixture'),
-    nuxtConfig: {
-      apiParty: {
-        endpoints: recordingEndpoints(backend.host),
-      },
-    },
   })
 
   describe('$testApi', () => {
@@ -47,11 +34,17 @@ describe('nuxt-api-party', async () => {
       })
     })
 
-    it('forwards the headers option to the API', async () => {
-      const result = await fetchTestResult<{ authorization?: string, traceId?: string }>('/request-headers')
+    it('forwards a Headers instance passed as the headers option to the API', async () => {
+      const result = await fetchTestResult<{ traceId?: string }>('/request-headers')
 
-      expect(result.authorization).toBe('Bearer developer-token')
       expect(result.traceId).toBe('abc')
+    })
+
+    it('forwards headers that an onRequest interceptor and an api-party:request hook set', async () => {
+      const result = await fetchTestResult<{ interceptorHeader?: string, hookHeader?: string }>('/hook-headers')
+
+      expect(result.interceptorHeader).toBe('interceptor')
+      expect(result.hookHeader).toBe('hook')
     })
 
     it('forwards the cookie only for the endpoint that sets forwardCredentials to true', async () => {
@@ -62,6 +55,14 @@ describe('nuxt-api-party', async () => {
 
       expect(result.withCookies).toBe('session=secret')
       expect(result.withoutCookies).toBeUndefined()
+    })
+
+    it('forwards the cookie while rendering a page a cross-site link opened', async () => {
+      const html = await $fetch<string>('/cookies', {
+        headers: { 'cookie': 'session=secret', 'sec-fetch-site': 'cross-site' },
+      })
+
+      expect(readTestResult<{ withCookies?: string }>(html).withCookies).toBe('session=secret')
     })
   })
 
@@ -122,97 +123,15 @@ describe('nuxt-api-party', async () => {
       await expect.poll(() => hits.textContent()).toBe(String(initialHits + 1))
       await page.close()
     })
-  })
 
-  describe('body', () => {
-    it.each([['null as the body', null], ['an empty body', undefined]])('rejects %s', async (_label, body) => {
-      const response = await proxy('backendApi', body)
+    it('sends a GET request to the proxy from the browser', async () => {
+      const page = await createPage('/refresh-in-browser')
+      const proxyRequest = page.waitForRequest(request => request.url().includes('/__api_party/'))
 
-      expect(response.status).toBe(400)
-    })
+      await page.getByTestId('refresh').click()
 
-    it.each([['x'], [[['a']]]])('rejects %j as headers', async (headers) => {
-      const response = await proxy('backendApi', { path: 'articles/1', headers })
-
-      expect(response.status).toBe(400)
-    })
-
-    it('forwards a request with null as headers', async () => {
-      const response = await proxy('guardedApi', { path: 'articles/1', headers: null })
-
-      expect(response.status).toBe(200)
-    })
-  })
-
-  describe('path', () => {
-    it.each(ABSOLUTE_PATH_TEMPLATES)('rejects %s without contacting the host it names', async (pathTemplate) => {
-      const response = await proxy('testApi', { path: pathTemplate.replace('{host}', backend.host) })
-
-      expect(response.status).toBe(400)
-      expect(backend.requestUrls).toEqual([])
-    })
-
-    it.each(ESCAPING_PATHS)('rejects %s for leaving the base path', async (path) => {
-      const response = await proxy('backendApi', { path })
-
-      expect(response.status).toBe(400)
-      expect(backend.requestUrls).toEqual([])
-    })
-
-    it('rejects a ../secret escape hidden before a line break', async () => {
-      const response = await proxy('backendApi', { path: '../secret\n/../base/articles' })
-
-      expect(response.status).toBe(400)
-      expect(backend.requestUrls).toEqual([])
-    })
-
-    it('rejects a non-string path', async () => {
-      const response = await proxy('backendApi', { path: 123 })
-
-      expect(response.status).toBe(400)
-    })
-  })
-
-  describe('allowedRoutes', () => {
-    it.each(ALLOWED_REQUESTS)('forwards %s %s', async (method, path) => {
-      const response = await proxy('guardedApi', { path, method })
-
-      expect(response.status).toBe(200)
-      expect(backend.requestUrls).toEqual([`/base/${path}`])
-    })
-
-    it.each(REFUSED_REQUESTS)('refuses %s %s without contacting the backend', async (method, path) => {
-      const response = await proxy('guardedApi', { path, method })
-
-      expect(response.status).toBe(403)
-      expect(backend.requestUrls).toEqual([])
-    })
-
-    it('rejects articles/../admin before matching allowedRoutes', async () => {
-      const response = await proxy('guardedApi', { path: 'articles/../admin' })
-
-      expect(response.status).toBe(400)
-      expect(backend.requestUrls).toEqual([])
-    })
-
-    it('forwards a request without a method to a GET-only route', async () => {
-      const response = await proxy('guardedApi', { path: 'articles/1' })
-
-      expect(response.status).toBe(200)
-    })
-
-    it('rejects a non-string method', async () => {
-      const response = await proxy('guardedApi', { path: 'articles/1', method: 123 })
-
-      expect(response.status).toBe(400)
-      expect(backend.requestUrls).toEqual([])
-    })
-
-    it('refuses every request with an empty list', async () => {
-      const response = await proxy('closedApi', { path: 'articles/1' })
-
-      expect(response.status).toBe(403)
-      expect(backend.requestUrls).toEqual([])
+      expect((await proxyRequest).method()).toBe('GET')
+      await page.close()
     })
   })
 
@@ -225,14 +144,6 @@ describe('nuxt-api-party', async () => {
     })
   })
 })
-
-function proxy(endpointId: string, body: { path?: unknown, method?: unknown, headers?: unknown } | null | undefined) {
-  return fetch(`/api/__api_party/${endpointId}`, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify(body),
-  })
-}
 
 async function fetchTestResult<T = any>(path: string): Promise<T> {
   return readTestResult<T>(await $fetch<string>(path))

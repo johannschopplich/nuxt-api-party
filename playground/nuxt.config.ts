@@ -19,9 +19,6 @@ export default defineNuxtConfig({
   },
 
   apiParty: {
-    server: {
-      proxyMode: 'passthrough',
-    },
     endpoints: {
       jsonPlaceholder: {
         url: 'https://jsonplaceholder.typicode.com',

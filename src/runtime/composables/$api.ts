@@ -4,13 +4,12 @@ import type { FetchResponseData, MethodOption, ParamsOption, PathItem, RequestBo
 import { defu } from 'defu'
 import { hash } from 'ohash'
 import { joinURL } from 'ufo'
-import { allowClient, allowPayloadCache, serverBasePath, serverProxyMode } from '#build/module/nuxt-api-party.config'
+import { allowClient, allowPayloadCache, serverBasePath } from '#build/module/nuxt-api-party.config'
 import { useNuxtApp, useRequestFetch, useRuntimeConfig } from '#imports'
 import { CACHE_KEY_PREFIX } from '../constants'
-import { isFormData } from '../form-data'
 import { mergeFetchHooks } from '../hooks'
 import { resolvePathParams } from '../openapi'
-import { mergeHeaders, serializeMaybeEncodedBody } from '../utils'
+import { mergeHeaders } from '../utils'
 
 // #region options
 export interface SharedFetchOptions {
@@ -145,12 +144,6 @@ export async function _$api<T = unknown>(
     console.error('[nuxt-api-party] Payload caching is disabled. Set `payloadCache: true` in the module options to enable it.')
   }
 
-  // The wrapped proxy turns every call into a POST to the Nuxt server route, and a POST is never served from the
-  // browser's HTTP cache, so the option would quietly do nothing.
-  if (import.meta.dev && cache && !client && serverProxyMode === 'wrapped') {
-    console.warn('[nuxt-api-party] The `cache` option has no effect while `server.proxyMode` is `wrapped`. Set it to `passthrough`, or send the request with `client: true`, to make the browser cache apply.')
-  }
-
   // The payload always carries an SSR response over to the client, so a write is due there regardless of the option.
   const cachesPayload = allowPayloadCache && (import.meta.server || payloadCache)
 
@@ -165,7 +158,7 @@ export async function _$api<T = unknown>(
       pathParams,
       query,
       method,
-      ...(isFormData(body) ? [] : [body]),
+      ...(body instanceof FormData ? [] : [body]),
     ]))
 
     return _key
@@ -200,46 +193,36 @@ export async function _$api<T = unknown>(
     },
   })
 
-  const clientFetcher = (baseURL: string) => $fetch<T>(resolvePathParams(path, pathParams), {
+  // Headers travel as a plain object: during SSR, `useRequestFetch` spreads them into one, which empties a `Headers` instance.
+  const targetOptions = allowClient && client
+    ? {
+        baseURL: endpoint.url,
+        query: { ...endpoint.query, ...query },
+        headers: Object.fromEntries(mergeHeaders(
+          endpoint.token ? { Authorization: `Bearer ${endpoint.token}` } : undefined,
+          endpoint.headers,
+          headers,
+        )),
+      }
+    : {
+        baseURL: joinURL('/api', serverBasePath, endpointId),
+        query,
+        headers: {
+          ...Object.fromEntries(mergeHeaders(headers)),
+          // During SSR, `useRequestFetch` forwards the `Sec-Fetch-Site` of the visitor's navigation, which would
+          // trip the server proxy's cross-site check, but this request comes from the app itself.
+          ...(import.meta.server && { 'sec-fetch-site': 'same-origin' }),
+        },
+      }
+
+  const request = ($fetch<T>(resolvePathParams(path, pathParams), {
     ...fetchOptions,
     ...fetchHooks,
+    ...targetOptions,
     cache,
-    baseURL,
     method,
-    query: {
-      ...endpoint.query,
-      ...query,
-    },
-    headers: mergeHeaders(
-      endpoint.token ? { Authorization: `Bearer ${endpoint.token}` } : undefined,
-      endpoint.headers,
-      headers,
-    ),
     body,
-  }) as Promise<T>
-
-  const serverFetcher = async () =>
-    (await $fetch<T>(joinURL('/api', serverBasePath, endpointId), {
-      ...fetchOptions,
-      ...fetchHooks,
-      cache,
-      method: 'POST',
-      body: {
-        path: resolvePathParams(path, pathParams),
-        query,
-        // The server handler reads the cookie off its own request, so sending
-        // one along here would only duplicate it.
-        headers: [...mergeHeaders(headers)],
-        method,
-        body: await serializeMaybeEncodedBody(body),
-      },
-    })) as T
-
-  const request = (allowClient && client
-    ? clientFetcher(endpoint.url!)
-    : serverProxyMode === 'passthrough'
-      ? clientFetcher(joinURL('/api', serverBasePath, endpointId, 'proxy'))
-      : serverFetcher())
+  }) as Promise<T>)
     .then((response) => {
       if (cachesPayload) {
         const cacheKey = getCacheKey()

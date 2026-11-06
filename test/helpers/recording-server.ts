@@ -1,4 +1,6 @@
+import type { IncomingHttpHeaders } from 'node:http'
 import type { AddressInfo } from 'node:net'
+import { Buffer } from 'node:buffer'
 import { createServer } from 'node:http'
 import { ALLOWED_ROUTES } from './allowed-routes'
 
@@ -10,7 +12,7 @@ export const ABSOLUTE_PATH_TEMPLATES = [
   'http:/{host}/stolen',
   'HTTP:{host}/stolen',
   ' http:{host}/stolen',
-  ' http://{host}/stolen',
+  ' http://{host}/stolen',
   '﻿http://{host}/stolen',
   '　http:\\\\{host}/stolen',
 ]
@@ -24,11 +26,26 @@ export const ESCAPING_PATHS = [
   'articles/..%2F..%2F..%2Fsecret',
 ]
 
+/** Cookie the server sets on a request to a path ending in `/set-cookie`. */
+export const UPSTREAM_COOKIE = 'upstream=1; Path=/'
+
+/** Location the server redirects a request to a path ending in `/redirect` to. */
+export const UPSTREAM_REDIRECT_LOCATION = '/base/redirected'
+
+export interface RecordedRequest {
+  url: string
+  method: string
+  headers: IncomingHttpHeaders
+  body: string
+}
+
 export interface RecordingServer {
   /** Host and port the server listens on. */
   host: string
-  /** Request URLs the server has received, oldest first. */
-  requestUrls: string[]
+  /** Requests the server has received, oldest first. */
+  requests: RecordedRequest[]
+  /** URLs of `requests`. */
+  readonly requestUrls: string[]
   close: () => Promise<void>
 }
 
@@ -36,6 +53,17 @@ export function recordingEndpoints(host: string) {
   return {
     backendApi: {
       url: `http://${host}/base`,
+    },
+    forwardingApi: {
+      url: `http://${host}/base`,
+      forwardCredentials: true,
+    },
+    tokenApi: {
+      url: `http://${host}/base`,
+      token: 'endpoint-token',
+      headers: { 'x-endpoint': 'endpoint' },
+      query: { tenant: 'a', locale: 'en' },
+      forwardCredentials: true,
     },
     guardedApi: {
       url: `http://${host}/base`,
@@ -48,17 +76,41 @@ export function recordingEndpoints(host: string) {
   }
 }
 
+/**
+ * Starts a server that records every request and answers it empty, except a path ending in
+ * `/set-cookie`, which sets `UPSTREAM_COOKIE`, and one ending in `/redirect`, which redirects
+ * to `UPSTREAM_REDIRECT_LOCATION`.
+ */
 export async function startRecordingServer(): Promise<RecordingServer> {
-  const requestUrls: string[] = []
-  const server = createServer((request, response) => {
-    requestUrls.push(request.url!)
+  const requests: RecordedRequest[] = []
+  const server = createServer(async (request, response) => {
+    const chunks: Buffer[] = []
+    for await (const chunk of request)
+      chunks.push(chunk)
+
+    requests.push({
+      url: request.url!,
+      method: request.method!,
+      headers: request.headers,
+      body: Buffer.concat(chunks).toString(),
+    })
+
+    if (request.url!.endsWith('/set-cookie'))
+      response.setHeader('set-cookie', UPSTREAM_COOKIE)
+
+    if (request.url!.endsWith('/redirect'))
+      response.writeHead(302, { location: UPSTREAM_REDIRECT_LOCATION })
+
     response.end()
   })
   await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve))
 
   return {
     host: `127.0.0.1:${(server.address() as AddressInfo).port}`,
-    requestUrls,
+    requests,
+    get requestUrls() {
+      return requests.map(request => request.url)
+    },
     close: () => new Promise<void>((resolve, reject) => server.close(error => error ? reject(error) : resolve())),
   }
 }

@@ -2,33 +2,16 @@ import type { H3Event } from 'h3'
 import { hasLeadingSlash, hasProtocol, joinURL, withoutBase } from 'ufo'
 
 const REDIRECT_STATUSES = new Set([301, 302, 303, 307, 308])
-const REDIRECT_MODES = new Set(['follow', 'error', 'manual'])
 
 /**
- * Nitro plugin to rewrite API request and response redirect behavior.
- *
- * This plugin requires the `server.proxyMode` option set to `'passthrough'`. The wrapped proxy
- * would cause some redirects to change from POST to GET, which would result in a 405 error
- * on the proxy.
- *
- * Request headers:
- * - `x-proxy-redirect`: Sets the redirect mode for the proxy request. Valid values are 'follow', 'error', and 'manual'.
+ * Nitro plugin to rewrite the location of a redirect the server proxy passes back.
  *
  * Response headers:
  * - `x-proxy-location`: Contains the original 'Location' header relative to the endpoint base url.
  */
 export default defineNitroPlugin(async (nitroApp) => {
-  nitroApp.hooks.hook('api-party:request', ({ options }, event) => {
-    // Set redirect mode from request header.
-    const redirect = getRequestHeader(event, 'x-proxy-redirect')
-    if (redirect && REDIRECT_MODES.has(redirect)) {
-      options.redirect = redirect as RequestRedirect
-    }
-  })
-
-  nitroApp.hooks.hook('api-party:response', ({ options, response }, event) => {
-    // Handle manual redirect responses.
-    if (options.redirect === 'manual' && REDIRECT_STATUSES.has(response.status)) {
+  nitroApp.hooks.hook('api-party:response', ({ response }, event) => {
+    if (REDIRECT_STATUSES.has(response.status)) {
       handleRedirectResponse(event, response)
     }
   })
@@ -81,7 +64,7 @@ function handleRedirectResponse(event: H3Event, response: Response) {
   location = joinURL(reqUrl.pathname.slice(0, -path.length), location)
 
   // Write the required status and headers, then end the response to prevent
-  // sendProxy from overwriting the Location header.
+  // the server proxy from overwriting the Location header.
   setResponseStatus(event, response.status, response.statusText)
   setResponseHeader(event, 'location', location)
   event.node.res.end()

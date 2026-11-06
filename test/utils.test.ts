@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { isForwardableBodyHeader, isForwardableProxyHeader, mergeHeaders } from '../src/runtime/utils'
+import { mergeHeaders } from '../src/runtime/utils'
 
 describe('mergeHeaders', () => {
   it('lowercases header names', () => {
@@ -21,41 +21,5 @@ describe('mergeHeaders', () => {
     const merged = mergeHeaders(undefined, { accept: 'application/json' }, undefined)
 
     expect([...merged]).toEqual([['accept', 'application/json']])
-  })
-})
-
-describe('isForwardableProxyHeader', () => {
-  it('forwards accept', () => {
-    expect(isForwardableProxyHeader('accept', {})).toBe(true)
-  })
-
-  it('withholds authorization', () => {
-    expect(isForwardableProxyHeader('authorization', {})).toBe(false)
-  })
-
-  it('matches whatever casing the browser used', () => {
-    expect(isForwardableProxyHeader('Authorization', {})).toBe(false)
-  })
-
-  it('withholds cookie when the endpoint leaves forwardCredentials unset', () => {
-    expect(isForwardableProxyHeader('cookie', {})).toBe(false)
-  })
-
-  it('withholds cookie when the endpoint sets forwardCredentials to false', () => {
-    expect(isForwardableProxyHeader('cookie', { forwardCredentials: false })).toBe(false)
-  })
-
-  it('forwards cookie when the endpoint sets forwardCredentials to true', () => {
-    expect(isForwardableProxyHeader('cookie', { forwardCredentials: true })).toBe(true)
-  })
-})
-
-describe('isForwardableBodyHeader', () => {
-  it('forwards authorization', () => {
-    expect(isForwardableBodyHeader('authorization')).toBe(true)
-  })
-
-  it('withholds cookie regardless of the endpoint', () => {
-    expect(isForwardableBodyHeader('cookie')).toBe(false)
   })
 })

@@ -8,7 +8,6 @@ import { computed, toValue } from 'vue'
 import { allowClient, allowPayloadCache } from '#build/module/nuxt-api-party.config'
 import { useFetch, useNuxtApp } from '#imports'
 import { CACHE_KEY_PREFIX } from '../constants'
-import { isFormData } from '../form-data'
 import { resolvePathParams } from '../openapi'
 import { _$api } from './$api'
 
@@ -125,7 +124,7 @@ export function _useApiData<T = unknown>(
     _path.value,
     toValue(opts.query),
     toValue(opts.method),
-    ...(isFormData(toValue(opts.body)) ? [] : [toValue(opts.body)]),
+    ...(toValue(opts.body) instanceof FormData ? [] : [toValue(opts.body)]),
   ]))
 
   // An explicit `key` merges two call sites back into one async data instance, as with Nuxt's own composables.

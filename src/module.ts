@@ -39,7 +39,7 @@ export interface ModuleOptions {
    * - `token` (optional): Bearer token for authentication
    * - `query` (optional): Default query parameters to send with each request
    * - `headers` (optional): Default headers to send with each request
-   * - `forwardCredentials` (optional): Whether the server proxy forwards the visitor's cookie to the API
+   * - `forwardCredentials` (optional): Whether the server proxy forwards the visitor's cookie and `Authorization` header to the API, and the API's `Set-Cookie` back
    * - `allowedRoutes` (optional): Routes the [server proxy may forward](https://nuxt-api-party.byjohann.dev/guides/allowed-routes)
    * - `schema` (optional): [OpenAPI](https://swagger.io/resources/open-api) document for [type generation](https://nuxt-api-party.byjohann.dev/guides/openapi-integration) – a file path, a `file:` or http(s) URL, the document itself, or an async function resolving to it
    *
@@ -88,19 +88,6 @@ export interface ModuleOptions {
      * @default '__api_party'
      */
     basePath?: string
-
-    /**
-     * How the Nuxt server handler forwards a request to the API.
-     *
-     * @remarks
-     * - `'wrapped'` sends every call as a POST request carrying the original request in its body, and adds the
-     *   endpoint's `token`, `headers` and `query` along the way.
-     * - `'passthrough'` mirrors the original request – path, method, headers, query and body travel as they are,
-     *   and nothing from the endpoint configuration is added. Attach credentials in a request hook instead.
-     *
-     * @default 'wrapped'
-     */
-    proxyMode?: 'wrapped' | 'passthrough'
   }
 
   /**
@@ -173,7 +160,6 @@ export default defineNuxtModule<ModuleOptions>().with({
     client: undefined,
     server: {
       basePath: '__api_party',
-      proxyMode: 'wrapped',
     },
     payloadCache: true,
   },
@@ -228,6 +214,7 @@ export default defineNuxtModule<ModuleOptions>().with({
     )
 
     const { resolve } = createResolver(import.meta.url)
+    // Nuxt passes the transpiled directories on to Nitro to inline, so the server runtime is bundled as well.
     nuxt.options.build.transpile.push(resolve('runtime'))
 
     const relativeTo = (path: string) => relative(
@@ -242,36 +229,17 @@ export default defineNuxtModule<ModuleOptions>().with({
     )
     const schemaEndpointIds = Object.keys(schemaEndpoints)
 
-    if (options.server.proxyMode === 'passthrough') {
-      addServerHandler({
-        route: joinURL('/api', options.server.basePath, ':endpointId/proxy/**:path'),
-        handler: resolve('runtime/server/proxyHandler'),
-      })
-      // Duplicated server handler because empty path will respond with 404.
-      addServerHandler({
-        route: joinURL('/api', options.server.basePath, ':endpointId/proxy/'),
-        handler: resolve('runtime/server/proxyHandler'),
-      })
-    }
-    else {
-      addServerHandler({
-        route: joinURL('/api', options.server.basePath, ':endpointId'),
-        handler: resolve('runtime/server/handler'),
-        method: 'post',
-      })
-    }
+    addServerHandler({
+      route: joinURL('/api', options.server.basePath, ':endpointId/**:path'),
+      handler: resolve('runtime/server/proxy'),
+    })
+    // Duplicated server handler because empty path will respond with 404.
+    addServerHandler({
+      route: joinURL('/api', options.server.basePath, ':endpointId'),
+      handler: resolve('runtime/server/proxy'),
+    })
 
     nuxt.hooks.hook('nitro:config', (config) => {
-      // Inlined because Nitro would otherwise fail to resolve the `utils` import from `server.ts`.
-      config.externals ||= {}
-      config.externals.inline ||= []
-      config.externals.inline.push(
-        resolve('runtime/utils'),
-        resolve('runtime/form-data'),
-        resolve('runtime/server/$api'),
-        resolve('runtime/server/path'),
-      )
-
       config.alias ||= {}
       config.alias[`#${moduleName}/server`] = resolve(nuxt.options.buildDir, `module/${moduleName}.nitro`)
 
@@ -427,7 +395,6 @@ ${await generateOpenAPITypes(schemaEndpoints, { rootDir: nuxt.options.rootDir })
       getContents: () => `
 export const allowClient = ${JSON.stringify(options.client)}
 export const serverBasePath = ${JSON.stringify(options.server.basePath)}
-export const serverProxyMode = ${JSON.stringify(options.server.proxyMode)}
 export const allowPayloadCache = ${JSON.stringify(options.payloadCache)}
 `.trimStart(),
     })
@@ -438,7 +405,6 @@ export const allowPayloadCache = ${JSON.stringify(options.payloadCache)}
       getContents: () => `
 export declare const allowClient: boolean | 'allow' | 'always'
 export declare const serverBasePath: string
-export declare const serverProxyMode: 'wrapped' | 'passthrough'
 export declare const allowPayloadCache: boolean
 `.trimStart(),
     })
