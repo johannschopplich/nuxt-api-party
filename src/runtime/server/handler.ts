@@ -42,7 +42,7 @@ export default defineEventHandler(async (event) => {
     headers,
     method,
     body,
-  } = await readBody<EndpointFetchOptions>(event)
+  } = (await readBody<EndpointFetchOptions | null | undefined>(event)) ?? {}
 
   if (typeof path !== 'string') {
     throw createError({

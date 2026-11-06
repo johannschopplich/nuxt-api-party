@@ -124,6 +124,14 @@ describe('nuxt-api-party', async () => {
     })
   })
 
+  describe('body', () => {
+    it.each([['null as the body', null], ['an empty body', undefined]])('rejects %s', async (_label, body) => {
+      const response = await proxy('backendApi', body)
+
+      expect(response.status).toBe(400)
+    })
+  })
+
   describe('path', () => {
     it.each(ABSOLUTE_PATH_TEMPLATES)('rejects %s without contacting the host it names', async (pathTemplate) => {
       const response = await proxy('testApi', { path: pathTemplate.replace('{host}', backend.host) })
@@ -157,7 +165,7 @@ describe('nuxt-api-party', async () => {
     })
 
     it('rejects a non-string path', async () => {
-      const response = await proxy('backendApi', { path: 123 as unknown as string })
+      const response = await proxy('backendApi', { path: 123 })
 
       expect(response.status).toBe(400)
     })
@@ -192,7 +200,7 @@ describe('nuxt-api-party', async () => {
     })
 
     it('rejects a non-string method', async () => {
-      const response = await proxy('guardedApi', { path: 'articles/1', method: 123 as unknown as string })
+      const response = await proxy('guardedApi', { path: 'articles/1', method: 123 })
 
       expect(response.status).toBe(400)
       expect(backend.requestUrls).toEqual([])
@@ -231,7 +239,7 @@ describe('nuxt-api-party', async () => {
   })
 })
 
-function proxy(endpointId: string, body: { path: string, method?: string, headers?: Record<string, string> }) {
+function proxy(endpointId: string, body: { path?: unknown, method?: unknown, headers?: unknown } | null | undefined) {
   return fetch(`/api/__api_party/${endpointId}`, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
