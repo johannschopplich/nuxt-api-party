@@ -27,7 +27,7 @@ export default defineNuxtConfig({
 
 Each `path` matches the pathname below the endpoint's `url`, without the query string. `*` matches exactly one segment, so `/comments/*` admits `/comments/1` but not `/comments/1/replies`. A trailing `**` matches any number of segments, including none, so `/articles/**` admits `/articles` as well as `/articles/1/comments`. `methods` limits the HTTP methods a route accepts; leave it out to accept every method. A route that lists only `GET` refuses `HEAD`.
 
-Independent of the list, the proxy refuses a path with a dot segment, such as `articles/../admin` or `articles/..%2Fadmin`, with a 400. An encoded slash otherwise stays inside its segment, so `/comments/*` admits `/comments/a%2Fb`.
+Independent of the list, the proxy refuses a path with a raw tab, a line break, a colon before its first slash, or a dot segment such as `articles/../admin` or `articles/..%2Fadmin`, with a 400. An encoded slash otherwise stays inside its segment, so `/comments/*` admits `/comments/a%2Fb`.
 
 Lists from Nuxt layers, the module options and `runtimeConfig` add up rather than narrow one another. Only the `NUXT_API_PARTY_ENDPOINTS_CMS_ALLOWED_ROUTES` environment variable replaces the list, and only for an endpoint that sets `allowedRoutes` at build time – `[]` is enough.
 
