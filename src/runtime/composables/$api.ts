@@ -1,7 +1,6 @@
 import type { NitroFetchOptions } from 'nitropack'
 import type { $Fetch, ResponseType } from 'ofetch'
 import type { FetchResponseData, MethodOption, ParamsOption, PathItem, RequestBodyOption } from '../openapi'
-import { defu } from 'defu'
 import { camelCase, pascalCase } from 'scule'
 import { joinURL } from 'ufo'
 import { proxyRoute } from '#build/module/nuxt-api-party.config'
@@ -79,16 +78,7 @@ export function createEndpointFetch(endpointId: string) {
   const endpointFetch = (clientEndpoint ? globalThis.$fetch : useRequestFetch()) as $Fetch
 
   function $fetch<T = unknown>(path: string, opts: ApiClientFetchOptions = {}) {
-    const {
-      path: pathParams,
-      query,
-      headers,
-      ...fetchOptions
-    } = defu(
-      opts,
-      nuxt.$apiParty?.endpoints?.[endpointId]?.defaults,
-      nuxt.$apiParty?.defaults,
-    )
+    const { path: pathParams, query, headers, ...fetchOptions } = opts
 
     const fetchHooks = mergeFetchHooks(fetchOptions, {
       async onRequest(ctx) {

@@ -1,8 +1,6 @@
 import type { HookResult, Nuxt } from '@nuxt/schema'
 import type { OpenAPIDocumentSource } from 'apiful/openapi/generate'
 import type { QueryObject } from 'ufo'
-import type { ObjectPlugin, Plugin } from '#app'
-import type { ApiClientFetchOptions } from './runtime/composables/$api'
 import type { AllowedRoute } from './runtime/types'
 import { fileURLToPath } from 'node:url'
 import { addImportsSources, addServerHandler, addTemplate, addTypeTemplate, createResolver, defineNuxtModule, updateTemplates } from '@nuxt/kit'
@@ -96,29 +94,6 @@ declare module '@nuxt/schema' {
 
   interface NuxtHooks {
     'api-party:extend': (options: ModuleOptions) => HookResult
-  }
-}
-
-export type FetchOptionsDefaults = Omit<
-  ApiClientFetchOptions,
-  | 'path'
-  | 'method'
-  | 'body'
->
-
-export interface ModuleInjections {
-  defaults?: FetchOptionsDefaults
-  endpoints?: Record<string, {
-    defaults?: FetchOptionsDefaults
-  }>
-}
-
-export type ModulePlugin = Plugin<{ apiParty: ModuleInjections }>
-  & ObjectPlugin<{ apiParty: ModuleInjections }>
-
-declare module '#app' {
-  interface NuxtApp {
-    $apiParty?: ModuleInjections
   }
 }
 
