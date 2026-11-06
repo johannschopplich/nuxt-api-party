@@ -7,9 +7,9 @@ import { hasProtocol } from 'ufo'
  * onto `baseURL`.
  *
  * `ofetch` skips that join whenever `ufo`'s `hasProtocol` finds a scheme, and it finds
- * one in `http:host/x` and in `http://` behind any `\s` character. The WHATWG parser
- * that resolves the outgoing request reads both as relative, so a path has to count as
- * relative under both checks before it is fetched.
+ * one in `http:host/x` and in `http://` behind any `\s` character. `new URL` against an
+ * `http:` base reads `http:host/x` and `x http://host` as relative, so a path has to count
+ * as relative under both checks before it is fetched.
  */
 export function assertRelativePath(path: string) {
   // TODO: Drop the `hasProtocol` check once Nitro ships `ofetch` 2, which no longer joins through `ufo`.
