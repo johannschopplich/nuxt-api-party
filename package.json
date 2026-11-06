@@ -46,13 +46,12 @@
     "release": "bumpp"
   },
   "dependencies": {
-    "@nuxt/kit": "^4.5.2",
+    "@nuxt/kit": "^4.6.4",
     "apiful": "^6.0.0",
     "chokidar": "^5.0.0",
     "defu": "^6.1.7",
     "h3": "^1.15.11",
     "ofetch": "^1.5.1",
-    "ohash": "^2.0.11",
     "pathe": "^2.0.3",
     "scule": "^1.3.0",
     "ufo": "^1.6.4"
@@ -60,13 +59,13 @@
   "devDependencies": {
     "@antfu/eslint-config": "^9.3.0",
     "@nuxt/module-builder": "^1.0.3",
-    "@nuxt/schema": "^4.5.2",
+    "@nuxt/schema": "^4.6.4",
     "@nuxt/test-utils": "^4.1.0",
     "@types/node": "^26.1.2",
     "bumpp": "^12.2.0",
     "destr": "^2.0.5",
     "eslint": "^10.8.0",
-    "nuxt": "^4.5.2",
+    "nuxt": "^4.6.4",
     "playwright-core": "^1.62.1",
     "typescript": "^6.0.3",
     "vitest": "^4.1.10",

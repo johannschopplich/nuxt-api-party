@@ -11,11 +11,11 @@ export default defineNuxtConfig({
       forbidden: {
         url: '/api',
       },
-      directApi: {
+      clientApi: {
         url: '/api',
-        token: 'direct-token',
+        token: 'client-token',
         query: { tenant: 'a' },
-        headers: { 'x-endpoint': 'direct' },
+        headers: { 'x-endpoint': 'client' },
         client: true,
       },
       credentialsApi: {

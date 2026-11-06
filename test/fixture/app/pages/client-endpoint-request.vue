@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { $directApi, useTestResult } from '#imports'
+import { $clientApi, useTestResult } from '#imports'
 
-const received = await $directApi<Record<string, string>>('echo-headers', {
+const received = await $clientApi<Record<string, string>>('echo-headers', {
   headers: { 'x-trace-id': 'abc' },
 })
 

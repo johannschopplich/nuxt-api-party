@@ -102,7 +102,7 @@ export default defineNuxtModule<ModuleOptions>().with({
     name,
     configKey: 'apiParty',
     compatibility: {
-      nuxt: '>=4.0.0',
+      nuxt: '>=4.4.0',
     },
   },
   defaults: {
@@ -112,6 +112,8 @@ export default defineNuxtModule<ModuleOptions>().with({
     const moduleName = name
     const getRawComposableName = (endpointId: string) => `$${camelCase(endpointId)}`
     const getDataComposableName = (endpointId: string) => `use${pascalCase(endpointId)}Data`
+    // Exported from the template only because Nuxt compiles a `createUseFetch` call in an export declaration alone.
+    const getFetchComposableName = (endpointId: string) => `_use${pascalCase(endpointId)}Fetch`
 
     await nuxt.callHook('api-party:extend', options)
 
@@ -230,11 +232,13 @@ export const ${getRawComposableName(i)} = (...args) => _$api('${i}', ...args)
       filename: `module/${moduleName}.mjs`,
       getContents() {
         return `
-import { _$api } from '${resolve('runtime/composables/$api')}'
+import { createUseFetch } from '#app/composables/fetch'
+import { _$api, createEndpointFetch } from '${resolve('runtime/composables/$api')}'
 import { _useApiData } from '${resolve('runtime/composables/useApiData')}'
 ${endpointKeys.map(i => `
 export const ${getRawComposableName(i)} = (...args) => _$api('${i}', ...args)
-export const ${getDataComposableName(i)} = (...args) => _useApiData('${i}', ...args)
+export const ${getFetchComposableName(i)} = createUseFetch(() => ({ ...createEndpointFetch('${i}'), _functionName: '${getDataComposableName(i)}' }))
+export const ${getDataComposableName(i)} = (...args) => _useApiData(${getFetchComposableName(i)}, ...args)
 `.trimStart()).join('')}`.trimStart()
       },
     })

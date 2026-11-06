@@ -1,13 +1,9 @@
 import type { NitroFetchOptions } from 'nitropack'
-import type { AsyncData, AsyncDataOptions, NuxtError } from 'nuxt/app'
+import type { AsyncData, AsyncDataOptions, NuxtError, UseFetch, UseFetchOptions } from 'nuxt/app'
 import type { MaybeRef, MaybeRefOrGetter, MultiWatchSources } from 'vue'
 import type { FetchResponseData, FetchResponseError, ParamsOption, PathItem, RequestBodyOption } from '../openapi'
-import { hash } from 'ohash'
-import { computed, toValue } from 'vue'
-import { useFetch } from '#imports'
-import { CACHE_KEY_PREFIX } from '../constants'
+import { toValue } from 'vue'
 import { resolvePathParams } from '../openapi'
-import { createEndpointFetch } from './$api'
 
 type ComputedOptions<T> = {
   // eslint-disable-next-line ts/no-unsafe-function-type
@@ -89,32 +85,16 @@ export type UseOpenAPIData<Paths> = <
 ) => AsyncData<DataT | undefined, NuxtError<ErrorT>>
 
 export function _useApiData<T = unknown>(
-  endpointId: string,
+  useFetch: UseFetch,
   path: MaybeRefOrGetter<string>,
   arg1?: UseApiDataOptions<T> | string,
   arg2?: string,
 ) {
   const [opts = {}, autoKey] = typeof arg1 === 'string' ? [{}, arg1] : [arg1, arg2]
-
   const { path: pathParams, ...fetchOptions } = opts
 
-  const _path = computed(() => resolvePathParams(toValue(path), toValue(pathParams)))
+  // Resolved into the request, so each value of the path parameters gets a key of its own.
+  const request = () => resolvePathParams(toValue(path), toValue(pathParams))
 
-  // Identity of the request, which keys the async data.
-  const _requestKey = computed(() => CACHE_KEY_PREFIX + hash([
-    endpointId,
-    _path.value,
-    toValue(opts.query),
-    toValue(opts.method),
-    ...(toValue(opts.body) instanceof FormData ? [] : [toValue(opts.body)]),
-  ]))
-
-  // An explicit `key` merges two call sites back into one async data instance, as with Nuxt's own composables.
-  const _asyncDataKey = computed(() => toValue(opts.key) || (autoKey ? `${_requestKey.value}${autoKey}` : _requestKey.value))
-
-  return useFetch(_path, {
-    ...fetchOptions,
-    key: _asyncDataKey,
-    $fetch: ((request: string, opts) => createEndpointFetch(endpointId).$fetch(request, opts)) as typeof globalThis.$fetch,
-  }) as AsyncData<T | undefined, NuxtError>
+  return useFetch(request, fetchOptions as UseFetchOptions<T>, autoKey) as AsyncData<T | undefined, NuxtError>
 }
