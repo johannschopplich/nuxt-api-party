@@ -1,0 +1,41 @@
+import { join } from 'node:path'
+import { $fetch, setup } from '@nuxt/test-utils/e2e'
+import destr from 'destr'
+import { describe, expect, it } from 'vitest'
+
+describe('nuxt-api-party route', async () => {
+  await setup({
+    server: true,
+    rootDir: join(import.meta.dirname, 'fixture'),
+    nuxtConfig: {
+      app: {
+        baseURL: '/app/',
+      },
+      nitro: {
+        apiBaseURL: '/rest',
+      },
+      apiParty: {
+        endpoints: {
+          testApi: { url: '/rest' },
+        },
+      },
+    },
+  })
+
+  it('serves the proxy below nitro.apiBaseURL', async () => {
+    const todos = await $fetch<unknown[]>('/app/rest/__api_party/testApi/todos')
+
+    expect(todos).toHaveLength(3)
+  })
+
+  it('sends a $testApi call through the proxy below app.baseURL and nitro.apiBaseURL', async () => {
+    const { json } = await fetchTestResult<{ json: unknown[] }>('/app/$testApi')
+
+    expect(json).toHaveLength(3)
+  })
+})
+
+async function fetchTestResult<T = any>(path: string): Promise<T> {
+  const html = await $fetch<string>(path)
+  return destr(html.match(/<script\s+type="text\/test-result">(.*?)<\/script>/s)?.[1])
+}

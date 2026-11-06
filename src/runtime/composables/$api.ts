@@ -4,7 +4,7 @@ import type { FetchResponseData, MethodOption, ParamsOption, PathItem, RequestBo
 import { defu } from 'defu'
 import { hash } from 'ohash'
 import { joinURL } from 'ufo'
-import { allowClient, allowPayloadCache, serverBasePath } from '#build/module/nuxt-api-party.config'
+import { allowClient, allowPayloadCache, proxyRoute } from '#build/module/nuxt-api-party.config'
 import { useNuxtApp, useRequestFetch, useRuntimeConfig } from '#imports'
 import { CACHE_KEY_PREFIX } from '../constants'
 import { mergeFetchHooks } from '../hooks'
@@ -117,7 +117,7 @@ export async function _$api<T = unknown>(
   opts: ApiClientFetchOptions & SharedFetchOptions = {},
 ) {
   const nuxt = useNuxtApp()
-  const apiParty = useRuntimeConfig().public.apiParty
+  const runtimeConfig = useRuntimeConfig()
 
   const {
     path: pathParams,
@@ -164,7 +164,7 @@ export async function _$api<T = unknown>(
     return _key
   }
 
-  const endpoint = apiParty.endpoints[endpointId]!
+  const endpoint = runtimeConfig.public.apiParty.endpoints[endpointId]!
 
   if (allowPayloadCache && (nuxt.isHydrating || payloadCache)) {
     const cacheKey = getCacheKey()
@@ -205,7 +205,8 @@ export async function _$api<T = unknown>(
         )),
       }
     : {
-        baseURL: joinURL('/api', serverBasePath, endpointId),
+        // A `baseURL` of its own replaces the `app.baseURL` that `$fetch` would prepend.
+        baseURL: joinURL(runtimeConfig.app.baseURL, proxyRoute, endpointId),
         query,
         headers: {
           ...Object.fromEntries(mergeHeaders(headers)),

@@ -81,15 +81,6 @@ export interface ModuleOptions {
    */
   client?: boolean | 'allow' | 'always'
 
-  server: {
-    /**
-     * The API base route for the Nuxt server handler.
-     *
-     * @default '__api_party'
-     */
-    basePath?: string
-  }
-
   /**
    * Cache a response in the Nuxt payload, keyed by the request.
    *
@@ -158,9 +149,6 @@ export default defineNuxtModule<ModuleOptions>().with({
   defaults: {
     endpoints: {},
     client: undefined,
-    server: {
-      basePath: '__api_party',
-    },
     payloadCache: true,
   },
   async setup(options, nuxt) {
@@ -229,13 +217,16 @@ export default defineNuxtModule<ModuleOptions>().with({
     )
     const schemaEndpointIds = Object.keys(schemaEndpoints)
 
+    // Nitro serves `server/api` below `apiBaseURL`, and the proxy joins it there.
+    const proxyRoute = joinURL(nuxt.options.nitro.apiBaseURL || '/api', '__api_party')
+
     addServerHandler({
-      route: joinURL('/api', options.server.basePath, ':endpointId/**:path'),
+      route: joinURL(proxyRoute, ':endpointId/**:path'),
       handler: resolve('runtime/server/proxy'),
     })
     // Duplicated server handler because empty path will respond with 404.
     addServerHandler({
-      route: joinURL('/api', options.server.basePath, ':endpointId'),
+      route: joinURL(proxyRoute, ':endpointId'),
       handler: resolve('runtime/server/proxy'),
     })
 
@@ -394,7 +385,7 @@ ${await generateOpenAPITypes(schemaEndpoints, { rootDir: nuxt.options.rootDir })
       filename: `module/${moduleName}.config.mjs`,
       getContents: () => `
 export const allowClient = ${JSON.stringify(options.client)}
-export const serverBasePath = ${JSON.stringify(options.server.basePath)}
+export const proxyRoute = ${JSON.stringify(proxyRoute)}
 export const allowPayloadCache = ${JSON.stringify(options.payloadCache)}
 `.trimStart(),
     })
@@ -404,7 +395,7 @@ export const allowPayloadCache = ${JSON.stringify(options.payloadCache)}
       write: false, // Read through the virtual import alone, so no file has to exist.
       getContents: () => `
 export declare const allowClient: boolean | 'allow' | 'always'
-export declare const serverBasePath: string
+export declare const proxyRoute: string
 export declare const allowPayloadCache: boolean
 `.trimStart(),
     })
