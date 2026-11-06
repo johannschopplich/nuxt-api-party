@@ -48,7 +48,7 @@ describe('assertNoDotSegments', () => {
     'comments/group%2Fname',
     'files/a..b',
     '.well-known/openid-configuration',
-    'articles?next=../admin',
+    'articles?next=/../admin',
   ])('accepts %j', (path) => {
     expect(statusOf(() => assertNoDotSegments(path))).toBe(200)
   })

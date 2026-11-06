@@ -25,11 +25,9 @@ export function assertRelativePath(path: string) {
 }
 
 /**
- * Throws a 400 for a path with a dot segment under any reading: percent-encoded, behind an
- * encoded slash or backslash, split by a tab or line break, followed by a `;` parameter, or
- * trailed by characters the URL parsers strip or cut at. Backends and Nitro's in-process
- * fetch disagree on which of these they resolve, so a path whose target depends on that is
- * never forwarded.
+ * Throws a 400 for a path with a dot segment, even an encoded one, one behind an encoded slash
+ * or backslash, or one followed by `;`, a line separator, or trailing spaces and controls.
+ * Backends and Nitro's in-process fetch disagree on which of these they resolve.
  */
 export function assertNoDotSegments(path: string) {
   const pathname = path.replace(/[\t\n\r]/g, '').split(/[?#]/, 1)[0]!
