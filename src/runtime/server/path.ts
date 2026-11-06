@@ -67,16 +67,16 @@ export function assertAllowedRoute(
   }
 }
 
+function splitPath(path: string) {
+  return path.replace(/^\/|\/$/g, '').split('/')
+}
+
 /**
  * Percent-encodes `segment` like a WHATWG pathname. A full URL parse would also resolve dot
  * segments and cut at `?` and `#`, letting a pattern match more than it says.
  */
 function encodePathSegment(segment: string) {
   return segment.replace(/[\u0000-\u0020"#<>?^`{}\u007F-\u{10FFFF}]/gu, character => encodeURIComponent(character))
-}
-
-function splitPath(path: string) {
-  return path.replace(/^\/|\/$/g, '').split('/')
 }
 
 function matchesPattern(patternSegments: string[], pathSegments: string[]) {
