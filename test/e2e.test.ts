@@ -73,6 +73,29 @@ describe('nuxt-api-party', async () => {
     })
   })
 
+  describe('$directApi', () => {
+    it('keeps the visitor cookie off a direct request during SSR but sends the token and headers option', async () => {
+      const html = await $fetch<string>('/direct-request', {
+        headers: { cookie: 'session=secret' },
+      })
+      const result = readTestResult<{ cookie?: string, authorization?: string, traceId?: string }>(html)
+
+      expect(result.cookie).toBeUndefined()
+      expect(result.authorization).toBe('Bearer direct-token')
+      expect(result.traceId).toBe('abc')
+    })
+
+    it('sends the request from the browser straight to the endpoint URL', async () => {
+      const page = await createPage('/direct-request-in-browser')
+      const request = page.waitForRequest(request => request.url().endsWith('/todos'))
+
+      await page.getByTestId('request').click()
+
+      expect(new URL((await request).url()).pathname).toBe('/api/todos')
+      await page.close()
+    })
+  })
+
   describe('useTestApiData', () => {
     it('applies transform to the resolved data', async () => {
       const todos = await fetchTestResult<{ isTransformed: boolean }[]>('/useTestApiData')

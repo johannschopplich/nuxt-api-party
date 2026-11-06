@@ -23,6 +23,17 @@ export interface EndpointConfiguration {
   token?: string
   query?: QueryObject
   headers?: HeadersInit
+  /**
+   * Whether every request goes straight to the API, from the browser and during SSR, instead of through the server
+   * proxy.
+   *
+   * @remarks
+   * The endpoint's URL, token, query and headers are published to the browser.
+   *
+   * @default true if Nuxt SSR is disabled and the endpoint sets neither `forwardCredentials` nor `allowedRoutes`,
+   * otherwise false
+   */
+  client?: boolean
   forwardCredentials?: boolean
   allowedRoutes?: AllowedRoute[]
   schema?: OpenAPIDocumentSource
@@ -39,6 +50,7 @@ export interface ModuleOptions {
    * - `token` (optional): Bearer token for authentication
    * - `query` (optional): Default query parameters to send with each request
    * - `headers` (optional): Default headers to send with each request
+   * - `client` (optional): Whether every request goes straight to the API instead of through the server proxy, which publishes the endpoint's URL and credentials to the browser
    * - `forwardCredentials` (optional): Whether the server proxy forwards the visitor's cookie and `Authorization` header to the API, and the API's `Set-Cookie` back
    * - `allowedRoutes` (optional): Routes the [server proxy may forward](https://nuxt-api-party.byjohann.dev/guides/allowed-routes)
    * - `schema` (optional): [OpenAPI](https://swagger.io/resources/open-api) document for [type generation](https://nuxt-api-party.byjohann.dev/guides/openapi-integration) – a file path, a `file:` or http(s) URL, the document itself, or an async function resolving to it
@@ -60,26 +72,6 @@ export interface ModuleOptions {
    * @default {}
    */
   endpoints: Record<string, EndpointConfiguration>
-
-  /**
-   * Allow client-side requests besides server-side ones.
-   *
-   * @remarks
-   * By default, API requests are only initiated server-side. Keep in mind that a
-   * client-side request exposes your API credentials to the client.
-   *
-   * - `false` keeps every request on the server.
-   * - `'allow'` (or `true`) lets a call opt in with `client: true`, but still defaults to the server.
-   * - `'always'` sends every call from the client unless it opts out with `client: false`.
-   *
-   * If Nuxt SSR is disabled, this defaults to `'always'`.
-   *
-   * @example
-   * useJsonPlaceholderData('/posts/1', { client: true })
-   *
-   * @default false
-   */
-  client?: boolean | 'allow' | 'always'
 
   /**
    * Cache a response in the Nuxt payload, keyed by the request.
@@ -148,20 +140,12 @@ export default defineNuxtModule<ModuleOptions>().with({
   },
   defaults: {
     endpoints: {},
-    client: undefined,
     payloadCache: true,
   },
   async setup(options, nuxt) {
     const moduleName = name
     const getRawComposableName = (endpointId: string) => `$${camelCase(endpointId)}`
     const getDataComposableName = (endpointId: string) => `use${pascalCase(endpointId)}Data`
-
-    if (!nuxt.options.ssr && options.client == null) {
-      logger.info('Enabling Nuxt API Party client requests by default because SSR is disabled.')
-      options.client = 'always'
-    }
-
-    options.client ??= false
 
     await nuxt.callHook('api-party:extend', options)
 
@@ -171,11 +155,26 @@ export default defineNuxtModule<ModuleOptions>().with({
       { endpoints: options.endpoints },
     )
 
+    // A client-rendered app is often served statically, with no server proxy to send through, so its endpoints
+    // default to client endpoints – except one that needs the server proxy for credential forwarding or allowed routes.
+    const defaultClientEndpointIds = nuxt.options.ssr
+      ? []
+      : Object.entries(mergedOptions.endpoints)
+          .filter(([, endpoint]) => endpoint.client == null && !endpoint.forwardCredentials && !endpoint.allowedRoutes)
+          .map(([endpointId]) => endpointId)
+
+    if (defaultClientEndpointIds.length) {
+      logger.info(`Sending the requests of ${defaultClientEndpointIds.map(i => `\`${i}\``).join(', ')} straight to the API because SSR is disabled. Set \`client: false\` on an endpoint to keep it on the server proxy.`)
+    }
+
     // Types are generated from the schema at build time, so it stays out of the runtime config the
-    // server bundle and, with client requests, the payload carry.
+    // server bundle and, for a client endpoint, the payload carry.
     const resolvedOptions: APIPartyRuntimeConfig = {
       endpoints: Object.fromEntries(
-        Object.entries(mergedOptions.endpoints).map(([endpointId, { schema, ...endpoint }]) => [endpointId, endpoint]),
+        Object.entries(mergedOptions.endpoints).map(([endpointId, { schema, ...endpoint }]) => [
+          endpointId,
+          defaultClientEndpointIds.includes(endpointId) ? { ...endpoint, client: true } : endpoint,
+        ]),
       ),
     }
     nuxt.options.runtimeConfig.apiParty = resolvedOptions
@@ -184,22 +183,12 @@ export default defineNuxtModule<ModuleOptions>().with({
       logger.warn('No API endpoints found. Nuxt API Party requires at least one defined endpoint.')
     }
 
-    // Write options to public runtime config if client requests are enabled.
-    // eslint-disable-next-line ts/ban-ts-comment
-    // @ts-ignore: `client` types are not compatible.
-    nuxt.options.runtimeConfig.public.apiParty = defu(
-      nuxt.options.runtimeConfig.public.apiParty,
-      options.client
-        ? resolvedOptions
-        : {
-            // Only expose the `forwardCredentials` endpoint option to the client.
-            endpoints: Object.fromEntries(
-              Object.entries(resolvedOptions.endpoints).map(
-                ([endpointId, endpoint]) => [endpointId, { forwardCredentials: endpoint.forwardCredentials }],
-              ),
-            ),
-          },
-    )
+    // Only a client endpoint sends its requests from the browser, so only its configuration is published.
+    nuxt.options.runtimeConfig.public.apiParty = {
+      endpoints: Object.fromEntries(
+        Object.entries(resolvedOptions.endpoints).filter(([, endpoint]) => endpoint.client),
+      ),
+    }
 
     const { resolve } = createResolver(import.meta.url)
     // Nuxt passes the transpiled directories on to Nitro to inline, so the server runtime is bundled as well.
@@ -377,7 +366,6 @@ ${await generateOpenAPITypes(schemaEndpoints, { rootDir: nuxt.options.rootDir })
     addTemplate({
       filename: `module/${moduleName}.config.mjs`,
       getContents: () => `
-export const allowClient = ${JSON.stringify(options.client)}
 export const proxyRoute = ${JSON.stringify(proxyRoute)}
 export const allowPayloadCache = ${JSON.stringify(options.payloadCache)}
 `.trimStart(),
@@ -387,7 +375,6 @@ export const allowPayloadCache = ${JSON.stringify(options.payloadCache)}
       filename: `module/${moduleName}.config.d.ts`,
       write: false, // Read through the virtual import alone, so no file has to exist.
       getContents: () => `
-export declare const allowClient: boolean | 'allow' | 'always'
 export declare const proxyRoute: string
 export declare const allowPayloadCache: boolean
 `.trimStart(),

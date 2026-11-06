@@ -11,6 +11,11 @@ export default defineNuxtConfig({
       forbidden: {
         url: '/api',
       },
+      directApi: {
+        url: '/api',
+        token: 'direct-token',
+        client: true,
+      },
       credentialsApi: {
         url: '/api',
         forwardCredentials: true,

@@ -25,8 +25,6 @@ describe('$jsonPlaceholder', () => {
   })
 
   it('rejects the options that only a browser-side call acts on', () => {
-    // @ts-expect-error: there is no browser to send from.
-    jsonPlaceholder('posts/1', { client: true })
     // @ts-expect-error: there is no Nuxt payload on the server.
     jsonPlaceholder('posts/1', { payloadCache: true })
     // @ts-expect-error: `key` addresses the payload cache.
@@ -44,8 +42,6 @@ describe('$petStore', () => {
   })
 
   it('rejects the options that only a browser-side call acts on', () => {
-    // @ts-expect-error: there is no browser to send from.
-    petStore('/pet/{petId}', { path: { petId: 1 }, client: true })
     // @ts-expect-error: there is no Nuxt payload on the server.
     petStore('/pet/{petId}', { path: { petId: 1 }, payloadCache: true })
   })

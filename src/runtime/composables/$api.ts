@@ -4,7 +4,7 @@ import type { FetchResponseData, MethodOption, ParamsOption, PathItem, RequestBo
 import { defu } from 'defu'
 import { hash } from 'ohash'
 import { joinURL } from 'ufo'
-import { allowClient, allowPayloadCache, proxyRoute } from '#build/module/nuxt-api-party.config'
+import { allowPayloadCache, proxyRoute } from '#build/module/nuxt-api-party.config'
 import { useNuxtApp, useRequestFetch, useRuntimeConfig } from '#imports'
 import { CACHE_KEY_PREFIX } from '../constants'
 import { mergeFetchHooks } from '../hooks'
@@ -13,14 +13,6 @@ import { mergeHeaders } from '../utils'
 
 // #region options
 export interface SharedFetchOptions {
-  /**
-   * Skip the Nuxt server proxy and fetch directly from the API.
-   * Requires `client` set to `true` in the module options.
-   * @remarks
-   * If Nuxt SSR is disabled, client-side requests are enabled by default.
-   * @default false
-   */
-  client?: boolean
   /**
    * The browser cache behavior.
    *
@@ -50,9 +42,10 @@ export interface SharedFetchOptions {
    * A custom `$fetch` function to use.
    *
    * @remarks
-   * Implementers supporting server-side should wrap `useRequestFetch()`.
+   * Implementers supporting server-side should wrap `useRequestFetch()` for a request through the server proxy,
+   * and keep a direct request off it, so the visitor's headers stay with the app.
    *
-   * @default useRequestFetch()
+   * @default `useRequestFetch()` through the server proxy, `globalThis.$fetch` for a direct request
    * @example
    * ```ts
    * async (request, options) => {
@@ -118,6 +111,7 @@ export async function _$api<T = unknown>(
 ) {
   const nuxt = useNuxtApp()
   const runtimeConfig = useRuntimeConfig()
+  const requestFetch = useRequestFetch()
 
   const {
     path: pathParams,
@@ -125,20 +119,16 @@ export async function _$api<T = unknown>(
     headers,
     method,
     body,
-    client = allowClient === 'always',
     key,
     cache,
     payloadCache = false,
-    $fetch = useRequestFetch(),
+    $fetch: customFetch,
     ...fetchOptions
   } = defu(
     opts,
     nuxt.$apiParty?.endpoints?.[endpointId]?.defaults,
     nuxt.$apiParty?.defaults,
   )
-
-  if (client && !allowClient)
-    throw new Error('Client-side API requests are disabled. Set "client: true" in the module options to enable them.')
 
   if (import.meta.dev && !allowPayloadCache && payloadCache) {
     console.error('[nuxt-api-party] Payload caching is disabled. Set `payloadCache: true` in the module options to enable it.')
@@ -164,7 +154,8 @@ export async function _$api<T = unknown>(
     return _key
   }
 
-  const endpoint = runtimeConfig.public.apiParty.endpoints[endpointId]!
+  // Only a client endpoint is published.
+  const clientEndpoint = runtimeConfig.public.apiParty.endpoints[endpointId]
 
   if (allowPayloadCache && (nuxt.isHydrating || payloadCache)) {
     const cacheKey = getCacheKey()
@@ -189,14 +180,17 @@ export async function _$api<T = unknown>(
     },
   })
 
+  // `useRequestFetch` forwards the visitor's headers, cookie included, which only the server proxy may see.
+  const $fetch = customFetch ?? (clientEndpoint ? globalThis.$fetch : requestFetch)
+
   // Headers travel as a plain object: during SSR, `useRequestFetch` spreads them into one, which empties a `Headers` instance.
-  const targetOptions = allowClient && client
+  const targetOptions = clientEndpoint
     ? {
-        baseURL: endpoint.url,
-        query: { ...endpoint.query, ...query },
+        baseURL: clientEndpoint.url,
+        query: { ...clientEndpoint.query, ...query },
         headers: Object.fromEntries(mergeHeaders(
-          endpoint.token ? { Authorization: `Bearer ${endpoint.token}` } : undefined,
-          endpoint.headers,
+          clientEndpoint.token ? { Authorization: `Bearer ${clientEndpoint.token}` } : undefined,
+          clientEndpoint.headers,
           headers,
         )),
       }

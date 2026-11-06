@@ -5,7 +5,7 @@ import type { FetchResponseData, FetchResponseError, ParamsOption, PathItem, Req
 import type { SharedFetchOptions } from './$api'
 import { hash } from 'ohash'
 import { computed, toValue } from 'vue'
-import { allowClient, allowPayloadCache } from '#build/module/nuxt-api-party.config'
+import { allowPayloadCache } from '#build/module/nuxt-api-party.config'
 import { useFetch, useNuxtApp } from '#imports'
 import { CACHE_KEY_PREFIX } from '../constants'
 import { resolvePathParams } from '../openapi'
@@ -110,7 +110,6 @@ export function _useApiData<T = unknown>(
 
   const {
     path: pathParams,
-    client = allowClient === 'always',
     payloadCache = allowPayloadCache,
     $fetch,
     ...fetchOptions
@@ -129,9 +128,6 @@ export function _useApiData<T = unknown>(
 
   // An explicit `key` merges two call sites back into one async data instance, as with Nuxt's own composables.
   const _asyncDataKey = computed(() => toValue(opts.key) || (autoKey ? `${_requestKey.value}${autoKey}` : _requestKey.value))
-
-  if (toValue(client) && !allowClient)
-    throw new Error('Client-side API requests are disabled. Set "client: true" in the module options to enable them.')
 
   const nuxt = useNuxtApp()
 
@@ -155,7 +151,6 @@ export function _useApiData<T = unknown>(
         ...opts,
         $fetch: toValue($fetch),
         payloadCache: toValue(payloadCache),
-        client: toValue(client),
         key: _requestKey.value,
       })
     }) as typeof globalThis.$fetch,
