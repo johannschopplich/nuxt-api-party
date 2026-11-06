@@ -25,12 +25,6 @@ export function assertPathBelowBase(path: string) {
   }
 }
 
-/**
- * Returns the pathname the backend receives for `requestURL`, relative to the pathname of
- * `baseURL`, or throws a 400 when it lies outside it. `requestURL` must be joined onto
- * `baseURL` the way the outgoing request joins it: the join leaves dot segments, their
- * encoded forms and backslashes for the WHATWG parser to resolve.
- */
 export function resolveRoutePath(requestURL: string, baseURL: string) {
   // Relative base URLs point to the Nuxt server itself, so any origin serves to resolve them.
   const base = new URL(baseURL, 'http://localhost')
@@ -50,10 +44,6 @@ export function resolveRoutePath(requestURL: string, baseURL: string) {
   return target.pathname.slice(basePath.length) || '/'
 }
 
-/**
- * Throws a 403 unless `allowedRoutes` is unset or one of its entries admits the request;
- * `routePath` is what `resolveRoutePath` returns.
- */
 export function assertAllowedRoute(
   allowedRoutes: AllowedRoute[] | undefined,
   routePath: string,
@@ -78,9 +68,8 @@ export function assertAllowedRoute(
 }
 
 /**
- * Percent-encodes `segment` with the WHATWG path percent-encode set, as the pathname it is
- * matched against is encoded. Unlike a full URL parse, it neither resolves dot segments or
- * backslashes nor drops what follows `?` or `#`, so a pattern cannot match more than it reads.
+ * Percent-encodes `segment` like a WHATWG pathname. A full URL parse would also resolve dot
+ * segments and cut at `?` and `#`, letting a pattern match more than it says.
  */
 function encodePathSegment(segment: string) {
   return segment.replace(/[\u0000-\u0020"#<>?^`{}\u007F-\u{10FFFF}]/gu, character => encodeURIComponent(character))

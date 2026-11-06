@@ -75,8 +75,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const requestQuery = { ...endpoint.query, ...query }
-  // `ofetch` builds the URL this way once the request hooks have run, so the check reads what is sent
-  // unless a hook rewrites it.
+  // Mirrors how `ofetch` builds the URL; a request hook that rewrites it is not checked again.
   const routePath = resolveRoutePath(withQuery(withBase(path, baseURL), requestQuery), baseURL)
   assertAllowedRoute(endpoint.allowedRoutes, routePath, method ?? 'GET')
 
