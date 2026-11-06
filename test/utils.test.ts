@@ -37,16 +37,16 @@ describe('isForwardableProxyHeader', () => {
     expect(isForwardableProxyHeader('Authorization', {})).toBe(false)
   })
 
-  it('withholds cookie when the endpoint leaves cookies unset', () => {
+  it('withholds cookie when the endpoint leaves forwardCredentials unset', () => {
     expect(isForwardableProxyHeader('cookie', {})).toBe(false)
   })
 
-  it('withholds cookie when the endpoint sets cookies to false', () => {
-    expect(isForwardableProxyHeader('cookie', { cookies: false })).toBe(false)
+  it('withholds cookie when the endpoint sets forwardCredentials to false', () => {
+    expect(isForwardableProxyHeader('cookie', { forwardCredentials: false })).toBe(false)
   })
 
-  it('forwards cookie when the endpoint sets cookies to true', () => {
-    expect(isForwardableProxyHeader('cookie', { cookies: true })).toBe(true)
+  it('forwards cookie when the endpoint sets forwardCredentials to true', () => {
+    expect(isForwardableProxyHeader('cookie', { forwardCredentials: true })).toBe(true)
   })
 })
 

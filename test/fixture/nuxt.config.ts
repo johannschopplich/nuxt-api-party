@@ -11,9 +11,9 @@ export default defineNuxtConfig({
       forbidden: {
         url: '/api',
       },
-      cookieApi: {
+      credentialsApi: {
         url: '/api',
-        cookies: true,
+        forwardCredentials: true,
       },
       schemaApi: {
         url: '/api',

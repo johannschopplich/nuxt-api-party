@@ -43,7 +43,7 @@ export default defineEventHandler(async (event) => {
   const proxyHeaders: Record<string, string | undefined> = getProxyRequestHeaders(event)
   const headers = new Headers()
   for (const [name, value] of Object.entries(proxyHeaders)) {
-    if (value != null && isForwardableProxyHeader(name, { cookies: endpoint.cookies }))
+    if (value != null && isForwardableProxyHeader(name, { forwardCredentials: endpoint.forwardCredentials }))
       headers.set(name, value)
   }
 
@@ -74,7 +74,7 @@ export default defineEventHandler(async (event) => {
         }),
       }).raw,
       onResponse: (event) => {
-        if (!endpoint.cookies && event.node.res.hasHeader('set-cookie')) {
+        if (!endpoint.forwardCredentials && event.node.res.hasHeader('set-cookie')) {
           event.node.res.removeHeader('set-cookie')
         }
       },

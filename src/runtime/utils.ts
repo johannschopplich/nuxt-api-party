@@ -33,11 +33,11 @@ export function mergeHeaders(...headers: (HeadersInit | undefined)[]) {
  * A cookie travels only for endpoints that opt in, and `authorization` never –
  * forwarding it would hand the caller's own credentials to a third party.
  */
-export function isForwardableProxyHeader(name: string, { cookies }: { cookies?: boolean }) {
+export function isForwardableProxyHeader(name: string, { forwardCredentials }: { forwardCredentials?: boolean }) {
   const header = name.toLowerCase()
 
   if (header === 'cookie')
-    return Boolean(cookies)
+    return Boolean(forwardCredentials)
 
   return header !== 'authorization'
 }
@@ -47,7 +47,7 @@ export function isForwardableProxyHeader(name: string, { cookies }: { cookies?: 
  * to the upstream API.
  *
  * Only `cookie` is dropped: the server handler reads one off its own request,
- * where the endpoint's `cookies` option decides.
+ * where the endpoint's `forwardCredentials` option decides.
  */
 export function isForwardableBodyHeader(name: string) {
   return name.toLowerCase() !== 'cookie'

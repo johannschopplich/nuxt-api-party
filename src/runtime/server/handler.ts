@@ -94,7 +94,7 @@ export default defineEventHandler(async (event) => {
             ...requestHeaders,
             'X-Forwarded-For': getRequestIP(event, { xForwardedFor: true }),
             ...(endpoint.token && { Authorization: `Bearer ${endpoint.token}` }),
-            ...(endpoint.cookies && { cookie: getRequestHeader(event, 'cookie') }),
+            ...(endpoint.forwardCredentials && { cookie: getRequestHeader(event, 'cookie') }),
           }),
           endpoint.headers,
           new Headers(

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { $cookieApi, $testApi, useTestResult } from '#imports'
+import { $credentialsApi, $testApi, useTestResult } from '#imports'
 
-const withCookies = await $cookieApi<Record<string, string>>('echo-headers')
+const withCookies = await $credentialsApi<Record<string, string>>('echo-headers')
 const withoutCookies = await $testApi<Record<string, string>>('echo-headers')
 
 useTestResult({

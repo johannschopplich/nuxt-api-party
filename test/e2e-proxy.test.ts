@@ -41,20 +41,20 @@ describe('nuxt-api-party proxy', async () => {
     })
   })
 
-  it('withholds the cookie from an endpoint that leaves cookies unset', async () => {
+  it('withholds the cookie from an endpoint that leaves forwardCredentials unset', async () => {
     const received = await echoHeaders('testApi', { cookie: 'session=secret' })
 
     expect(received.cookie).toBeUndefined()
   })
 
-  it('forwards the cookie to an endpoint that sets cookies to true', async () => {
-    const received = await echoHeaders('cookieApi', { cookie: 'session=secret' })
+  it('forwards the cookie to an endpoint that sets forwardCredentials to true', async () => {
+    const received = await echoHeaders('credentialsApi', { cookie: 'session=secret' })
 
     expect(received.cookie).toBe('session=secret')
   })
 
-  it('withholds authorization even from an endpoint that forwards cookies', async () => {
-    const received = await echoHeaders('cookieApi', { authorization: 'Bearer client-token' })
+  it('withholds authorization even from an endpoint that sets forwardCredentials to true', async () => {
+    const received = await echoHeaders('credentialsApi', { authorization: 'Bearer client-token' })
 
     expect(received.authorization).toBeUndefined()
   })

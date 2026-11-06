@@ -23,7 +23,7 @@ export interface EndpointConfiguration {
   token?: string
   query?: QueryObject
   headers?: HeadersInit
-  cookies?: boolean
+  forwardCredentials?: boolean
   allowedRoutes?: AllowedRoute[]
   schema?: OpenAPIDocumentSource
 }
@@ -39,7 +39,7 @@ export interface ModuleOptions {
    * - `token` (optional): Bearer token for authentication
    * - `query` (optional): Default query parameters to send with each request
    * - `headers` (optional): Default headers to send with each request
-   * - `cookies` (optional): Whether to forward cookies in requests
+   * - `forwardCredentials` (optional): Whether the server proxy forwards the visitor's cookie to the API
    * - `allowedRoutes` (optional): Routes the [server proxy may forward](https://nuxt-api-party.byjohann.dev/guides/allowed-routes)
    * - `schema` (optional): [OpenAPI](https://swagger.io/resources/open-api) document for [type generation](https://nuxt-api-party.byjohann.dev/guides/openapi-integration) – a file path, a `file:` or http(s) URL, the document itself, or an async function resolving to it
    *
@@ -218,10 +218,10 @@ export default defineNuxtModule<ModuleOptions>().with({
       options.client
         ? resolvedOptions
         : {
-            // Only expose cookies endpoint option to the client.
+            // Only expose the `forwardCredentials` endpoint option to the client.
             endpoints: Object.fromEntries(
               Object.entries(resolvedOptions.endpoints).map(
-                ([endpointId, endpoint]) => [endpointId, { cookies: endpoint.cookies }],
+                ([endpointId, endpoint]) => [endpointId, { forwardCredentials: endpoint.forwardCredentials }],
               ),
             ),
           },

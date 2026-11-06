@@ -54,7 +54,7 @@ describe('nuxt-api-party', async () => {
       expect(result.traceId).toBe('abc')
     })
 
-    it('forwards the cookie only for the endpoint that sets cookies to true', async () => {
+    it('forwards the cookie only for the endpoint that sets forwardCredentials to true', async () => {
       const html = await $fetch<string>('/cookies', {
         headers: { cookie: 'session=secret' },
       })
