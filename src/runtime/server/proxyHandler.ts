@@ -4,7 +4,6 @@ import {
   defineEventHandler,
   getProxyRequestHeaders,
   getQuery,
-  getRequestHeader,
   getRouterParam,
   isError,
   readRawBody,
@@ -34,17 +33,7 @@ export default defineEventHandler(async (event) => {
 
   assertPathBelowBase(path)
 
-  const baseURL = getRequestHeader(event, `${endpointId}-Endpoint-Url`) || endpoint.url
-
-  if (
-    baseURL !== endpoint.url
-    && !endpoint.allowedUrls?.includes(baseURL)
-  ) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: `Base URL "${baseURL}" is not allowed`,
-    })
-  }
+  const baseURL = endpoint.url
 
   const url = withQuery(joinURL(baseURL, path), getQuery(event))
   const routePath = resolveRoutePath(url, baseURL)
@@ -54,7 +43,7 @@ export default defineEventHandler(async (event) => {
   const proxyHeaders: Record<string, string | undefined> = getProxyRequestHeaders(event)
   const headers = new Headers()
   for (const [name, value] of Object.entries(proxyHeaders)) {
-    if (value != null && isForwardableProxyHeader(name, { endpointId, cookies: endpoint.cookies }))
+    if (value != null && isForwardableProxyHeader(name, { cookies: endpoint.cookies }))
       headers.set(name, value)
   }
 

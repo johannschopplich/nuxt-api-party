@@ -15,10 +15,6 @@ export default defineNuxtConfig({
         url: '/api',
         cookies: true,
       },
-      nestedApi: {
-        url: '/api/nested',
-        allowedUrls: ['/api'],
-      },
       schemaApi: {
         url: '/api',
         schema: {

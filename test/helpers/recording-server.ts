@@ -36,11 +36,9 @@ export function recordingEndpoints(host: string) {
   return {
     backendApi: {
       url: `http://${host}/base`,
-      allowedUrls: [`http://${host}/other`],
     },
     guardedApi: {
       url: `http://${host}/base`,
-      allowedUrls: [`http://${host}/other`],
       allowedRoutes: ALLOWED_ROUTES,
     },
     closedApi: {

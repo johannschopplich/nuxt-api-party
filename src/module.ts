@@ -24,7 +24,6 @@ export interface EndpointConfiguration {
   query?: QueryObject
   headers?: HeadersInit
   cookies?: boolean
-  allowedUrls?: string[]
   allowedRoutes?: AllowedRoute[]
   schema?: OpenAPIDocumentSource
 }
@@ -41,7 +40,6 @@ export interface ModuleOptions {
    * - `query` (optional): Default query parameters to send with each request
    * - `headers` (optional): Default headers to send with each request
    * - `cookies` (optional): Whether to forward cookies in requests
-   * - `allowedUrls` (optional): URLs allowed for [dynamic backend switching](https://nuxt-api-party.byjohann.dev/guides/dynamic-backend-url)
    * - `allowedRoutes` (optional): Routes the [server proxy may forward](https://nuxt-api-party.byjohann.dev/guides/allowed-routes)
    * - `schema` (optional): [OpenAPI](https://swagger.io/resources/open-api) document for [type generation](https://nuxt-api-party.byjohann.dev/guides/openapi-integration) – a file path, a `file:` or http(s) URL, the document itself, or an async function resolving to it
    *

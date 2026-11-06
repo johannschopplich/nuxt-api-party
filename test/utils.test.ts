@@ -25,50 +25,37 @@ describe('mergeHeaders', () => {
 })
 
 describe('isForwardableProxyHeader', () => {
-  const endpointId = 'jsonPlaceholder'
-
   it('forwards accept', () => {
-    expect(isForwardableProxyHeader('accept', { endpointId })).toBe(true)
+    expect(isForwardableProxyHeader('accept', {})).toBe(true)
   })
 
   it('withholds authorization', () => {
-    expect(isForwardableProxyHeader('authorization', { endpointId })).toBe(false)
-  })
-
-  it('withholds the endpoint URL override', () => {
-    expect(isForwardableProxyHeader('jsonPlaceholder-Endpoint-Url', { endpointId })).toBe(false)
+    expect(isForwardableProxyHeader('authorization', {})).toBe(false)
   })
 
   it('matches whatever casing the browser used', () => {
-    expect(isForwardableProxyHeader('Authorization', { endpointId })).toBe(false)
-    expect(isForwardableProxyHeader('jsonplaceholder-endpoint-url', { endpointId })).toBe(false)
+    expect(isForwardableProxyHeader('Authorization', {})).toBe(false)
   })
 
   it('withholds cookie when the endpoint leaves cookies unset', () => {
-    expect(isForwardableProxyHeader('cookie', { endpointId })).toBe(false)
+    expect(isForwardableProxyHeader('cookie', {})).toBe(false)
   })
 
   it('withholds cookie when the endpoint sets cookies to false', () => {
-    expect(isForwardableProxyHeader('cookie', { endpointId, cookies: false })).toBe(false)
+    expect(isForwardableProxyHeader('cookie', { cookies: false })).toBe(false)
   })
 
   it('forwards cookie when the endpoint sets cookies to true', () => {
-    expect(isForwardableProxyHeader('cookie', { endpointId, cookies: true })).toBe(true)
+    expect(isForwardableProxyHeader('cookie', { cookies: true })).toBe(true)
   })
 })
 
 describe('isForwardableBodyHeader', () => {
-  const endpointId = 'jsonPlaceholder'
-
   it('forwards authorization', () => {
-    expect(isForwardableBodyHeader('authorization', { endpointId })).toBe(true)
-  })
-
-  it('withholds the endpoint URL override', () => {
-    expect(isForwardableBodyHeader('jsonPlaceholder-Endpoint-Url', { endpointId })).toBe(false)
+    expect(isForwardableBodyHeader('authorization')).toBe(true)
   })
 
   it('withholds cookie regardless of the endpoint', () => {
-    expect(isForwardableBodyHeader('cookie', { endpointId })).toBe(false)
+    expect(isForwardableBodyHeader('cookie')).toBe(false)
   })
 })

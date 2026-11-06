@@ -31,20 +31,15 @@ export function mergeHeaders(...headers: (HeadersInit | undefined)[]) {
  * upstream API.
  *
  * A cookie travels only for endpoints that opt in, and `authorization` never –
- * forwarding it would hand the caller's own credentials to a third party. The
- * endpoint URL override has already been read by the time this runs.
+ * forwarding it would hand the caller's own credentials to a third party.
  */
-export function isForwardableProxyHeader(
-  name: string,
-  { endpointId, cookies }: { endpointId: string, cookies?: boolean },
-) {
+export function isForwardableProxyHeader(name: string, { cookies }: { cookies?: boolean }) {
   const header = name.toLowerCase()
 
   if (header === 'cookie')
     return Boolean(cookies)
 
   return header !== 'authorization'
-    && !isEndpointUrlOverride(header, endpointId)
 }
 
 /**
@@ -52,13 +47,10 @@ export function isForwardableProxyHeader(
  * to the upstream API.
  *
  * Only `cookie` is dropped: the server handler reads one off its own request,
- * where the endpoint's `cookies` option decides. The endpoint URL override has
- * already been read by the time this runs.
+ * where the endpoint's `cookies` option decides.
  */
-export function isForwardableBodyHeader(name: string, { endpointId }: { endpointId: string }) {
-  const header = name.toLowerCase()
-
-  return header !== 'cookie' && !isEndpointUrlOverride(header, endpointId)
+export function isForwardableBodyHeader(name: string) {
+  return name.toLowerCase() !== 'cookie'
 }
 
 /**
@@ -69,8 +61,4 @@ export function omitUndefinedValues<T extends object>(object: T) {
     Object.entries(object)
       .filter(([, value]) => value !== undefined),
   ) as FilteredObject<T>
-}
-
-function isEndpointUrlOverride(header: string, endpointId: string) {
-  return header === `${endpointId.toLowerCase()}-endpoint-url`
 }

@@ -159,16 +159,6 @@ describe('nuxt-api-party', async () => {
       expect(backend.requestUrls).toEqual([])
     })
 
-    it('rejects a path leaving an -Endpoint-Url base', async () => {
-      const response = await proxy('backendApi', {
-        path: '../base/secret',
-        headers: { 'backendApi-Endpoint-Url': `http://${backend.host}/other` },
-      })
-
-      expect(response.status).toBe(400)
-      expect(backend.requestUrls).toEqual([])
-    })
-
     it('rejects a ../secret escape hidden before a line break', async () => {
       const response = await proxy('backendApi', { path: '../secret\n/../base/articles' })
 
@@ -218,16 +208,6 @@ describe('nuxt-api-party', async () => {
       expect(backend.requestUrls).toEqual([])
     })
 
-    it('forwards a path below an -Endpoint-Url base', async () => {
-      const response = await proxy('guardedApi', {
-        path: 'articles/1',
-        headers: { 'guardedApi-Endpoint-Url': `http://${backend.host}/other` },
-      })
-
-      expect(response.status).toBe(200)
-      expect(backend.requestUrls).toEqual(['/other/articles/1'])
-    })
-
     it('refuses every request with an empty list', async () => {
       const response = await proxy('closedApi', { path: 'articles/1' })
 
@@ -242,20 +222,6 @@ describe('nuxt-api-party', async () => {
 
       expect(endpoints.schemaApi).toHaveProperty('url')
       expect(endpoints.schemaApi).not.toHaveProperty('schema')
-    })
-  })
-
-  describe('endpoint URL override', () => {
-    it('fetches from an -Endpoint-Url listed in allowedUrls', async () => {
-      const response = await proxy('nestedApi', { path: '/echo-headers', headers: { 'nestedApi-Endpoint-Url': '/api' } })
-
-      expect(response.status).toBe(200)
-    })
-
-    it('rejects an -Endpoint-Url outside allowedUrls', async () => {
-      const response = await proxy('nestedApi', { path: '/echo-headers', headers: { 'nestedApi-Endpoint-Url': '/api/elsewhere' } })
-
-      expect(response.status).toBe(400)
     })
   })
 })

@@ -75,15 +75,6 @@ describe('nuxt-api-party proxy', async () => {
       expect(status).toBe(400)
       expect(backend.requestUrls).toEqual([])
     })
-
-    it('rejects a path leaving an -Endpoint-Url base', async () => {
-      const status = await requestStatus('/api/__api_party/backendApi/proxy/../base/secret', {
-        'backendApi-Endpoint-Url': `http://${backend.host}/other`,
-      })
-
-      expect(status).toBe(400)
-      expect(backend.requestUrls).toEqual([])
-    })
   })
 
   describe('allowedRoutes', () => {
@@ -108,15 +99,6 @@ describe('nuxt-api-party proxy', async () => {
       expect(backend.requestUrls).toEqual([])
     })
 
-    it('forwards a path below an -Endpoint-Url base', async () => {
-      const status = await requestStatus('/api/__api_party/guardedApi/proxy/articles/1', {
-        'guardedApi-Endpoint-Url': `http://${backend.host}/other`,
-      })
-
-      expect(status).toBe(200)
-      expect(backend.requestUrls).toEqual(['/other/articles/1'])
-    })
-
     it('refuses every request with an empty list', async () => {
       const status = await requestStatus('/api/__api_party/closedApi/proxy/articles/1')
 
@@ -125,14 +107,13 @@ describe('nuxt-api-party proxy', async () => {
     })
   })
 
-  describe('endpoint URL override', () => {
-    it('fetches from an -Endpoint-Url listed in allowedUrls', async () => {
-      const response = await fetch('/api/__api_party/nestedApi/proxy/echo-headers', {
-        headers: { 'nestedApi-Endpoint-Url': '/api' },
-      })
-
-      expect(response.status).toBe(200)
+  it('fetches from the endpoint URL whatever an -Endpoint-Url header names', async () => {
+    const status = await requestStatus('/api/__api_party/backendApi/proxy/articles/1', {
+      'backendApi-Endpoint-Url': `http://${backend.host}/other`,
     })
+
+    expect(status).toBe(200)
+    expect(backend.requestUrls).toEqual(['/base/articles/1'])
   })
 })
 

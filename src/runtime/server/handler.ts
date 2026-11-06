@@ -71,17 +71,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const baseURL = bodyHeaders.get(`${endpointId}-Endpoint-Url`) || endpoint.url
-
-  if (
-    baseURL !== endpoint.url
-    && !endpoint.allowedUrls?.includes(baseURL)
-  ) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: `Base URL "${baseURL}" is not allowed`,
-    })
-  }
+  const baseURL = endpoint.url
 
   const requestQuery = { ...endpoint.query, ...query }
   // Mirrors how `ofetch` builds the URL; a request hook that rewrites it is not checked again.
@@ -109,7 +99,7 @@ export default defineEventHandler(async (event) => {
           endpoint.headers,
           new Headers(
             [...bodyHeaders].filter(
-              ([name]) => isForwardableBodyHeader(name, { endpointId }),
+              ([name]) => isForwardableBodyHeader(name),
             ),
           ),
         ),

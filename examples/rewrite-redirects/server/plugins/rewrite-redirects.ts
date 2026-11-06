@@ -34,15 +34,6 @@ export default defineNitroPlugin(async (nitroApp) => {
   })
 })
 
-function getEndpointUrl(event: H3Event, endpointId: string) {
-  const { apiParty } = useRuntimeConfig(event)
-  const endpoint = apiParty.endpoints[endpointId as keyof typeof apiParty.endpoints]!
-
-  // Should be safe, this header isn't used to kick off any new requests.
-  // And it's called after api-party has already validated the header.
-  return getRequestHeader(event, `${endpointId}-endpoint-url`) || endpoint.url
-}
-
 function handleRedirectResponse(event: H3Event, response: Response) {
   let location = response.headers.get('location')
   if (!location) {
@@ -65,7 +56,8 @@ function handleRedirectResponse(event: H3Event, response: Response) {
 
   // For when the endpoint url points to a local nitro path.
   // e.g. { url: '/api' }
-  const baseUrl = new URL(getEndpointUrl(event, endpointId), reqUrl)
+  const { apiParty } = useRuntimeConfig(event)
+  const baseUrl = new URL(apiParty.endpoints[endpointId as keyof typeof apiParty.endpoints]!.url, reqUrl)
   // For when the redirect points to the same server.
   // e.g. Location: /other-path
   const locUrl = new URL(location, baseUrl)
