@@ -2,7 +2,7 @@
 
 # Nuxt API Party
 
-Auto-generated composables for any API in [Nuxt](https://nuxt.com), typed from OpenAPI and never exposing your credentials.
+Auto-generated composables for any API in [Nuxt](https://nuxt.com), typed from OpenAPI, with your credentials kept on the server.
 
 - [✨ &nbsp;Release Notes](https://github.com/johannschopplich/nuxt-api-party/releases)
 - [📖 &nbsp;Read the documentation](https://nuxt-api-party.byjohann.dev)
