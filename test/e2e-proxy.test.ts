@@ -3,7 +3,7 @@ import { join } from 'node:path'
 import { $fetch, fetch, setup, url } from '@nuxt/test-utils/e2e'
 import { afterAll, beforeEach, describe, expect, it } from 'vitest'
 import { ALLOWED_REQUESTS, REFUSED_REQUESTS } from './helpers/allowed-routes'
-import { ABSOLUTE_PATH_TEMPLATES, ESCAPING_PATHS, recordingEndpoints, startRecordingServer } from './helpers/recording-server'
+import { ABSOLUTE_PATH_TEMPLATES, AMBIGUOUS_PATHS, ESCAPING_PATHS, recordingEndpoints, startRecordingServer } from './helpers/recording-server'
 
 describe('nuxt-api-party proxy', async () => {
   const backend = await startRecordingServer()
@@ -69,7 +69,7 @@ describe('nuxt-api-party proxy', async () => {
       expect(backend.requestUrls).toEqual([])
     })
 
-    it.each(ESCAPING_PATHS)('rejects %s for leaving the base path', async (path) => {
+    it.each([...ESCAPING_PATHS, ...AMBIGUOUS_PATHS])('rejects %s for leaving the base path', async (path) => {
       const status = await requestStatus(`/api/__api_party/backendApi/proxy/${path}`)
 
       expect(status).toBe(400)

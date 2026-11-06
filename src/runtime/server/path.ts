@@ -25,6 +25,26 @@ export function assertRelativePath(path: string) {
 }
 
 /**
+ * Throws a 400 for a path with a dot segment under any reading: percent-encoded, behind an
+ * encoded slash or backslash, split by a tab or line break, followed by a `;` parameter, or
+ * trailed by characters the URL parsers strip or cut at. Backends and Nitro's in-process
+ * fetch disagree on which of these they resolve, so a path whose target depends on that is
+ * never forwarded.
+ */
+export function assertNoDotSegments(path: string) {
+  const pathname = path.replace(/[\t\n\r]/g, '').split(/[?#]/, 1)[0]!
+  const segments = pathname.replace(/%2e/gi, '.').replace(/%3b/gi, ';').replace(/%2f|%5c/gi, '/').split(/[/\\]/)
+
+  // eslint-disable-next-line no-control-regex -- The WHATWG parser strips trailing C0 controls.
+  if (segments.some(segment => /^\.{1,2}(?:[;\u2028\u2029]|[\u0000-\u0020]*$)/.test(segment))) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Path must not contain dot segments',
+    })
+  }
+}
+
+/**
  * Returns the pathname the backend receives for `requestURL`, relative to the pathname of
  * `baseURL`, or throws a 400 when it lies outside it. `requestURL` must be joined onto
  * `baseURL` the way the outgoing request joins it: the join leaves dot segments, their

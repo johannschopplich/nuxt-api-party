@@ -15,7 +15,7 @@ import {
 import { useNitroApp, useRuntimeConfig } from 'nitropack/runtime'
 import { withBase, withQuery } from 'ufo'
 import { deserializeMaybeEncodedBody, isForwardableBodyHeader, mergeHeaders, omitUndefinedValues } from '../utils'
-import { assertAllowedRoute, assertRelativePath, resolveRoutePath } from './path'
+import { assertAllowedRoute, assertNoDotSegments, assertRelativePath, resolveRoutePath } from './path'
 
 const ALLOWED_REQUEST_HEADERS = [
   'Origin',
@@ -59,6 +59,7 @@ export default defineEventHandler(async (event) => {
   }
 
   assertRelativePath(path)
+  assertNoDotSegments(path)
 
   // Allows to overwrite the backend URL with a custom header
   // (e.g. `jsonPlaceholder` endpoint becomes `jsonPlaceholder-Endpoint-Url`).
