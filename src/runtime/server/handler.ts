@@ -62,7 +62,7 @@ export default defineEventHandler(async (event) => {
 
   let bodyHeaders: Headers
   try {
-    bodyHeaders = new Headers(headers)
+    bodyHeaders = new Headers(headers ?? undefined)
   }
   catch {
     throw createError({

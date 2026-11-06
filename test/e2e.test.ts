@@ -131,10 +131,16 @@ describe('nuxt-api-party', async () => {
       expect(response.status).toBe(400)
     })
 
-    it.each([['x'], [null], [[['a']]]])('rejects %j as headers', async (headers) => {
+    it.each([['x'], [[['a']]]])('rejects %j as headers', async (headers) => {
       const response = await proxy('backendApi', { path: 'articles/1', headers })
 
       expect(response.status).toBe(400)
+    })
+
+    it('forwards a request with null as headers', async () => {
+      const response = await proxy('guardedApi', { path: 'articles/1', headers: null })
+
+      expect(response.status).toBe(200)
     })
   })
 
