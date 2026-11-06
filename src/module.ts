@@ -119,7 +119,7 @@ export interface ModuleOptions {
 // #endregion options
 
 export interface APIPartyRuntimeConfig {
-  endpoints: Record<string, EndpointConfiguration>
+  endpoints: Record<string, Omit<EndpointConfiguration, 'schema'>>
 }
 
 declare module '@nuxt/schema' {
@@ -129,7 +129,7 @@ declare module '@nuxt/schema' {
 
   interface PublicRuntimeConfig {
     apiParty: {
-      endpoints: Record<string, Partial<EndpointConfiguration>>
+      endpoints: Record<string, Partial<APIPartyRuntimeConfig['endpoints'][string]>>
     }
   }
 
@@ -193,14 +193,20 @@ export default defineNuxtModule<ModuleOptions>().with({
 
     await nuxt.callHook('api-party:extend', options)
 
-    nuxt.options.runtimeConfig.apiParty = defu(
+    // Annotated because `defu`'s return type widens the endpoint values to `unknown`.
+    const mergedOptions: { endpoints: Record<string, EndpointConfiguration> } = defu(
       nuxt.options.runtimeConfig.apiParty,
       { endpoints: options.endpoints },
     )
 
-    // Annotated because `defu`'s return type widens the endpoint values to
-    // `unknown` through the assignment above.
-    const resolvedOptions: APIPartyRuntimeConfig = nuxt.options.runtimeConfig.apiParty
+    // Types are generated from the schema at build time, so it stays out of the runtime config the
+    // server bundle and, with client requests, the payload carry.
+    const resolvedOptions: APIPartyRuntimeConfig = {
+      endpoints: Object.fromEntries(
+        Object.entries(mergedOptions.endpoints).map(([endpointId, { schema, ...endpoint }]) => [endpointId, endpoint]),
+      ),
+    }
+    nuxt.options.runtimeConfig.apiParty = resolvedOptions
 
     if (!Object.keys(resolvedOptions.endpoints).length) {
       logger.warn('No API endpoints found. Nuxt API Party requires at least one defined endpoint.')
@@ -233,7 +239,7 @@ export default defineNuxtModule<ModuleOptions>().with({
 
     const endpointKeys = Object.keys(resolvedOptions.endpoints)
     const schemaEndpoints = Object.fromEntries(
-      Object.entries(resolvedOptions.endpoints)
+      Object.entries(options.endpoints)
         .filter(([, endpoint]) => 'schema' in endpoint),
     )
     const schemaEndpointIds = Object.keys(schemaEndpoints)

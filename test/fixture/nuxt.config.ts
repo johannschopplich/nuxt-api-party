@@ -19,6 +19,14 @@ export default defineNuxtConfig({
         url: '/api/nested',
         allowedUrls: ['/api'],
       },
+      schemaApi: {
+        url: '/api',
+        schema: {
+          openapi: '3.1.0',
+          info: { title: 'Schema API', version: '1.0.0' },
+          paths: {},
+        },
+      },
     },
   },
 })

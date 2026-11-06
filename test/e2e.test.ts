@@ -236,6 +236,15 @@ describe('nuxt-api-party', async () => {
     })
   })
 
+  describe('runtimeConfig', () => {
+    it('leaves the endpoint schema out', async () => {
+      const endpoints = await $fetch<Record<string, Record<string, unknown>>>('/api/runtime-endpoints')
+
+      expect(endpoints.schemaApi).toHaveProperty('url')
+      expect(endpoints.schemaApi).not.toHaveProperty('schema')
+    })
+  })
+
   describe('endpoint URL override', () => {
     it('fetches from an -Endpoint-Url listed in allowedUrls', async () => {
       const response = await proxy('nestedApi', { path: '/echo-headers', headers: { 'nestedApi-Endpoint-Url': '/api' } })
