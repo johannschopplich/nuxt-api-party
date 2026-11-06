@@ -5,8 +5,10 @@ export default defineNitroPlugin((nitroApp) => {
     options.headers.set('x-nitro-endpoint-id', endpointId)
   })
 
-  nitroApp.hooks.hook('api-party:response', (_ctx, event, endpointId) => {
+  nitroApp.hooks.hook('api-party:response', (ctx, event, endpointId) => {
     if (event)
       setResponseHeader(event, 'x-nitro-endpoint-id', endpointId)
+    else
+      ctx.response._data = { endpointId }
   })
 })

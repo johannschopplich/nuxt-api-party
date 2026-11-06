@@ -1,5 +1,6 @@
 import type { ApiClientFetchOptions, OpenAPIClient } from '../composables/$api'
-import { useRuntimeConfig } from 'nitropack/runtime'
+import { useNitroApp, useRuntimeConfig } from 'nitropack/runtime'
+import { mergeFetchHooks } from '../hooks'
 import { resolvePathParams } from '../openapi'
 import { mergeHeaders } from '../utils'
 
@@ -16,11 +17,19 @@ export function _$api<T = unknown>(
   opts: ApiClientFetchOptions = {},
 ): Promise<T> {
   const { path: pathParams, query, headers, ...fetchOptions } = opts
-  const apiParty = useRuntimeConfig().apiParty
-  const endpoint = apiParty.endpoints[endpointId]!
+  const nitro = useNitroApp()
+  const endpoint = useRuntimeConfig().apiParty.endpoints[endpointId]!
 
   return globalThis.$fetch<T>(resolvePathParams(path, pathParams), {
     ...fetchOptions,
+    ...mergeFetchHooks(fetchOptions, {
+      async onRequest(ctx) {
+        await nitro.hooks.callHook('api-party:request', ctx, undefined, endpointId)
+      },
+      async onResponse(ctx) {
+        await nitro.hooks.callHook('api-party:response', ctx, undefined, endpointId)
+      },
+    }),
     baseURL: endpoint.url,
     query: {
       ...endpoint.query,
@@ -31,5 +40,7 @@ export function _$api<T = unknown>(
       endpoint.headers,
       headers,
     ),
+    // Following a redirect would carry the endpoint credentials to wherever the API points.
+    redirect: 'manual',
   }) as Promise<T>
 }

@@ -11,7 +11,7 @@ const REDIRECT_STATUSES = new Set([301, 302, 303, 307, 308])
  */
 export default defineNitroPlugin(async (nitroApp) => {
   nitroApp.hooks.hook('api-party:response', ({ response }, event) => {
-    if (REDIRECT_STATUSES.has(response.status)) {
+    if (event && REDIRECT_STATUSES.has(response.status)) {
       handleRedirectResponse(event, response)
     }
   })

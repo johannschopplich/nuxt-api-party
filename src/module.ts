@@ -349,8 +349,9 @@ declare module '#app' {
 
 declare module 'nitropack/types' {
   interface NitroRuntimeHooks {
-    'api-party:request': (options: FetchContext, event: H3Event, endpointId: string) => HookResult
-    'api-party:response': (options: Omit<FetchContext, 'response'> & { response: FetchResponse<any> }, event: H3Event, endpointId: string) => HookResult
+    // A server proxy request passes its \`event\`, a server-side \`$<name>\` call none, so \`event\` tells the two apart.
+    'api-party:request': (options: FetchContext, event: H3Event | undefined, endpointId: string) => HookResult
+    'api-party:response': (options: Omit<FetchContext, 'response'> & { response: FetchResponse<any> }, event: H3Event | undefined, endpointId: string) => HookResult
   }
 }
 `.trimStart()
