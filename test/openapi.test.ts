@@ -1,5 +1,6 @@
 import type { EndpointConfiguration } from '../src/module'
 import { join } from 'node:path'
+import { pathToFileURL } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import { generateOpenAPITypes } from '../src/openapi'
 import { resolvePathParams } from '../src/runtime/openapi'
@@ -15,7 +16,7 @@ describe('generateOpenAPITypes', () => {
   it('wraps the generated types in a module declaration named after the endpoint', async () => {
     const types = await generateOpenAPITypes({ petStore }, { rootDir })
 
-    expect(types).toContain('declare module "#nuxt-api-party/petStore"')
+    expect(types).toContain(`declare module '#nuxt-api-party/petStore'`)
     expect(types).toContain('export interface paths')
   })
 
@@ -25,28 +26,31 @@ describe('generateOpenAPITypes', () => {
     expect(types).toContain('"/pet/{petId}"')
   })
 
-  it('applies the global openAPITS options', async () => {
-    const types = await generateOpenAPITypes({ petStore }, { rootDir, openAPITS: { exportType: true } })
-
-    expect(types).toContain('export type paths')
-  })
-
-  it('lets an endpoint override a single global openAPITS option', async () => {
+  it('loads a schema given as a URL', async () => {
     const types = await generateOpenAPITypes(
-      { petStore: { ...petStore, openAPITS: { exportType: false } } },
-      { rootDir, openAPITS: { exportType: true } },
+      { petStore: { url: 'https://example.com', schema: pathToFileURL(join(rootDir, 'schemas/petStore.yaml')) } },
+      { rootDir },
     )
 
-    expect(types).toContain('export interface paths')
+    expect(types).toContain('"/pet/{petId}"')
   })
 
-  it('keeps the global openAPITS option when the endpoint sets it to undefined', async () => {
+  it('loads a schema given as a function', async () => {
     const types = await generateOpenAPITypes(
-      { petStore: { ...petStore, openAPITS: { exportType: undefined } } },
-      { rootDir, openAPITS: { exportType: true } },
+      {
+        inventory: {
+          url: 'https://example.com',
+          schema: async () => ({
+            openapi: '3.1.0',
+            info: { title: 'Inventory', version: '1.0.0' },
+            paths: { '/items': { get: { responses: { 204: { description: 'No content' } } } } },
+          }),
+        },
+      },
+      { rootDir },
     )
 
-    expect(types).toContain('export type paths')
+    expect(types).toContain('"/items"')
   })
 
   it('emits one module declaration per endpoint', async () => {
@@ -55,9 +59,8 @@ describe('generateOpenAPITypes', () => {
       { rootDir },
     )
 
-    expect(types).toContain('declare module "#nuxt-api-party/petStore"')
-    expect(types).toContain('declare module "#nuxt-api-party/petStoreMirror"')
-    expect(types).toContain('}\n\ndeclare module')
+    expect(types).toContain(`declare module '#nuxt-api-party/petStore'`)
+    expect(types).toContain(`declare module '#nuxt-api-party/petStoreMirror'`)
   })
 
   it('indents the declaration body by two spaces', async () => {
@@ -82,16 +85,8 @@ describe('generateOpenAPITypes', () => {
       { rootDir },
     )
 
-    expect(types).toContain('declare module "#nuxt-api-party/broken"')
+    expect(types).toContain(`declare module '#nuxt-api-party/broken'`)
     expect(types).toContain('export type paths = Record<string, never>')
-  })
-
-  it('rejects a schema given as a function', async () => {
-    await expect(generateOpenAPITypes(
-      // @ts-expect-error: The option type no longer allows a function.
-      { legacy: { url: 'https://example.com', schema: () => ({}) } },
-      { rootDir },
-    )).rejects.toThrow(/no longer accepts a function/)
   })
 })
 

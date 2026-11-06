@@ -19,16 +19,16 @@ describe('PetStore', () => {
   })
 
   it('extracts a required request body', () => {
-    expectTypeOf<PetStore<'/pet', 'post'>['request']>().toEqualTypeOf<PetStoreComponents['schemas']['Pet']>()
+    expectTypeOf<PetStore<'/pet', 'post'>['request']>().toEqualTypeOf<PetStoreComponents['schemas']['Pet'] | URLSearchParams>()
   })
 
   it('widens an optional request body with undefined', () => {
     expectTypeOf<PetStore<'/store/order', 'post'>['request']>()
-      .toEqualTypeOf<PetStoreComponents['schemas']['Order'] | undefined>()
+      .toEqualTypeOf<PetStoreComponents['schemas']['Order'] | URLSearchParams | undefined>()
   })
 
   it('extracts a request body sent as application/octet-stream', () => {
-    expectTypeOf<PetStore<'/pet/{petId}/uploadImage', 'post'>['request']>().toEqualTypeOf<string | undefined>()
+    expectTypeOf<PetStore<'/pet/{petId}/uploadImage', 'post'>['request']>().toEqualTypeOf<Blob | File | undefined>()
   })
 
   it('types the request body as undefined for an operation that declares none', () => {

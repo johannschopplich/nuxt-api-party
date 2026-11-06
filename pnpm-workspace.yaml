@@ -4,7 +4,7 @@ allowBuilds:
   unrs-resolver: true
 
 minimumReleaseAgeExclude:
-  - apiful@5.0.1
+  - apiful@6.0.0
 
 shellEmulator: true
 trustPolicy: no-downgrade

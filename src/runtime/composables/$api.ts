@@ -1,6 +1,6 @@
 import type { H3Event$Fetch, NitroFetchOptions } from 'nitropack'
 import type { NuxtApp } from '#app'
-import type { FetchResponseData, FilterMethods, MethodOption, ParamsOption, RequestBodyOption } from '../openapi'
+import type { FetchResponseData, MethodOption, ParamsOption, PathItem, RequestBodyOption } from '../openapi'
 import { defu } from 'defu'
 import { hash } from 'ohash'
 import { joinURL } from 'ufo'
@@ -96,7 +96,7 @@ export type OpenAPIClientFetchOptions<
 
 export type OpenAPIClient<Paths, ClientOnlyOptions = SharedFetchOptions> = <
   ReqT extends Extract<keyof Paths, string>,
-  Methods extends FilterMethods<Paths[ReqT]>,
+  Methods extends PathItem<Paths[ReqT]>,
   Method extends Extract<keyof Methods, string> | Uppercase<Extract<keyof Methods, string>>,
   LowercasedMethod extends Lowercase<Method> extends keyof Methods ? Lowercase<Method> : never,
   DefaultMethod extends 'get' extends LowercasedMethod ? 'get' : LowercasedMethod,

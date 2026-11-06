@@ -1,7 +1,7 @@
 import type { NitroFetchOptions } from 'nitropack'
 import type { AsyncData, AsyncDataOptions, NuxtError } from 'nuxt/app'
 import type { MaybeRef, MaybeRefOrGetter, MultiWatchSources } from 'vue'
-import type { FetchResponseData, FetchResponseError, FilterMethods, ParamsOption, RequestBodyOption } from '../openapi'
+import type { FetchResponseData, FetchResponseError, ParamsOption, PathItem, RequestBodyOption } from '../openapi'
 import type { SharedFetchOptions } from './$api'
 import { hash } from 'ohash'
 import { computed, toValue } from 'vue'
@@ -88,7 +88,7 @@ export type UseOpenAPIDataOptions<
 
 export type UseOpenAPIData<Paths> = <
   ReqT extends Extract<keyof Paths, string>,
-  Methods extends FilterMethods<Paths[ReqT]>,
+  Methods extends PathItem<Paths[ReqT]>,
   Method extends Extract<keyof Methods, string> | Uppercase<Extract<keyof Methods, string>>,
   LowercasedMethod extends Lowercase<Method> extends keyof Methods ? Lowercase<Method> : never,
   DefaultMethod extends 'get' extends LowercasedMethod ? 'get' : LowercasedMethod,

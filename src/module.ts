@@ -1,15 +1,14 @@
 import type { HookResult, Nuxt } from '@nuxt/schema'
-import type { OpenAPI3, OpenAPITSOptions } from 'openapi-typescript'
+import type { OpenAPIDocumentSource } from 'apiful/openapi/generate'
 import type { QueryObject } from 'ufo'
 import type { ObjectPlugin, Plugin } from '#app'
 import type { ApiClientFetchOptions, SharedFetchOptions } from './runtime/composables/$api'
 import type { AllowedRoute } from './runtime/types'
 import { fileURLToPath } from 'node:url'
 import { addImportsSources, addServerHandler, addTemplate, addTypeTemplate, createResolver, defineNuxtModule, updateTemplates } from '@nuxt/kit'
-import { generateTypeHelpers } from 'apiful/openapi'
+import { generateTypeHelpers } from 'apiful/openapi/generate'
 import { watch } from 'chokidar'
 import { defu } from 'defu'
-import { createJiti } from 'jiti'
 import { relative } from 'pathe'
 import { camelCase, pascalCase } from 'scule'
 import { joinURL } from 'ufo'
@@ -27,8 +26,7 @@ export interface EndpointConfiguration {
   cookies?: boolean
   allowedUrls?: string[]
   allowedRoutes?: AllowedRoute[]
-  schema?: string | OpenAPI3
-  openAPITS?: OpenAPITSOptions
+  schema?: OpenAPIDocumentSource
 }
 // #endregion endpoints
 
@@ -45,8 +43,7 @@ export interface ModuleOptions {
    * - `cookies` (optional): Whether to forward cookies in requests
    * - `allowedUrls` (optional): URLs allowed for [dynamic backend switching](https://nuxt-api-party.byjohann.dev/guides/dynamic-backend-url)
    * - `allowedRoutes` (optional): Routes the [server proxy may forward](https://nuxt-api-party.byjohann.dev/guides/allowed-routes)
-   * - `schema` (optional): [OpenAPI Schema](https://swagger.io/resources/open-api) schema URL or file path for [type generation](https://nuxt-api-party.byjohann.dev/guides/openapi-integration)
-   * - `openAPITS` (optional): Endpoint-specific configuration options for [`openapi-typescript`](https://openapi-ts.dev/node/#options). Will override the global `openAPITS` options if provided.
+   * - `schema` (optional): [OpenAPI](https://swagger.io/resources/open-api) document for [type generation](https://nuxt-api-party.byjohann.dev/guides/openapi-integration) – a file path, a `file:` or http(s) URL, the document itself, or an async function resolving to it
    *
    * @example
    * export default defineNuxtConfig({
@@ -85,11 +82,6 @@ export interface ModuleOptions {
    * @default false
    */
   client?: boolean | 'allow' | 'always'
-
-  /**
-   * Global options for [`openapi-typescript`](https://openapi-ts.dev/node/#options).
-   */
-  openAPITS: OpenAPITSOptions
 
   server: {
     /**
@@ -181,7 +173,6 @@ export default defineNuxtModule<ModuleOptions>().with({
   defaults: {
     endpoints: {},
     client: undefined,
-    openAPITS: {},
     server: {
       basePath: '__api_party',
       proxyMode: 'wrapped',
@@ -246,13 +237,6 @@ export default defineNuxtModule<ModuleOptions>().with({
         .filter(([, endpoint]) => 'schema' in endpoint),
     )
     const schemaEndpointIds = Object.keys(schemaEndpoints)
-    const jiti = createJiti(nuxt.options.rootDir, { alias: nuxt.options.alias })
-    const openAPITSSrc = jiti.esmResolve('openapi-typescript', { default: true, try: true })
-
-    if (schemaEndpointIds.length && !openAPITSSrc) {
-      logger.warn('OpenAPI types generation is enabled, but the `openapi-typescript` package is missing. Please install it to enable endpoint types generation.')
-      schemaEndpointIds.length = 0
-    }
 
     if (options.server.proxyMode === 'passthrough') {
       addServerHandler({
@@ -350,10 +334,10 @@ import type { UseApiData, UseOpenAPIData, UseApiDataOptions, UseOpenAPIDataOptio
 import type { OpenAPIEndpoint, OpenAPIPathMethods } from '${relativeTo('runtime/openapi')}'
 
 ${schemaEndpointIds.map(i => `
-import type { paths as ${pascalCase(i)}Paths, components as ${pascalCase(i)}Components, operations as ${pascalCase(i)}Operations } from '#${moduleName}/${i}'
+import type { paths as ${pascalCase(i)}Paths, components as ${pascalCase(i)}Components } from '#${moduleName}/${i}'
 `.trimStart()).join('').trimEnd()}
 
-export type { FetchResponseData, FetchResponseError, MethodOption, ParamsOption, RequestBodyOption, FilterMethods, OpenAPIEndpoint, OpenAPIParameters, OpenAPIPathMethods } from '${relativeTo('runtime/openapi')}'
+export type { FetchResponseData, FetchResponseError, MethodOption, ParamsOption, RequestBodyOption, OpenAPIEndpoint, OpenAPIParameters, OpenAPIPathMethods } from '${relativeTo('runtime/openapi')}'
 export type { ApiClient, OpenAPIClient, ApiClientFetchOptions, OpenAPIClientFetchOptions, UseApiData, UseOpenAPIData, UseApiDataOptions, UseOpenAPIDataOptions }
 
 ${endpointKeys.map(i => `
@@ -361,7 +345,7 @@ export declare const ${getRawComposableName(i)}: ${schemaEndpointIds.includes(i)
 export declare const ${getDataComposableName(i)}: ${schemaEndpointIds.includes(i) ? `UseOpenAPIData<${pascalCase(i)}Paths>` : 'UseApiData'}
 `.trimStart()).join('').trimEnd()}
 
-${schemaEndpointIds.map(generateTypeHelpers).join('\n\n')}
+${schemaEndpointIds.map(i => generateTypeHelpers(i, { paths: `${pascalCase(i)}Paths`, components: `${pascalCase(i)}Components` })).join('\n\n')}
 `.trimStart()
       },
     })
@@ -424,7 +408,7 @@ declare module 'nitropack/types' {
         async getContents() {
           return `
 // Generated by ${moduleName}
-${await generateOpenAPITypes(schemaEndpoints, { rootDir: nuxt.options.rootDir, openAPITS: options.openAPITS })}
+${await generateOpenAPITypes(schemaEndpoints, { rootDir: nuxt.options.rootDir })}
 `.trimStart()
         },
       })
@@ -457,7 +441,7 @@ export declare const allowPayloadCache: boolean
 
     if (nuxt.options.dev) {
       const schemaFiles = Object.values(schemaEndpoints)
-        .map(({ schema }) => schema)
+        .map(({ schema }) => schema instanceof URL ? schema.href : schema)
         .filter((schema): schema is string => typeof schema === 'string' && !/^https?:\/\//.test(schema))
         .map(schema => schema.startsWith('file:') ? fileURLToPath(schema) : schema)
         .map(schema => resolve(nuxt.options.rootDir, schema))
