@@ -109,14 +109,10 @@ export default defineEventHandler(async (event) => {
       redirect: 'manual',
       ignoreResponseError: true,
       async onRequest(ctx) {
-        await nitro.hooks.callHook('api-party:request', ctx, event)
-        // @ts-expect-error: Types will be generated on Nuxt prepare.
-        await nitro.hooks.callHook(`api-party:request:${endpointId}`, ctx, event)
+        await nitro.hooks.callHook('api-party:request', ctx, event, endpointId)
       },
       async onResponse(ctx) {
-        // @ts-expect-error: Types will be generated on Nuxt prepare.
-        await nitro.hooks.callHook(`api-party:response:${endpointId}`, ctx, event)
-        await nitro.hooks.callHook('api-party:response', ctx, event)
+        await nitro.hooks.callHook('api-party:response', ctx, event, endpointId)
       },
     })
   }

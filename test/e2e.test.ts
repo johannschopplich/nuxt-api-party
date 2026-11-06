@@ -47,6 +47,13 @@ describe('nuxt-api-party', async () => {
       expect(result.hookHeader).toBe('hook')
     })
 
+    it('passes the endpoint ID to the api-party:request and api-party:response hooks', async () => {
+      const result = await fetchTestResult<{ requestHookEndpointId?: string, responseHookEndpointId?: string }>('/hook-headers')
+
+      expect(result.requestHookEndpointId).toBe('testApi')
+      expect(result.responseHookEndpointId).toBe('testApi')
+    })
+
     it('forwards the cookie only for the endpoint that sets forwardCredentials to true', async () => {
       const html = await $fetch<string>('/cookies', {
         headers: { cookie: 'session=secret' },

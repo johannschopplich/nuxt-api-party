@@ -182,14 +182,10 @@ export async function _$api<T = unknown>(
 
   const fetchHooks = mergeFetchHooks(fetchOptions, {
     async onRequest(ctx) {
-      await nuxt.callHook('api-party:request', ctx)
-      // @ts-expect-error: Types will be generated on Nuxt prepare.
-      await nuxt.callHook(`api-party:request:${endpointId}`, ctx)
+      await nuxt.callHook('api-party:request', ctx, endpointId)
     },
     async onResponse(ctx) {
-      // @ts-expect-error: Types will be generated on Nuxt prepare.
-      await nuxt.callHook(`api-party:response:${endpointId}`, ctx)
-      await nuxt.callHook('api-party:response', ctx)
+      await nuxt.callHook('api-party:response', ctx, endpointId)
     },
   })
 

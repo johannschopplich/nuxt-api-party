@@ -34,9 +34,16 @@ describe('nuxt-api-party proxy', async () => {
     expect(response.status).toBe(401)
   })
 
-  it('sends the endpoint token, headers and query, letting the incoming query win', async () => {
+  it('passes the endpoint ID to the api-party:request and api-party:response hooks', async () => {
+    const response = await fetch('/api/__api_party/backendApi/articles')
+
+    expect(backend.requests[0]!.headers['x-nitro-endpoint-id']).toBe('backendApi')
+    expect(response.headers.get('x-nitro-endpoint-id')).toBe('backendApi')
+  })
+
+  it('lets the endpoint token and headers replace the incoming ones, while the incoming query wins', async () => {
     await fetch('/api/__api_party/tokenApi/articles?tenant=b', {
-      headers: { authorization: 'Bearer visitor-token' },
+      headers: { 'authorization': 'Bearer visitor-token', 'x-endpoint': 'visitor' },
     })
 
     const [received] = backend.requests

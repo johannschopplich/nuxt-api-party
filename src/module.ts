@@ -342,23 +342,15 @@ import type { FetchContext, FetchResponse } from 'ofetch'
 
 declare module '#app' {
   interface RuntimeNuxtHooks {
-    'api-party:request': (options: FetchContext) => HookResult
-    'api-party:response': (options: Omit<FetchContext, 'response'> & { response: FetchResponse<any> }) => HookResult
-    ${endpointKeys.flatMap(i => [
-      `'api-party:request:${i}': (option: FetchContext) => HookResult`,
-      `'api-party:response:${i}': (option: Omit<FetchContext, 'response'> & { response: FetchResponse<any> }) => HookResult`,
-    ]).join('\n    ')}
+    'api-party:request': (options: FetchContext, endpointId: string) => HookResult
+    'api-party:response': (options: Omit<FetchContext, 'response'> & { response: FetchResponse<any> }, endpointId: string) => HookResult
   }
 }
 
 declare module 'nitropack/types' {
   interface NitroRuntimeHooks {
-    'api-party:request': (options: FetchContext, event: H3Event) => HookResult
-    'api-party:response': (options: Omit<FetchContext, 'response'> & { response: FetchResponse<any> }, event: H3Event) => HookResult
-    ${endpointKeys.flatMap(i => [
-      `'api-party:request:${i}': (option: FetchContext, event: H3Event) => HookResult`,
-      `'api-party:response:${i}': (option: Omit<FetchContext, 'response'> & { response: FetchResponse<any> }, event: H3Event) => HookResult`,
-    ]).join('\n    ')}
+    'api-party:request': (options: FetchContext, event: H3Event, endpointId: string) => HookResult
+    'api-party:response': (options: Omit<FetchContext, 'response'> & { response: FetchResponse<any> }, event: H3Event, endpointId: string) => HookResult
   }
 }
 `.trimStart()
