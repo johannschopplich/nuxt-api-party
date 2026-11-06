@@ -25,13 +25,13 @@ export function assertRelativePath(path: string) {
 }
 
 /**
- * Throws a 400 for a path with a dot segment, even an encoded one, one behind an encoded slash
- * or backslash, or one followed by `;`, a line separator, or trailing spaces and controls.
+ * Throws a 400 for a path with a dot segment, even an encoded one, one delimited by `#` or by an
+ * encoded slash or backslash, or one followed by `;`, U+2028, U+2029, or trailing spaces and controls.
  * Backends and Nitro's in-process fetch disagree on which of these they resolve.
  */
 export function assertNoDotSegments(path: string) {
-  const pathname = path.replace(/[\t\n\r]/g, '').split(/[?#]/, 1)[0]!
-  const segments = pathname.replace(/%2e/gi, '.').replace(/%3b/gi, ';').replace(/%2f|%5c/gi, '/').split(/[/\\]/)
+  const pathname = path.replace(/[\t\n\r]/g, '').split('?', 1)[0]!
+  const segments = pathname.replace(/%2e/gi, '.').replace(/%3b/gi, ';').replace(/%2f|%5c/gi, '/').split(/[/\\#]/)
 
   // eslint-disable-next-line no-control-regex -- The WHATWG parser strips trailing C0 controls.
   if (segments.some(segment => /^\.{1,2}(?:[;\u2028\u2029]|[\u0000-\u0020]*$)/.test(segment))) {
