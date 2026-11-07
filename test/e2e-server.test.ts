@@ -40,6 +40,12 @@ describe('nuxt-api-party server', async () => {
     expect(backend.requests[0]!.headers.authorization).toBe('Basic call')
   })
 
+  it('rejects a lone surrogate path parameter instead of throwing', async () => {
+    const response = await fetch('/api/server-rejection')
+
+    expect(await response.json()).toEqual({ errorName: 'URIError' })
+  })
+
   it('leaves an upstream redirect unfollowed', async () => {
     await fetch('/api/server-request/backendApi/redirect')
 

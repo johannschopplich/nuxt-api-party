@@ -4,7 +4,7 @@ import { mergeFetchHooks } from '../hooks'
 import { resolvePathParams } from '../openapi'
 import { getEndpointHeaders, mergeHeaders } from '../utils'
 
-export function _$api<T = unknown>(
+export async function _$api<T = unknown>(
   endpointId: string,
   path: string,
   opts: ApiClientFetchOptions = {},
