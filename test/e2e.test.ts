@@ -83,6 +83,29 @@ describe('nuxt-api-party', async () => {
 
       expect(readTestResult<{ withCookies?: string }>(html).withCookies).toBe('session=secret')
     })
+
+    it('sends the visitor\'s headers but not the page request\'s own during SSR', async () => {
+      const html = await $fetch<string>('/page-request-headers', {
+        headers: {
+          'cookie': 'session=secret',
+          'authorization': 'Bearer visitor-token',
+          'user-agent': 'visitor-agent',
+          'accept-language': 'de',
+          'if-none-match': '"page"',
+          'if-modified-since': 'Wed, 01 Jan 2025 00:00:00 GMT',
+          'sec-fetch-dest': 'document',
+        },
+      })
+
+      expect(readTestResult(html)).toEqual({
+        cookie: 'session=secret',
+        authorization: 'Bearer visitor-token',
+        userAgent: 'visitor-agent',
+        acceptLanguage: 'de',
+        forwardedFor: '127.0.0.1',
+        pageTag: '/page-request-headers',
+      })
+    })
   })
 
   describe('$clientApi', () => {

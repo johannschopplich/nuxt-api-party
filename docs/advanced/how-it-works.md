@@ -10,7 +10,7 @@ The generated composables send every request to `/api/__api_party/{endpointId}/{
 
 The route lives below Nitro's [`apiBaseURL`](https://nitro.build/config#apibaseurl), which defaults to `/api` – with `nitro.apiBaseURL: '/rest'`, the proxy answers at `/rest/__api_party/{endpointId}/{path}`. A non-root [`app.baseURL`](https://nuxt.com/docs/api/nuxt-config#baseurl) prefixes it as well. Match this path in the rules of a CDN, a WAF or a rate limiter in front of your app.
 
-During server-side rendering, the call reaches the proxy inside the same process, without a network round trip.
+During server-side rendering, the call reaches the proxy inside the same process, without a network round trip. It carries the visitor's `Cookie`, `Authorization`, `Accept-Language` and `User-Agent` headers and the visitor's address, as a request from the browser would, but not the headers that belong to the page request, such as `If-None-Match` or `Sec-Fetch-Dest`.
 
 The route itself is public, though: anyone who can reach your app can send it a request, and the proxy forwards it with the endpoint credentials. Restrict it to the routes your app calls with [`allowedRoutes`](/guides/allowed-routes).
 

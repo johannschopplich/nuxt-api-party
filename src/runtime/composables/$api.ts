@@ -1,15 +1,23 @@
+import type { H3Event } from 'h3'
 import type { NitroFetchOptions } from 'nitropack'
 import type { $Fetch, ResponseType } from 'ofetch'
 import type { FetchResponseData, MethodOption, ParamsOption, PathItem, RequestBodyOption } from '../openapi'
+import { getRequestIP } from 'h3'
 import { camelCase, pascalCase } from 'scule'
 import { joinURL } from 'ufo'
+import { useNuxtApp, useRequestEvent, useRequestHeaders, useRuntimeConfig } from '#imports'
 import { proxyRoute } from '#build/module/nuxt-api-party.config'
-import { useNuxtApp, useRequestFetch, useRuntimeConfig } from '#imports'
 import { mergeFetchHooks } from '../hooks'
 import { resolvePathParams } from '../openapi'
 import { getEndpointHeaders, mergeHeaders } from '../utils'
 
 let hasWarnedAboutHydration = false
+
+/**
+ * Headers of the page request that describe the visitor rather than the page, which a request from the browser
+ * would carry as well.
+ */
+const VISITOR_HEADERS = ['cookie', 'authorization', 'accept-language', 'user-agent']
 
 // #region options
 export type ApiClientFetchOptions
@@ -67,15 +75,16 @@ export function createEndpointFetch(endpointId: string) {
   const nuxt = useNuxtApp()
   const runtimeConfig = useRuntimeConfig()
 
-  // Only a client endpoint is published.
   const clientEndpoint = runtimeConfig.public.apiParty.endpoints[endpointId]
 
   // A `baseURL` of its own replaces the `app.baseURL` that `$fetch` would prepend.
   const baseURL = clientEndpoint ? clientEndpoint.url : joinURL(runtimeConfig.app.baseURL, proxyRoute, endpointId)
 
-  // `useRequestFetch` forwards the visitor's headers, cookie included, which only the server proxy may see.
   // Typed as plain ofetch: the endpoint's paths are not the app's routes that Nuxt's typed fetch checks against.
-  const endpointFetch = (clientEndpoint ? globalThis.$fetch : useRequestFetch()) as $Fetch
+  const endpointFetch = globalThis.$fetch as $Fetch
+  // During SSR, the server proxy sees the visitor's headers, cookie included, which a client endpoint must not.
+  const requestEvent = import.meta.server && !clientEndpoint ? useRequestEvent() : undefined
+  const visitorHeaders = requestEvent ? getVisitorHeaders(requestEvent) : {}
 
   function $fetch<T = unknown>(path: string, opts: ApiClientFetchOptions = {}) {
     const { path: pathParams, query, headers, ...fetchOptions } = opts
@@ -96,12 +105,9 @@ export function createEndpointFetch(endpointId: string) {
         }
       : {
           query,
-          headers: {
-            ...mergeHeaders(headers),
-            // During SSR, `useRequestFetch` forwards the `Sec-Fetch-Site` of the visitor's navigation, which would
-            // trip the server proxy's cross-site check, but this request comes from the app itself.
-            ...(import.meta.server && { 'sec-fetch-site': 'same-origin' }),
-          },
+          headers: mergeHeaders(visitorHeaders, headers),
+          // Hands the proxy the page request's platform bindings, such as `event.context.cloudflare`, as `useRequestFetch` does.
+          ...(requestEvent && { context: requestEvent.context }),
         }
 
     return endpointFetch<T, ResponseType>(resolvePathParams(path, pathParams), {
@@ -113,4 +119,19 @@ export function createEndpointFetch(endpointId: string) {
   }
 
   return { baseURL, $fetch }
+}
+
+/**
+ * Collects the page request's `VISITOR_HEADERS` and the visitor's address. Unlike `useRequestFetch`, it leaves out
+ * the page request's own headers, such as `If-None-Match`, to which the API could answer with a body-less `304`.
+ */
+function getVisitorHeaders(event: H3Event) {
+  // Only the headers the page request carries come back, so none is `undefined`.
+  const headers = useRequestHeaders(VISITOR_HEADERS) as Record<string, string>
+
+  const clientAddress = getRequestIP(event, { xForwardedFor: true })
+  if (clientAddress)
+    headers['x-forwarded-for'] = clientAddress
+
+  return headers
 }

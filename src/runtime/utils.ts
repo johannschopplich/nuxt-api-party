@@ -1,9 +1,4 @@
-/**
- * Merges headers into a plain object, where a later source replaces a header an earlier one set.
- *
- * @remarks
- * A plain object, since `useRequestFetch` spreads the headers during SSR, which empties a `Headers` instance.
- */
+/** Merges headers into a plain object, where a later source replaces a header an earlier one set. */
 export function mergeHeaders(...headers: (HeadersInit | undefined)[]): Record<string, string> {
   const merged: Record<string, string> = {}
 
