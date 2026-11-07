@@ -33,7 +33,7 @@ On the way back, the response keeps its status code, status message, headers and
 
 ## Redirects
 
-The proxy passes redirects back instead of following them, so a `3xx` from the API reaches the browser with its `Location` unchanged. That location points at the API rather than at the proxy. To keep a redirect on the proxy, rewrite its location in a [response hook](/guides/hooks) – the [rewrite redirects example](https://github.com/johannschopplich/nuxt-api-party/tree/main/examples/rewrite-redirects) shows one.
+The proxy passes redirects back as the API sent them instead of following them. The browser follows an absolute `Location` straight to its target, such as a signed download URL, while a relative one resolves against your app rather than the API. During SSR, nothing follows a redirect, and the call receives the `3xx` response itself. Where the API redirects to a canonical path, call that path instead.
 
 ## Errors the Proxy Answers Itself
 

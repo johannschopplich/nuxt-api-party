@@ -26,10 +26,8 @@ export const ESCAPING_PATHS = [
   'articles/..%2F..%2F..%2Fsecret',
 ]
 
-/** Cookie the server sets on a request to a path ending in `/set-cookie`. */
 export const UPSTREAM_COOKIE = 'upstream=1; Path=/'
 
-/** Location the server redirects a request to a path ending in `/redirect` to. */
 export const UPSTREAM_REDIRECT_LOCATION = '/base/redirected'
 
 export interface RecordedRequest {
@@ -44,7 +42,6 @@ export interface RecordingServer {
   host: string
   /** Requests the server has received, oldest first. */
   requests: RecordedRequest[]
-  /** URLs of `requests`. */
   readonly requestUrls: string[]
   close: () => Promise<void>
 }

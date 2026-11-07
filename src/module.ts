@@ -347,7 +347,6 @@ export const proxyRoute = ${JSON.stringify(proxyRoute)}
 
     addTemplate({
       filename: `module/${moduleName}.config.d.ts`,
-      write: false, // Read through the virtual import alone, so no file has to exist.
       getContents: () => `
 export declare const proxyRoute: string
 `.trimStart(),

@@ -80,5 +80,5 @@ export default defineNitroPlugin((nitroApp) => {
 A request hook that throws an h3 error, such as `throw createError({ statusCode: 401 })`, answers the proxy request with that error and the API is never called.
 
 ::: info Response Body in the Proxy
-The server proxy streams the API's response through, so in a Nitro response hook for a proxy request, `ctx.response._data` is a `ReadableStream`, not the parsed body. Read status and headers from `ctx.response`, and set additional response headers on `event`. The proxy copies the API's headers after the hook, so to replace one of them, answer the request in the hook and end the response – the [rewrite redirects example](https://github.com/johannschopplich/nuxt-api-party/tree/main/examples/rewrite-redirects) does this. A server import parses the body as usual.
+The server proxy streams the API's response through, so in a Nitro response hook for a proxy request, `ctx.response._data` is a `ReadableStream`, not the parsed body. Read status and headers from `ctx.response`, and set additional response headers on `event`. The proxy copies the API's headers after the hook, so to replace one of them, answer the request in the hook – with `send(event, body)` or `sendRedirect(event, location)` – and the proxy leaves the response alone. A server import parses the body as usual.
 :::

@@ -321,7 +321,7 @@ await $myApi('events', {
 
 #### Redirects Are No Longer Followed
 
-The proxy passes redirects back instead of following them, and a server import resolves a `3xx` response instead of following it. Read the `Location` header and send the follow-up request yourself where the target is trusted.
+The proxy passes redirects back as the API sent them, and a server import resolves a `3xx` response, instead of following them. Where the API redirects to a canonical path, call that path instead. See [Redirects](/advanced/how-it-works#redirects).
 
 #### Browser Caching Works Through the Proxy
 

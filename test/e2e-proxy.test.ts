@@ -59,9 +59,11 @@ describe('nuxt-api-party proxy', async () => {
   })
 
   it('drops a header that the incoming connection header names', async () => {
-    await requestStatus('/api/__api_party/backendApi/articles', { 'connection': 'x-hop', 'x-hop': '1' })
+    await requestStatus('/api/__api_party/backendApi/articles', { 'connection': 'x-hop', 'x-hop': '1', 'x-kept': '1' })
 
-    expect(backend.requests[0]!.headers['x-hop']).toBeUndefined()
+    const { headers } = backend.requests[0]!
+    expect(headers['x-hop']).toBeUndefined()
+    expect(headers['x-kept']).toBe('1')
   })
 
   it('forwards a multipart upload as it stands', async () => {
