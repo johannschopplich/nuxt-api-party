@@ -47,7 +47,7 @@
   },
   "dependencies": {
     "@nuxt/kit": "^4.6.4",
-    "apiful": "^6.0.0",
+    "apiful": "^7.0.0",
     "chokidar": "^5.0.0",
     "defu": "^6.1.7",
     "h3": "^1.15.11",

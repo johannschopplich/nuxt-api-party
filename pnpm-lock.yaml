@@ -170,8 +170,8 @@ importers:
         specifier: ^4.6.4
         version: 4.6.4(@nuxt/schema@4.6.4)(confbox@0.3.2)(dotenv@17.4.2)(giget@3.3.1)(jiti@2.7.0)(magic-string@1.1.0)(mlly@1.8.2)(rolldown@1.2.16)(unplugin@3.3.0(esbuild@0.28.2)(rolldown@1.2.16)(rollup@4.67.5)(vite@8.3.6(@types/node@26.1.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.0)))
       apiful:
-        specifier: ^6.0.0
-        version: 6.0.0(vitest@4.1.10(@types/node@26.1.2)(vite@8.3.6(@types/node@26.1.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.0)))
+        specifier: ^7.0.0
+        version: 7.0.0(vitest@4.1.10(@types/node@26.1.2)(vite@8.3.6(@types/node@26.1.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.0)))
       chokidar:
         specifier: ^5.0.0
         version: 5.0.0
@@ -2661,8 +2661,8 @@ packages:
     resolution: {integrity: sha512-KMReFUr0B4t+D+OBkjR3KYqvocp2XaSzO55UcB6mgQMd3KbcE+mWTyvVV7D/zsdEbNnV6acZUutkiHQXvTr1Rw==}
     engines: {node: '>= 8'}
 
-  apiful@6.0.0:
-    resolution: {integrity: sha512-n3dbaQTIX2cI0woF2qh4z+BpuIubWvN6g5ZvHiAC8V5ZBNjGGLr050KCmBX2ofhbTWZuReV6WKlPoV3qAbtOsQ==}
+  apiful@7.0.0:
+    resolution: {integrity: sha512-qLquR7vtf0EHn4ZbP62R/SDba6PsP4y8cxVRCs98dA8mJmTmPsLRqdLCnZXGbgNoh4ikUvy70TkSoChX6rgCaQ==}
     hasBin: true
 
   archiver@8.0.0:
@@ -8773,7 +8773,7 @@ snapshots:
       normalize-path: 3.0.0
       picomatch: 2.3.2
 
-  apiful@6.0.0(vitest@4.1.10(@types/node@26.1.2)(vite@8.3.6(@types/node@26.1.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.0))):
+  apiful@7.0.0(vitest@4.1.10(@types/node@26.1.2)(vite@8.3.6(@types/node@26.1.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.0))):
     dependencies:
       confbox: 0.3.2
       ofetch: 1.5.1

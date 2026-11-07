@@ -1,5 +1,5 @@
 import type { EndpointConfiguration } from './module'
-import { declareModule, EMPTY_SCHEMA_TYPES, generateSchemaTypes, loadOpenAPIDocument } from 'apiful/openapi/generate'
+import { declareModule, EMPTY_DOCUMENT_TYPES, generateDocumentTypes, loadOpenAPIDocument } from 'apiful/openapi/generate'
 import { logger } from './kit'
 
 type SchemaEndpoint = EndpointConfiguration & {
@@ -35,10 +35,10 @@ async function generateEndpointTypes(
 ): Promise<string> {
   try {
     const document = await loadOpenAPIDocument(endpoint.schema, { rootDir: options.rootDir })
-    return generateSchemaTypes(document)
+    return generateDocumentTypes(document)
   }
   catch (error) {
     logger.error(`Failed to generate types for ${id}`, error)
-    return EMPTY_SCHEMA_TYPES
+    return EMPTY_DOCUMENT_TYPES
   }
 }
