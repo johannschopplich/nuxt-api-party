@@ -92,7 +92,7 @@ export function createEndpointFetch(endpointId: string) {
   const requestEvent = import.meta.server && !clientEndpoint ? useRequestEvent() : undefined
   const visitorHeaders = requestEvent ? getVisitorHeaders(requestEvent) : {}
 
-  function $fetch<T = unknown>(
+  async function $fetch<T = unknown>(
     path: string,
     // `useMyApiData` hands its path parameters over as a getter.
     opts: Omit<ApiClientFetchOptions, 'path'> & { path?: MaybeRefOrGetter<Record<string, string>> } = {},
@@ -108,6 +108,12 @@ export function createEndpointFetch(endpointId: string) {
       },
     })
 
+    // During SSR, the proxy is called in-process, where nothing derives the content type from a form or
+    // `Blob` body as `fetch` does on the wire, a multipart boundary included.
+    const encodedBody = requestEvent && (fetchOptions.body instanceof FormData || fetchOptions.body instanceof URLSearchParams || fetchOptions.body instanceof Blob)
+      ? new Response(fetchOptions.body)
+      : undefined
+
     const targetOptions = clientEndpoint
       ? {
           query: { ...clientEndpoint.query, ...query },
@@ -115,7 +121,9 @@ export function createEndpointFetch(endpointId: string) {
         }
       : {
           query,
-          headers: mergeHeaders(visitorHeaders, headers),
+          headers: mergeHeaders(visitorHeaders, encodedBody?.headers, headers),
+          // Read in full, so a retry sends the body again.
+          ...(encodedBody && { body: new Uint8Array(await encodedBody.arrayBuffer()) }),
           // Hands the proxy the page request's platform bindings, such as `event.context.cloudflare`, as `useRequestFetch` does.
           ...(requestEvent && { context: requestEvent.context }),
         }

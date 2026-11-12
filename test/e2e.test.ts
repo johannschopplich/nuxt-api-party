@@ -52,6 +52,22 @@ describe('nuxt-api-party', async () => {
       expect(dotSegmentError).toContain('Path parameter `id` is `..`')
     })
 
+    it('sends a URLSearchParams body again when it retries a request during SSR', async () => {
+      const { body } = await fetchTestResult<{ body: string }>('/form-body-retry')
+
+      expect(body).toBe('title=Hello')
+    })
+
+    it('sends a FormData, a URLSearchParams and a Blob body with their content type during SSR', async () => {
+      const { multipart, urlEncoded, binary } = await fetchTestResult<Record<'multipart' | 'urlEncoded' | 'binary', { contentType?: string, body: string }>>('/form-body')
+
+      const boundary = multipart.contentType?.match(/^multipart\/form-data; boundary=(.+)$/)?.[1]
+      expect(multipart.body).toContain(`--${boundary}`)
+      expect(multipart.body).toContain('name="title"')
+      expect(urlEncoded).toEqual({ contentType: 'application/x-www-form-urlencoded;charset=UTF-8', body: 'title=Hello' })
+      expect(binary).toEqual({ contentType: 'text/markdown', body: 'Hello' })
+    })
+
     it('forwards a Headers instance passed as the headers option to the API', async () => {
       const result = await fetchTestResult<{ traceId?: string }>('/request-headers')
 
