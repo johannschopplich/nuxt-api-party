@@ -7,8 +7,8 @@ A Nuxt module that calls APIs the app doesn't control through generated composab
 ### Endpoints
 
 **Endpoint**:
-An API configured under a name in `apiParty.endpoints`. The name – the endpoint ID – keys everything generated for it: the `$<name>` and `use<Name>Data` composables, the `#nuxt-api-party/<name>` types and the endpoint argument of every hook.
-_Avoid_: API, backend, service
+An API configured under a name in `apiParty.endpoints`; that name is the endpoint ID.
+_Avoid_: backend, service
 
 **Endpoint credentials**:
 The token, headers and query an endpoint's configuration adds to every request. They stay on the server unless the endpoint is a client endpoint.

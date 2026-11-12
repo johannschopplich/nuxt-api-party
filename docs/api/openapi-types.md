@@ -7,7 +7,7 @@ import type { PetStore } from '#nuxt-api-party'
 
 type UserEndpoint = PetStore<'/user/{username}', 'get'>
 
-// Extract any part of the endpoint
+// Extract any part of the operation
 type PathParams = UserEndpoint['path'] // { username: string }
 type QueryParams = UserEndpoint['query'] // Query parameters
 type RequestBody = UserEndpoint['request'] // Request body type
@@ -74,7 +74,7 @@ type PlaceOrderBody = PetStore<'/store/order', 'post'>['request']
 Extract the body a particular status code carries:
 
 ```ts
-// All responses the endpoint declares
+// All responses the operation declares
 type AllPetResponses = PetStore<'/pet/{petId}', 'get'>['responses']
 //   ^? { 200: Pet; 400: undefined; 404: undefined }
 
@@ -107,7 +107,7 @@ Only the methods the path declares are listed.
 
 ## Schema Model Types
 
-Models are also reachable on their own, without going through an endpoint:
+Models are also reachable on their own, without going through an operation:
 
 ```ts
 import type { PetStoreModel } from '#nuxt-api-party'
@@ -123,4 +123,4 @@ type User = PetStoreModel<'User'>
 //   ^? { id?: number; username?: string; firstName?: string; lastName?: string; email?: string; password?: string; phone?: string; userStatus?: number }
 ```
 
-Reach for this where a type belongs to your domain rather than to one request – a shared component, a form, a helper used by several endpoints.
+Reach for this where a type belongs to your domain rather than to one request – a shared component, a form, a helper used by several operations.
