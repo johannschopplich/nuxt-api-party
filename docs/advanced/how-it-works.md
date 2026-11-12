@@ -20,7 +20,7 @@ A visitor who opens a proxy URL in the browser sees the API's response rendered 
 
 On the way to the API, the proxy applies the endpoint's configuration:
 
-- `query` – Merged into the query string. A query parameter of the request wins over one of the same name. The proxy parses and rebuilds every query string, so `?a=` reaches the API as `?a`, `%20` as `+`, and the values of a repeated key next to each other.
+- `query` – Merged into the query string. A query parameter of the request wins over one of the same name.
 - `headers` – Set on the request, replacing a header of the same name the browser sent.
 - `token` – Sent as `Authorization: Bearer {token}`, replacing any other `Authorization` header.
 - `X-Forwarded-For` – Set to the client address of the request, taken from an incoming `X-Forwarded-For` where there is one.

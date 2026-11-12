@@ -54,7 +54,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 
 The hook runs before every attempt, a retry included. Set a default with `??=`: a plain assignment to `retry` resets the count on each attempt, so a failing request retries without end, and it overrides the option of a call.
 
-A `timeout` set here takes effect for a `$myApi` request from the browser, and for one to a [client endpoint](/api/module-configuration#client-endpoints) during SSR. `useMyApiData` hands the request an abort signal of its own, so pass it the [`timeout` option](https://nuxt.com/docs/api/composables/use-fetch#params) instead. A request through the server proxy during SSR takes its `timeout` from a [Nitro hook](#nitro-runtime-hooks).
+A `timeout` set here reaches neither `useMyApiData`, which takes its own [`timeout` option](https://nuxt.com/docs/api/composables/use-fetch#params), nor a request through the server proxy during SSR, which takes it from a [Nitro hook](#nitro-runtime-hooks).
 
 ::: warning Client-Side Execution
 Nuxt hooks run in the browser as well, and a request from the browser reaches the [server proxy](/advanced/how-it-works) like any visitor's. Without [credential forwarding](/guides/credential-forwarding), an `Authorization` header set here never reaches the API. Attach credentials in a Nitro hook instead.
@@ -81,7 +81,7 @@ export default defineNitroPlugin((nitroApp) => {
 
 A request hook that throws an h3 error, such as `throw createError({ statusCode: 401 })`, answers the proxy request with that error and the API is never called.
 
-A `timeout` set on `ctx.options` bounds the proxy's wait for the API's response headers. When it runs out, the proxy answers `502` – after a second attempt for a request other than `POST`, `PUT`, `PATCH` and `DELETE`.
+A `timeout` set on `ctx.options` bounds the proxy's wait for the API's response headers. When it runs out, the proxy answers `502`.
 
 ::: info Response Body in the Proxy
 The server proxy streams the API's response through, so in a Nitro response hook for a proxy request, `ctx.response._data` is a `ReadableStream`, not the parsed body. Read status and headers from `ctx.response`, and set additional response headers on `event`. The proxy copies the API's headers after the hook, so to replace one of them, answer the request in the hook – with `send(event, body)` or `sendRedirect(event, location)` – and the proxy leaves the response alone. A server import parses the body as usual.

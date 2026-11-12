@@ -6,8 +6,6 @@ The module refuses to start on an option v5 removed, and its error names each on
 
 ### Code You Have to Change
 
-Each of these changes asks for an edit in your config or code.
-
 #### Nuxt 4.4 Is Required
 
 The module now requires Nuxt 4.4 or later.
@@ -191,7 +189,7 @@ export default defineNuxtPlugin((nuxtApp) => { // [!code ++]
 }) // [!code ++]
 ```
 
-A `timeout` set in the hook reaches neither `useMyApiData` nor a request through the server proxy during SSR – pass `useMyApiData` its own `timeout` option, and set the proxy's in a [Nitro hook](/guides/hooks#nitro-runtime-hooks). Static headers and query parameters belong in the endpoint's `headers` and `query`. Nuxt's [`experimental.defaults.useFetch`](https://nuxt.com/docs/guide/going-further/experimental-features#defaults) sets `retry` and `retryDelay` for `useMyApiData` as well.
+A `timeout` set in the hook [reaches neither `useMyApiData` nor a request through the server proxy during SSR](/guides/hooks#nuxt-runtime-hooks). Static headers and query parameters belong in the endpoint's `headers` and `query`. Nuxt's [`experimental.defaults.useFetch`](https://nuxt.com/docs/guide/going-further/experimental-features#defaults) sets `retry` and `retryDelay` for `useMyApiData` as well.
 
 #### The Dynamic Backend URL Is Gone
 
@@ -297,8 +295,6 @@ export function $petStoreCall<
 A call that passes options no longer type-checks where its path is a union of paths that declare different methods. Split it into one call per path.
 
 ### Behavior That Changed
-
-These changes need no edit to build. Check each against what your app relies on.
 
 #### The Proxy Forwards Request Headers
 
