@@ -46,6 +46,12 @@ describe('nuxt-api-party', async () => {
       expect(errorName).toBe('URIError')
     })
 
+    it('rejects .. as a path parameter', async () => {
+      const { dotSegmentError } = await fetchTestResult<{ dotSegmentError: string }>('/$testApi-rejection')
+
+      expect(dotSegmentError).toContain('Path parameter `id` is `..`')
+    })
+
     it('forwards a Headers instance passed as the headers option to the API', async () => {
       const result = await fetchTestResult<{ traceId?: string }>('/request-headers')
 
@@ -198,13 +204,39 @@ describe('nuxt-api-party', async () => {
       await page.close()
     })
 
-    it('fetches again when a getter passed as the path option changes', async () => {
+    it('puts the rejection of .. as a path parameter into error', async () => {
+      const { errorMessage } = await fetchTestResult<{ errorMessage: string }>('/path-rejection')
+
+      expect(errorMessage).toContain('Path parameter `id` is `..`')
+    })
+
+    it.each([
+      ['the path option', 'id'],
+      ['a path parameter', 'id-by-parameter'],
+    ])('fetches again when a getter passed as %s changes', async (_, testId) => {
       const page = await createPage('/path-getter')
-      const id = page.getByTestId('id')
+      const id = page.getByTestId(testId)
 
       await page.getByTestId('next-id').click()
 
       await expect.poll(() => id.textContent()).toBe('2')
+      await page.close()
+    })
+
+    it('sends no request when a path parameter getter runs again with the same value', async () => {
+      const page = await createPage('/path-getter')
+      const itemRequestPaths: string[] = []
+      page.on('request', (request) => {
+        if (request.url().includes('/items/'))
+          itemRequestPaths.push(new URL(request.url()).pathname)
+      })
+
+      await page.getByTestId('rerun').click()
+      await page.getByTestId('next-id').click()
+
+      await expect.poll(() => page.getByTestId('id-by-parameter').textContent()).toBe('2')
+      // One request per call on the page, and none for the unchanged first item.
+      expect(itemRequestPaths).toEqual(['/api/__api_party/testApi/items/2', '/api/__api_party/testApi/items/2'])
       await page.close()
     })
 

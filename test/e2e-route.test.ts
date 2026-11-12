@@ -1,11 +1,12 @@
 import { join } from 'node:path'
-import { $fetch, setup } from '@nuxt/test-utils/e2e'
+import { $fetch, createPage, setup } from '@nuxt/test-utils/e2e'
 import destr from 'destr'
 import { describe, expect, it } from 'vitest'
 
 describe('nuxt-api-party route', async () => {
   await setup({
     server: true,
+    browser: true,
     rootDir: join(import.meta.dirname, 'fixture'),
     nuxtConfig: {
       app: {
@@ -32,6 +33,16 @@ describe('nuxt-api-party route', async () => {
     const { json } = await fetchTestResult<{ json: unknown[] }>('/app/$testApi')
 
     expect(json).toHaveLength(3)
+  })
+
+  it('sends a client endpoint request to the endpoint URL as written, outside app.baseURL', async () => {
+    const page = await createPage('/app/client-endpoint-request-in-browser')
+    const request = page.waitForRequest(request => request.url().includes('/todos'))
+
+    await page.getByTestId('request').click()
+
+    expect(new URL((await request).url()).pathname).toBe('/api/todos')
+    await page.close()
   })
 })
 

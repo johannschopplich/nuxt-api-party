@@ -4,8 +4,8 @@ import type { FetchOptions } from 'ofetch'
 import type { MaybeRefOrGetter } from 'vue'
 import type { FetchResponseData, MethodOption, ParamsOption, PathItem, RequestBodyOption } from '../openapi'
 import type { RequestMethod } from '../types'
+import { resolvePathParams } from 'apiful/openapi'
 import { toValue } from 'vue'
-import { resolvePathParams } from '../openapi'
 
 /** Copy of the type Nuxt maps its own fetch options through, which it does not export. */
 type ComputedOptions<T extends Record<string, any>> = {
@@ -90,8 +90,21 @@ export function _useApiData(
   const [opts = {}, autoKey] = typeof arg1 === 'string' ? [{}, arg1] : [arg1, arg2]
   const { path: pathParams, ...fetchOptions } = opts
 
-  // Resolved into the request, so each value of the path parameters gets a key of its own.
-  const request = () => resolvePathParams(toValue(path), toValue(pathParams))
+  const getPathParams = () => Object.fromEntries(
+    Object.entries(toValue(pathParams) ?? {}).map(([name, value]) => [name, toValue(value)]),
+  )
 
-  return useFetch(request, fetchOptions as UseFetchOptions<unknown>, autoKey)
+  // Resolved into the request, so each value of the path parameters gets a key of its own. A value that
+  // cannot be resolved is left to the endpoint's fetch, whose error lands in `error` rather than in `setup`.
+  const request = () => {
+    try {
+      return resolvePathParams(toValue(path), getPathParams())
+    }
+    catch {
+      return toValue(path)
+    }
+  }
+
+  // Passed on as a getter, which Nuxt neither unwraps nor watches, so only a changed key fetches again.
+  return useFetch(request, { ...fetchOptions, path: getPathParams } as UseFetchOptions<unknown>, autoKey)
 }

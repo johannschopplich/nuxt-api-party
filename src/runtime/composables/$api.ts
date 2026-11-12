@@ -1,14 +1,16 @@
 import type { H3Event } from 'h3'
 import type { NitroFetchOptions } from 'nitropack'
 import type { $Fetch, ResponseType } from 'ofetch'
+import type { MaybeRefOrGetter } from 'vue'
 import type { FetchResponseData, MethodOption, ParamsOption, PathItem, RequestBodyOption } from '../openapi'
+import { resolvePathParams } from 'apiful/openapi'
 import { getRequestIP } from 'h3'
 import { camelCase, pascalCase } from 'scule'
 import { joinURL } from 'ufo'
+import { toValue } from 'vue'
 import { proxyRoute } from '#build/module/nuxt-api-party.config'
 import { useNuxtApp, useRequestEvent, useRequestHeaders, useRuntimeConfig } from '#imports'
 import { mergeFetchHooks } from '../hooks'
-import { resolvePathParams } from '../openapi'
 import { getEndpointHeaders, mergeHeaders } from '../utils'
 
 let hasWarnedAboutHydration = false
@@ -77,7 +79,6 @@ export function createEndpointFetch(endpointId: string) {
 
   const clientEndpoint = runtimeConfig.public.apiParty.endpoints[endpointId]
 
-  // A `baseURL` of its own replaces the `app.baseURL` that `$fetch` would prepend.
   const baseURL = clientEndpoint ? clientEndpoint.url : joinURL(runtimeConfig.app.baseURL, proxyRoute, endpointId)
 
   // Typed as plain ofetch: the endpoint's paths are not the app's routes that Nuxt's typed fetch checks against.
@@ -86,7 +87,11 @@ export function createEndpointFetch(endpointId: string) {
   const requestEvent = import.meta.server && !clientEndpoint ? useRequestEvent() : undefined
   const visitorHeaders = requestEvent ? getVisitorHeaders(requestEvent) : {}
 
-  function $fetch<T = unknown>(path: string, opts: ApiClientFetchOptions = {}) {
+  function $fetch<T = unknown>(
+    path: string,
+    // `useMyApiData` hands its path parameters over as a getter.
+    opts: Omit<ApiClientFetchOptions, 'path'> & { path?: MaybeRefOrGetter<Record<string, string>> } = {},
+  ) {
     const { path: pathParams, query, headers, ...fetchOptions } = opts
 
     const fetchHooks = mergeFetchHooks(fetchOptions, {
@@ -110,11 +115,13 @@ export function createEndpointFetch(endpointId: string) {
           ...(requestEvent && { context: requestEvent.context }),
         }
 
-    return endpointFetch<T, ResponseType>(resolvePathParams(path, pathParams), {
+    // Joined here rather than by `$fetch`, which sends a path that names a scheme to the host it names.
+    return endpointFetch<T, ResponseType>(joinURL(baseURL, resolvePathParams(path, toValue(pathParams))), {
       ...fetchOptions,
       ...fetchHooks,
       ...targetOptions,
-      baseURL,
+      // Without it, `$fetch` would prepend `app.baseURL`.
+      baseURL: '',
     }) as Promise<T>
   }
 

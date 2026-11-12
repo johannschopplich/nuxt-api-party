@@ -136,6 +136,16 @@ describe('nuxt-api-party proxy', async () => {
       expect(backend.requestUrls).toEqual([])
     })
 
+    it.each(ABSOLUTE_PATH_TEMPLATES)('keeps a call to %s during SSR from the host it names', async (pathTemplate) => {
+      const path = pathTemplate.replace('{host}', backend.host)
+
+      const response = await fetch(`/path-from-query?path=${encodeURIComponent(path)}`)
+
+      // The proxy refuses the call, or the API has no such path below the endpoint URL.
+      expect(await response.text()).toMatch(/"statusCode":40[04]\}/)
+      expect(backend.requestUrls).toEqual([])
+    })
+
     it.each(ESCAPING_PATHS)('rejects %s for leaving the base path', async (path) => {
       const status = await requestStatus(`/api/__api_party/backendApi/${path}`)
 

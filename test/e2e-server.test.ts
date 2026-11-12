@@ -1,7 +1,7 @@
 import { join } from 'node:path'
 import { fetch, setup } from '@nuxt/test-utils/e2e'
 import { afterAll, beforeEach, describe, expect, it } from 'vitest'
-import { recordingEndpoints, startRecordingServer } from './helpers/recording-server'
+import { ABSOLUTE_PATH_TEMPLATES, recordingEndpoints, startRecordingServer } from './helpers/recording-server'
 
 describe('nuxt-api-party server', async () => {
   const backend = await startRecordingServer()
@@ -43,7 +43,21 @@ describe('nuxt-api-party server', async () => {
   it('rejects a lone surrogate path parameter instead of throwing', async () => {
     const response = await fetch('/api/server-rejection')
 
-    expect(await response.json()).toEqual({ errorName: 'URIError' })
+    expect(await response.json()).toMatchObject({ errorName: 'URIError' })
+  })
+
+  it('rejects .. as a path parameter', async () => {
+    const response = await fetch('/api/server-rejection')
+
+    expect(await response.json()).toMatchObject({ dotSegmentError: expect.stringContaining('Path parameter `id` is `..`') })
+  })
+
+  it.each(ABSOLUTE_PATH_TEMPLATES)('keeps a call to %s below the endpoint URL', async (pathTemplate) => {
+    const path = pathTemplate.replace('{host}', backend.host)
+
+    await fetch(`/api/server-request/backendApi/unused?path=${encodeURIComponent(path)}`)
+
+    expect(backend.requestUrls).toEqual([expect.stringMatching(/^\/base\//)])
   })
 
   it('leaves an upstream redirect unfollowed', async () => {
