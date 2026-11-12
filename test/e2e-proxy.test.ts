@@ -116,12 +116,9 @@ describe('nuxt-api-party proxy', async () => {
     expect(backend.requestUrls).toEqual(['/base/redirect'])
   })
 
-  it.each([
-    ['', {}],
-    [' under a timeout a request hook sets', { 'x-hook-timeout': '60000' }],
-  ])('stops waiting for the API once the client is gone%s', async (_, headers) => {
+  it('stops waiting for the API once the client is gone', async () => {
     const abortController = new AbortController()
-    const response = fetch('/api/__api_party/backendApi/hang', { headers, signal: abortController.signal })
+    const response = fetch('/api/__api_party/backendApi/hang', { signal: abortController.signal })
     await expect.poll(() => backend.requestUrls).toEqual(['/base/hang'])
 
     abortController.abort()
@@ -144,41 +141,6 @@ describe('nuxt-api-party proxy', async () => {
     const response = await fetch('/api/__api_party/backendApi/hang', { headers: { 'x-hook-timeout': '100' } })
 
     expect(response.status).toBe(502)
-    // A GET request gets a second attempt.
-    expect(backend.requestUrls).toEqual(['/base/hang', '/base/hang'])
-  })
-
-  it('answers 502 once a signal runs out that a request hook sets next to a timeout', async () => {
-    const response = await fetch('/api/__api_party/backendApi/hang', {
-      headers: { 'x-hook-timeout': '60000', 'x-hook-signal-timeout': '100' },
-    })
-
-    expect(response.status).toBe(502)
-  })
-
-  it('sends no request to the API for a client that left before the proxy ran', async () => {
-    const abortController = new AbortController()
-    const response = fetch('/api/__api_party/backendApi/articles', {
-      headers: { 'x-middleware-delay': '300', 'x-hook-signal-timeout': '60000' },
-      signal: abortController.signal,
-    })
-    setTimeout(() => abortController.abort(), 100)
-    await response.catch(() => {})
-
-    await new Promise(resolve => setTimeout(resolve, 500))
-
-    expect(backend.requestUrls).toEqual([])
-  })
-
-  it('keeps reading a response body past the timeout a request hook sets', async () => {
-    const response = await fetch('/api/__api_party/backendApi/stream', { headers: { 'x-hook-timeout': '200' } })
-    const reader = response.body!.getReader()
-
-    const readUntil = Date.now() + 600
-    while (Date.now() < readUntil)
-      expect((await reader.read()).done).toBe(false)
-
-    await reader.cancel()
   })
 
   describe('forwardCredentials', () => {

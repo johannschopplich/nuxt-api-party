@@ -95,17 +95,11 @@ export default defineEventHandler(async (event) => {
 
   Object.assign(headers, getEndpointHeaders(endpoint))
 
-  // A client that left before this handler ran closes no second time.
-  if (event.node.res.destroyed)
-    return null
-
   // A request from inside the app has no socket, and its response stream is handed back unread.
   const abortController = new AbortController()
   if (event.node.res.socket)
     event.node.res.once('close', () => abortController.abort())
 
-  let timeoutId: ReturnType<typeof setTimeout> | undefined
-  let attemptSignal: AbortSignal | undefined
   let response
   try {
     response = await globalThis.$fetch.raw<ReadableStream<Uint8Array>>(url, {
@@ -113,32 +107,17 @@ export default defineEventHandler(async (event) => {
       headers,
       body: getRequestWebStream(event),
       responseType: 'stream',
-      signal: abortController.signal,
       // The client decides whether to follow a redirect.
       redirect: 'manual',
       ignoreResponseError: true,
       async onRequest(ctx) {
         await nitro.hooks.callHook('api-party:request', ctx, event, endpointId)
 
-        // `$fetch` arms a `timeout` only for a request without a signal, so one a hook sets is armed here.
-        clearTimeout(timeoutId)
-        if (ctx.options.timeout) {
-          const timeoutController = new AbortController()
-          timeoutId = setTimeout(
-            () => timeoutController.abort(new DOMException('The operation was aborted due to timeout', 'TimeoutError')),
-            ctx.options.timeout,
-          )
-
-          const signals = [abortController.signal, timeoutController.signal]
-          // A retry starts from the signal of the attempt before it; any other signal is one the hook set.
-          if (ctx.options.signal && ctx.options.signal !== attemptSignal)
-            signals.push(ctx.options.signal)
-          attemptSignal = ctx.options.signal = AbortSignal.any(signals)
-        }
+        // `$fetch` arms a `timeout` only for a request without a signal.
+        if (!ctx.options.timeout)
+          ctx.options.signal ??= abortController.signal
       },
       async onResponse(ctx) {
-        // The timeout bounds the wait for the response, not the reading of its body.
-        clearTimeout(timeoutId)
         await nitro.hooks.callHook('api-party:response', ctx, event, endpointId)
       },
     })
@@ -157,9 +136,6 @@ export default defineEventHandler(async (event) => {
       statusCode: 502,
       statusMessage: 'Bad Gateway',
     })
-  }
-  finally {
-    clearTimeout(timeoutId)
   }
 
   // A response hook may have answered the request already.
