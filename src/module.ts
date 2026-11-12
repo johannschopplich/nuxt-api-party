@@ -22,16 +22,6 @@ export interface EndpointConfiguration {
   token?: string
   query?: QueryObject
   headers?: Record<string, string>
-  /**
-   * Whether every request goes straight to the API, from the browser and during SSR, instead of through the server
-   * proxy.
-   *
-   * @remarks
-   * The endpoint's URL, token, query and headers are published to the browser.
-   *
-   * @default true if Nuxt SSR is disabled and the endpoint sets neither `forwardCredentials` nor `allowedRoutes`,
-   * otherwise false
-   */
   client?: boolean
   forwardCredentials?: boolean
   allowedRoutes?: AllowedRoute[]
@@ -49,7 +39,7 @@ export interface ModuleOptions {
    * - `token` (optional): Bearer token for authentication
    * - `query` (optional): Default query parameters to send with each request
    * - `headers` (optional): Default headers to send with each request
-   * - `client` (optional): Whether every request goes straight to the API instead of through the server proxy, which publishes the endpoint's URL and credentials to the browser
+   * - `client` (optional): Whether every request goes straight to the API, from the browser and during SSR, instead of through the server proxy. A client endpoint's URL and credentials are published to the browser. Defaults to `true` where Nuxt SSR is disabled and the endpoint sets neither `forwardCredentials` nor `allowedRoutes`.
    * - `forwardCredentials` (optional): Whether the server proxy forwards the visitor's cookie and `Authorization` header to the API, and the API's `Set-Cookie` back
    * - `allowedRoutes` (optional): Routes the [server proxy may forward](https://nuxt-api-party.byjohann.dev/guides/allowed-routes)
    * - `schema` (optional): [OpenAPI](https://swagger.io/resources/open-api) document for [type generation](https://nuxt-api-party.byjohann.dev/guides/openapi-integration) – a file path, a `file:` or http(s) URL, the document itself, or an async function resolving to it
