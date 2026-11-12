@@ -2,10 +2,11 @@
 
 import type { NuxtError } from 'nuxt/app'
 import type { components as PetStoreComponents } from '#nuxt-api-party/petStore'
-import type { $jsonPlaceholder, useJsonPlaceholderData, usePetStoreData } from '../playground/.nuxt/module/nuxt-api-party'
+import type { $jsonPlaceholder, $petStore, useJsonPlaceholderData, usePetStoreData } from '../playground/.nuxt/module/nuxt-api-party'
 import { describe, expectTypeOf, it } from 'vitest'
 
 declare const jsonPlaceholder: typeof $jsonPlaceholder
+declare const petStore: typeof $petStore
 declare const useJsonPlaceholder: typeof useJsonPlaceholderData
 declare const usePetStore: typeof usePetStoreData
 
@@ -15,13 +16,20 @@ describe('$jsonPlaceholder', () => {
     jsonPlaceholder('posts/1', { client: true })
   })
 
-  it('rejects the payload cache options and a custom $fetch', () => {
+  it('rejects payloadCache, key and $fetch', () => {
     // @ts-expect-error: a call is a plain fetch, so there is no payload cache.
     jsonPlaceholder('posts/1', { payloadCache: true })
     // @ts-expect-error: a call is a plain fetch, so there is no cache key.
     jsonPlaceholder('posts/1', { key: 'posts' })
     // @ts-expect-error: the endpoint decides which fetch sends the request.
     jsonPlaceholder('posts/1', { $fetch: undefined })
+  })
+})
+
+describe('$petStore', () => {
+  it('rejects payloadCache', () => {
+    // @ts-expect-error: A call is a plain fetch, so there is no payload cache.
+    petStore('/pet/{petId}', { path: { petId: 1 }, payloadCache: true })
   })
 })
 
@@ -72,6 +80,11 @@ describe('usePetStoreData', () => {
     const { error } = usePetStore('/user', { method: 'POST', body: {} })
 
     expectTypeOf(error.value).toEqualTypeOf<NuxtError<PetStoreComponents['schemas']['User']> | undefined>()
+  })
+
+  it('rejects payloadCache', () => {
+    // @ts-expect-error: Nuxt's `getCachedData` takes the place of the payload cache.
+    usePetStore('/pet/{petId}', { path: { petId: 1 }, payloadCache: true })
   })
 
   it('accepts a getter for the path option', () => {

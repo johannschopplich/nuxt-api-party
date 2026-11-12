@@ -3,7 +3,7 @@ import { join } from 'node:path'
 import { fetch, setup, url } from '@nuxt/test-utils/e2e'
 import { afterAll, beforeEach, describe, expect, it } from 'vitest'
 import { ALLOWED_REQUESTS, REFUSED_REQUESTS } from './helpers/allowed-routes'
-import { ABSOLUTE_PATH_TEMPLATES, ESCAPING_PATHS, recordingEndpoints, startRecordingServer, UPSTREAM_COOKIE, UPSTREAM_REDIRECT_LOCATION } from './helpers/recording-server'
+import { ABSOLUTE_PATH_TEMPLATES, ESCAPING_PATHS, recordingEndpoints, startRecordingServer, UPSTREAM_COOKIE, UPSTREAM_GZIP_BODY, UPSTREAM_REDIRECT_LOCATION } from './helpers/recording-server'
 
 describe('nuxt-api-party proxy', async () => {
   const backend = await startRecordingServer()
@@ -65,6 +65,34 @@ describe('nuxt-api-party proxy', async () => {
     const { headers } = backend.requests[0]!
     expect(headers['x-hop']).toBeUndefined()
     expect(headers['x-kept']).toBe('1')
+  })
+
+  it('withholds te and accept-encoding from the API', async () => {
+    await requestStatus('/api/__api_party/backendApi/articles', { 'te': 'trailers', 'accept-encoding': 'identity' })
+
+    const { headers } = backend.requests[0]!
+    expect(headers.te).toBeUndefined()
+    expect(headers['accept-encoding']).not.toBe('identity')
+  })
+
+  it('passes a compressed response back decoded and without content-encoding', async () => {
+    const response = await fetch('/api/__api_party/backendApi/gzip')
+
+    expect(response.headers.get('content-encoding')).toBeNull()
+    expect(await response.text()).toBe(UPSTREAM_GZIP_BODY)
+  })
+
+  it('answers a HEAD request with the status of the API', async () => {
+    const status = await requestStatus('/api/__api_party/backendApi/articles', {}, 'HEAD')
+
+    expect(status).toBe(200)
+    expect(backend.requests[0]!.method).toBe('HEAD')
+  })
+
+  it('answers 502 for an API it cannot reach', async () => {
+    const response = await fetch('/api/__api_party/unreachableApi/articles')
+
+    expect(response.status).toBe(502)
   })
 
   it('forwards a multipart upload as it stands', async () => {
@@ -181,6 +209,15 @@ describe('nuxt-api-party proxy', async () => {
 
       expect(response.status).toBe(403)
       expect(backend.requestUrls).toEqual([])
+    })
+
+    it('forwards a cross-site request to an endpoint that leaves forwardCredentials unset', async () => {
+      const response = await fetch('/api/__api_party/backendApi/articles', {
+        headers: { 'sec-fetch-site': 'cross-site' },
+      })
+
+      expect(response.status).toBe(200)
+      expect(backend.requestUrls).toEqual(['/base/articles'])
     })
 
     it('passes set-cookie back only from an endpoint that sets forwardCredentials to true', async () => {

@@ -34,6 +34,12 @@ describe('nuxt-api-party server', async () => {
     expect(backend.requests[0]!.headers.authorization).toBe('Bearer endpoint-token')
   })
 
+  it('sends the endpoint query', async () => {
+    await fetch('/api/server-request/tokenApi/articles')
+
+    expect(backend.requestUrls).toEqual(['/base/articles?tenant=a&locale=en'])
+  })
+
   it('lets the authorization header of a call replace the endpoint token', async () => {
     await fetch('/api/server-request/tokenApi/articles?authorization=Basic%20call')
 

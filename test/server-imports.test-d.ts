@@ -14,7 +14,7 @@ describe('$jsonPlaceholder', () => {
     expectTypeOf(jsonPlaceholder<{ title: string }>('posts/1')).resolves.toEqualTypeOf<{ title: string }>()
   })
 
-  it('accepts the request options the server handler forwards', () => {
+  it('accepts the path, method, query, headers and body options', () => {
     expectTypeOf(jsonPlaceholder).toBeCallableWith('posts/:id', {
       path: { id: '1' },
       method: 'POST',

@@ -15,6 +15,10 @@ export default defineNuxtConfig({
       forbidden: {
         url: '/api',
       },
+      // Named like a member of the object prototype.
+      valueOf: {
+        url: '/api',
+      },
       clientApi: {
         url: '/api',
         token: 'client-token',

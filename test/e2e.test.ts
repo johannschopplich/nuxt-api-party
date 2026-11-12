@@ -68,6 +68,12 @@ describe('nuxt-api-party', async () => {
       expect(binary).toEqual({ contentType: 'text/markdown', body: 'Hello' })
     })
 
+    it('sends a request to the valueOf endpoint, which the object prototype also defines, through the server proxy', async () => {
+      const { todoCount } = await fetchTestResult<{ todoCount: number }>('/prototype-member-endpoint')
+
+      expect(todoCount).toBe(3)
+    })
+
     it('forwards a Headers instance passed as the headers option to the API', async () => {
       const result = await fetchTestResult<{ traceId?: string }>('/request-headers')
 
@@ -126,6 +132,7 @@ describe('nuxt-api-party', async () => {
         acceptLanguage: 'de',
         forwardedFor: '127.0.0.1',
         pageTag: '/page-request-headers',
+        callAcceptLanguage: 'fr',
       })
     })
   })
@@ -140,6 +147,12 @@ describe('nuxt-api-party', async () => {
       expect(result.cookie).toBeUndefined()
       expect(result.authorization).toBe('Bearer client-token')
       expect(result.traceId).toBe('abc')
+    })
+
+    it('sends the endpoint query', async () => {
+      const { tenant } = await fetchTestResult<{ tenant?: string }>('/client-endpoint-request')
+
+      expect(tenant).toBe('a')
     })
 
     it('sends the requests of a client endpoint that sets only its URL', async () => {
@@ -174,7 +187,7 @@ describe('nuxt-api-party', async () => {
       expect(result.firstTwoTodosCount).toBe(2)
     })
 
-    it('sends a single request for two call sites with the same key', async () => {
+    it('shares one data ref between two call sites with the same key', async () => {
       const result = await fetchTestResult<{ firstHits: number, secondHits: number }>('/shared-key')
 
       expect(result.firstHits).toBeGreaterThan(0)

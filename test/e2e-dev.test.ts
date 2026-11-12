@@ -2,7 +2,7 @@ import { join } from 'node:path'
 import { createPage, setup, url } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 
-describe('nuxt-api-party in development', async () => {
+describe('nuxt-api-party (development)', async () => {
   await setup({
     dev: true,
     browser: true,

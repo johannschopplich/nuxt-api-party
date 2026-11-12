@@ -2,6 +2,7 @@ import type { IncomingHttpHeaders } from 'node:http'
 import type { AddressInfo } from 'node:net'
 import { Buffer } from 'node:buffer'
 import { createServer } from 'node:http'
+import { gzipSync } from 'node:zlib'
 import { ALLOWED_ROUTES } from './allowed-routes'
 
 /** Paths that name a host of their own, with `{host}` standing in for that host. */
@@ -29,6 +30,8 @@ export const ESCAPING_PATHS = [
 export const UPSTREAM_COOKIE = 'upstream=1; Path=/'
 
 export const UPSTREAM_REDIRECT_LOCATION = '/base/redirected'
+
+export const UPSTREAM_GZIP_BODY = 'Hello, gzip'
 
 export interface RecordedRequest {
   url: string
@@ -72,14 +75,19 @@ export function recordingEndpoints(host: string) {
       url: `http://${host}/base`,
       allowedRoutes: [],
     },
+    unreachableApi: {
+      // Nothing listens on the discard port.
+      url: 'http://127.0.0.1:9/base',
+    },
   }
 }
 
 /**
  * Starts a server that records every request and answers it empty, except a path ending in
  * `/set-cookie`, which sets `UPSTREAM_COOKIE`, one ending in `/redirect`, which redirects
- * to `UPSTREAM_REDIRECT_LOCATION`, one ending in `/hang`, which never answers, and one ending
- * in `/stream`, which never stops answering.
+ * to `UPSTREAM_REDIRECT_LOCATION`, one ending in `/gzip`, which answers `UPSTREAM_GZIP_BODY`
+ * compressed, one ending in `/hang`, which never answers, and one ending in `/stream`, which
+ * never stops answering.
  */
 export async function startRecordingServer(): Promise<RecordingServer> {
   const requests: RecordedRequest[] = []
@@ -106,6 +114,12 @@ export async function startRecordingServer(): Promise<RecordingServer> {
 
     if (request.url!.endsWith('/redirect'))
       response.writeHead(302, { location: UPSTREAM_REDIRECT_LOCATION })
+
+    if (request.url!.endsWith('/gzip')) {
+      response.setHeader('content-encoding', 'gzip')
+      response.end(gzipSync(UPSTREAM_GZIP_BODY))
+      return
+    }
 
     if (request.url!.endsWith('/hang'))
       return
