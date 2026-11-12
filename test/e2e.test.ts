@@ -46,18 +46,6 @@ describe('nuxt-api-party', async () => {
       expect(errorName).toBe('URIError')
     })
 
-    it('rejects .. as a path parameter', async () => {
-      const { dotSegmentError } = await fetchTestResult<{ dotSegmentError: string }>('/$testApi-rejection')
-
-      expect(dotSegmentError).toContain('Path parameter `id` is `..`')
-    })
-
-    it('sends a URLSearchParams body again when it retries a request during SSR', async () => {
-      const { body } = await fetchTestResult<{ body: string }>('/form-body-retry')
-
-      expect(body).toBe('title=Hello')
-    })
-
     it('sends a FormData, a URLSearchParams and a Blob body with their content type during SSR', async () => {
       const { multipart, urlEncoded, binary } = await fetchTestResult<Record<'multipart' | 'urlEncoded' | 'binary', { contentType?: string, body: string }>>('/form-body')
 

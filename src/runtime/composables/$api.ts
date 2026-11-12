@@ -114,7 +114,6 @@ export function createEndpointFetch(endpointId: string) {
       : {
           query,
           headers: mergeHeaders(visitorHeaders, encodedBody?.headers, headers),
-          // Read in full, so a retry sends the body again.
           ...(encodedBody && { body: new Uint8Array(await encodedBody.arrayBuffer()) }),
           // Hands the proxy the page request's platform bindings, such as `event.context.cloudflare`, as `useRequestFetch` does.
           ...(requestEvent && { context: requestEvent.context }),
