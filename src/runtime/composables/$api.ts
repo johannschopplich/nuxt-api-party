@@ -82,7 +82,9 @@ export function createEndpointFetch(endpointId: string) {
   const nuxt = useNuxtApp()
   const runtimeConfig = useRuntimeConfig()
 
-  const clientEndpoint = runtimeConfig.public.apiParty.endpoints[endpointId]
+  const { endpoints } = runtimeConfig.public.apiParty
+  // An ID like `constructor` would otherwise find a member of the object prototype.
+  const clientEndpoint = Object.hasOwn(endpoints, endpointId) ? endpoints[endpointId] : undefined
 
   const baseURL = clientEndpoint ? clientEndpoint.url : joinURL(runtimeConfig.app.baseURL, proxyRoute, endpointId)
 
