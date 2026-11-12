@@ -14,7 +14,7 @@ Import it explicitly from `#nuxt-api-party/server` where auto-imports do not rea
 The endpoint's `url`, `token`, `query` and `headers` come from the private runtime config and are added to every call. A header the call sets replaces the endpoint's header of the same name, so an `Authorization` header in the call's `headers` takes the place of the token. Path parameters, `query`, `headers`, `body`, `method` and the other [`ofetch` options](https://github.com/unjs/ofetch) work as they do in the browser, except `baseURL`, which the endpoint decides, and `redirect`, which is always `manual` – see [Redirects](#redirects).
 
 ::: info Placeholder
-`$myApi` is a placeholder. The name is generated from your API endpoint ID, so endpoint `jsonPlaceholder` generates `$jsonPlaceholder` – the same name the browser-side composable carries.
+`$myApi` is a placeholder. The name is generated from the endpoint ID, so endpoint `jsonPlaceholder` generates `$jsonPlaceholder` – the same name the browser-side composable carries.
 :::
 
 ## Hooks

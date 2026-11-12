@@ -13,7 +13,7 @@ Server code gets its own `$myApi`, which reaches the API without the server prox
 
 ## Generated Composables
 
-Composable names come from your API endpoint ID. An endpoint `jsonPlaceholder` generates:
+Composable names come from the endpoint ID. An endpoint `jsonPlaceholder` generates:
 
 - `$jsonPlaceholder`
 - `useJsonPlaceholderData`

@@ -22,7 +22,7 @@ hero:
 features:
   - title: API Composables
     icon: <span class="i-carbon:magic-wand-filled"></span>
-    details: Auto-generated composables for each API endpoint.
+    details: Auto-generated composables for each API.
     link: /api/
     linkText: API Reference
   - title: Credentials Stay on the Server
@@ -38,8 +38,8 @@ features:
   - title: Several APIs Side by Side
     icon: <span class="i-carbon:ibm-watson-query"></span>
     details: Configure each API once and reach all of them from anywhere in your app.
-    link: /essentials/getting-started#configure-your-first-api-endpoint
-    linkText: Set up API Endpoints
+    link: /essentials/getting-started#configure-your-first-endpoint
+    linkText: Configure Your First Endpoint
   - title: OpenAPI Support
     icon: <span class="i-devicon-plain:openapi"></span>
     details: Typed paths, parameters, request bodies and responses, generated from your OpenAPI document.

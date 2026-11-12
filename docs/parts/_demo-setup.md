@@ -1,5 +1,5 @@
 :::: info Demo Setup
-These examples assume that you have set up an API endpoint called `jsonPlaceholder`:
+These examples assume that you have set up an endpoint called `jsonPlaceholder`:
 
 ::: code-group
 ```ts [nuxt.config.ts]

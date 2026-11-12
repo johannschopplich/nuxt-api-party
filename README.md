@@ -9,11 +9,11 @@ Auto-generated composables for any API in [Nuxt](https://nuxt.com), typed from O
 
 ## Features
 
-- 🪅 [Auto-generated composables](https://nuxt-api-party.byjohann.dev/api/#generated-composables) for each API endpoint
+- 🪅 [Auto-generated composables](https://nuxt-api-party.byjohann.dev/api/#generated-composables) for each API
 - 🔒 API credentials kept on the server by a server proxy
 - 🌐 No CORS issues
 - 🍱 Built on Nuxt's [`useFetch`](https://nuxt.com/docs/api/composables/use-fetch) and `$fetch`
-- 🧇 [Connect all your APIs](https://nuxt-api-party.byjohann.dev/essentials/getting-started#configure-your-first-api-endpoint)
+- 🧇 [Connect all your APIs](https://nuxt-api-party.byjohann.dev/essentials/getting-started#configure-your-first-endpoint)
 - 🦾 Fully typed API clients from [OpenAPI documents](https://nuxt-api-party.byjohann.dev/guides/openapi-integration), with nothing else to install
 - 🗃 Cached responses and hydration
 

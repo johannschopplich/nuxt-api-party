@@ -5,7 +5,7 @@ Returns the API response as Nuxt async data. Intended for data that requires rea
 `useMyApiData` is built on Nuxt's own [`useFetch`](https://nuxt.com/docs/api/composables/use-fetch), so it takes every `useFetch` option – `key`, `lazy`, `server`, `immediate`, `default`, `transform`, `pick`, `watch`, `getCachedData`, `dedupe` and the rest – and returns the same `AsyncData`. Only the options that pick where a request goes – `baseURL` and `$fetch` – are the endpoint's to decide, and `params` is left out in favor of `query`.
 
 ::: info Placeholder
-`useMyApiData` is a placeholder. The composable is generated based on your API endpoint ID. For example, endpoint `jsonPlaceholder` generates `useJsonPlaceholderData`.
+`useMyApiData` is a placeholder. The composable is generated based on the endpoint ID. For example, endpoint `jsonPlaceholder` generates `useJsonPlaceholderData`.
 :::
 
 ## Return Values

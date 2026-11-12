@@ -26,9 +26,9 @@ export default defineNuxtConfig({
 ```
 :::
 
-## Configure Your First API Endpoint
+## Configure Your First Endpoint
 
-Configure an API endpoint in your Nuxt configuration. Each endpoint generates two composables for data fetching:
+Configure an endpoint in your Nuxt configuration. Each endpoint generates two composables for data fetching:
 
 ::: code-group
 ```ts [nuxt.config.ts]

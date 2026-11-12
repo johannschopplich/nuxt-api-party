@@ -3,7 +3,7 @@
 Sends a plain fetch and returns the response data. Intended for actions inside methods, e.g. when sending form data on submit.
 
 ::: info Placeholder
-`$myApi` is a placeholder. The composable is generated based on your API endpoint ID. For example, endpoint `jsonPlaceholder` generates `$jsonPlaceholder`.
+`$myApi` is a placeholder. The composable is generated based on the endpoint ID. For example, endpoint `jsonPlaceholder` generates `$jsonPlaceholder`.
 :::
 
 ## Type Declarations
