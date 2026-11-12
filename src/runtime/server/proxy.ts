@@ -60,7 +60,7 @@ export default defineEventHandler(async (event) => {
   if (!endpoint) {
     throw createError({
       statusCode: 404,
-      statusMessage: `Unknown API endpoint "${endpointId}"`,
+      statusMessage: `Unknown endpoint "${endpointId}"`,
     })
   }
 

@@ -31,9 +31,6 @@ export interface EndpointConfiguration {
 
 export interface ModuleOptions {
   /**
-   * API endpoints.
-   *
-   * @remarks
    * Each key represents an endpoint ID, which is used to generate the composables. The value is an object with the following properties:
    * - `url` (required): Base URL of the API
    * - `token` (optional): Bearer token for authentication
@@ -138,7 +135,7 @@ export default defineNuxtModule<ModuleOptions>().with({
     nuxt.options.runtimeConfig.apiParty = resolvedOptions
 
     if (!Object.keys(resolvedOptions.endpoints).length) {
-      logger.warn('No API endpoints found. Nuxt API Party requires at least one defined endpoint.')
+      logger.warn('No endpoints configured. Nuxt API Party needs at least one endpoint.')
     }
 
     // Only a client endpoint's requests go from the browser to the API itself, and only what such a request needs is published.
