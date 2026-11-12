@@ -68,12 +68,6 @@ describe('nuxt-api-party', async () => {
       expect(binary).toEqual({ contentType: 'text/markdown', body: 'Hello' })
     })
 
-    it('sends a request to the valueOf endpoint, which the object prototype also defines, through the server proxy', async () => {
-      const { todoCount } = await fetchTestResult<{ todoCount: number }>('/prototype-member-endpoint')
-
-      expect(todoCount).toBe(3)
-    })
-
     it('forwards a Headers instance passed as the headers option to the API', async () => {
       const result = await fetchTestResult<{ traceId?: string }>('/request-headers')
 

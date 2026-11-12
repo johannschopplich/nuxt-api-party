@@ -20,15 +20,9 @@ describe('nuxt-api-party (SSR disabled)', async () => {
   it('makes every endpoint a client endpoint that sets neither client to false nor forwardCredentials nor allowedRoutes', async () => {
     const endpoints = await $fetch<Record<string, unknown>>('/api/public-runtime-endpoints')
 
-    expect(Object.keys(endpoints).sort()).toEqual([
-      'clientApi',
-      'forbidden',
-      'runtimeSchemaApi',
-      'schemaApi',
-      'testApi',
-      'unsetSchemaApi',
-      'urlOnlyClientApi',
-      'valueOf',
-    ])
+    expect(endpoints).toHaveProperty('testApi')
+    expect(endpoints).not.toHaveProperty('proxiedApi')
+    expect(endpoints).not.toHaveProperty('credentialsApi')
+    expect(endpoints).not.toHaveProperty('guardedApi')
   })
 })

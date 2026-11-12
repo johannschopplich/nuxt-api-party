@@ -78,8 +78,7 @@ export function createEndpointFetch(endpointId: string) {
   const runtimeConfig = useRuntimeConfig()
 
   const { endpoints } = runtimeConfig.public.apiParty
-  // An ID like `constructor` would otherwise find a member of the object prototype.
-  const clientEndpoint = Object.hasOwn(endpoints, endpointId) ? endpoints[endpointId] : undefined
+  const clientEndpoint = endpoints[endpointId]
 
   const baseURL = clientEndpoint ? clientEndpoint.url : joinURL(runtimeConfig.app.baseURL, proxyRoute, endpointId)
 
