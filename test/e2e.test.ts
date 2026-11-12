@@ -120,6 +120,12 @@ describe('nuxt-api-party', async () => {
       expect(result.traceId).toBe('abc')
     })
 
+    it('sends the requests of a client endpoint that sets only its URL', async () => {
+      const result = await fetchTestResult<{ requestTodoCount: number, dataTodoCount: number }>('/client-endpoint-url-only')
+
+      expect(result).toEqual({ requestTodoCount: 3, dataTodoCount: 3 })
+    })
+
     it('sends the request from the browser straight to the endpoint URL', async () => {
       const page = await createPage('/client-endpoint-request-in-browser')
       const request = page.waitForRequest(request => request.url().includes('/todos'))
@@ -297,6 +303,8 @@ describe('nuxt-api-party', async () => {
           query: { tenant: 'a' },
           headers: { 'x-endpoint': 'client', 'Authorization': 'Basic endpoint' },
         },
+        // Nitro fills an unset runtime config value with an empty string.
+        urlOnlyClientApi: { url: '/api', token: '', query: '', headers: '' },
       })
     })
   })

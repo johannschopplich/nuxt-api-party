@@ -18,6 +18,10 @@ export default defineNuxtConfig({
         headers: { 'x-endpoint': 'client', 'Authorization': 'Basic endpoint' },
         client: true,
       },
+      urlOnlyClientApi: {
+        url: '/api',
+        client: true,
+      },
       credentialsApi: {
         url: '/api',
         forwardCredentials: true,
