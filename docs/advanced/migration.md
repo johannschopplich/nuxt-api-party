@@ -1,10 +1,12 @@
 # Migration
 
-## From v4 to v5
+## v5.0.0
 
 The module refuses to start on an option v5 removed, and its error names each one along with what replaces it. Run `nuxt prepare` first to collect that list, then work through the sections below.
 
 ### Code You Have to Change
+
+Each of these changes asks for an edit in your config or code.
 
 #### Nuxt 4.4 Is Required
 
@@ -39,6 +41,8 @@ export type Pet = components['schemas']['Pet']
 
 The generated `PetStoreModel<'Pet'>` resolves to the same type. The `operations` interface is gone, since operations are inlined into `paths` – read an operation through `PetStore<'/pet/{petId}', 'get'>` instead.
 
+An endpoint's `schema` takes an async function that resolves to the document again, so a schema resolved in the `api-party:extend` hook can move back into the option.
+
 #### `server.proxyMode` and `server.basePath` Are Gone
 
 The `server` option is removed. There is one [server proxy](/advanced/how-it-works) now, serving `<nitro.apiBaseURL>/__api_party/{endpointId}/{path}` – `/api/__api_party/{endpointId}/{path}` by default – and forwarding each request under its own method, with its query, headers and body as they are:
@@ -57,7 +61,7 @@ export default defineNuxtConfig({
 
 Unlike `'passthrough'` mode, the proxy adds the endpoint's `token`, `headers` and `query`, so a request hook that attached them only for the passthrough proxy can go.
 
-Rules of a CDN, a WAF or a rate limiter that matched the old route need the new path: a GET request is now a `GET /api/__api_party/{endpointId}/{path}`, not a `POST /api/__api_party/{endpointId}`.
+Rules of a CDN, a WAF or a rate limiter that matched the old route need the new path: a GET request is now a `GET /api/__api_party/{endpointId}/{path}`, not a `POST /api/__api_party/{endpointId}`. The `/proxy/` segment of the passthrough route is gone as well: `/api/__api_party/{endpointId}/proxy/{path}` is now `/api/__api_party/{endpointId}/{path}`.
 
 Code that built the POST envelope by hand sends a normal request to the route instead:
 
@@ -94,6 +98,8 @@ export default defineNuxtConfig({
 
 Without `forwardCredentials`, the server proxy withholds the visitor's cookie and `Authorization` header from the API and keeps the API's `Set-Cookie` from the browser. With it, the API receives every cookie the browser sends to your app, your app's own session cookie included, and every cookie the API sets reaches the browser. See [Credential Forwarding](/guides/credential-forwarding).
 
+An endpoint with `forwardCredentials` now answers a cross-site request with `403`. Call the proxy from your own site only – see [Cross-Site Requests](/guides/credential-forwarding#cross-site-requests).
+
 ::: warning A Per-User `Authorization` Header Needs `forwardCredentials`
 An `Authorization` header set in a call's `headers`, an interceptor or a Nuxt hook used to travel to the API inside the POST envelope. It now reaches the proxy as a request header, which the proxy drops unless the endpoint sets `forwardCredentials` – the API answers `401`. Set `forwardCredentials: true` on such an endpoint, or attach the header in a [Nitro hook](/guides/hooks#nitro-runtime-hooks).
 :::
@@ -126,6 +132,8 @@ export default defineNuxtConfig({
 There is no `'allow'` any more. Where some calls went through the proxy and others opted out with `client: true`, configure the API twice, as two endpoints, one of them with `client: true`. Only client endpoints are published to the public runtime config now. See [Client Endpoints](/api/module-configuration#client-endpoints).
 
 An endpoint that sets `client: true` together with `forwardCredentials` or `allowedRoutes` fails the build, since neither applies without the proxy.
+
+With `ssr: false`, an endpoint still defaults to a client endpoint – unless it sets `forwardCredentials` or `allowedRoutes`, which keep it on the server proxy. Drop both options from the endpoints of an app that is served statically, with no server to proxy through.
 
 #### `payloadCache` and `key` on `$myApi` Are Gone
 
@@ -161,7 +169,7 @@ Or use `useMyApiData('posts')`.
 
 #### The Defaults Plugin Is Gone
 
-A plugin that provided `apiParty.defaults` no longer has an effect, and the `ModulePlugin`, `ModuleInjections` and `FetchOptionsDefaults` types are gone. Set the defaults in an `api-party:request` [hook](/guides/hooks#nuxt-runtime-hooks), where `headers`, `retry`, `retryDelay` and `timeout` take effect:
+A plugin that provided `apiParty.defaults` no longer has an effect, and the `ModulePlugin`, `ModuleInjections` and `FetchOptionsDefaults` types are gone. Set the defaults in an `api-party:request` [hook](/guides/hooks#nuxt-runtime-hooks) instead. The hook runs before every attempt, a retry included, so assign with `??=` – a plain assignment to `retry` resets the count each time, and a failing request retries without end:
 
 ```ts
 export default defineNuxtPlugin(() => { // [!code --]
@@ -176,18 +184,18 @@ export default defineNuxtPlugin(() => { // [!code --]
 }) satisfies ModulePlugin // [!code --]
 export default defineNuxtPlugin((nuxtApp) => { // [!code ++]
   nuxtApp.hook('api-party:request', (ctx, endpointId) => { // [!code ++]
-    ctx.options.retry = 2 // [!code ++]
+    ctx.options.retry ??= 2 // [!code ++]
     if (endpointId === 'jsonPlaceholder') // [!code ++]
-      ctx.options.timeout = 5000 // [!code ++]
+      ctx.options.timeout ??= 5000 // [!code ++]
   }) // [!code ++]
 }) // [!code ++]
 ```
 
-Static headers and query parameters belong in the endpoint's `headers` and `query`. Nuxt's [`experimental.defaults.useFetch`](https://nuxt.com/docs/guide/going-further/experimental-features#defaults) reaches `useMyApiData` as well.
+A `timeout` set in the hook reaches neither `useMyApiData` nor a request through the server proxy during SSR – pass `useMyApiData` its own `timeout` option, and set the proxy's in a [Nitro hook](/guides/hooks#nitro-runtime-hooks). Static headers and query parameters belong in the endpoint's `headers` and `query`. Nuxt's [`experimental.defaults.useFetch`](https://nuxt.com/docs/guide/going-further/experimental-features#defaults) sets `retry` and `retryDelay` for `useMyApiData` as well.
 
 #### The Dynamic Backend URL Is Gone
 
-The `allowedUrls` endpoint option is removed, and the proxy ignores a `{endpointId}-Endpoint-Url` header. Configure one endpoint per API URL and pick the composable at the call site:
+The `allowedUrls` endpoint option is removed, and the proxy no longer reads a `{endpointId}-Endpoint-Url` header – it forwards it to the API like any other. Configure one endpoint per API URL and pick the composable at the call site:
 
 ```ts
 export default defineNuxtConfig({
@@ -286,17 +294,28 @@ export function $petStoreCall<
 >(path: Path) {}
 ```
 
-A call whose path is a union of several paths no longer type-checks. Split it into one call per path.
+A call that passes options no longer type-checks where its path is a union of paths that declare different methods. Split it into one call per path.
 
 ### Behavior That Changed
+
+These changes need no edit to build. Check each against what your app relies on.
 
 #### The Proxy Forwards Request Headers
 
 The POST envelope forwarded only `Origin`, `Referer` and `User-Agent` of the browser's request. The proxy now forwards every request header except `Host`, the hop-by-hop headers, `Accept-Encoding`, `Expect`, and – without `forwardCredentials` – `Cookie` and `Authorization`. See [Which Headers Travel](/advanced/how-it-works#which-headers-travel).
 
-#### Nitro Response Hooks See a Stream
+A header the endpoint sets replaces one of the same name that a call sends through the proxy, where v4 sent both values.
+
+#### Nitro Hooks See Streams and No Query Object
 
 The proxy streams the API's response through, so in a Nitro `api-party:response` hook for a proxy request, `ctx.response._data` is a `ReadableStream` rather than the parsed body. A hook that read or replaced the body has to move that logic to the browser, into a Nuxt hook or an interceptor.
+
+A Nitro `api-party:request` hook for a proxy request changed the same way: `ctx.options.body` is a `ReadableStream` on a `POST`, `PUT`, `PATCH` or `DELETE` request, and the query is already part of `ctx.request`, which leaves `ctx.options.query` `undefined`. A hook that set a property on it now throws, and the proxy answers `502`. Assign the object instead:
+
+```ts
+ctx.options.query.apiKey = apiKey // [!code --]
+ctx.options.query = { ...ctx.options.query, apiKey } // [!code ++]
+```
 
 #### Server Imports Fire the Nitro Hooks
 
@@ -308,7 +327,7 @@ A Nitro route that rethrows the error of a server import with `createError` nest
 
 #### Query Values No Longer Pass Through JSON
 
-The POST envelope carried `query` as JSON, which turned a `Date` into its ISO string and a `NaN` into an empty value. The proxy now takes the query string as it is, so `NaN` arrives as `NaN` and a `Date` as a JSON-quoted string. Convert such values before the call:
+The POST envelope carried `query` as JSON, which turned a `Date` into its ISO string and a `NaN` into an empty value. The proxy now reads the query string of the request, so `NaN` arrives as `NaN` and a `Date` as a JSON-quoted string. Convert such values before the call:
 
 ```ts
 await $myApi('events', {
@@ -323,6 +342,14 @@ await $myApi('events', {
 
 The proxy passes redirects back as the API sent them, and a server import resolves a `3xx` response, instead of following them. Where the API redirects to a canonical path, call that path instead. See [Redirects](/advanced/how-it-works#redirects).
 
+#### `useMyApiData` Neither Caches Nor Shares a Request by Default
+
+v4 answered a repeated `useMyApiData` request from the payload unless `payloadCache` was `false`, and two call sites that asked for the same resource shared one request. Now every call site sends its own request, and a page fetches again when the visitor navigates back to it. Expect more requests where your app relied on either, and pass [`getCachedData`](#payloadcache-and-key-on-myapi-are-gone) where a call site may keep the response it has.
+
+#### A Failed GET Request Is Sent Twice
+
+A request through the proxy keeps its method, so `ofetch` retries it once, as it does for every `$fetch`: a request other than `POST`, `PUT`, `PATCH` and `DELETE` that fails with a network error or with `408`, `409`, `425`, `429`, `500`, `502`, `503` or `504`. The POST envelope was never retried. Pass `retry: 0` to keep the call from retrying. As in v4, the proxy itself sends such a request a second time when its connection to the API fails.
+
 #### Browser Caching Works Through the Proxy
 
 A GET request through the proxy stays a GET request, so the browser's HTTP cache serves it under the API's cache headers. Pass `cache: 'no-store'` where a call must always reach the API.
@@ -330,10 +357,6 @@ A GET request through the proxy stays a GET request, so the browser's HTTP cache
 #### A Client Endpoint Gets No Visitor Credentials During SSR
 
 During SSR, a request to a client endpoint leaves the server without the visitor's cookie or `Authorization` header.
-
-#### `schema` Accepts an Async Function Again
-
-An endpoint's `schema` takes an async function that resolves to the document, alongside a file path, a `file:`, `http:` or `https:` URL and the document itself.
 
 ## v4.0.0
 

@@ -105,14 +105,12 @@ The browser reads a client endpoint from the public runtime config, so its overr
 
 ## Options That Fail the Build
 
-The module refuses to start on an option that no longer exists or that contradicts another, and names each in its error:
+The module refuses to start on an option that v5 removed or that contradicts another. Its error opens with `Invalid Nuxt API Party options:` and names each one. Two combinations contradict each other:
 
-- `server`, `client`, `openAPITS` and `payloadCache` at the module level.
-- `allowedUrls`, `cookies` and `openAPITS` on an endpoint.
 - `client: true` together with `forwardCredentials` – a client endpoint skips the server proxy, so there are no visitor credentials to forward.
 - `client: true` together with `allowedRoutes` – a client endpoint publishes its token and skips the server proxy, so the allowed routes protect nothing.
 
-See the [migration guide](/advanced/migration#from-v4-to-v5) for what replaces each removed option.
+See the [migration guide](/advanced/migration#v5-0-0) for what replaces each removed option.
 
 ## Type Declarations
 
