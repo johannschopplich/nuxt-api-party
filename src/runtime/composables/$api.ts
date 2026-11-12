@@ -61,9 +61,14 @@ export async function _$api<T = unknown>(
   path: string,
   opts: ApiClientFetchOptions = {},
 ) {
-  if (import.meta.dev && import.meta.client && !hasWarnedAboutHydration && useNuxtApp().isHydrating) {
-    hasWarnedAboutHydration = true
-    console.warn(`[nuxt-api-party] \`$${camelCase(endpointId)}\` sent a request during hydration that the server has already sent. To reuse the server's response, wrap the call in \`useAsyncData\` or use \`use${pascalCase(endpointId)}Data\`.`)
+  if (import.meta.dev && import.meta.client && !hasWarnedAboutHydration) {
+    const nuxt = useNuxtApp()
+
+    // Without a server render, no request was sent before this one.
+    if (nuxt.isHydrating && nuxt.payload.serverRendered) {
+      hasWarnedAboutHydration = true
+      console.warn(`[nuxt-api-party] \`$${camelCase(endpointId)}\` sent a request during hydration. If the server sent it as well while rendering the page, wrap the call in \`useAsyncData\` or use \`use${pascalCase(endpointId)}Data\` to reuse the server's response.`)
+    }
   }
 
   return createEndpointFetch(endpointId).$fetch<T>(path, opts)

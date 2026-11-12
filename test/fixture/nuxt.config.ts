@@ -3,6 +3,10 @@ import { defineNuxtConfig } from 'nuxt/config'
 export default defineNuxtConfig({
   modules: ['../../src/module.ts'],
 
+  routeRules: {
+    '/hydration-request-without-ssr': { ssr: false },
+  },
+
   apiParty: {
     endpoints: {
       testApi: {
