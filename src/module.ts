@@ -117,14 +117,11 @@ export default defineNuxtModule<ModuleOptions>().with({
 
     await nuxt.callHook('api-party:extend', options)
 
-    // The runtime config takes endpoints of its own, so a removed option may hide there too.
-    assertValidOptions(defu(nuxt.options.runtimeConfig.apiParty, options))
-
     // Annotated because `defu`'s return type widens the endpoint values to `unknown`.
-    const mergedOptions: { endpoints: Record<string, EndpointConfiguration> } = defu(
-      nuxt.options.runtimeConfig.apiParty,
-      { endpoints: options.endpoints },
-    )
+    const mergedOptions: ModuleOptions = defu(nuxt.options.runtimeConfig.apiParty, options)
+
+    // The runtime config takes endpoints of its own, so a removed option may hide there too.
+    assertValidOptions(mergedOptions)
 
     // A client-rendered app is often served statically, with no server proxy to send through, so its endpoints
     // default to client endpoints – except one that needs the server proxy for credential forwarding or allowed routes.
