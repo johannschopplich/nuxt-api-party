@@ -8,7 +8,7 @@ const REMOVED_MODULE_OPTIONS: Record<string, string> = {
 
 const REMOVED_ENDPOINT_OPTIONS: Record<string, string> = {
   allowedUrls: 'Configure one endpoint per API URL instead.',
-  cookies: 'Set `forwardCredentials: true` instead.',
+  cookies: 'Rename it to `forwardCredentials`.',
   openAPITS: 'The types are generated with apiful, which takes no generator options.',
 }
 
