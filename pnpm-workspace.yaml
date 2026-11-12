@@ -15,4 +15,3 @@ trustPolicyExclude:
 packages:
   - docs
   - playground
-  - examples/*
