@@ -151,7 +151,7 @@ export default defineNuxtModule<ModuleOptions>().with({
       logger.warn('No API endpoints found. Nuxt API Party requires at least one defined endpoint.')
     }
 
-    // Only a client endpoint sends its requests from the browser, and only what such a request needs is published.
+    // Only a client endpoint's requests go from the browser to the API itself, and only what such a request needs is published.
     nuxt.options.runtimeConfig.public.apiParty = {
       endpoints: Object.fromEntries(
         Object.entries(resolvedOptions.endpoints)

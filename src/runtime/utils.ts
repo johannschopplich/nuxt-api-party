@@ -1,4 +1,3 @@
-/** Merges headers into a plain object, where a later source replaces a header an earlier one set. */
 export function mergeHeaders(...headers: (HeadersInit | undefined)[]): Record<string, string> {
   const merged: Record<string, string> = {}
 
@@ -10,10 +9,6 @@ export function mergeHeaders(...headers: (HeadersInit | undefined)[]): Record<st
   return merged
 }
 
-/**
- * Collects the headers an endpoint adds to each of its requests, where the token replaces an `Authorization` among
- * its `headers`.
- */
 export function getEndpointHeaders(endpoint: { token?: string, headers?: Record<string, string> }) {
   // Nitro fills an unset runtime config value with an empty string.
   return mergeHeaders(endpoint.headers || undefined, endpoint.token ? { Authorization: `Bearer ${endpoint.token}` } : undefined)

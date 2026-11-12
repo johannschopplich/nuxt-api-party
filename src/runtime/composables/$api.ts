@@ -74,10 +74,7 @@ export async function _$api<T = unknown>(
   return createEndpointFetch(endpointId).$fetch<T>(path, opts)
 }
 
-/**
- * Creates the fetch for an endpoint's requests, which go through the server proxy or, for a client endpoint,
- * straight to the API, along with the base URL it sends them to.
- */
+/** Creates an endpoint's fetch, which sends its requests through the server proxy or, for a client endpoint, straight to the API. */
 export function createEndpointFetch(endpointId: string) {
   const nuxt = useNuxtApp()
   const runtimeConfig = useRuntimeConfig()
