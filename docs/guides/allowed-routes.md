@@ -45,6 +45,8 @@ Where your API issues scoped tokens, give the endpoint one that can do only what
 
 Independent of the list, the proxy refuses a path with a raw tab, a line break, a colon before its first slash, or a dot segment such as `articles/../admin` or `articles/..%2Fadmin`, with a 400. An encoded slash otherwise stays inside its segment, so `/comments/*` admits `/comments/a%2Fb`.
 
+A segment without a wildcard matches the request as it is spelled. The `path` option of a call percent-encodes its values, `@me` to `%40me`, so `/users/@me` refuses that request – write the route as `/users/*` or `/users/%40me`.
+
 ## Lists From Several Sources
 
 Lists from Nuxt layers, the module options and `runtimeConfig` add up rather than narrow one another. Only the `NUXT_API_PARTY_ENDPOINTS_CMS_ALLOWED_ROUTES` environment variable replaces the list, and only for an endpoint that sets `allowedRoutes` at build time – `[]` is enough.

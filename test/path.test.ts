@@ -8,6 +8,8 @@ const ROUTES: AllowedRoute[] = [
   // A non-trailing `**` is a literal segment.
   { path: '/users/**/avatar' },
   { path: '/a^b' },
+  { path: '/users/@me' },
+  { path: '/accounts/%40me' },
   // Resolved as a whole, this pattern would read as `/**`.
   { path: '/legacy/../**' },
 ]
@@ -78,6 +80,8 @@ describe('assertAllowedRoute', () => {
     ['get', '/articles/1'],
     ['POST', '/comments/1'],
     ['GET', '/a%5Eb'],
+    ['GET', '/users/@me'],
+    ['GET', '/accounts/%40me'],
   ])('admits %s %s', (method, routePath) => {
     expect(statusFor(ROUTES, method, routePath)).toBe(200)
   })
@@ -89,6 +93,7 @@ describe('assertAllowedRoute', () => {
     ['GET', '/comments//'],
     ['GET', '/users/1/avatar'],
     ['GET', '/admin'],
+    ['GET', '/users/%40me'],
   ])('refuses %s %s', (method, routePath) => {
     expect(statusFor(ROUTES, method, routePath)).toBe(403)
   })

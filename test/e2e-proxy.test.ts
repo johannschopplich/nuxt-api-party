@@ -127,6 +127,18 @@ describe('nuxt-api-party proxy', async () => {
   })
 
   describe('path', () => {
+    it.each([
+      ['articles/', '/base/articles/'],
+      ['files/a%23b', '/base/files/a%23b'],
+      ['files/a%3Fpage%3D1?page=2', '/base/files/a%3Fpage%3D1?page=2'],
+      ['urn%3Aisbn%3A123', '/base/urn%3Aisbn%3A123'],
+    ])('forwards %s as the client sent it', async (path, upstreamUrl) => {
+      const status = await requestStatus(`/api/__api_party/backendApi/${path}`)
+
+      expect(status).toBe(200)
+      expect(backend.requestUrls).toEqual([upstreamUrl])
+    })
+
     it.each(ABSOLUTE_PATH_TEMPLATES)('rejects %s without contacting the host it names', async (pathTemplate) => {
       const path = encodeURI(pathTemplate.replace('{host}', backend.host))
 

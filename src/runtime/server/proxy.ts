@@ -1,7 +1,7 @@
+import type { H3Event } from 'h3'
 import {
   createError,
   defineEventHandler,
-  getQuery,
   getRequestHeader,
   getRequestHeaders,
   getRequestIP,
@@ -13,7 +13,7 @@ import {
   setResponseStatus,
 } from 'h3'
 import { useNitroApp, useRuntimeConfig } from 'nitropack/runtime'
-import { joinURL, withQuery } from 'ufo'
+import { getQuery, joinURL, withQuery } from 'ufo'
 import { getEndpointHeaders } from '../utils'
 import { assertAllowedRoute, assertPathBelowBase, resolveRoutePath } from './path'
 
@@ -51,8 +51,7 @@ const CREDENTIAL_HEADERS = new Set(['cookie', 'authorization'])
 export default defineEventHandler(async (event) => {
   const nitro = useNitroApp()
   const endpointId = getRouterParam(event, 'endpointId')!
-  // The router leaves the path as the client sent it, so the checks see every percent-encoding.
-  const path = getRouterParam(event, 'path') || ''
+  const path = getRawPath(event)
   const { endpoints } = useRuntimeConfig().apiParty
   // An ID like `constructor` would otherwise find a member of the object prototype.
   const endpoint = Object.hasOwn(endpoints, endpointId) ? endpoints[endpointId] : undefined
@@ -74,7 +73,7 @@ export default defineEventHandler(async (event) => {
 
   assertPathBelowBase(path)
 
-  const url = withQuery(joinURL(endpoint.url, path), { ...endpoint.query, ...getQuery(event) })
+  const url = withQuery(joinURL(endpoint.url, path), { ...endpoint.query, ...getQuery(event.node.req.url!) })
   // A request hook that rewrites the URL is not checked again.
   assertAllowedRoute(endpoint.allowedRoutes, resolveRoutePath(url, endpoint.url), event.method)
 
@@ -142,6 +141,18 @@ export default defineEventHandler(async (event) => {
 
   return response._data ?? send(event)
 })
+
+/**
+ * Reads the path below the endpoint ID as the client sent it, so the checks and the API see every
+ * percent-encoding. The router's own parameter comes decoded and without a trailing slash.
+ */
+function getRawPath(event: H3Event) {
+  // h3 leaves the undecoded request target here, less `app.baseURL`.
+  const pathname = event.node.req.url!.split('?', 1)[0]!
+  const endpointIdIndex = event.context.matchedRoute!.path.split('/').indexOf(':endpointId')
+
+  return pathname.split('/').slice(endpointIdIndex + 1).join('/')
+}
 
 function isForwardableRequestHeader(name: string, forwardCredentials?: boolean) {
   const header = name.toLowerCase()

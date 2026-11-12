@@ -29,6 +29,12 @@ describe('nuxt-api-party route', async () => {
     expect(todos).toHaveLength(3)
   })
 
+  it('forwards a percent-encoded path below app.baseURL as the client sent it', async () => {
+    const { url } = await $fetch<{ url: string }>('/app/rest/__api_party/testApi/echo-url/a%3Fb/')
+
+    expect(url).toBe('/app/rest/echo-url/a%3Fb/')
+  })
+
   it('sends a $testApi call through the proxy below app.baseURL and nitro.apiBaseURL', async () => {
     const { json } = await fetchTestResult<{ json: unknown[] }>('/app/$testApi')
 
