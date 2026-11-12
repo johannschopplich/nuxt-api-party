@@ -43,6 +43,8 @@ export interface RecordingServer {
   /** Requests the server has received, oldest first. */
   requests: RecordedRequest[]
   readonly requestUrls: string[]
+  /** URLs of the requests whose client went away before the answer was complete. */
+  abandonedUrls: string[]
   close: () => Promise<void>
 }
 
@@ -75,12 +77,19 @@ export function recordingEndpoints(host: string) {
 
 /**
  * Starts a server that records every request and answers it empty, except a path ending in
- * `/set-cookie`, which sets `UPSTREAM_COOKIE`, and one ending in `/redirect`, which redirects
- * to `UPSTREAM_REDIRECT_LOCATION`.
+ * `/set-cookie`, which sets `UPSTREAM_COOKIE`, one ending in `/redirect`, which redirects
+ * to `UPSTREAM_REDIRECT_LOCATION`, one ending in `/hang`, which never answers, and one ending
+ * in `/stream`, which never stops answering.
  */
 export async function startRecordingServer(): Promise<RecordingServer> {
   const requests: RecordedRequest[] = []
+  const abandonedUrls: string[] = []
   const server = createServer(async (request, response) => {
+    response.on('close', () => {
+      if (!response.writableFinished)
+        abandonedUrls.push(request.url!)
+    })
+
     const chunks: Buffer[] = []
     for await (const chunk of request)
       chunks.push(chunk)
@@ -98,6 +107,15 @@ export async function startRecordingServer(): Promise<RecordingServer> {
     if (request.url!.endsWith('/redirect'))
       response.writeHead(302, { location: UPSTREAM_REDIRECT_LOCATION })
 
+    if (request.url!.endsWith('/hang'))
+      return
+
+    if (request.url!.endsWith('/stream')) {
+      const interval = setInterval(() => response.write('chunk'), 10)
+      response.on('close', () => clearInterval(interval))
+      return
+    }
+
     response.end()
   })
   await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve))
@@ -105,6 +123,7 @@ export async function startRecordingServer(): Promise<RecordingServer> {
   return {
     host: `127.0.0.1:${(server.address() as AddressInfo).port}`,
     requests,
+    abandonedUrls,
     get requestUrls() {
       return requests.map(request => request.url)
     },

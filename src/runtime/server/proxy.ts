@@ -16,6 +16,7 @@ import { useNitroApp, useRuntimeConfig } from 'nitropack/runtime'
 import { getQuery, joinURL, withQuery } from 'ufo'
 import { getEndpointHeaders } from '../utils'
 import { assertAllowedRoute, assertPathBelowBase, resolveRoutePath } from './path'
+import { endOnAbort } from './stream'
 
 /** Headers that describe a single connection rather than the message, so they end at the proxy. */
 const HOP_BY_HOP_HEADERS = new Set([
@@ -94,6 +95,17 @@ export default defineEventHandler(async (event) => {
 
   Object.assign(headers, getEndpointHeaders(endpoint))
 
+  // A client that left before this handler ran closes no second time.
+  if (event.node.res.destroyed)
+    return null
+
+  // A request from inside the app has no socket, and its response stream is handed back unread.
+  const abortController = new AbortController()
+  if (event.node.res.socket)
+    event.node.res.once('close', () => abortController.abort())
+
+  let timeoutId: ReturnType<typeof setTimeout> | undefined
+  let attemptSignal: AbortSignal | undefined
   let response
   try {
     response = await globalThis.$fetch.raw<ReadableStream<Uint8Array>>(url, {
@@ -101,18 +113,41 @@ export default defineEventHandler(async (event) => {
       headers,
       body: getRequestWebStream(event),
       responseType: 'stream',
+      signal: abortController.signal,
       // The client decides whether to follow a redirect.
       redirect: 'manual',
       ignoreResponseError: true,
       async onRequest(ctx) {
         await nitro.hooks.callHook('api-party:request', ctx, event, endpointId)
+
+        // `$fetch` arms a `timeout` only for a request without a signal, so one a hook sets is armed here.
+        clearTimeout(timeoutId)
+        if (ctx.options.timeout) {
+          const timeoutController = new AbortController()
+          timeoutId = setTimeout(
+            () => timeoutController.abort(new DOMException('The operation was aborted due to timeout', 'TimeoutError')),
+            ctx.options.timeout,
+          )
+
+          const signals = [abortController.signal, timeoutController.signal]
+          // A retry starts from the signal of the attempt before it; any other signal is one the hook set.
+          if (ctx.options.signal && ctx.options.signal !== attemptSignal)
+            signals.push(ctx.options.signal)
+          attemptSignal = ctx.options.signal = AbortSignal.any(signals)
+        }
       },
       async onResponse(ctx) {
+        // The timeout bounds the wait for the response, not the reading of its body.
+        clearTimeout(timeoutId)
         await nitro.hooks.callHook('api-party:response', ctx, event, endpointId)
       },
     })
   }
   catch (error) {
+    // The client is gone, so nobody is left to answer.
+    if (abortController.signal.aborted)
+      return null
+
     // A hook may answer with a status of its own, such as 401.
     if (isError(error))
       throw error
@@ -122,6 +157,9 @@ export default defineEventHandler(async (event) => {
       statusCode: 502,
       statusMessage: 'Bad Gateway',
     })
+  }
+  finally {
+    clearTimeout(timeoutId)
   }
 
   // A response hook may have answered the request already.
@@ -139,7 +177,10 @@ export default defineEventHandler(async (event) => {
   if (endpoint.forwardCredentials && cookies.length)
     setResponseHeader(event, 'set-cookie', cookies)
 
-  return response._data ?? send(event)
+  if (!response._data)
+    return send(event)
+
+  return event.node.res.socket ? endOnAbort(response._data, abortController.signal) : response._data
 })
 
 /**
