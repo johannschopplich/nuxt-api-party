@@ -2,7 +2,7 @@
 
 Interceptors are the [`ofetch`](https://github.com/unjs/ofetch) callbacks `onRequest`, `onResponse`, `onRequestError` and `onResponseError`, passed to a single call. They see that call's fetch lifecycle and nothing else, which makes them the place for per-request concerns – a retry for one call, a log line for one query. Both `useMyApiData` and `$myApi` accept them.
 
-An interceptor sees the request your app sends. For an endpoint behind the [server proxy](/advanced/how-it-works), that is the request to the proxy: `request` is the path you passed, `options.baseURL` the proxy route, and the endpoint credentials are not on it yet.
+An interceptor sees the request your app sends. For an endpoint behind the [server proxy](/advanced/how-it-works), that is the request to the proxy: `request` is the proxy URL with the path you passed, such as `/api/__api_party/myApi/posts/1`, and the endpoint credentials are not on it yet.
 
 To cover every request instead, reach for a [hook](/guides/hooks).
 

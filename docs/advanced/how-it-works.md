@@ -6,7 +6,7 @@ A server proxy inside your Nuxt app forwards each request to its endpoint and ad
 
 ## The Server Proxy
 
-The generated composables send every request to `/api/__api_party/{endpointId}/{path}`, under its own HTTP method and with its query string. The proxy forwards the request to `{url}/{path}` of the endpoint and streams the request body and the response body through as they are.
+The generated composables send every request to `/api/__api_party/{endpointId}/{path}`, under its own HTTP method and with its query string. The proxy forwards the request to `{url}/{path}` of the endpoint and streams the request body and the response body through as they are. A request body travels with `POST`, `PUT`, `PATCH` and `DELETE` requests only.
 
 The route lives below Nitro's [`apiBaseURL`](https://nitro.build/config#apibaseurl), which defaults to `/api` – with `nitro.apiBaseURL: '/rest'`, the proxy answers at `/rest/__api_party/{endpointId}/{path}`. A non-root [`app.baseURL`](https://nuxt.com/docs/api/nuxt-config#baseurl) prefixes it as well. Match this path in the rules of a CDN, a WAF or a rate limiter in front of your app.
 
@@ -14,11 +14,13 @@ During server-side rendering, the call reaches the proxy inside the same process
 
 The route itself is public, though: anyone who can reach your app can send it a request, and the proxy forwards it with the endpoint credentials. Restrict it to the routes your app calls with [`allowedRoutes`](/guides/allowed-routes).
 
+A visitor who opens a proxy URL in the browser sees the API's response rendered on your app's origin. Where the API serves HTML or SVG that its own users control, keep those paths out of the allowed routes.
+
 ## What the Proxy Adds
 
 On the way to the API, the proxy applies the endpoint's configuration:
 
-- `query` – Merged into the query string. A query parameter of the request wins over one of the same name.
+- `query` – Merged into the query string. A query parameter of the request wins over one of the same name. The proxy parses and rebuilds every query string, so `?a=` reaches the API as `?a`, `%20` as `+`, and the values of a repeated key next to each other.
 - `headers` – Set on the request, replacing a header of the same name the browser sent.
 - `token` – Sent as `Authorization: Bearer {token}`, replacing any other `Authorization` header.
 - `X-Forwarded-For` – Set to the client address of the request, taken from an incoming `X-Forwarded-For` where there is one.
@@ -33,7 +35,7 @@ On the way back, the response keeps its status code, status message, headers and
 
 ## Redirects
 
-The proxy passes redirects back as the API sent them instead of following them. The browser follows an absolute `Location` straight to its target, such as a signed download URL, while a relative one resolves against your app rather than the API. During SSR, nothing follows a redirect, and the call receives the `3xx` response itself. Where the API redirects to a canonical path, call that path instead.
+The proxy passes redirects back as the API sent them instead of following them. The browser follows an absolute `Location` straight to its target, such as a signed download URL. That request is cross-origin, so the target has to allow your app's origin through CORS. A relative `Location` resolves against your app rather than the API. During SSR, nothing follows a redirect, and the call receives the `3xx` response itself. Where the API redirects to a canonical path, call that path instead.
 
 ## Errors the Proxy Answers Itself
 

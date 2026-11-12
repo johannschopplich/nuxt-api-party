@@ -1,6 +1,6 @@
 # Hooks
 
-Hooks run inside your app – in a Nuxt plugin or a Nitro plugin – and see every request the module sends, whichever endpoint it belongs to. Each runtime hook receives the endpoint ID, so one handler covers all endpoints and branches where they differ. Use hooks for behavior that spans endpoints, such as attaching a per-visitor token on the server, setting a timeout, or logging failures centrally.
+Hooks run inside your app – in a Nuxt plugin or a Nitro plugin – and see every request the module sends, whichever endpoint it belongs to. Each runtime hook receives the endpoint ID, so one handler covers all endpoints and branches where they differ. Use hooks for behavior that spans endpoints, such as attaching a per-visitor token on the server, setting a retry count, or logging failures centrally.
 
 To change a single call instead, reach for an [interceptor](/guides/interceptors).
 
@@ -38,7 +38,7 @@ export default defineNuxtConfig({
 
 Register Nuxt runtime hooks in a Nuxt plugin. They fire for every `$myApi` and `useMyApiData` call: in the browser, and on the server during SSR.
 
-`ctx.options` is the place for defaults that span endpoints – headers, `retry`, `retryDelay` and `timeout` all take effect when set here:
+`ctx.options` is the place for defaults that span endpoints, such as headers, `retry` and `retryDelay`:
 
 ```ts [plugins/api-party.ts]
 export default defineNuxtPlugin((nuxtApp) => {
@@ -46,13 +46,15 @@ export default defineNuxtPlugin((nuxtApp) => {
     // Add a unique request ID to each request
     ctx.options.headers.set('X-Request-Id', crypto.randomUUID())
 
-    if (endpointId === 'jsonPlaceholder') {
-      ctx.options.retry = 3
-      ctx.options.timeout = 5000
-    }
+    if (endpointId === 'jsonPlaceholder')
+      ctx.options.retry ??= 3
   })
 })
 ```
+
+The hook runs before every attempt, a retry included. Set a default with `??=`: a plain assignment to `retry` resets the count on each attempt, so a failing request retries without end, and it overrides the option of a call.
+
+A `timeout` set here takes effect for a `$myApi` request from the browser, and for one to a [client endpoint](/api/module-configuration#client-endpoints) during SSR. `useMyApiData` hands the request an abort signal of its own, so pass it the [`timeout` option](https://nuxt.com/docs/api/composables/use-fetch#params) instead. A request through the server proxy during SSR takes its `timeout` from a [Nitro hook](#nitro-runtime-hooks).
 
 ::: warning Client-Side Execution
 Nuxt hooks run in the browser as well, and a request from the browser reaches the [server proxy](/advanced/how-it-works) like any visitor's. Without [credential forwarding](/guides/credential-forwarding), an `Authorization` header set here never reaches the API. Attach credentials in a Nitro hook instead.
@@ -78,6 +80,8 @@ export default defineNitroPlugin((nitroApp) => {
 `event` is the h3 event of the request the proxy is answering. A server import has no request to answer, so `event` is `undefined` there – which also tells the two apart.
 
 A request hook that throws an h3 error, such as `throw createError({ statusCode: 401 })`, answers the proxy request with that error and the API is never called.
+
+A `timeout` set on `ctx.options` bounds the proxy's wait for the API's response headers. When it runs out, the proxy answers `502` – after a second attempt for a request other than `POST`, `PUT`, `PATCH` and `DELETE`.
 
 ::: info Response Body in the Proxy
 The server proxy streams the API's response through, so in a Nitro response hook for a proxy request, `ctx.response._data` is a `ReadableStream`, not the parsed body. Read status and headers from `ctx.response`, and set additional response headers on `event`. The proxy copies the API's headers after the hook, so to replace one of them, answer the request in the hook – with `send(event, body)` or `sendRedirect(event, location)` – and the proxy leaves the response alone. A server import parses the body as usual.

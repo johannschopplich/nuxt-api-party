@@ -33,7 +33,7 @@ Enable this only for APIs you trust. Every cookie the browser sends to your app 
 
 ## Cross-Site Requests
 
-A page on another site could make the visitor's browser send a request to the proxy, cookies included. For an endpoint that forwards credentials, the proxy refuses a request whose `Sec-Fetch-Site` header is `cross-site` with a `403`, before it contacts the API.
+A page on another site could make the visitor's browser send a request to the proxy, cookies included. For an endpoint that forwards credentials, the proxy refuses a request whose `Sec-Fetch-Site` header is `cross-site` with a `403`, before it contacts the API. A request without that header passes – Safari before 16.4 and clients other than a browser send none – and so does a `same-site` request from a sibling subdomain.
 
 A page opened from a link on another site still renders with the visitor's credentials: the request made during its SSR comes from your app, not from the other site.
 

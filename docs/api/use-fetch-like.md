@@ -42,7 +42,7 @@ const { data } = await useJsonPlaceholderData('comments', {
 })
 ```
 
-Path parameters are resolved into the request URL, so each value gets a cache key of its own.
+Path parameters are resolved into the request URL, so each value gets a cache key of its own. With a `key` of your own, the key stays the same, and a changed path parameter or a getter passed as `query` sends no request – name its source in `watch`.
 
 ## Caching
 

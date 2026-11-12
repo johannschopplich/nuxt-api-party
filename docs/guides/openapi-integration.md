@@ -142,9 +142,9 @@ The generated `MyApiModel<'Foo'>` resolves to the same type – see [Schema Mode
 
 ### Use OpenAPI Defined Path Parameters
 
-OpenAPI can define path parameters on endpoints. They're declared as `/foo/{id}`. The endpoint isn't defined as `/foo/10`, so using that as the path breaks type inference.
+OpenAPI can define path parameters on paths. They're declared as `/foo/{id}`. The path isn't declared as `/foo/10`, so using that as the path breaks type inference.
 
-To work with path parameters, set an object of parameters to the `path` property. Use the declared path for type inference, and the type checker ensures you provide all required path parameters. Parameters are percent-encoded and interpolated into the path before the request is made.
+To work with path parameters, set an object of parameters to the `path` property. Use the declared path for type inference, and the type checker ensures you provide all required path parameters. Parameters are percent-encoded and interpolated into the path before the request is made. A parameter that fills a path segment with `.` or `..` fails the call, since it would resolve the request to another path: `$myApi` rejects, and `useMyApiData` returns the error in `error`.
 
 ```ts
 const data = await $myApi('/foo/{id}', {

@@ -1,6 +1,6 @@
 # `$fetch`-Like Composable
 
-Sends a plain fetch and returns the raw API response. Intended for actions inside methods, e.g. when sending form data on submit.
+Sends a plain fetch and returns the response data. Intended for actions inside methods, e.g. when sending form data on submit.
 
 ::: info Placeholder
 `$myApi` is a placeholder. The composable is generated based on your API endpoint ID. For example, endpoint `jsonPlaceholder` generates `$jsonPlaceholder`.
