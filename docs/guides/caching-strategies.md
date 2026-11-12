@@ -86,7 +86,7 @@ For resources that may change frequently, use the `'no-cache'` option to make th
 ::: info
 This mode will make a conditional request to the server, and if the resource has not changed, it should return a `304 Not Modified` response, allowing the browser to reuse the cached response.
 
-Endpoints should check for the request headers `If-None-Match` or `If-Modified-Since` to determine if the resource has changed.
+The API should check the request headers `If-None-Match` or `If-Modified-Since` to determine whether the resource has changed.
 :::
 
 ```ts

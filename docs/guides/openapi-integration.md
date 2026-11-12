@@ -142,7 +142,7 @@ The generated `MyApiModel<'Foo'>` resolves to the same type – see [Schema Mode
 
 ### Use OpenAPI Defined Path Parameters
 
-OpenAPI can define path parameters on paths. They're declared as `/foo/{id}`. The path isn't declared as `/foo/10`, so using that as the path breaks type inference.
+A path in the schema can contain parameters, declared in braces: `/foo/{id}`. Passing `/foo/10` instead breaks type inference, because the schema declares no such path.
 
 To work with path parameters, set an object of parameters to the `path` property. Use the declared path for type inference, and the type checker ensures you provide all required path parameters. Parameters are percent-encoded and interpolated into the path before the request is made. A parameter that fills a path segment with `.` or `..` fails the call, since it would resolve the request to another path: `$myApi` rejects, and `useMyApiData` returns the error in `error`.
 
@@ -170,9 +170,9 @@ const { data } = await useMyApiData('/foo/{id}', {
 Issues will **NOT** be reported at runtime by Nuxt API Party if the wrong parameters are used. The **incomplete** path will be sent to the API **as-is**.
 :::
 
-### Route Method Overloading
+### Paths With Several Methods
 
-Some routes support multiple HTTP methods. The typing chooses the type based on the `method` property. When omitted, typing defaults to `GET`.
+Some paths declare more than one method. The types follow the `method` option and default to `GET` when it is left out.
 
 In the example schema, `GET /foo` will return a `Foo[]` array, but `POST /foo` will return a `Foo` object.
 

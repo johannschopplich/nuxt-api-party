@@ -98,9 +98,9 @@ export default defineNuxtConfig({
 
 Without `forwardCredentials`, the server proxy withholds the visitor's cookie and `Authorization` header from the API and keeps the API's `Set-Cookie` from the browser. With it, the API receives every cookie the browser sends to your app, your app's own session cookie included, and every cookie the API sets reaches the browser. See [Credential Forwarding](/guides/credential-forwarding).
 
-An endpoint with `forwardCredentials` now answers a cross-site request with `403`. Call the proxy from your own site only – see [Cross-Site Requests](/guides/credential-forwarding#cross-site-requests).
+For an endpoint with `forwardCredentials`, the proxy now answers a cross-site request with `403`. Call the proxy from your own site only – see [Cross-Site Requests](/guides/credential-forwarding#cross-site-requests).
 
-::: warning A Per-User `Authorization` Header Needs `forwardCredentials`
+::: warning A Per-Visitor `Authorization` Header Needs `forwardCredentials`
 An `Authorization` header set in a call's `headers`, an interceptor or a Nuxt hook used to travel to the API inside the POST envelope. It now reaches the proxy as a request header, which the proxy drops unless the endpoint sets `forwardCredentials` – the API answers `401`. Set `forwardCredentials: true` on such an endpoint, or attach the header in a [Nitro hook](/guides/hooks#nitro-runtime-hooks).
 :::
 
@@ -406,7 +406,7 @@ An API that cannot be reached used to yield `503 Service Unavailable` from the d
 
 ### The Passthrough Proxy No Longer Forwards `authorization`
 
-With `server.proxyMode` set to `'passthrough'`, a browser request's `authorization` header used to travel on to your API. It no longer does: the header carries the caller's credentials for *your* app, not your app's credentials for the upstream service.
+With `server.proxyMode` set to `'passthrough'`, a browser request's `authorization` header used to travel on to your API. It no longer does: the header carries the visitor's credentials for *your* app, not your app's credentials for the API.
 
 A cookie still travels, but only for endpoints that set `cookies: true`. Note that the passthrough proxy forwards the request as it stands and does not add the endpoint's `token`, `headers` or `query` – only the default `/api/__api_party/{endpointId}` handler does. If you relied on the old behavior to pass a bearer token through, attach it in a [request hook](/guides/hooks).
 

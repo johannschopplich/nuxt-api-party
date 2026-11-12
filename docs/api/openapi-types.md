@@ -5,17 +5,17 @@ For each endpoint with a schema, Nuxt API Party generates a type carrying everyt
 ```ts
 import type { PetStore } from '#nuxt-api-party'
 
-type UserEndpoint = PetStore<'/user/{username}', 'get'>
+type GetUser = PetStore<'/user/{username}', 'get'>
 
 // Extract any part of the operation
-type PathParams = UserEndpoint['path'] // { username: string }
-type QueryParams = UserEndpoint['query'] // Query parameters
-type RequestBody = UserEndpoint['request'] // Request body type
-type Response = UserEndpoint['response'] // Success response
-type ErrorResponse = UserEndpoint['responses'][404] // Specific status code
+type PathParams = GetUser['path'] // { username: string }
+type QueryParams = GetUser['query'] // Query parameters
+type RequestBody = GetUser['request'] // Request body type
+type Response = GetUser['response'] // Success response
+type ErrorResponse = GetUser['responses'][404] // Specific status code
 ```
 
-Both parameters are required, and both are checked against the schema. A path the endpoint doesn't declare is a compile error, and so is a method the path doesn't allow – `PetStore<'/pet', 'get'>` doesn't compile, because the Petstore declares only `post` and `put` there.
+Both parameters are required, and both are checked against the schema. A path the schema doesn't declare is a compile error, and so is a method the path doesn't allow – `PetStore<'/pet', 'get'>` doesn't compile, because the Petstore declares only `post` and `put` there.
 
 ## Core Type Properties
 
@@ -123,4 +123,4 @@ type User = PetStoreModel<'User'>
 //   ^? { id?: number; username?: string; firstName?: string; lastName?: string; email?: string; password?: string; phone?: string; userStatus?: number }
 ```
 
-Reach for this where a type belongs to your domain rather than to one request – a shared component, a form, a helper used by several operations.
+Reach for this where a type belongs to your domain rather than to one operation – a shared component, a form, a helper that calls several.
