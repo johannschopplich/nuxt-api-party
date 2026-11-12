@@ -300,7 +300,7 @@ declare module '#app' {
 
 declare module 'nitropack/types' {
   interface NitroRuntimeHooks {
-    // A server proxy request passes its \`event\`, a server-side \`$<name>\` call none, so \`event\` tells the two apart.
+    // A server proxy request passes its \`event\`, a server import none, so \`event\` tells the two apart.
     'api-party:request': (ctx: FetchContext, event: H3Event | undefined, endpointId: string) => HookResult
     'api-party:response': (ctx: Omit<FetchContext, 'response'> & { response: FetchResponse<any> }, event: H3Event | undefined, endpointId: string) => HookResult
   }

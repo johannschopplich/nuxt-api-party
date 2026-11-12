@@ -4,7 +4,7 @@ import { createError } from 'h3'
 /* eslint-disable no-control-regex -- URL parsers strip leading and trailing C0 controls and percent-encode the rest, so the checks name them. */
 
 /**
- * Throws a 400 for a path that a URL parser or the backend behind it could read as absolute or as
+ * Throws a 400 for a path that a URL parser or the API behind it could read as absolute or as
  * climbing above the base URL: a scheme, an authority, a tab or line break, or a dot segment, also
  * percent-encoded or with a `;` parameter.
  */
