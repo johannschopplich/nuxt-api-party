@@ -4,7 +4,7 @@ import type { NuxtError } from 'nuxt/app'
 import type { components as PetStoreComponents } from '#nuxt-api-party/petStore'
 import type { $jsonPlaceholder, $petStore, useJsonPlaceholderData, usePetStoreData } from '../playground/.nuxt/module/nuxt-api-party'
 import { describe, expectTypeOf, it } from 'vitest'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 declare const jsonPlaceholder: typeof $jsonPlaceholder
 declare const petStore: typeof $petStore
@@ -72,6 +72,17 @@ describe('useJsonPlaceholderData', () => {
       headers: ref({ 'x-trace': 'abc' }),
     })
     useJsonPlaceholder('posts/1', {
+      headers: {
+        'x-trace': ref('abc'),
+      },
+    })
+    useJsonPlaceholder('posts/1', {
+      // @ts-expect-error: Vue unwraps no ref inside a computed value, so the header would be sent as `[object Object]`.
+      headers: computed(() => ({
+        'x-trace': ref('abc'),
+      })),
+    })
+    useJsonPlaceholder('posts/1', {
       // @ts-expect-error: Nuxt watches a ref for headers, but never calls a getter to see a change.
       headers: () => ({ 'x-trace': 'abc' }),
     })
@@ -121,6 +132,12 @@ describe('usePetStoreData', () => {
     usePetStore('/pet/{petId}', {
       path: { petId: 1 },
       headers: ref({ 'x-trace': 'abc' }),
+    })
+    usePetStore('/pet/{petId}', {
+      path: { petId: 1 },
+      headers: {
+        'x-trace': ref('abc'),
+      },
     })
     usePetStore('/pet/{petId}', {
       path: { petId: 1 },

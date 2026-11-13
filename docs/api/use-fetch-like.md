@@ -22,7 +22,7 @@ The generic parameters follow `useFetch`: `ResT` types the response, `ErrorT` th
 
 ## Request Options
 
-`path`, `query`, `body` and `method` accept a plain value, a ref or a getter, and `headers` a plain value or a ref. The request is sent again whenever one of them changes:
+`path`, `query`, `body` and `method` accept a plain value, a ref or a getter, and `headers` a plain value or a ref, for the whole object or, in a record, per header. The request is sent again whenever one of them changes:
 
 ```ts
 const postId = ref(1)

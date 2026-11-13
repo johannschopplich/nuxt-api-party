@@ -16,6 +16,13 @@ type ComputedOptions<T extends Record<string, any>> = {
   [K in keyof T]: T[K] extends Function ? T[K] : ComputedOptions<T[K]> | MaybeRefOrGetter<T[K]>
 }
 
+/** Headers in a ref, or a plain record of them with a ref per value, both of which Nuxt unwraps and watches. */
+type MaybeRefHeaders<T> = MaybeRef<T> | (T extends Headers | readonly unknown[]
+  ? never
+  : T extends Record<string, any>
+    ? { [K in keyof T]: MaybeRef<T[K]> }
+    : never)
+
 /**
  * Nuxt's own `useFetch` options, less those that type the request against the app's server routes or that
  * the endpoint decides.
@@ -39,7 +46,7 @@ export type UseApiDataOptions<
     body?: FetchOptions['body']
   }>
   & {
-    headers?: MaybeRef<FetchOptions['headers']>
+    headers?: MaybeRefHeaders<FetchOptions['headers']>
   }
 
 export type UseApiData = <
@@ -68,7 +75,7 @@ export type UseOpenAPIDataOptions<
   & ComputedOptions<MethodOption<Method, Params>>
   & ComputedOptions<Omit<ParamsOption<Operation>, 'headers'>>
   & {
-    headers?: MaybeRef<ParamsOption<Operation>['headers']>
+    headers?: MaybeRefHeaders<ParamsOption<Operation>['headers']>
   }
   & ComputedOptions<RequestBodyOption<Operation>>
 
