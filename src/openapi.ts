@@ -25,17 +25,17 @@ export async function generateOpenAPITypes(
   endpoints: Record<string, EndpointConfiguration>,
   options: OpenAPITypesOptions,
 ): Promise<OpenAPITypes> {
-  const results = await Promise.all(
+  const endpointTypes = await Promise.all(
     Object.entries(endpoints)
       .filter((entry): entry is [string, SchemaEndpoint] => hasSchema(entry[1]))
       .map(async ([id, endpoint]) => ({ id, types: await generateEndpointTypes(id, endpoint, options) })),
   )
 
   return {
-    declarations: results
+    declarations: endpointTypes
       .map(({ id, types }) => declareModule(`#nuxt-api-party/${id}`, types ?? EMPTY_DOCUMENT_TYPES))
       .join('\n'),
-    typedEndpointIds: results
+    typedEndpointIds: endpointTypes
       .filter(({ types }) => types != null)
       .map(({ id }) => id),
   }
