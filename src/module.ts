@@ -4,7 +4,7 @@ import type { QueryObject } from 'ufo'
 import type { OpenAPITypes } from './openapi'
 import type { AllowedRoute } from './runtime/types'
 import { fileURLToPath } from 'node:url'
-import { addImportsSources, addServerHandler, addTemplate, addTypeTemplate, createResolver, defineNuxtModule, updateTemplates } from '@nuxt/kit'
+import { addImportsSources, addServerHandler, addServerImports, addServerTemplate, addTemplate, addTypeTemplate, createResolver, defineNuxtModule, updateTemplates } from '@nuxt/kit'
 import { generateTypeHelpers } from 'apiful/openapi/generate'
 import { watch } from 'chokidar'
 import { defu } from 'defu'
@@ -186,36 +186,23 @@ export default defineNuxtModule<ModuleOptions>().with({
       handler: resolve('runtime/server/proxy'),
     })
 
-    nuxt.hooks.hook('nitro:config', (config) => {
-      config.alias ||= {}
-      config.alias[`#${moduleName}/server`] = resolve(nuxt.options.buildDir, `module/${moduleName}.nitro`)
+    // The alias types the server imports; the virtual module of the same name provides them.
+    nuxt.options.nitro.alias ||= {}
+    nuxt.options.nitro.alias[`#${moduleName}/server`] = resolve(nuxt.options.buildDir, `module/${moduleName}.nitro`)
 
-      config.virtual ||= {}
-      config.virtual[`#${moduleName}/server`] = () => `
+    addServerTemplate({
+      filename: `#${moduleName}/server`,
+      getContents: () => `
 import { _$api } from '${resolve('runtime/server/$api')}'
 ${endpointKeys.map(i => `
 export const ${getRawComposableName(i)} = (...args) => _$api('${i}', ...args)
-`.trimStart()).join('')}`.trimStart()
-
-      if (endpointKeys.length) {
-        config.typescript ||= {}
-        config.typescript.tsConfig ||= {}
-        config.typescript.tsConfig.include ||= []
-        config.typescript.tsConfig.include.push(
-          `./module/${moduleName}.schema.d.ts`,
-          `./module/${moduleName}.hooks.d.ts`,
-        )
-      }
-
-      config.imports = defu(config.imports, {
-        presets: [
-          {
-            from: `#${moduleName}/server`,
-            imports: endpointKeys.map(getRawComposableName),
-          },
-        ],
-      })
+`.trimStart()).join('')}`.trimStart(),
     })
+
+    addServerImports(endpointKeys.map(i => ({
+      name: getRawComposableName(i),
+      from: `#${moduleName}/server`,
+    })))
 
     addImportsSources({
       from: resolve(nuxt.options.buildDir, `module/${moduleName}`),
@@ -329,10 +316,10 @@ declare module 'nitropack/types' {
 }
 `.trimStart()
       },
-    })
+    }, { nitro: true, nuxt: true })
 
     if (schemaEndpointIds.length) {
-      addTemplate({
+      addTypeTemplate({
         filename: `module/${moduleName}.schema.d.ts`,
         async getContents() {
           return `
@@ -340,13 +327,7 @@ declare module 'nitropack/types' {
 ${(await loadOpenAPITypes()).declarations}
 `.trimStart()
         },
-      })
-
-      nuxt.hooks.hook('prepare:types', ({ references }) => {
-        references.push({
-          path: resolve(nuxt.options.buildDir, `module/${moduleName}.schema.d.ts`),
-        })
-      })
+      }, { nitro: true, nuxt: true })
     }
 
     addTemplate({
