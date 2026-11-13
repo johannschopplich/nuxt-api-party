@@ -88,4 +88,4 @@ A `$fetch` or `useFetch` call to this route then finds the API's body at `error.
 
 ## Error Types
 
-`$myApi` throws an ofetch [`FetchError`](https://github.com/unjs/ofetch), and `useMyApiData` returns a `NuxtError`, whose properties Nuxt lists under [`useError`](https://nuxt.com/docs/api/composables/use-error#type).
+`$myApi` throws an ofetch [`FetchError`](https://github.com/unjs/ofetch), and the `error` of `useMyApiData` holds a `NuxtError`, whose properties Nuxt lists under [`useError`](https://nuxt.com/docs/api/composables/use-error#type).
