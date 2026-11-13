@@ -8,9 +8,9 @@
     "preview": "vitepress preview"
   },
   "devDependencies": {
-    "@iconify-json/carbon": "^1.2.25",
-    "@iconify-json/devicon-plain": "^1.2.57",
-    "unocss": "^66.7.5",
+    "@iconify-json/carbon": "^1.2.30",
+    "@iconify-json/devicon-plain": "^1.2.71",
+    "unocss": "^66.12.0",
     "vitepress": "^1.6.4"
   }
 }
