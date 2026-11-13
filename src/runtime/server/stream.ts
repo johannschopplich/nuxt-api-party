@@ -1,3 +1,5 @@
+// Kept identical in nuxt-api-party and nuxt-kirby: a change here goes to both repositories.
+
 /**
  * Ends the stream instead of failing it where its source fails after `signal` aborted. The aborted API
  * response would otherwise surface as the error of a request nobody waits for.

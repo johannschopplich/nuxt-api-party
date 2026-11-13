@@ -1,3 +1,5 @@
+// Kept identical in nuxt-api-party and nuxt-kirby: a change here goes to both repositories.
+
 import type { AllowedRoute } from '../types'
 import { createError } from 'h3'
 
