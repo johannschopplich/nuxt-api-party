@@ -88,23 +88,4 @@ A `$fetch` or `useFetch` call to this route then finds the API's body at `error.
 
 ## Error Types
 
-### `FetchError` Interface
-
-The `FetchError` type from [ofetch](https://github.com/unjs/ofetch) is used for errors thrown by `$myApi` functions:
-
-```ts
-interface FetchError<T = any> extends Error {
-  request?: FetchRequest
-  options?: FetchOptions
-  response?: FetchResponse<T>
-  data?: T
-  status?: number
-  statusText?: string
-  statusCode?: number
-  statusMessage?: string
-}
-```
-
-### `NuxtError` Interface
-
-The `NuxtError` type is used for errors returned by `useMyApiData` composables. Nuxt lists its properties under [`useError`](https://nuxt.com/docs/api/composables/use-error#type).
+`$myApi` throws an ofetch [`FetchError`](https://github.com/unjs/ofetch), and `useMyApiData` returns a `NuxtError`, whose properties Nuxt lists under [`useError`](https://nuxt.com/docs/api/composables/use-error#type).

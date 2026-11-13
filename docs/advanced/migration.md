@@ -389,11 +389,9 @@ Its four flags moved out and two of them changed their default:
 
 Every `useMyApiData` call now gets its own async data state, keyed by its position in your source, the way Nuxt keys `useFetch` and `useAsyncData` – with no switch either way, as Nuxt has none. Two components asking for the same resource therefore no longer share a `data` ref, and no longer collide when their `transform`, `pick` or `default` options differ. They do still share the underlying request. Pass the same explicit `key` to put two call sites back on one instance.
 
-The schema file watcher no longer has a switch. Nuxt's own builder watcher cannot stand in for it – it covers each layer's `app` and `server` directories only, and a path registered through `nuxt.options.watch` restarts the dev server rather than regenerating the types.
-
 ### `refresh()` Sends the Request Again
 
-The request cache sits below Nuxt's async data, so Nuxt could not reach into it: `refresh()`, `clear()` and a key change driven by a reactive option were answered with the response already cached for that request. Each of them now sends a new request. Expect more traffic where a page refreshes on an interval, and reach for `getCachedData` to decide when a call site may keep what it has.
+`refresh()`, `clear()` and a key change driven by a reactive option used to be answered with the response already cached for that request. Each of them now sends a new request. Expect more traffic where a page refreshes on an interval, and reach for `getCachedData` to decide when a call site may keep what it has.
 
 ### `cache` Only Means the Browser Cache Now
 

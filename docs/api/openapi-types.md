@@ -34,33 +34,9 @@ Each property is read off the operation in your schema:
 
 Where an operation declares nothing at all for a property, the type says so rather than inventing an empty object: `path` and `query` are `never`, `request` is `undefined`, and `response` is `undefined` for an operation whose success carries no body.
 
-`request` and `response` resolve through the same helpers a request resolves through, so a value annotated with `PetStore<Path, Method>['response']` is exactly what `$petStore` hands back for that call.
+`request` and `response` match the composables: a value annotated with `PetStore<Path, Method>['response']` is exactly what `$petStore` hands back for that call.
 
 ## Examples
-
-### Basic Type Extraction
-
-Pull out a single part of an operation for a form, a component prop, or a function signature:
-
-```ts
-import type { PetStore } from '#nuxt-api-party'
-
-// Extract path parameters
-type PetParams = PetStore<'/pet/{petId}', 'get'>['path']
-//   ^? { petId: number }
-
-// Extract query parameters
-type StatusQuery = PetStore<'/pet/findByStatus', 'get'>['query']
-//   ^? { status?: "available" | "pending" | "sold" }
-
-// Extract request body
-type CreatePetBody = PetStore<'/pet', 'post'>['request']
-//   ^? Pet | URLSearchParams
-
-// Extract response type
-type PetResponse = PetStore<'/pet/{petId}', 'get'>['response']
-//   ^? { id?: number; name: string; category?: Category; photoUrls: string[]; tags?: Tag[]; status?: 'available' | 'pending' | 'sold' }
-```
 
 A request body the schema marks optional comes back widened with `undefined`, matching what the composables accept:
 

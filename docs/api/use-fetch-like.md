@@ -72,17 +72,12 @@ interface Comment {
 const postId = ref(1)
 
 const { data, status, refresh, error } = await useJsonPlaceholderData('comments', {
-  // Whether to resolve the async function after loading the route, instead of blocking client-side navigation (defaults to `false`)
   lazy: true,
-  // A factory function to set the default value of the data, before the async function resolves - particularly useful with the `lazy: true` option
   default: () => [] as Comment[],
-  // A function that can be used to alter handler function result after resolving
   transform: (comments: Comment[]) => comments.filter(comment => comment.body.length > 0),
-  // Custom query parameters to be added to the request, can be reactive
   query: computed(() => ({
     postId: postId.value
   })),
-  // Custom headers to be sent with the request
   headers: {
     'X-Foo': 'bar'
   }

@@ -120,6 +120,6 @@ const post = await $jsonPlaceholder('posts', {
 })
 ```
 
-It throws on a failed request rather than exposing an `error` value, so wrap it where you need to react to failure. [Data Fetching Methods](/essentials/data-fetching-methods) walks through a complete form.
+It throws on a failed request rather than exposing an `error` value, so wrap it where you need to react to failure.
 
 From here, [Error Handling](/guides/error-handling) shows what a failed request gives you, [OpenAPI Integration](/guides/openapi-integration) how to infer request and response types from a schema, and [Caching Strategies](/guides/caching-strategies) how to reuse responses from the payload or the browser's cache.

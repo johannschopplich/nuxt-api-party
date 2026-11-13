@@ -1,10 +1,6 @@
 # Data Fetching Methods
 
-Each endpoint gives you two composables. They differ in what they return and in who decides when the request goes out.
-
-::: tip
-`useMyApiData` is built on Nuxt's `useFetch`, and `$myApi` is a plain `$fetch`. If you know Nuxt data fetching, you know these.
-:::
+Each endpoint gives you two composables: `useMyApiData` is built on Nuxt's `useFetch`, and `$myApi` is a plain `$fetch`. They differ in what they return and in who decides when the request goes out.
 
 ## Comparison
 
@@ -50,57 +46,7 @@ Use `$myApi` composables for programmatic API interactions, form submissions, an
 `$myApi` is a plain fetch. Awaited in a component's setup, it runs during SSR and once more in the browser while the page hydrates. Fetch page data with `useMyApiData`, or wrap the call in `useAsyncData` – see the [`$myApi` documentation](/api/dollarfetch-like#in-component-setup).
 :::
 
-Common pattern for handling form submissions:
-
-```vue
-<script setup lang="ts">
-import type { FetchError } from 'ofetch'
-
-const form = ref({
-  title: '',
-  body: '',
-  userId: 1
-})
-const isSubmitting = ref(false)
-const submitError = ref<string | null>(null)
-
-async function submitPost() {
-  isSubmitting.value = true
-  submitError.value = null
-
-  try {
-    const newPost = await $jsonPlaceholder('posts', {
-      method: 'POST',
-      body: form.value
-    })
-
-    console.log('Post created:', newPost)
-    // Redirect or show success message
-  }
-  catch (error) {
-    submitError.value = (error as FetchError).statusMessage || 'Failed to create post'
-  }
-  finally {
-    isSubmitting.value = false
-  }
-}
-</script>
-
-<template>
-  <form @submit.prevent="submitPost">
-    <input v-model="form.title" placeholder="Title" required>
-    <textarea v-model="form.body" placeholder="Content" required />
-
-    <button type="submit" :disabled="isSubmitting">
-      {{ isSubmitting ? 'Creating...' : 'Create Post' }}
-    </button>
-
-    <div v-if="submitError" class="error">
-      {{ submitError }}
-    </div>
-  </form>
-</template>
-```
+In a submit handler, catch the error `$myApi` throws – see [`$myApi` Throws](/guides/error-handling#myapi-throws).
 
 In plugins or middleware, use `$myApi` for initial data fetching. Keep the result in `useState`, so the browser takes it from the payload instead of fetching it again:
 

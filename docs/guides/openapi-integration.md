@@ -109,7 +109,7 @@ export default defineNuxtConfig({
 In development, changes to a local schema file regenerate the types right away. A remote schema is read once, so pick up changes there by restarting the Nuxt dev server. A schema that fails to load logs an error and leaves the endpoint untyped.
 :::
 
-For most use cases, no further configuration is needed. Nuxt API Party uses the generated types to infer correct types automatically when [`useFetch`-like](/api/use-fetch-like) and [`$fetch`-like](/api/dollarfetch-like) composables are used.
+With no further configuration, the [`useFetch`-like](/api/use-fetch-like) and [`$fetch`-like](/api/dollarfetch-like) composables infer their types from the schema.
 
 ## Pass Path Parameters
 
