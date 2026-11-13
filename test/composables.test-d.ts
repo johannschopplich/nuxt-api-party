@@ -117,7 +117,11 @@ describe('usePetStoreData', () => {
     })
   })
 
-  it('rejects a getter for the headers option', () => {
+  it('accepts a ref but rejects a getter for the headers option', () => {
+    usePetStore('/pet/{petId}', {
+      path: { petId: 1 },
+      headers: ref({ 'x-trace': 'abc' }),
+    })
     usePetStore('/pet/{petId}', {
       path: { petId: 1 },
       // @ts-expect-error: Nuxt watches a ref for headers, but never calls a getter to see a change.
