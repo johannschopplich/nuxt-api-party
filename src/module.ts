@@ -173,7 +173,7 @@ export default defineNuxtModule<ModuleOptions>().with({
     )
     const schemaEndpointIds = Object.keys(schemaEndpoints)
 
-    // The schemas load once for every template typed after them, and again only when a watched schema file changes.
+    // Loads the schemas once across templates, and again only after a watched schema file changes.
     let openAPITypes: Promise<OpenAPITypes> | undefined
     const loadOpenAPITypes = () => openAPITypes ??= generateOpenAPITypes(schemaEndpoints, { rootDir: nuxt.options.rootDir })
 
@@ -190,7 +190,7 @@ export default defineNuxtModule<ModuleOptions>().with({
       handler: resolve('runtime/server/proxy'),
     })
 
-    // The alias types the server imports; the virtual module of the same name provides them.
+    // The alias gives the server imports their types; the virtual module of the same name provides their code.
     nuxt.options.nitro.alias ||= {}
     nuxt.options.nitro.alias[`#${moduleName}/server`] = resolve(nuxt.options.buildDir, `module/${moduleName}.nitro`)
 
