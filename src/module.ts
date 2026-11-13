@@ -100,6 +100,10 @@ export default defineNuxtModule<ModuleOptions>().with({
     const moduleName = name
     const getRawComposableName = (endpointId: string) => `$${camelCase(endpointId)}`
     const getDataComposableName = (endpointId: string) => `use${pascalCase(endpointId)}Data`
+    // Decides per endpoint whether its raw and its data composable are typed, so the two never diverge.
+    const getComposableTypes = (endpointId: string, typedEndpointIds: string[]) => typedEndpointIds.includes(endpointId)
+      ? { raw: `OpenAPIClient<${pascalCase(endpointId)}Paths>`, data: `UseOpenAPIData<${pascalCase(endpointId)}Paths>` }
+      : { raw: 'ApiClient', data: 'UseApiData' }
     // Exported from the template only because Nuxt compiles a `createUseFetch` call in an export declaration alone.
     const getFetchComposableName = (endpointId: string) => `_use${pascalCase(endpointId)}Fetch`
 
@@ -256,12 +260,8 @@ export type { FetchResponseData, FetchResponseError, MethodOption, ParamsOption,
 export type { ApiClient, OpenAPIClient, ApiClientFetchOptions, OpenAPIClientFetchOptions, UseApiData, UseOpenAPIData, UseApiDataOptions, UseOpenAPIDataOptions }
 
 ${endpointKeys.map(i => `
-export declare const ${getRawComposableName(i)}: ${typedEndpointIds.includes(i)
-  ? `OpenAPIClient<${pascalCase(i)}Paths>`
-  : 'ApiClient'}
-export declare const ${getDataComposableName(i)}: ${typedEndpointIds.includes(i)
-  ? `UseOpenAPIData<${pascalCase(i)}Paths>`
-  : 'UseApiData'}
+export declare const ${getRawComposableName(i)}: ${getComposableTypes(i, typedEndpointIds).raw}
+export declare const ${getDataComposableName(i)}: ${getComposableTypes(i, typedEndpointIds).data}
 `.trimStart()).join('').trimEnd()}
 
 ${schemaEndpointIds.map(i => generateTypeHelpers(i, { paths: `${pascalCase(i)}Paths`, components: `${pascalCase(i)}Components` })).join('\n\n')}
@@ -283,9 +283,7 @@ import type { paths as ${pascalCase(i)}Paths } from '#${moduleName}/${i}'
 `.trimStart()).join('').trimEnd()}
 
 ${endpointKeys.map(i => `
-export declare const ${getRawComposableName(i)}: ${typedEndpointIds.includes(i)
-  ? `OpenAPIClient<${pascalCase(i)}Paths>`
-  : 'ApiClient'}
+export declare const ${getRawComposableName(i)}: ${getComposableTypes(i, typedEndpointIds).raw}
 `.trimStart()).join('').trimEnd()}
 `.trimStart()
       },
