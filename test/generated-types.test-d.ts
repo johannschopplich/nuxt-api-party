@@ -1,5 +1,3 @@
-// The assertions run against the fixture's build output, which declares an endpoint with an unset `schema`,
-// one whose `schema` fails to load and one whose `schema` comes from the runtime config.
 /// <reference path="./fixture/.nuxt/module/nuxt-api-party.schema.d.ts" />
 
 import type { ApiClient } from '../src/runtime/composables/$api'

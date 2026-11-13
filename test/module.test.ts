@@ -10,7 +10,7 @@ describe('module setup', () => {
         runtimeConfig: {
           apiParty: {
             endpoints: {
-              // @ts-expect-error: The endpoint option was removed in 5.0.
+              // @ts-expect-error: `cookies` was removed in 5.0.
               legacyApi: { url: '/api', cookies: true },
             },
           },
