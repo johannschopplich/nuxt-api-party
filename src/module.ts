@@ -47,7 +47,7 @@ export interface ModuleOptions {
    *   apiParty: {
    *     endpoints: {
    *       jsonPlaceholder: {
-   *         url: 'https://jsonplaceholder.typicode.com'
+   *         url: 'https://jsonplaceholder.typicode.com',
    *         headers: {
    *           Authorization: `Basic ${globalThis.btoa('username:password')}`
    *         }
