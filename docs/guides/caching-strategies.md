@@ -43,7 +43,7 @@ During SSR, the request never reaches a browser, so only calls made in the brows
 
 ### Cache Options
 
-The `cache` option is passed to `fetch` as [`Request.cache`](https://developer.mozilla.org/en-US/docs/Web/API/Request/cache) and takes its values. `'no-store'` skips the browser cache. `'no-cache'` revalidates with the API before reusing a cached response, which suits resources that change often and needs an API that answers `If-None-Match` or `If-Modified-Since` with `304 Not Modified` when nothing changed:
+The `cache` option is passed to `fetch` as [`Request.cache`](https://developer.mozilla.org/en-US/docs/Web/API/Request/cache) and takes its values. `'no-store'` skips the browser cache. `'no-cache'` revalidates with the API before reusing a cached response, for resources that change often. The browser reuses the cached response only when the API answers `If-None-Match` or `If-Modified-Since` with `304 Not Modified`:
 
 ```ts
 const { data } = await useJsonPlaceholderData('posts', {
