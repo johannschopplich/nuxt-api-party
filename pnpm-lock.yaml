@@ -252,7 +252,11 @@ importers:
         specifier: ^1.6.4
         version: 1.6.4(@algolia/client-search@5.64.0)(@types/node@26.6.6)(change-case@5.4.4)(lightningcss@1.33.0)(postcss@8.5.32)(search-insights@2.17.3)(terser@5.51.2)(typescript@6.0.3)
 
-  playground: {}
+  playground:
+    devDependencies:
+      consola:
+        specifier: ^3.4.2
+        version: 3.4.2
 
 packages:
 

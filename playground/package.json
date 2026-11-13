@@ -6,5 +6,8 @@
     "dev": "nuxt dev",
     "build": "nuxt build",
     "generate": "nuxt generate"
+  },
+  "devDependencies": {
+    "consola": "^3.4.2"
   }
 }
