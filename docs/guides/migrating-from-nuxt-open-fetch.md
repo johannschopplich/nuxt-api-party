@@ -14,7 +14,7 @@ npm uninstall nuxt-open-fetch
 npx nuxt module add api-party
 ```
 
-Nuxt API Party requires Nuxt 4.4 or later. Remove `openapi-typescript` as well, unless something else in your app uses it.
+Remove `openapi-typescript` as well, unless something else in your app uses it.
 
 ## Move the Configuration
 

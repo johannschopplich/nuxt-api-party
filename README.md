@@ -23,8 +23,6 @@ Auto-generated composables for any API in [Nuxt](https://nuxt.com), typed from O
 npx nuxt module add api-party
 ```
 
-Nuxt API Party requires Nuxt 4.4 or later.
-
 ## Basic Usage
 
 Add Nuxt API Party to your Nuxt configuration and describe your first API under the `apiParty` module option:
