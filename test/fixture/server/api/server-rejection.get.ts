@@ -1,5 +1,4 @@
-import { defineEventHandler } from '#imports'
-import { $testApi } from '#nuxt-api-party/server'
+import { $testApi, defineEventHandler } from '#imports'
 
 export default defineEventHandler(async () => ({
   // A lone surrogate makes `encodeURIComponent` throw.
