@@ -3,8 +3,7 @@
 /// <reference path="./fixture/.nuxt/module/nuxt-api-party.schema.d.ts" />
 
 import type { ApiClient } from '../src/runtime/composables/$api'
-import type { UseApiData } from '../src/runtime/composables/useApiData'
-import type { $brokenSchemaApi, $runtimeSchemaApi, $unsetSchemaApi, useBrokenSchemaApiData } from './fixture/.nuxt/module/nuxt-api-party'
+import type { $brokenSchemaApi, $runtimeSchemaApi, $unsetSchemaApi } from './fixture/.nuxt/module/nuxt-api-party'
 import type { $brokenSchemaApi as $serverBrokenSchemaApi } from './fixture/.nuxt/module/nuxt-api-party.nitro'
 import { describe, expectTypeOf, it } from 'vitest'
 
@@ -20,12 +19,6 @@ describe('$brokenSchemaApi', () => {
   it('types an endpoint whose schema fails to load as an ApiClient', () => {
     expectTypeOf<typeof $brokenSchemaApi>().toEqualTypeOf<ApiClient>()
     expectTypeOf<typeof $serverBrokenSchemaApi>().toEqualTypeOf<ApiClient>()
-  })
-})
-
-describe('useBrokenSchemaApiData', () => {
-  it('types the composable of an endpoint whose schema fails to load as UseApiData', () => {
-    expectTypeOf<typeof useBrokenSchemaApiData>().toEqualTypeOf<UseApiData>()
   })
 })
 
