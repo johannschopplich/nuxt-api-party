@@ -13,20 +13,20 @@ const petStore: EndpointConfiguration = {
 
 describe('generateOpenAPITypes', () => {
   it('wraps the generated types in a module declaration named after the endpoint', async () => {
-    const types = await generateOpenAPITypes({ petStore }, { rootDir })
+    const { declarations } = await generateOpenAPITypes({ petStore }, { rootDir })
 
-    expect(types).toContain(`declare module '#nuxt-api-party/petStore'`)
-    expect(types).toContain('export interface paths')
+    expect(declarations).toContain(`declare module '#nuxt-api-party/petStore'`)
+    expect(declarations).toContain('export interface paths')
   })
 
   it('resolves a relative schema path against rootDir', async () => {
-    const types = await generateOpenAPITypes({ petStore }, { rootDir })
+    const { declarations } = await generateOpenAPITypes({ petStore }, { rootDir })
 
-    expect(types).toContain('"/pet/{petId}"')
+    expect(declarations).toContain('"/pet/{petId}"')
   })
 
   it('loads a schema given as a URL', async () => {
-    const types = await generateOpenAPITypes(
+    const { declarations } = await generateOpenAPITypes(
       {
         petStore: {
           url: 'https://example.com',
@@ -36,11 +36,11 @@ describe('generateOpenAPITypes', () => {
       { rootDir },
     )
 
-    expect(types).toContain('"/pet/{petId}"')
+    expect(declarations).toContain('"/pet/{petId}"')
   })
 
   it('loads a schema given as a function', async () => {
-    const types = await generateOpenAPITypes(
+    const { declarations } = await generateOpenAPITypes(
       {
         inventory: {
           url: 'https://example.com',
@@ -62,46 +62,47 @@ describe('generateOpenAPITypes', () => {
       { rootDir },
     )
 
-    expect(types).toContain('"/items"')
+    expect(declarations).toContain('"/items"')
   })
 
   it('emits one module declaration per endpoint', async () => {
-    const types = await generateOpenAPITypes(
+    const { declarations } = await generateOpenAPITypes(
       { petStore, petStoreMirror: petStore },
       { rootDir },
     )
 
-    expect(types).toContain(`declare module '#nuxt-api-party/petStore'`)
-    expect(types).toContain(`declare module '#nuxt-api-party/petStoreMirror'`)
+    expect(declarations).toContain(`declare module '#nuxt-api-party/petStore'`)
+    expect(declarations).toContain(`declare module '#nuxt-api-party/petStoreMirror'`)
   })
 
   it('indents the declaration body by two spaces', async () => {
-    const types = await generateOpenAPITypes({ petStore }, { rootDir })
+    const { declarations } = await generateOpenAPITypes({ petStore }, { rootDir })
 
-    expect(types).toContain('\n  export interface paths {\n    "/pet": {')
+    expect(declarations).toContain('\n  export interface paths {\n    "/pet": {')
   })
 
   it('skips an endpoint that declares no schema', async () => {
-    const types = await generateOpenAPITypes(
+    const { declarations } = await generateOpenAPITypes(
       {
         withoutSchema: { url: 'https://example.com' },
       },
       { rootDir },
     )
 
-    expect(types).toBe('')
+    expect(declarations).toBe('')
   })
 
   // The dev server keeps running on a schema it cannot read, so a later save can fix it.
-  it('falls back to empty paths instead of throwing on an unreadable schema', async () => {
-    const types = await generateOpenAPITypes(
+  it('declares empty paths instead of throwing on an unreadable schema and leaves its endpoint untyped', async () => {
+    const { declarations, typedEndpointIds } = await generateOpenAPITypes(
       {
         broken: { url: 'https://example.com', schema: './schemas/does-not-exist.yaml' },
       },
       { rootDir },
     )
 
-    expect(types).toContain(`declare module '#nuxt-api-party/broken'`)
-    expect(types).toContain('export type paths = Record<string, never>')
+    expect(declarations).toContain(`declare module '#nuxt-api-party/broken'`)
+    expect(declarations).toContain('export type paths = Record<string, never>')
+    expect(typedEndpointIds).toEqual([])
   })
 })

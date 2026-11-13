@@ -34,6 +34,10 @@ export default defineNuxtConfig({
         url: '/api',
         schema: undefined,
       },
+      brokenSchemaApi: {
+        url: '/api',
+        schema: './does-not-exist.yaml',
+      },
       schemaApi: {
         url: '/api',
         schema: {
