@@ -46,16 +46,16 @@ export default defineNuxtConfig({
 })
 ```
 
-If you were to call your API `jsonPlaceholder`, the generated composables are:
+For an endpoint `jsonPlaceholder`, the module generates:
 
-- `$jsonPlaceholder` – Returns the response data, similar to [`$fetch`](https://nuxt.com/docs/api/utils/dollarfetch#fetch)
+- `$jsonPlaceholder` – Returns the response data, similar to [`$fetch`](https://nuxt.com/docs/api/utils/dollarfetch)
 - `useJsonPlaceholderData` – Returns [multiple values](https://nuxt-api-party.byjohann.dev/api/use-fetch-like#return-values) similar to [`useFetch`](https://nuxt.com/docs/api/composables/use-fetch)
 
 Use these composables in your templates or components:
 
 ```vue
 <script setup lang="ts">
-const { data, refresh, error, status, clear } = await useJsonPlaceholderData('posts/1')
+const { data, refresh, error, status, clear } = await useJsonPlaceholderData<{ title: string }>('posts/1')
 </script>
 
 <template>
@@ -64,8 +64,7 @@ const { data, refresh, error, status, clear } = await useJsonPlaceholderData('po
 </template>
 ```
 
-> [!TIP]
-> You can connect as many APIs as you want, just add them to the `endpoints` object.
+Connect as many APIs as you need: each entry in `endpoints` gets its own pair of composables.
 
 The [documentation](https://nuxt-api-party.byjohann.dev) covers the OpenAPI integration, caching, credential forwarding and every module option. Coming from v4? See the [migration guide](https://nuxt-api-party.byjohann.dev/advanced/migration#v5-0-0).
 
