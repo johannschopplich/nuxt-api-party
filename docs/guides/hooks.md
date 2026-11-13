@@ -54,15 +54,15 @@ export default defineNuxtPlugin((nuxtApp) => {
 
 The hook runs before every attempt, a retry included. Set a default with `??=`: a plain assignment to `retry` resets the count on each attempt, so a failing request retries without end, and it overrides the option of a call.
 
-A `timeout` set here reaches neither `useMyApiData`, which takes its own [`timeout` option](https://nuxt.com/docs/api/composables/use-fetch#params), nor a request through the server proxy during SSR, which takes it from a [Nitro hook](#nitro-runtime-hooks).
+A `timeout` set here reaches neither `useMyApiData`, which takes its own [`timeout` option](https://nuxt.com/docs/api/composables/use-fetch#parameters), nor a request through the server proxy during SSR, which takes it from a [Nitro hook](#nitro-runtime-hooks).
 
 ::: warning Client-Side Execution
-Nuxt hooks run in the browser as well, and a request from the browser reaches the [server proxy](/advanced/how-it-works) like any visitor's. Without [credential forwarding](/guides/credential-forwarding), an `Authorization` header set here never reaches the API. Attach credentials in a Nitro hook instead.
+Nuxt hooks run in the browser as well, and a request from the browser reaches the [server proxy](/essentials/how-it-works) like any visitor's. Without [credential forwarding](/guides/credential-forwarding), an `Authorization` header set here never reaches the API. Attach credentials in a Nitro hook instead.
 :::
 
 ## Nitro Runtime Hooks
 
-Register Nitro runtime hooks in a server plugin. They fire for every request the [server proxy](/advanced/how-it-works) forwards and for every [server import](/api/server-imports) call, and are the place for credentials that depend on the visitor:
+Register Nitro runtime hooks in a server plugin. They fire for every request the [server proxy](/essentials/how-it-works) forwards and for every [server import](/api/server-imports) call, and are the place for credentials that depend on the visitor:
 
 ```ts [server/plugins/api-party.ts]
 export default defineNitroPlugin((nitroApp) => {

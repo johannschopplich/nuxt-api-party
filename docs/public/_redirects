@@ -4,3 +4,9 @@
 /guides/defaults.html /advanced/migration#the-defaults-plugin-is-gone 301
 /guides/dynamic-backend-url /advanced/migration#the-dynamic-backend-url-is-gone 301
 /guides/dynamic-backend-url.html /advanced/migration#the-dynamic-backend-url-is-gone 301
+/essentials/what-is-nuxt-api-party /essentials/getting-started 301
+/essentials/what-is-nuxt-api-party.html /essentials/getting-started 301
+/advanced/how-it-works /essentials/how-it-works 301
+/advanced/how-it-works.html /essentials/how-it-works 301
+/advanced/migrating-from-nuxt-open-fetch /guides/migrating-from-nuxt-open-fetch 301
+/advanced/migrating-from-nuxt-open-fetch.html /guides/migrating-from-nuxt-open-fetch 301

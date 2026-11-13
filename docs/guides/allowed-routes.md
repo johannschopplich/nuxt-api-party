@@ -1,6 +1,6 @@
 # Allowed Routes
 
-The [server proxy](/advanced/how-it-works) is public – anyone who can reach your app can call it with `curl`, and the proxy forwards the request with the endpoint credentials. The token never reaches the browser, but whatever it authorizes is open to everyone.
+The [server proxy](/essentials/how-it-works) is public – anyone who can reach your app can call it with `curl`, and the proxy forwards the request with the endpoint credentials. The token never reaches the browser, but whatever it authorizes is open to everyone.
 
 List the routes your app calls in `allowedRoutes`, and the proxy answers every other request with a 403 before it contacts the API:
 
@@ -29,7 +29,7 @@ Each `path` matches the pathname below the endpoint's `url`, without the query s
 
 ## What the List Covers
 
-The list guards the server proxy only: [server imports](/api/server-imports) call the API directly, and a [client endpoint](/api/module-configuration#client-endpoints) cannot set `allowedRoutes` at all.
+The list guards the server proxy only: [server imports](/api/server-imports) call the API directly, and a [client endpoint](/guides/client-endpoints) cannot set `allowedRoutes` at all.
 
 The proxy checks the URL before a [Nitro request hook](/guides/hooks#nitro-runtime-hooks) runs, so a hook that rewrites the URL is not checked again.
 

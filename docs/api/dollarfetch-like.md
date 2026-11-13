@@ -12,16 +12,6 @@ Sends a plain fetch and returns the response data. Intended for actions inside m
 
 Every [`ofetch` option](https://github.com/unjs/ofetch) but `baseURL`, which the endpoint decides, passes through – `cache` for the browser's [HTTP cache](/guides/caching-strategies#browser-caching) included.
 
-## In Component Setup
-
-`$myApi` sends a request every time it runs and stores nothing in the Nuxt payload. Called in a component's setup, it runs once during SSR and once more in the browser while the page hydrates – two requests for one result. In development, the module warns in the console when that happens.
-
-Fetch data for a page with [`useMyApiData`](/api/use-fetch-like), or wrap the call in `useAsyncData`, which hands the server's response to the browser:
-
-```ts
-const { data } = await useAsyncData('posts', () => $jsonPlaceholder('posts'))
-```
-
 ## Examples
 
 <!--@include: ../parts/_demo-setup.md-->
@@ -42,11 +32,21 @@ async function createPost() {
     async onRequestError({ error }) {
       console.log(error)
     },
-    async onResponseError({ error }) {
-      console.log(error)
+    async onResponseError({ response }) {
+      console.log(response.status, response._data)
     }
   })
 }
+```
+
+## In Component Setup
+
+`$myApi` sends a request every time it runs and stores nothing in the Nuxt payload. Called in a component's setup, it runs once during SSR and once more in the browser while the page hydrates – two requests for one result. In development, the module warns in the console when that happens.
+
+Fetch data for a page with [`useMyApiData`](/api/use-fetch-like), or wrap the call in `useAsyncData`, which hands the server's response to the browser:
+
+```ts
+const { data } = await useAsyncData('posts', () => $jsonPlaceholder('posts'))
 ```
 
 ## Several Calls in `useAsyncData`

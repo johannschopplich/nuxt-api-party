@@ -11,9 +11,9 @@ hero:
   actions:
     - theme: brand
       text: Get Started
-      link: /essentials/what-is-nuxt-api-party
+      link: /essentials/getting-started
     - theme: alt
-      text: API
+      text: API Reference
       link: /api/
     - theme: alt
       text: View on GitHub
@@ -28,13 +28,13 @@ features:
   - title: Credentials Stay on the Server
     icon: <span class="i-carbon:ibm-cloud-hyper-protect-dbaas"></span>
     details: A server proxy in your app forwards each request, so tokens never reach the browser and CORS never applies.
-    link: /advanced/how-it-works
+    link: /essentials/how-it-works
     linkText: How It Works
   - title: Familiar Data Handling
     icon: <span class="i-carbon:noodle-bowl"></span>
     details: The composables are built on Nuxt's own <code>useFetch</code> and <code>$fetch</code>.
     link: /api/use-fetch-like
-    linkText: Async Data Composable
+    linkText: useFetch-Like Composable
   - title: Several APIs Side by Side
     icon: <span class="i-carbon:ibm-watson-query"></span>
     details: Configure each API once and reach all of them from anywhere in your app.

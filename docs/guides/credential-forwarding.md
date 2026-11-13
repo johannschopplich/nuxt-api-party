@@ -41,4 +41,4 @@ A page opened from a link on another site still renders with the visitor's crede
 
 During SSR, a call to the endpoint carries the cookie and `Authorization` header of the page request on to the proxy, and from there to the API. A `Set-Cookie` the API answers with ends at the server render, though: Nuxt does not copy it onto the page response. A cookie the visitor has to keep, such as a fresh session after login, comes from a call made in the browser.
 
-[Client endpoints](/api/module-configuration#client-endpoints) never receive visitor credentials, which is why an endpoint cannot set both `client` and `forwardCredentials`.
+[Client endpoints](/guides/client-endpoints) never receive visitor credentials, which is why an endpoint cannot set both `client` and `forwardCredentials`.

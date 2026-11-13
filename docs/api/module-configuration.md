@@ -25,12 +25,12 @@ The APIs the module generates composables for. Each key is an endpoint ID and na
 - `token` – Bearer token sent with each request.
 - `query` – Query parameters added to each request.
 - `headers` – Headers sent with each request, as a record of strings.
-- `client` – Whether every request goes straight to the API instead of through the server proxy. See [Client Endpoints](#client-endpoints).
+- `client` – Whether every request goes straight to the API instead of through the server proxy. See [Client Endpoints](/guides/client-endpoints).
 - `forwardCredentials` – Whether the server proxy forwards the visitor's cookie and `Authorization` header to the API, and the API's `Set-Cookie` back. See [Credential Forwarding](/guides/credential-forwarding).
 - `allowedRoutes` – Routes the server proxy may forward to this API. See [Allowed Routes](/guides/allowed-routes).
 - `schema` – [OpenAPI document](https://swagger.io/resources/open-api) to generate types from: a file path, a `file:`, `http:` or `https:` URL, the parsed document, or an async function resolving to it. See [OpenAPI Integration](/guides/openapi-integration).
 
-`token`, `query` and `headers` are the endpoint credentials. The [server proxy](/advanced/how-it-works) adds them to each request on the server, so they never reach the browser – unless the endpoint is a client endpoint.
+`token`, `query` and `headers` are the endpoint credentials. The [server proxy](/essentials/how-it-works) adds them to each request on the server, so they never reach the browser – unless the endpoint is a client endpoint.
 
 **Default Value**: `{}`
 
@@ -66,33 +66,6 @@ export default defineNuxtConfig({
 })
 ```
 
-## Client Endpoints
-
-An endpoint with `client: true` sends every request straight to the API – from the browser, and from the server during SSR – and never through the server proxy:
-
-```ts
-export default defineNuxtConfig({
-  apiParty: {
-    endpoints: {
-      publicApi: {
-        url: 'https://api.example.com',
-        client: true
-      }
-    }
-  }
-})
-```
-
-::: warning Endpoint Credentials Are Public
-The browser has to send the endpoint credentials itself, so a client endpoint's `url`, `token`, `query` and `headers` are written into the public runtime config, readable in the delivered HTML. Reserve `client: true` for APIs whose credentials may be public, and expect the API to answer CORS requests from your origin.
-:::
-
-During SSR, a request to a client endpoint leaves the server without the visitor's cookie or `Authorization` header.
-
-With `ssr: false`, there is often no server to proxy through, so every endpoint defaults to `client: true`. Two exceptions keep the server proxy: an endpoint with `client: false`, and one that sets `forwardCredentials` or `allowedRoutes`, both of which only the proxy acts on.
-
-To send some calls of one API through the proxy and others straight to it, configure the API twice, as two endpoints.
-
 ## Environment Variables
 
 Nuxt overrides [runtime config](https://nuxt.com/docs/guide/going-further/runtime-config#environment-variables) values from environment variables at runtime, for keys that exist at build time:
@@ -101,7 +74,28 @@ Nuxt overrides [runtime config](https://nuxt.com/docs/guide/going-further/runtim
 NUXT_API_PARTY_ENDPOINTS_{ENDPOINT_ID}_{OPTION}
 ```
 
-The browser reads a client endpoint from the public runtime config, so its overrides take the `PUBLIC` prefix – `NUXT_PUBLIC_API_PARTY_ENDPOINTS_PUBLIC_API_URL` for the example above. Server imports read the private runtime config, so a client endpoint that server code calls, too, needs both variables.
+Or declare the endpoint under `runtimeConfig.apiParty` alone, with empty values the environment fills:
+
+::: code-group
+```ts [nuxt.config.ts]
+export default defineNuxtConfig({
+  modules: ['nuxt-api-party'],
+
+  runtimeConfig: {
+    apiParty: {
+      endpoints: {
+        jsonPlaceholder: {
+          url: '', // Will be populated from `NUXT_API_PARTY_ENDPOINTS_JSON_PLACEHOLDER_URL`
+          token: '' // Will be populated from `NUXT_API_PARTY_ENDPOINTS_JSON_PLACEHOLDER_TOKEN`
+        }
+      }
+    }
+  }
+})
+```
+:::
+
+The browser reads a client endpoint from the public runtime config, so its overrides take the `PUBLIC` prefix – `NUXT_PUBLIC_API_PARTY_ENDPOINTS_PUBLIC_API_URL` for an endpoint `publicApi`. Server imports read the private runtime config, so a client endpoint that server code calls, too, needs both variables.
 
 ## Options That Fail the Build
 

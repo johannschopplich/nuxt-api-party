@@ -23,12 +23,12 @@ A server import fires the Nitro [`api-party:request` and `api-party:response` ho
 
 ## Redirects
 
-A server import doesn't follow redirects: a `3xx` response resolves instead of throwing, with whatever body the redirect carries. Read its status and `Location` header in an `onResponse` interceptor, and send a follow-up request yourself where the target is trusted.
+A server import does not follow redirects: a `3xx` response resolves instead of throwing, with whatever body the redirect carries. Read its status and `Location` header in an `onResponse` interceptor, and send a follow-up request yourself where the target is trusted.
 
 ## What It Leaves Out
 
 Server code needs neither the proxy nor the browser's caches, so this is a `$fetch` against the API and nothing more:
 
-- **No proxy.** The request goes straight to the API rather than through the server proxy, which saves the hop that only exists to keep credentials off the browser. [Allowed routes](/guides/allowed-routes) don't apply.
+- **No proxy.** The request goes straight to the API, so [allowed routes](/guides/allowed-routes) do not apply.
 - **No visitor credentials.** The visitor's cookie and `Authorization` header stay behind, whatever `forwardCredentials` says. Pass them in `headers` where the API needs them.
 - **No payload cache.** Two calls for the same resource are two requests. Reach for Nitro's [`cachedEventHandler`](https://nitro.build/guide/cache) where you want caching.

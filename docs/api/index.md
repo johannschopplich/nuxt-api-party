@@ -1,22 +1,23 @@
-# Overview
+# API Reference
 
-## Composables
+This reference covers the module options and everything an endpoint generates. To make a first request, start with [Getting Started](/essentials/getting-started).
 
-Each endpoint yields two composables, both [auto-imported](https://nuxt.com/docs/guide/concepts/auto-imports):
+## Configuration
 
-- [Async data composable](/api/use-fetch-like) – Returns multiple values similar to [`useFetch`](https://nuxt.com/docs/api/composables/use-fetch).
-  Generated name: `useMyApiData`.
-- [Plain fetch composable](/api/dollarfetch-like) – Returns response data, similar to [`$fetch`](https://nuxt.com/docs/api/utils/dollarfetch#fetch).
-  Generated name: `$myApi`.
-
-Server code gets its own `$myApi`, which reaches the API without the server proxy. See [Server Imports](/api/server-imports).
+- [Module Configuration](/api/module-configuration) – Every option an endpoint accepts.
 
 ## Generated Composables
 
-Composable names come from the endpoint ID. An endpoint `jsonPlaceholder` generates:
+Each endpoint yields two composables, both [auto-imported](https://nuxt.com/docs/guide/concepts/auto-imports):
 
-- `$jsonPlaceholder`
-- `useJsonPlaceholderData`
+- [`useFetch`-Like Composable](/api/use-fetch-like) – Returns multiple values similar to [`useFetch`](https://nuxt.com/docs/api/composables/use-fetch).
+  Generated name: `useMyApiData`.
+- [`$fetch`-Like Composable](/api/dollarfetch-like) – Returns response data, similar to [`$fetch`](https://nuxt.com/docs/api/utils/dollarfetch).
+  Generated name: `$myApi`.
+
+Composable names come from the endpoint ID: an endpoint `jsonPlaceholder` generates `$jsonPlaceholder` and `useJsonPlaceholderData`.
+
+Server code gets its own `$myApi`, which reaches the API without the server proxy. See [Server Imports](/api/server-imports).
 
 ## Types
 

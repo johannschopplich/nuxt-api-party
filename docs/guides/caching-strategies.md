@@ -2,6 +2,8 @@
 
 A response can be reused from two places: the Nuxt payload, which is fast and lives for the page, and the browser's HTTP cache, which survives reloads. Nuxt's `getCachedData` option decides on the former, the `cache` option on the latter.
 
+<!--@include: ../parts/_demo-setup.md-->
+
 ## Payload Caching
 
 `useMyApiData` stores its response in the Nuxt payload under its key, the way `useFetch` does. A response fetched during SSR reaches the browser that way, and hydration reuses it instead of sending the request again.
@@ -22,9 +24,21 @@ Nuxt calls `getCachedData` on a refresh and a change of a `watch` source, too, s
 
 Payload caching works for every method and needs nothing from the API, but it does not survive a page reload and is not shared across tabs.
 
+### Refresh Cached Data
+
+`refresh` sends the request again, and so do `execute` after a `clear` and a reactive request option that changes the key – unless a `getCachedData` of your own answers them from the payload.
+
+```ts
+const { data, refresh } = await useJsonPlaceholderData('posts')
+
+async function reload() {
+  await refresh()
+}
+```
+
 ## Browser Caching
 
-The browser's [HTTP cache](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Caching) survives page reloads. A GET request through the [server proxy](/advanced/how-it-works) stays a GET request, and the proxy passes the API's cache headers through, so the browser caches it like any other response.
+The browser's [HTTP cache](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Caching) survives page reloads. A GET request through the [server proxy](/essentials/how-it-works) stays a GET request, and the proxy passes the API's cache headers through, so the browser caches it like any other response.
 
 For that, the API has to:
 
@@ -43,33 +57,6 @@ The `cache` option is passed to `fetch` as [`Request.cache`](https://developer.m
 - `'no-cache'`: Use the cache, but revalidate with the server before returning the cached response.
 - `'force-cache'`: Use the cache, even if it is stale.
 - `'only-if-cached'`: Use the cache, but do not make a request to the server if the resource is not in the cache. If the resource is not in the cache, will respond with a 504 Gateway Timeout error.
-
-For reference, here is a table summarizing the behavior of each cache option:
-
-| Cache Option       | Loads Cache | Stores Cache | Reuses Stale | Makes Request |
-| ------------------ | ----------- | ------------ | ------------ | ------------- |
-| `'default'`        | ✅          | ✅           | ❌           | ✅            |
-| `'no-store'`       | ❌          | ❌           | ❌           | ✅            |
-| `'reload'`         | ❌          | ✅           | ❌           | ✅            |
-| `'no-cache'`       | ✅          | ✅           | ❌           | ✅            |
-| `'force-cache'`    | ✅          | ✅           | ✅           | ✅            |
-| `'only-if-cached'` | ✅          | ❌           | ✅           | ❌            |
-
-## Examples
-
-<!--@include: ../parts/_demo-setup.md-->
-
-### Refresh Cached Data
-
-`refresh` sends the request again, and so do `execute` after a `clear` and a reactive request option that changes the key – unless a `getCachedData` of your own answers them from the payload.
-
-```ts
-const { data, refresh } = await useJsonPlaceholderData('posts')
-
-async function reload() {
-  await refresh()
-}
-```
 
 ### Skip the Browser Cache
 

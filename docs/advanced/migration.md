@@ -1,3 +1,7 @@
+---
+outline: deep
+---
+
 # Migration
 
 ## v5.0.0
@@ -43,7 +47,7 @@ An endpoint's `schema` takes an async function that resolves to the document aga
 
 #### `server.proxyMode` and `server.basePath` Are Gone
 
-The `server` option is removed. There is one [server proxy](/advanced/how-it-works) now, serving `<nitro.apiBaseURL>/__api_party/{endpointId}/{path}` – `/api/__api_party/{endpointId}/{path}` by default – and forwarding each request under its own method, with its query, headers and body as they are:
+The `server` option is removed. There is one [server proxy](/essentials/how-it-works) now, serving `<nitro.apiBaseURL>/__api_party/{endpointId}/{path}` – `/api/__api_party/{endpointId}/{path}` by default – and forwarding each request under its own method, with its query, headers and body as they are:
 
 ```ts
 export default defineNuxtConfig({
@@ -127,7 +131,7 @@ export default defineNuxtConfig({
 })
 ```
 
-There is no `'allow'` any more. Where some calls went through the proxy and others opted out with `client: true`, configure the API twice, as two endpoints, one of them with `client: true`. Only client endpoints are published to the public runtime config now. See [Client Endpoints](/api/module-configuration#client-endpoints).
+There is no `'allow'` any more. Where some calls went through the proxy and others opted out with `client: true`, configure the API twice, as two endpoints, one of them with `client: true`. Only client endpoints are published to the public runtime config now. See [Client Endpoints](/guides/client-endpoints).
 
 An endpoint that sets `client: true` together with `forwardCredentials` or `allowedRoutes` fails the build, since neither applies without the proxy.
 
@@ -298,7 +302,7 @@ A call that passes options no longer type-checks where its path is a union of pa
 
 #### The Proxy Forwards Request Headers
 
-The POST envelope forwarded only `Origin`, `Referer` and `User-Agent` of the browser's request. The proxy now forwards every request header except `Host`, the hop-by-hop headers, `Accept-Encoding`, `Expect`, and – without `forwardCredentials` – `Cookie` and `Authorization`. See [Which Headers Travel](/advanced/how-it-works#which-headers-travel).
+The POST envelope forwarded only `Origin`, `Referer` and `User-Agent` of the browser's request. The proxy now forwards every request header except `Host`, the hop-by-hop headers, `Accept-Encoding`, `Expect`, and – without `forwardCredentials` – `Cookie` and `Authorization`. See [Which Headers Travel](/essentials/how-it-works#which-headers-travel).
 
 A header the endpoint sets replaces one of the same name that a call sends through the proxy, where v4 sent both values.
 
@@ -336,7 +340,7 @@ await $myApi('events', {
 
 #### Redirects Are No Longer Followed
 
-The proxy passes redirects back as the API sent them, and a server import resolves a `3xx` response, instead of following them. Where the API redirects to a canonical path, call that path instead. See [Redirects](/advanced/how-it-works#redirects).
+The proxy passes redirects back as the API sent them, and a server import resolves a `3xx` response, instead of following them. Where the API redirects to a canonical path, call that path instead. See [Redirects](/essentials/how-it-works#redirects).
 
 #### `useMyApiData` Neither Caches Nor Shares a Request by Default
 

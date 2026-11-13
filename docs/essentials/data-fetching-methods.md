@@ -25,7 +25,7 @@ Use `useMyApiData` composables in components and pages. They hook into Nuxt's hy
 const postId = ref(1)
 
 // The request is sent again when `postId` changes
-const { data } = await useJsonPlaceholderData(() => `posts/${postId.value}`)
+const { data } = await useJsonPlaceholderData<{ title: string }>(() => `posts/${postId.value}`)
 
 function nextPost() {
   postId.value++
@@ -62,7 +62,7 @@ const form = ref({
   userId: 1
 })
 const isSubmitting = ref(false)
-const submitError = ref(null)
+const submitError = ref<string | null>(null)
 
 async function submitPost() {
   isSubmitting.value = true
@@ -123,7 +123,4 @@ export default defineNuxtPlugin(async () => {
 ```
 :::
 
-## Next Steps
-
-- [Module Configuration](/api/module-configuration) – Every option an endpoint accepts.
-- [OpenAPI Integration](/guides/openapi-integration) – Infer request and response types from a schema.
+From here, [Module Configuration](/api/module-configuration) lists every option an endpoint accepts, and [OpenAPI Integration](/guides/openapi-integration) shows how to infer request and response types from a schema.

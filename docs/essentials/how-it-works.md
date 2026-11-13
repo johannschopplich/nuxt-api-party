@@ -52,4 +52,4 @@ A Nitro [request hook](/guides/hooks#nitro-runtime-hooks) that throws an h3 erro
 
 ## Client Endpoints
 
-An endpoint with [`client: true`](/api/module-configuration#client-endpoints) skips the proxy: the browser – and the server during SSR – calls the API directly. Its URL and endpoint credentials are published to the browser for that.
+An endpoint with [`client: true`](/guides/client-endpoints) skips the proxy: the browser – and the server during SSR – calls the API directly. Its URL and endpoint credentials are published to the browser for that.

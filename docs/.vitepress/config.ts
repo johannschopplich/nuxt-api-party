@@ -43,26 +43,29 @@ export default defineConfig({
         text: 'Essentials',
         activeMatch: '^/essentials/',
         items: [
-          { text: 'What is Nuxt API Party?', link: '/essentials/what-is-nuxt-api-party' },
           { text: 'Getting Started', link: '/essentials/getting-started' },
           { text: 'Data Fetching Methods', link: '/essentials/data-fetching-methods' },
+          { text: 'How It Works', link: '/essentials/how-it-works' },
         ],
       },
       {
         text: 'Guides',
-        activeMatch: '^/guides/',
+        activeMatch: '^/(guides|advanced)/',
         items: [
           { text: 'OpenAPI Integration', link: '/guides/openapi-integration' },
+          { text: 'Error Handling', link: '/guides/error-handling' },
           { text: 'Caching Strategies', link: '/guides/caching-strategies' },
+          { text: 'Allowed Routes', link: '/guides/allowed-routes' },
+          { text: 'Credential Forwarding', link: '/guides/credential-forwarding' },
+          { text: 'Client Endpoints', link: '/guides/client-endpoints' },
           { text: 'Hooks', link: '/guides/hooks' },
           { text: 'Interceptors', link: '/guides/interceptors' },
-          { text: 'Error Handling', link: '/guides/error-handling' },
-          { text: 'Credential Forwarding', link: '/guides/credential-forwarding' },
-          { text: 'Allowed Routes', link: '/guides/allowed-routes' },
+          { text: 'Migration', link: '/advanced/migration' },
+          { text: 'Migrating From nuxt-open-fetch', link: '/guides/migrating-from-nuxt-open-fetch' },
         ],
       },
       {
-        text: 'API',
+        text: 'API Reference',
         link: '/api/',
         activeMatch: '^/api/',
       },
@@ -101,29 +104,24 @@ function sidebarMain(): DefaultTheme.SidebarItem[] {
     {
       text: 'Essentials',
       items: [
-        { text: 'What is Nuxt API Party?', link: '/essentials/what-is-nuxt-api-party' },
         { text: 'Getting Started', link: '/essentials/getting-started' },
         { text: 'Data Fetching Methods', link: '/essentials/data-fetching-methods' },
+        { text: 'How It Works', link: '/essentials/how-it-works' },
       ],
     },
     {
       text: 'Guides',
       items: [
         { text: 'OpenAPI Integration', link: '/guides/openapi-integration' },
+        { text: 'Error Handling', link: '/guides/error-handling' },
         { text: 'Caching Strategies', link: '/guides/caching-strategies' },
+        { text: 'Allowed Routes', link: '/guides/allowed-routes' },
+        { text: 'Credential Forwarding', link: '/guides/credential-forwarding' },
+        { text: 'Client Endpoints', link: '/guides/client-endpoints' },
         { text: 'Hooks', link: '/guides/hooks' },
         { text: 'Interceptors', link: '/guides/interceptors' },
-        { text: 'Error Handling', link: '/guides/error-handling' },
-        { text: 'Credential Forwarding', link: '/guides/credential-forwarding' },
-        { text: 'Allowed Routes', link: '/guides/allowed-routes' },
-      ],
-    },
-    {
-      text: 'Advanced',
-      items: [
-        { text: 'How It Works', link: '/advanced/how-it-works' },
         { text: 'Migration', link: '/advanced/migration' },
-        { text: 'Migrating From nuxt-open-fetch', link: '/advanced/migrating-from-nuxt-open-fetch' },
+        { text: 'Migrating From nuxt-open-fetch', link: '/guides/migrating-from-nuxt-open-fetch' },
       ],
     },
     { text: 'API Reference', link: '/api/' },
@@ -134,7 +132,7 @@ function sidebarMain(): DefaultTheme.SidebarItem[] {
 function sidebarApi(): DefaultTheme.SidebarItem[] {
   return [
     {
-      text: 'Overview',
+      text: 'API Reference',
       link: '/api/',
     },
     {
@@ -144,8 +142,8 @@ function sidebarApi(): DefaultTheme.SidebarItem[] {
     {
       text: 'Generated Composables',
       items: [
-        { text: 'useFetch-like Composables', link: '/api/use-fetch-like' },
-        { text: '$fetch-like Composables', link: '/api/dollarfetch-like' },
+        { text: 'useFetch-Like Composable', link: '/api/use-fetch-like' },
+        { text: '$fetch-Like Composable', link: '/api/dollarfetch-like' },
         { text: 'Server Imports', link: '/api/server-imports' },
       ],
     },

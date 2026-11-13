@@ -4,7 +4,7 @@
 
 Two differences shape the move:
 
-- **Where requests go.** nuxt-open-fetch publishes each client's `baseURL`, `headers` and `query` to the public runtime config, and the browser calls the API directly. Nuxt API Party sends requests through a [server proxy](/advanced/how-it-works) by default, so the endpoint credentials stay on the server and CORS never applies. A [client endpoint](/api/module-configuration#client-endpoints) keeps the old behavior.
+- **Where requests go.** nuxt-open-fetch publishes each client's `baseURL`, `headers` and `query` to the public runtime config, and the browser calls the API directly. Nuxt API Party sends requests through a [server proxy](/essentials/how-it-works) by default, so the endpoint credentials stay on the server and CORS never applies. A [client endpoint](/guides/client-endpoints) keeps the old behavior.
 - **What generates the types.** nuxt-open-fetch runs `openapi-typescript` and takes its options. Nuxt API Party generates the types with [APIful](https://apiful.land), which takes none.
 
 ## Swap the Module

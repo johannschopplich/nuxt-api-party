@@ -11,19 +11,7 @@ Point an endpoint at its [OpenAPI](https://swagger.io/resources/open-api/) schem
 
 The types are generated at build time by [APIful](https://apiful.land), which the module depends on, so there is nothing else to install. OpenAPI 3.0 and 3.1 are supported.
 
-## Schema Generation
-
-Based on your configured routes, some web frameworks can generate an OpenAPI schema for you. Some examples include:
-
-- [NestJS](https://docs.nestjs.com/openapi/introduction)
-- [ElysiaJS](https://elysiajs.com/patterns/openapi.html#openapi)
-- [ASP.NET Core](https://learn.microsoft.com/en-us/aspnet/core/tutorials/web-api-help-pages-using-swagger)
-- [Spring](https://springdoc.org/)
-- [utoipa](https://docs.rs/utoipa/latest/utoipa/)
-
-If your framework doesn't directly support it, there may also be an additional library that does.
-
-## Configuring the Schema
+## Point an Endpoint at Its Schema
 
 Add the `schema` property to your endpoint config. It accepts:
 
@@ -121,26 +109,9 @@ export default defineNuxtConfig({
 In development, changes to a local schema file regenerate the types right away. A remote schema is read once, so pick up changes there by restarting the Nuxt dev server. A schema that fails to load logs an error and leaves the endpoint untyped.
 :::
 
-## Using the Types
-
 For most use cases, no further configuration is needed. Nuxt API Party uses the generated types to infer correct types automatically when [`useFetch`-like](/api/use-fetch-like) and [`$fetch`-like](/api/dollarfetch-like) composables are used.
 
-### Extract Schema Types
-
-The `#nuxt-api-party/myApi` module exports two types: `paths`, with every operation, and `components`, with every schema object your document defines. The generator emits no alias per schema object, so name the ones you use yourself.
-
-Using the schema above, extract the `Foo` type:
-
-```ts
-import type { components } from '#nuxt-api-party/myApi'
-
-export type Foo = components['schemas']['Foo']
-//          ^? { id?: number; bar: string }
-```
-
-The generated `MyApiModel<'Foo'>` resolves to the same type – see [Schema Model Types](/api/openapi-types#schema-model-types).
-
-### Use OpenAPI Defined Path Parameters
+## Pass Path Parameters
 
 A path in the schema can contain parameters, declared in braces: `/foo/{id}`. Passing `/foo/10` instead breaks type inference, because the schema declares no such path.
 
@@ -170,7 +141,7 @@ const { data } = await useMyApiData('/foo/{id}', {
 Issues will **NOT** be reported at runtime by Nuxt API Party if the wrong parameters are used. The **incomplete** path will be sent to the API **as-is**.
 :::
 
-### Paths With Several Methods
+## Call a Path With Several Methods
 
 Some paths declare more than one method. The types follow the `method` option and default to `GET` when it is left out.
 
@@ -189,25 +160,15 @@ const resultPost = await $myApi('/foo', {
 })
 ```
 
-## OpenAPI Type Helpers
+## Name a Type in Your Own Code
 
-::: tip Type Declarations
-For more details and examples, see the [OpenAPI Type Helpers](/api/openapi-types) documentation.
-:::
-
-Beyond inferring the composables, the module generates one type per endpoint that carries everything an operation declares. It is named after the endpoint ID and takes a path and a method:
+The `#nuxt-api-party/myApi` module exports two types: `paths`, with every operation, and `components`, with every schema object your document defines. The generator emits no alias per schema object, so name the ones you use yourself:
 
 ```ts
-import type { MyApi } from '#nuxt-api-party'
+import type { components } from '#nuxt-api-party/myApi'
 
-type CreateFoo = MyApi<'/foo', 'post'>
-
-type PathParams = CreateFoo['path'] // `never`, the operation declares none
-type RequestBody = CreateFoo['request'] // { id?: number; bar: string }
-type Response = CreateFoo['response'] // { id?: number; bar: string }
-type ByStatus = CreateFoo['responses'] // { 200: { id?: number; bar: string } }
+export type Foo = components['schemas']['Foo']
+//          ^? { id?: number; bar: string }
 ```
 
-Extracting from the schema this way beats writing the same shape by hand, which drifts the moment the API changes.
-
-Follow the [OpenAPI Type Helpers](/api/openapi-types) documentation for every property the type carries.
+The generated `MyApiModel<'Foo'>` resolves to the same type, and `MyApi<'/foo', 'post'>` carries everything one operation declares – see [OpenAPI Type Helpers](/api/openapi-types).

@@ -15,7 +15,7 @@ type Response = GetUser['response'] // Success response
 type ErrorResponse = GetUser['responses'][404] // Specific status code
 ```
 
-Both parameters are required, and both are checked against the schema. A path the schema doesn't declare is a compile error, and so is a method the path doesn't allow – `PetStore<'/pet', 'get'>` doesn't compile, because the Petstore declares only `post` and `put` there.
+Both parameters are required, and both are checked against the schema. A path the schema does not declare is a compile error, and so is a method the path does not allow – `PetStore<'/pet', 'get'>` does not compile, because the Petstore declares only `post` and `put` there.
 
 ## Core Type Properties
 
@@ -32,7 +32,7 @@ Each property is read off the operation in your schema:
 | `method`    | HTTP method                                                              | `'get'`                                            |
 | `operation` | Full OpenAPI operation                                                   | Complete operation object                          |
 
-Where an operation declares nothing at all for a property, the type says so rather than inventing an empty object: `path` and `query` are `never`, `request` is `undefined`, and `response` is `never` for an operation whose success carries no body.
+Where an operation declares nothing at all for a property, the type says so rather than inventing an empty object: `path` and `query` are `never`, `request` is `undefined`, and `response` is `undefined` for an operation whose success carries no body.
 
 `request` and `response` resolve through the same helpers a request resolves through, so a value annotated with `PetStore<Path, Method>['response']` is exactly what `$petStore` hands back for that call.
 
@@ -55,7 +55,7 @@ type StatusQuery = PetStore<'/pet/findByStatus', 'get'>['query']
 
 // Extract request body
 type CreatePetBody = PetStore<'/pet', 'post'>['request']
-//   ^? { id?: number; name: string; category?: Category; photoUrls: string[]; tags?: Tag[]; status?: 'available' | 'pending' | 'sold' }
+//   ^? Pet | URLSearchParams
 
 // Extract response type
 type PetResponse = PetStore<'/pet/{petId}', 'get'>['response']
@@ -66,7 +66,7 @@ A request body the schema marks optional comes back widened with `undefined`, ma
 
 ```ts
 type PlaceOrderBody = PetStore<'/store/order', 'post'>['request']
-//   ^? Order | undefined
+//   ^? Order | URLSearchParams | undefined
 ```
 
 ### Error Handling Types
@@ -102,8 +102,6 @@ type AllPaths = PetStoreApiPaths
 type PetMethods = PetStoreApiMethods<'/pet'>
 //   ^? 'post' | 'put'
 ```
-
-Only the methods the path declares are listed.
 
 ## Schema Model Types
 

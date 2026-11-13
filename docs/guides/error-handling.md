@@ -1,16 +1,14 @@
 # Error Handling
 
-The [server proxy](/advanced/how-it-works) passes the API's error through untouched – status code, status message, headers and body all reach your app, so a 404, a validation error and a 500 stay distinguishable. The API's error body lands at `error.data` of the thrown error, and at `error.value.data` of a `useMyApiData` call.
+The [server proxy](/essentials/how-it-works) passes the API's error through untouched – status code, status message, headers and body all reach your app, so a 404, a validation error and a 500 stay distinguishable. The API's error body lands at `error.data` of the thrown error, and at `error.value.data` of a `useMyApiData` call.
 
-## Error Types
-
-### Composables – `useMyApiData`
+## `useMyApiData` Returns the Error
 
 The `useMyApiData` composables integrate with Nuxt's error handling and expose errors through the `error` property, following Nuxt's [`useAsyncData`](https://nuxt.com/docs/api/composables/use-async-data) pattern:
 
 ```vue
 <script setup lang="ts">
-const { data, error } = await useJsonPlaceholderData('posts/invalid-id')
+const { data, error } = await useJsonPlaceholderData<{ title: string }, { message?: string }>('posts/invalid-id')
 
 if (error.value) {
   console.error('Request failed:', error.value.statusText)
@@ -34,7 +32,7 @@ if (error.value) {
 </template>
 ```
 
-### Functions – `$myApi`
+## `$myApi` Throws
 
 The `$myApi` functions throw errors directly since they're designed for programmatic use (like form submissions or one-time actions):
 
@@ -88,7 +86,7 @@ export default defineEventHandler(async (event) => {
 
 A `$fetch` or `useFetch` call to this route then finds the API's body at `error.data`, as it would for a call through the server proxy.
 
-## Type Declarations
+## Error Types
 
 ### `FetchError` Interface
 
@@ -109,31 +107,4 @@ interface FetchError<T = any> extends Error {
 
 ### `NuxtError` Interface
 
-The `NuxtError` type is used for errors returned by `useMyApiData` composables:
-
-```ts
-interface NuxtError<DataT = unknown> extends Omit<H3Error<DataT>, 'statusCode' | 'statusMessage'>, Error {
-  readonly __nuxt_error?: true
-  error?: true
-  status?: number
-  statusText?: string
-  /** @deprecated Use `status` */
-  statusCode?: H3Error<DataT>['statusCode']
-  /** @deprecated Use `statusText` */
-  statusMessage?: H3Error<DataT>['statusMessage']
-}
-
-declare class H3Error<DataT = unknown> extends Error {
-  static __h3_error__: boolean
-  statusCode: number
-  fatal: boolean
-  unhandled: boolean
-  statusMessage?: string
-  data?: DataT
-  cause?: unknown
-  constructor(message: string, opts?: {
-    cause?: unknown
-  })
-  toJSON(): Pick<H3Error<DataT>, 'message' | 'statusCode' | 'statusMessage' | 'data'>
-}
-```
+The `NuxtError` type is used for errors returned by `useMyApiData` composables. Nuxt lists its properties under [`useError`](https://nuxt.com/docs/api/composables/use-error#type).

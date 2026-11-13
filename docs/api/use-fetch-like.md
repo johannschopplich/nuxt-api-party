@@ -10,19 +10,9 @@ Returns the API response as Nuxt async data. Intended for data that requires rea
 
 ## Return Values
 
-- **`data`**: result of the asynchronous function.
-- **`refresh`/`execute`**: function to refresh the data returned by the handler.
-- **`error`**: error object if data fetching failed.
-- **`status`**: string indicating the status of the data request:
-  - `idle`: when the request has not started, such as:
-    - when `execute` has not yet been called and `{ immediate: false }` is set
-    - when rendering HTML on the server and `{ server: false }` is set
-  - `pending`: the request is in progress
-  - `success`: the request has completed successfully
-  - `error`: the request has failed
-- **`clear`**: function to set `data` to `undefined` (or `options.default()` value if provided), set `error` to `undefined`, set `status` to `idle`, and mark pending requests as cancelled.
+`useMyApiData` returns `data`, `refresh` (alias `execute`), `error`, `status` and `clear`, as [`useFetch`](https://nuxt.com/docs/api/composables/use-fetch#return-values) does.
 
-By default, Nuxt waits until a `refresh` is finished before it can be executed again.
+By default, a `refresh` called while a request is pending cancels that request and sends a new one. Pass `dedupe: 'defer'` to wait for the pending one instead.
 
 ## Type Declarations
 
@@ -56,7 +46,7 @@ A response fetched during SSR reaches the browser in the Nuxt payload, and hydra
 
 ```vue
 <script setup lang="ts">
-const { data, refresh, error, status, clear } = await useJsonPlaceholderData('posts/1')
+const { data, refresh, error, status, clear } = await useJsonPlaceholderData<{ title: string }>('posts/1')
 </script>
 
 <template>
@@ -69,7 +59,7 @@ const { data, refresh, error, status, clear } = await useJsonPlaceholderData('po
 </template>
 ```
 
-### Extended Example
+### Extended
 
 ```vue
 <script setup lang="ts">
@@ -81,13 +71,13 @@ interface Comment {
 
 const postId = ref(1)
 
-const { data, status, refresh, error } = await useJsonPlaceholderData<Comment[]>('comments', {
+const { data, status, refresh, error } = await useJsonPlaceholderData('comments', {
   // Whether to resolve the async function after loading the route, instead of blocking client-side navigation (defaults to `false`)
   lazy: true,
   // A factory function to set the default value of the data, before the async function resolves - particularly useful with the `lazy: true` option
-  default: () => [],
+  default: () => [] as Comment[],
   // A function that can be used to alter handler function result after resolving
-  transform: comments => comments.filter(comment => comment.body.length > 0),
+  transform: (comments: Comment[]) => comments.filter(comment => comment.body.length > 0),
   // Custom query parameters to be added to the request, can be reactive
   query: computed(() => ({
     postId: postId.value
