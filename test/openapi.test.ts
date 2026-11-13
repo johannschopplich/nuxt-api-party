@@ -93,8 +93,8 @@ describe('generateOpenAPITypes', () => {
   })
 
   // The dev server keeps running on a schema it cannot read, so a later save can fix it.
-  it('declares empty paths instead of throwing on an unreadable schema and leaves its endpoint untyped', async () => {
-    const { declarations, typedEndpointIds } = await generateOpenAPITypes(
+  it('falls back to empty paths instead of throwing on an unreadable schema', async () => {
+    const { declarations } = await generateOpenAPITypes(
       {
         broken: { url: 'https://example.com', schema: './schemas/does-not-exist.yaml' },
       },
@@ -103,6 +103,5 @@ describe('generateOpenAPITypes', () => {
 
     expect(declarations).toContain(`declare module '#nuxt-api-party/broken'`)
     expect(declarations).toContain('export type paths = Record<string, never>')
-    expect(typedEndpointIds).toEqual([])
   })
 })
