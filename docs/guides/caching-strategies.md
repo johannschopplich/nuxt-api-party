@@ -14,7 +14,9 @@ After hydration, Nuxt's default `getCachedData` sends every request again. To an
 const { data, refresh } = await useJsonPlaceholderData('posts', {
   // `refresh()`, `refreshNuxtData()` and a changed `watch` source still fetch.
   getCachedData: (key, nuxtApp, { cause }) =>
-    cause === 'initial' ? nuxtApp.payload.data[key] : undefined
+    cause === 'initial'
+      ? nuxtApp.payload.data[key]
+      : undefined
 })
 ```
 

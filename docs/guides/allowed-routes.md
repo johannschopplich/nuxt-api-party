@@ -15,8 +15,14 @@ export default defineNuxtConfig({
         url: process.env.CMS_API_BASE_URL!,
         token: process.env.CMS_API_TOKEN!,
         allowedRoutes: [
-          { path: '/articles/**', methods: ['GET'] },
-          { path: '/comments/*', methods: ['GET', 'POST'] }
+          {
+            path: '/articles/**',
+            methods: ['GET']
+          },
+          {
+            path: '/comments/*',
+            methods: ['GET', 'POST']
+          }
         ]
       }
     }

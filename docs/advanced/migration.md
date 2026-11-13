@@ -152,7 +152,9 @@ const { data } = await useAsyncData('posts', () => $myApi('posts')) // [!code ++
 const { data } = await useMyApiData('posts', {
   payloadCache: true, // [!code --]
   getCachedData: (key, nuxtApp, { cause }) => // [!code ++]
-    cause === 'initial' ? nuxtApp.payload.data[key] : undefined // [!code ++]
+    cause === 'initial' // [!code ++]
+      ? nuxtApp.payload.data[key] // [!code ++]
+      : undefined // [!code ++]
 })
 ```
 
@@ -179,7 +181,11 @@ export default defineNuxtPlugin(() => { // [!code --]
     provide: { // [!code --]
       apiParty: { // [!code --]
         defaults: { retry: 2 }, // [!code --]
-        endpoints: { jsonPlaceholder: { defaults: { timeout: 5000 } } } // [!code --]
+        endpoints: { // [!code --]
+          jsonPlaceholder: { // [!code --]
+            defaults: { timeout: 5000 } // [!code --]
+          } // [!code --]
+        } // [!code --]
       } // [!code --]
     } // [!code --]
   } // [!code --]
@@ -333,7 +339,9 @@ The POST envelope carried `query` as JSON, which turned a `Date` into its ISO st
 await $myApi('events', {
   query: {
     from: from.toISOString(),
-    limit: Number.isNaN(limit) ? undefined : limit
+    limit: Number.isNaN(limit)
+      ? undefined
+      : limit
   }
 })
 ```

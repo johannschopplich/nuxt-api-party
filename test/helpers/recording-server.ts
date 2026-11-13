@@ -141,6 +141,8 @@ export async function startRecordingServer(): Promise<RecordingServer> {
     get requestUrls() {
       return requests.map(request => request.url)
     },
-    close: () => new Promise<void>((resolve, reject) => server.close(error => error ? reject(error) : resolve())),
+    close: () => new Promise<void>((resolve, reject) => server.close(error => error
+      ? reject(error)
+      : resolve())),
   }
 }

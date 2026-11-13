@@ -20,7 +20,9 @@ describe('assertValidOptions', () => {
     ['openAPITS', 'apiful'],
   ])('rejects the removed endpoint option %s, naming %s as its replacement', (key, replacement) => {
     const message = readErrorMessage(() => assertValidOptions({
-      endpoints: { testApi: { url: '/api', [key]: true } },
+      endpoints: {
+        testApi: { url: '/api', [key]: true },
+      },
     }))
 
     expect(message).toContain(`\`testApi\``)
@@ -36,13 +38,17 @@ describe('assertValidOptions', () => {
 
   it('rejects client together with forwardCredentials', () => {
     expect(() => assertValidOptions({
-      endpoints: { testApi: { url: '/api', client: true, forwardCredentials: true } },
+      endpoints: {
+        testApi: { url: '/api', client: true, forwardCredentials: true },
+      },
     })).toThrow('`forwardCredentials`')
   })
 
   it('rejects client together with allowedRoutes', () => {
     expect(() => assertValidOptions({
-      endpoints: { testApi: { url: '/api', client: true, allowedRoutes: [] } },
+      endpoints: {
+        testApi: { url: '/api', client: true, allowedRoutes: [] },
+      },
     })).toThrow('`allowedRoutes`')
   })
 })

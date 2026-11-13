@@ -87,13 +87,18 @@ export function _useApiData(
   arg1?: UseApiDataOptions<unknown> | string,
   arg2?: string,
 ) {
-  const [opts = {}, autoKey] = typeof arg1 === 'string' ? [{}, arg1] : [arg1, arg2]
+  const [opts = {}, autoKey] = typeof arg1 === 'string'
+    ? [{}, arg1]
+    : [arg1, arg2]
   const { path: pathParams, ...fetchOptions } = opts
 
   // Resolves the path parameters into the request, so each of their values gets a key of its own.
   const request = () => resolvePathParams(
     toValue(path),
-    Object.fromEntries(Object.entries(toValue(pathParams) ?? {}).map(([name, value]) => [name, toValue(value)])),
+    Object.fromEntries(Object.entries(toValue(pathParams) ?? {}).map(([name, value]) => [
+      name,
+      toValue(value),
+    ])),
   )
 
   return useFetch(request, fetchOptions as UseFetchOptions<unknown>, autoKey)

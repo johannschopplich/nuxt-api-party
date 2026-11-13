@@ -324,7 +324,12 @@ describe('nuxt-api-party', async () => {
           headers: { 'x-endpoint': 'client', 'Authorization': 'Basic endpoint' },
         },
         // Nitro fills an unset runtime config value with an empty string.
-        urlOnlyClientApi: { url: '/api', token: '', query: '', headers: '' },
+        urlOnlyClientApi: {
+          url: '/api',
+          token: '',
+          query: '',
+          headers: '',
+        },
       })
     })
   })

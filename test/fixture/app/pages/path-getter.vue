@@ -5,10 +5,14 @@ import { useTestApiData } from '#imports'
 const id = ref(1)
 
 const { data } = await useTestApiData<{ id: string }>('items/{id}', {
-  path: () => ({ id: String(id.value) }),
+  path: () => ({
+    id: String(id.value),
+  }),
 })
 const { data: dataByParameter } = await useTestApiData<{ id: string }>('items/{id}', {
-  path: { id: () => String(id.value) },
+  path: {
+    id: () => String(id.value),
+  },
 })
 </script>
 

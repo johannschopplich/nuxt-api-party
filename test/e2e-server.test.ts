@@ -55,7 +55,9 @@ describe('nuxt-api-party server', async () => {
   it('rejects .. as a path parameter', async () => {
     const response = await fetch('/api/server-rejection')
 
-    expect(await response.json()).toMatchObject({ dotSegmentError: expect.stringContaining('Path parameter `id` is `..`') })
+    expect(await response.json()).toMatchObject({
+      dotSegmentError: expect.stringContaining('Path parameter `id` is `..`'),
+    })
   })
 
   it.each(ABSOLUTE_PATH_TEMPLATES)('keeps a call to %s below the endpoint URL', async (pathTemplate) => {
@@ -63,7 +65,9 @@ describe('nuxt-api-party server', async () => {
 
     await fetch(`/api/server-request/backendApi/unused?path=${encodeURIComponent(path)}`)
 
-    expect(backend.requestUrls).toEqual([expect.stringMatching(/^\/base\//)])
+    expect(backend.requestUrls).toEqual([
+      expect.stringMatching(/^\/base\//),
+    ])
   })
 
   it('leaves an upstream redirect unfollowed', async () => {

@@ -128,7 +128,9 @@ export default defineNuxtModule<ModuleOptions>().with({
       endpoints: Object.fromEntries(
         Object.entries(mergedOptions.endpoints).map(([endpointId, { schema, ...endpoint }]) => [
           endpointId,
-          defaultClientEndpointIds.includes(endpointId) ? { ...endpoint, client: true } : endpoint,
+          defaultClientEndpointIds.includes(endpointId)
+            ? { ...endpoint, client: true }
+            : endpoint,
         ]),
       ),
     }
@@ -143,7 +145,10 @@ export default defineNuxtModule<ModuleOptions>().with({
       endpoints: Object.fromEntries(
         Object.entries(resolvedOptions.endpoints)
           .filter(([, endpoint]) => endpoint.client)
-          .map(([endpointId, { url, token, query, headers }]) => [endpointId, { url, token, query, headers }]),
+          .map(([endpointId, { url, token, query, headers }]) => [
+            endpointId,
+            { url, token, query, headers },
+          ]),
       ),
     }
 
@@ -198,16 +203,21 @@ export const ${getRawComposableName(i)} = (...args) => _$api('${i}', ...args)
       }
 
       config.imports = defu(config.imports, {
-        presets: [{
-          from: `#${moduleName}/server`,
-          imports: endpointKeys.map(getRawComposableName),
-        }],
+        presets: [
+          {
+            from: `#${moduleName}/server`,
+            imports: endpointKeys.map(getRawComposableName),
+          },
+        ],
       })
     })
 
     addImportsSources({
       from: resolve(nuxt.options.buildDir, `module/${moduleName}`),
-      imports: endpointKeys.flatMap(i => [getRawComposableName(i), getDataComposableName(i)]),
+      imports: endpointKeys.flatMap(i => [
+        getRawComposableName(i),
+        getDataComposableName(i),
+      ]),
     })
 
     nuxt.options.alias[`#${moduleName}`] = resolve(nuxt.options.buildDir, `module/${moduleName}`)
@@ -252,8 +262,12 @@ export type { FetchResponseData, FetchResponseError, MethodOption, ParamsOption,
 export type { ApiClient, OpenAPIClient, ApiClientFetchOptions, OpenAPIClientFetchOptions, UseApiData, UseOpenAPIData, UseApiDataOptions, UseOpenAPIDataOptions }
 
 ${endpointKeys.map(i => `
-export declare const ${getRawComposableName(i)}: ${schemaEndpointIds.includes(i) ? `OpenAPIClient<${pascalCase(i)}Paths>` : 'ApiClient'}
-export declare const ${getDataComposableName(i)}: ${schemaEndpointIds.includes(i) ? `UseOpenAPIData<${pascalCase(i)}Paths>` : 'UseApiData'}
+export declare const ${getRawComposableName(i)}: ${schemaEndpointIds.includes(i)
+  ? `OpenAPIClient<${pascalCase(i)}Paths>`
+  : 'ApiClient'}
+export declare const ${getDataComposableName(i)}: ${schemaEndpointIds.includes(i)
+  ? `UseOpenAPIData<${pascalCase(i)}Paths>`
+  : 'UseApiData'}
 `.trimStart()).join('').trimEnd()}
 
 ${schemaEndpointIds.map(i => generateTypeHelpers(i, { paths: `${pascalCase(i)}Paths`, components: `${pascalCase(i)}Components` })).join('\n\n')}
@@ -273,7 +287,9 @@ import type { paths as ${pascalCase(i)}Paths } from '#${moduleName}/${i}'
 `.trimStart()).join('').trimEnd()}
 
 ${endpointKeys.map(i => `
-export declare const ${getRawComposableName(i)}: ${schemaEndpointIds.includes(i) ? `OpenAPIClient<${pascalCase(i)}Paths>` : 'ApiClient'}
+export declare const ${getRawComposableName(i)}: ${schemaEndpointIds.includes(i)
+  ? `OpenAPIClient<${pascalCase(i)}Paths>`
+  : 'ApiClient'}
 `.trimStart()).join('').trimEnd()}
 `.trimStart()
       },
@@ -318,7 +334,9 @@ ${await generateOpenAPITypes(schemaEndpoints, { rootDir: nuxt.options.rootDir })
       })
 
       nuxt.hooks.hook('prepare:types', ({ references }) => {
-        references.push({ path: resolve(nuxt.options.buildDir, `module/${moduleName}.schema.d.ts`) })
+        references.push({
+          path: resolve(nuxt.options.buildDir, `module/${moduleName}.schema.d.ts`),
+        })
       })
     }
 
@@ -338,9 +356,13 @@ export declare const proxyRoute: string
 
     if (nuxt.options.dev) {
       const schemaFiles = Object.values(schemaEndpoints)
-        .map(({ schema }) => schema instanceof URL ? schema.href : schema)
+        .map(({ schema }) => schema instanceof URL
+          ? schema.href
+          : schema)
         .filter((schema): schema is string => typeof schema === 'string' && !/^https?:\/\//.test(schema))
-        .map(schema => schema.startsWith('file:') ? fileURLToPath(schema) : schema)
+        .map(schema => schema.startsWith('file:')
+          ? fileURLToPath(schema)
+          : schema)
         .map(schema => resolve(nuxt.options.rootDir, schema))
 
       createSchemaWatcher(schemaFiles, nuxt)
@@ -359,7 +381,9 @@ function createSchemaWatcher(schemaFiles: string[], nuxt: Nuxt) {
   const watcherCallback = () => {
     // Update the schema types template, which will trigger a types regeneration.
     // Ignore the file path since only the watched files will trigger this.
-    updateTemplates({ filter: t => t.filename === `module/${name}.schema.d.ts` })
+    updateTemplates({
+      filter: t => t.filename === `module/${name}.schema.d.ts`,
+    })
   }
 
   watcher.on('change', watcherCallback)

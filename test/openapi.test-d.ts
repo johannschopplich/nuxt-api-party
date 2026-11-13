@@ -40,12 +40,18 @@ describe('PetStore', () => {
   })
 
   it('resolves the response the way a call through $petStore does', () => {
-    expectTypeOf(() => petStore('/pet/{petId}', { method: 'get', path: { petId: 1 } }))
+    expectTypeOf(() => petStore('/pet/{petId}', {
+      method: 'get',
+      path: { petId: 1 },
+    }))
       .returns
       .resolves
       .toEqualTypeOf<PetStore<'/pet/{petId}', 'get'>['response']>()
 
-    expectTypeOf(() => petStore('/pet/{petId}', { method: 'delete', path: { petId: 1 } }))
+    expectTypeOf(() => petStore('/pet/{petId}', {
+      method: 'delete',
+      path: { petId: 1 },
+    }))
       .returns
       .resolves
       .toEqualTypeOf<PetStore<'/pet/{petId}', 'delete'>['response']>()

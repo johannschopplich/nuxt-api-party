@@ -63,7 +63,13 @@ export default defineNuxtConfig({
                         'application/json': {
                           schema: {
                             type: 'array',
-                            items: { type: 'object', properties: { id: { type: 'integer' } }, required: ['id'] },
+                            items: {
+                              type: 'object',
+                              properties: {
+                                id: { type: 'integer' },
+                              },
+                              required: ['id'],
+                            },
                           },
                         },
                       },

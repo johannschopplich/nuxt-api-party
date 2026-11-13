@@ -5,7 +5,9 @@ import { useTestApiData } from '#imports'
 const revision = ref(0)
 const { data } = await useTestApiData<{ hits: number }>('hit-count', {
   watch: [revision],
-  getCachedData: (key, nuxtApp, ctx) => ctx.cause === 'initial' ? nuxtApp.payload.data[key] : undefined,
+  getCachedData: (key, nuxtApp, ctx) => ctx.cause === 'initial'
+    ? nuxtApp.payload.data[key]
+    : undefined,
 })
 </script>
 

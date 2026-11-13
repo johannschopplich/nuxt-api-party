@@ -110,8 +110,12 @@ Its `url`, `token`, `query` and `headers` are public, as they were with nuxt-ope
 | `createOpenFetch`, `createUseOpenFetch` | No replacement – configure another endpoint |
 
 ```ts
-const { data } = await usePets('/pet/{petId}', { path: { petId: 1 } }) // [!code --]
-const { data } = await usePetsData('/pet/{petId}', { path: { petId: 1 } }) // [!code ++]
+const { data } = await usePets('/pet/{petId}', { // [!code --]
+  path: { petId: 1 } // [!code --]
+}) // [!code --]
+const { data } = await usePetsData('/pet/{petId}', { // [!code ++]
+  path: { petId: 1 } // [!code ++]
+}) // [!code ++]
 ```
 
 `usePetsData` is built on Nuxt's `useFetch` like `usePets` was, so `key`, `lazy`, `server`, `transform`, `pick`, `default`, `watch` and `getCachedData` carry over. `$pets` is a plain fetch: in a component's setup, wrap it in `useAsyncData`, or the browser sends the request again while the page hydrates.

@@ -27,7 +27,9 @@ describe('$jsonPlaceholder', () => {
 
 describe('$petStore', () => {
   it('types the response from the schema', () => {
-    expectTypeOf(petStore('/pet/{petId}', { path: { petId: 1 } }))
+    expectTypeOf(petStore('/pet/{petId}', {
+      path: { petId: 1 },
+    }))
       .resolves
       .toEqualTypeOf<PetStoreComponents['schemas']['Pet']>()
   })

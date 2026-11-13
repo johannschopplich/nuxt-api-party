@@ -28,8 +28,11 @@ describe('$jsonPlaceholder', () => {
 
 describe('$petStore', () => {
   it('rejects payloadCache', () => {
-    // @ts-expect-error: A call is a plain fetch, so there is no payload cache.
-    petStore('/pet/{petId}', { path: { petId: 1 }, payloadCache: true })
+    petStore('/pet/{petId}', {
+      path: { petId: 1 },
+      // @ts-expect-error: A call is a plain fetch, so there is no payload cache.
+      payloadCache: true,
+    })
   })
 })
 
@@ -47,7 +50,9 @@ describe('useJsonPlaceholderData', () => {
   })
 
   it('types data as the return value of transform', () => {
-    const { data } = useJsonPlaceholder('posts/1', { transform: (post: { title: string }) => post.title })
+    const { data } = useJsonPlaceholder('posts/1', {
+      transform: (post: { title: string }) => post.title,
+    })
 
     expectTypeOf(data.value).toEqualTypeOf<string | undefined>()
   })
@@ -65,13 +70,19 @@ describe('useJsonPlaceholderData', () => {
 
 describe('usePetStoreData', () => {
   it('types data as the return value of transform', () => {
-    const { data } = usePetStore('/pet/{petId}', { path: { petId: 1 }, transform: pet => pet.name })
+    const { data } = usePetStore('/pet/{petId}', {
+      path: { petId: 1 },
+      transform: pet => pet.name,
+    })
 
     expectTypeOf(data.value).toEqualTypeOf<string | undefined>()
   })
 
   it('types data as the keys pick selects', () => {
-    const { data } = usePetStore('/pet/{petId}', { path: { petId: 1 }, pick: ['name'] })
+    const { data } = usePetStore('/pet/{petId}', {
+      path: { petId: 1 },
+      pick: ['name'],
+    })
 
     expectTypeOf(data.value).toEqualTypeOf<{ name: string } | undefined>()
   })
@@ -83,11 +94,16 @@ describe('usePetStoreData', () => {
   })
 
   it('rejects payloadCache', () => {
-    // @ts-expect-error: Nuxt's `getCachedData` takes the place of the payload cache.
-    usePetStore('/pet/{petId}', { path: { petId: 1 }, payloadCache: true })
+    usePetStore('/pet/{petId}', {
+      path: { petId: 1 },
+      // @ts-expect-error: Nuxt's `getCachedData` takes the place of the payload cache.
+      payloadCache: true,
+    })
   })
 
   it('accepts a getter for the path option', () => {
-    usePetStore('/pet/{petId}', { path: () => ({ petId: 1 }) })
+    usePetStore('/pet/{petId}', {
+      path: () => ({ petId: 1 }),
+    })
   })
 })

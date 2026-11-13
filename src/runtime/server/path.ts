@@ -87,8 +87,11 @@ function matchesPattern(patternSegments: string[], pathSegments: string[]) {
     const pathSegment = pathSegments[index]
     if (pathSegment === undefined)
       return false
-    if (patternSegment === '*' ? pathSegment === '' : patternSegment !== pathSegment)
+    if (patternSegment === '*'
+      ? pathSegment === ''
+      : patternSegment !== pathSegment) {
       return false
+    }
   }
 
   return patternSegments.length === pathSegments.length

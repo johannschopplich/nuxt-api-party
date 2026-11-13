@@ -3,7 +3,10 @@ import { describe, expect, it } from 'vitest'
 import { assertAllowedRoute, assertPathBelowBase, resolveRoutePath } from '../src/runtime/server/path'
 
 const ROUTES: AllowedRoute[] = [
-  { path: '/articles/**', methods: ['GET'] },
+  {
+    path: '/articles/**',
+    methods: ['GET'],
+  },
   { path: '/comments/*' },
   // A non-trailing `**` is a literal segment.
   { path: '/users/**/avatar' },
@@ -107,6 +110,8 @@ describe('assertAllowedRoute', () => {
   })
 
   it('refuses every method with an empty methods list', () => {
-    expect(statusFor([{ path: '/articles', methods: [] }], 'GET', '/articles')).toBe(403)
+    expect(statusFor([
+      { path: '/articles', methods: [] },
+    ], 'GET', '/articles')).toBe(403)
   })
 })

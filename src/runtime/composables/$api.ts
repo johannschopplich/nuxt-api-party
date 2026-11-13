@@ -17,7 +17,12 @@ let hasWarnedAboutHydration = false
  * Headers of the page request that describe the visitor rather than the page, which a request from the browser
  * would carry as well.
  */
-const VISITOR_HEADERS = ['cookie', 'authorization', 'accept-language', 'user-agent']
+const VISITOR_HEADERS = [
+  'cookie',
+  'authorization',
+  'accept-language',
+  'user-agent',
+]
 
 // #region options
 export type ApiClientFetchOptions
@@ -80,13 +85,19 @@ export function createEndpointFetch(endpointId: string) {
   const { endpoints } = runtimeConfig.public.apiParty
   const clientEndpoint = endpoints[endpointId]
 
-  const baseURL = clientEndpoint ? clientEndpoint.url : joinURL(runtimeConfig.app.baseURL, proxyRoute, endpointId)
+  const baseURL = clientEndpoint
+    ? clientEndpoint.url
+    : joinURL(runtimeConfig.app.baseURL, proxyRoute, endpointId)
 
   // Typed as plain ofetch: the endpoint's paths are not the app's routes that Nuxt's typed fetch checks against.
   const endpointFetch = globalThis.$fetch as $Fetch
   // During SSR, the server proxy sees the visitor's headers, cookie included, which a client endpoint must not.
-  const requestEvent = import.meta.server && !clientEndpoint ? useRequestEvent() : undefined
-  const visitorHeaders = requestEvent ? getVisitorHeaders(requestEvent) : {}
+  const requestEvent = import.meta.server && !clientEndpoint
+    ? useRequestEvent()
+    : undefined
+  const visitorHeaders = requestEvent
+    ? getVisitorHeaders(requestEvent)
+    : {}
 
   async function $fetch<T = unknown>(path: string, opts: ApiClientFetchOptions = {}) {
     const { path: pathParams, query, headers, ...fetchOptions } = opts
@@ -108,13 +119,18 @@ export function createEndpointFetch(endpointId: string) {
 
     const targetOptions = clientEndpoint
       ? {
-          query: { ...clientEndpoint.query, ...query },
+          query: {
+            ...clientEndpoint.query,
+            ...query,
+          },
           headers: mergeHeaders(getEndpointHeaders(clientEndpoint), headers),
         }
       : {
           query,
           headers: mergeHeaders(visitorHeaders, encodedBody?.headers, headers),
-          ...(encodedBody && { body: new Uint8Array(await encodedBody.arrayBuffer()) }),
+          ...(encodedBody && {
+            body: new Uint8Array(await encodedBody.arrayBuffer()),
+          }),
           // Hands the proxy the page request's platform bindings, such as `event.context.cloudflare`, as `useRequestFetch` does.
           ...(requestEvent && { context: requestEvent.context }),
         }

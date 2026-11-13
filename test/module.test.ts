@@ -8,8 +8,12 @@ describe('module setup', () => {
       cwd: join(import.meta.dirname, 'fixture'),
       overrides: {
         runtimeConfig: {
-          // @ts-expect-error: The endpoint option was removed in 5.0.
-          apiParty: { endpoints: { legacyApi: { url: '/api', cookies: true } } },
+          apiParty: {
+            endpoints: {
+              // @ts-expect-error: The endpoint option was removed in 5.0.
+              legacyApi: { url: '/api', cookies: true },
+            },
+          },
         },
       },
     })

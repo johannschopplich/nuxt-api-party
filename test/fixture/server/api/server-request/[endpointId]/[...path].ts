@@ -5,7 +5,11 @@ import * as serverClients from '#nuxt-api-party/server'
 export default defineEventHandler(async (event) => {
   const client = serverClients[`$${getRouterParam(event, 'endpointId')}` as keyof typeof serverClients]
   const { authorization, path } = getQuery(event)
-  return await client(typeof path === 'string' ? path : getRouterParam(event, 'path')!, {
-    headers: typeof authorization === 'string' ? { Authorization: authorization } : undefined,
+  return await client(typeof path === 'string'
+    ? path
+    : getRouterParam(event, 'path')!, {
+    headers: typeof authorization === 'string'
+      ? { Authorization: authorization }
+      : undefined,
   })
 })

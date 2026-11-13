@@ -1,7 +1,10 @@
 import type { AllowedRoute } from '../../src/runtime/types'
 
 export const ALLOWED_ROUTES: AllowedRoute[] = [
-  { path: '/articles/**', methods: ['GET'] },
+  {
+    path: '/articles/**',
+    methods: ['GET'],
+  },
   { path: '/comments/*' },
   { path: '/café' },
 ]

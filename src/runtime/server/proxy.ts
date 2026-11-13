@@ -55,7 +55,9 @@ export default defineEventHandler(async (event) => {
   const path = getRawPath(event)
   const { endpoints } = useRuntimeConfig().apiParty
   // An ID like `constructor` would otherwise find a member of the object prototype.
-  const endpoint = Object.hasOwn(endpoints, endpointId) ? endpoints[endpointId] : undefined
+  const endpoint = Object.hasOwn(endpoints, endpointId)
+    ? endpoints[endpointId]
+    : undefined
 
   if (!endpoint) {
     throw createError({
@@ -74,7 +76,10 @@ export default defineEventHandler(async (event) => {
 
   assertPathBelowBase(path)
 
-  const url = withQuery(joinURL(endpoint.url, path), { ...endpoint.query, ...getQuery(event.node.req.url!) })
+  const url = withQuery(joinURL(endpoint.url, path), {
+    ...endpoint.query,
+    ...getQuery(event.node.req.url!),
+  })
   // A request hook that rewrites the URL is not checked again.
   assertAllowedRoute(endpoint.allowedRoutes, resolveRoutePath(url, endpoint.url), event.method)
 
@@ -156,7 +161,9 @@ export default defineEventHandler(async (event) => {
   if (!response._data)
     return send(event)
 
-  return event.node.res.socket ? endOnAbort(response._data, abortController.signal) : response._data
+  return event.node.res.socket
+    ? endOnAbort(response._data, abortController.signal)
+    : response._data
 })
 
 /**

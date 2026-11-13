@@ -11,5 +11,7 @@ export function mergeHeaders(...headers: (HeadersInit | undefined)[]): Record<st
 
 export function getEndpointHeaders(endpoint: { token?: string, headers?: Record<string, string> }) {
   // Nitro fills an unset runtime config value with an empty string.
-  return mergeHeaders(endpoint.headers || undefined, endpoint.token ? { Authorization: `Bearer ${endpoint.token}` } : undefined)
+  return mergeHeaders(endpoint.headers || undefined, endpoint.token
+    ? { Authorization: `Bearer ${endpoint.token}` }
+    : undefined)
 }

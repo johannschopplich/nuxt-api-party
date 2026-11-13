@@ -11,7 +11,12 @@ describe('nuxt-api-party (SSR disabled)', async () => {
       apiParty: {
         endpoints: {
           proxiedApi: { url: '/api', client: false },
-          guardedApi: { url: '/api', allowedRoutes: [{ path: 'todos' }] },
+          guardedApi: {
+            url: '/api',
+            allowedRoutes: [
+              { path: 'todos' },
+            ],
+          },
         },
       },
     },

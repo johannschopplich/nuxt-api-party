@@ -138,7 +138,9 @@ describe('nuxt-api-party proxy', async () => {
   })
 
   it('answers 502 once the timeout a request hook sets runs out', async () => {
-    const response = await fetch('/api/__api_party/backendApi/hang', { headers: { 'x-hook-timeout': '100' } })
+    const response = await fetch('/api/__api_party/backendApi/hang', {
+      headers: { 'x-hook-timeout': '100' },
+    })
 
     expect(response.status).toBe(502)
   })
