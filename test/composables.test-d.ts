@@ -4,6 +4,7 @@ import type { NuxtError } from 'nuxt/app'
 import type { components as PetStoreComponents } from '#nuxt-api-party/petStore'
 import type { $jsonPlaceholder, $petStore, useJsonPlaceholderData, usePetStoreData } from '../playground/.nuxt/module/nuxt-api-party'
 import { describe, expectTypeOf, it } from 'vitest'
+import { ref } from 'vue'
 
 declare const jsonPlaceholder: typeof $jsonPlaceholder
 declare const petStore: typeof $petStore
@@ -57,13 +58,22 @@ describe('useJsonPlaceholderData', () => {
     expectTypeOf(data.value).toEqualTypeOf<string | undefined>()
   })
 
-  it('accepts a getter for every request option', () => {
+  it('accepts a getter for the method, path, query and body options', () => {
     expectTypeOf(useJsonPlaceholder).toBeCallableWith('posts/{id}', {
       method: () => 'POST',
       path: () => ({ id: '1' }),
       query: () => ({ draft: true }),
-      headers: () => ({ 'x-trace': 'abc' }),
       body: () => ({ title: 'Hello' }),
+    })
+  })
+
+  it('accepts a ref but rejects a getter for the headers option', () => {
+    useJsonPlaceholder('posts/1', {
+      headers: ref({ 'x-trace': 'abc' }),
+    })
+    useJsonPlaceholder('posts/1', {
+      // @ts-expect-error: Nuxt watches a ref for headers, but never calls a getter to see a change.
+      headers: () => ({ 'x-trace': 'abc' }),
     })
   })
 })
@@ -104,6 +114,14 @@ describe('usePetStoreData', () => {
   it('accepts a getter for the path option', () => {
     usePetStore('/pet/{petId}', {
       path: () => ({ petId: 1 }),
+    })
+  })
+
+  it('rejects a getter for the headers option', () => {
+    usePetStore('/pet/{petId}', {
+      path: { petId: 1 },
+      // @ts-expect-error: Nuxt watches a ref for headers, but never calls a getter to see a change.
+      headers: () => ({ 'x-trace': 'abc' }),
     })
   })
 })

@@ -1,13 +1,16 @@
 import type { FetchResponseErrorData } from 'apiful/openapi'
 import type { AsyncData, KeysOf, NuxtError, PickFrom, UseFetch, UseFetchOptions } from 'nuxt/app'
 import type { FetchOptions } from 'ofetch'
-import type { MaybeRefOrGetter } from 'vue'
+import type { MaybeRef, MaybeRefOrGetter } from 'vue'
 import type { FetchResponseData, MethodOption, ParamsOption, PathItem, RequestBodyOption } from '../openapi'
 import type { RequestMethod } from '../types'
 import { resolvePathParams } from 'apiful/openapi'
 import { toValue } from 'vue'
 
-/** Copy of the type Nuxt maps its own fetch options through, which it does not export. */
+/**
+ * Copy of the type Nuxt maps its own fetch options through, which it does not export. `headers` stays out of it:
+ * Nuxt watches a ref there, but never calls a getter to see a change.
+ */
 type ComputedOptions<T extends Record<string, any>> = {
   // eslint-disable-next-line ts/no-unsafe-function-type
   [K in keyof T]: T[K] extends Function ? T[K] : ComputedOptions<T[K]> | MaybeRefOrGetter<T[K]>
@@ -33,9 +36,11 @@ export type UseApiDataOptions<
     method?: RequestMethod
     path?: Record<string, string>
     query?: FetchOptions['query']
-    headers?: FetchOptions['headers']
     body?: FetchOptions['body']
   }>
+  & {
+    headers?: MaybeRef<FetchOptions['headers']>
+  }
 
 export type UseApiData = <
   ResT = unknown,
@@ -61,7 +66,10 @@ export type UseOpenAPIDataOptions<
   Operation = 'get' extends LowercasedMethod ? ('get' extends keyof Params ? Params['get'] : never) : LowercasedMethod extends keyof Params ? Params[LowercasedMethod] : never,
 > = AsyncDataFetchOptions<ResT, DataT, PickKeys, DefaultT>
   & ComputedOptions<MethodOption<Method, Params>>
-  & ComputedOptions<ParamsOption<Operation>>
+  & ComputedOptions<Omit<ParamsOption<Operation>, 'headers'>>
+  & {
+    headers?: MaybeRef<ParamsOption<Operation>['headers']>
+  }
   & ComputedOptions<RequestBodyOption<Operation>>
 
 export type UseOpenAPIData<Paths> = <
