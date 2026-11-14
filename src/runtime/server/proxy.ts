@@ -15,7 +15,7 @@ import {
 import { useNitroApp, useRuntimeConfig } from 'nitropack/runtime'
 import { getQuery, joinURL, withQuery } from 'ufo'
 import { getEndpointHeaders } from '../utils'
-import { assertAllowedRoute, assertPathBelowBase, resolveRoutePath } from './path'
+import { isAllowedRoute, isPathBelowBase, resolveRoutePath } from './path'
 import { endOnAbort } from './stream'
 
 /** Headers that describe a single connection rather than the message, so they end at the proxy. */
@@ -74,14 +74,24 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  assertPathBelowBase(path)
+  if (!isPathBelowBase(path))
+    throw pathOutsideBaseError()
 
   const url = withQuery(joinURL(endpoint.url, path), {
     ...endpoint.query,
     ...getQuery(event.node.req.url!),
   })
+  const routePath = resolveRoutePath(url, endpoint.url)
+  if (routePath === undefined)
+    throw pathOutsideBaseError()
+
   // A request hook that rewrites the URL is not checked again.
-  assertAllowedRoute(endpoint.allowedRoutes, resolveRoutePath(url, endpoint.url), event.method)
+  if (!isAllowedRoute(endpoint.allowedRoutes, routePath, event.method)) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Route is not allowed',
+    })
+  }
 
   // RFC 9110 makes every header the `Connection` header names hop-by-hop as well.
   const connectionHeaderNames = new Set(
@@ -165,6 +175,13 @@ export default defineEventHandler(async (event) => {
     ? endOnAbort(response._data, abortController.signal)
     : response._data
 })
+
+function pathOutsideBaseError() {
+  return createError({
+    statusCode: 400,
+    statusMessage: 'Path must stay below the base URL',
+  })
+}
 
 /**
  * Reads the path below the endpoint ID as the client sent it, so the checks and the API see every

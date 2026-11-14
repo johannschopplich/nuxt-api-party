@@ -1,6 +1,6 @@
 import type { AllowedRoute } from '../src/runtime/types'
 import { describe, expect, it } from 'vitest'
-import { assertAllowedRoute, assertPathBelowBase, resolveRoutePath } from '../src/runtime/server/path'
+import { isAllowedRoute, isPathBelowBase, resolveRoutePath } from '../src/runtime/server/path'
 
 const ROUTES: AllowedRoute[] = [
   {
@@ -17,21 +17,7 @@ const ROUTES: AllowedRoute[] = [
   { path: '/legacy/../**' },
 ]
 
-function statusFor(allowedRoutes: AllowedRoute[] | undefined, method: string, routePath: string) {
-  return statusOf(() => assertAllowedRoute(allowedRoutes, routePath, method))
-}
-
-function statusOf(check: () => unknown) {
-  try {
-    check()
-    return 200
-  }
-  catch (error) {
-    return (error as { statusCode: number }).statusCode
-  }
-}
-
-describe('assertPathBelowBase', () => {
+describe('isPathBelowBase', () => {
   it.each([
     '1:2/x',
     'a%2Fb:c',
@@ -56,7 +42,7 @@ describe('assertPathBelowBase', () => {
     'articles#/../admin',
     'articles/..#x',
   ])('rejects %j', (path) => {
-    expect(statusOf(() => assertPathBelowBase(path))).toBe(400)
+    expect(isPathBelowBase(path)).toBe(false)
   })
 
   it.each([
@@ -66,17 +52,23 @@ describe('assertPathBelowBase', () => {
     '.well-known/openid-configuration',
     'articles?next=/../admin',
   ])('accepts %j', (path) => {
-    expect(statusOf(() => assertPathBelowBase(path))).toBe(200)
+    expect(isPathBelowBase(path)).toBe(true)
   })
 })
 
 describe('resolveRoutePath', () => {
-  it('rejects /basement for a /base base URL (shared prefix)', () => {
-    expect(statusOf(() => resolveRoutePath('http://h/basement', 'http://h/base'))).toBe(400)
+  it.each([
+    ['http://h/base/articles', 'http://h/base', '/articles'],
+    ['http://h/base', 'http://h/base', '/'],
+    // A shared prefix is no path below the base.
+    ['http://h/basement', 'http://h/base', undefined],
+    ['http://other/base/articles', 'http://h/base', undefined],
+  ])('resolves %s below %s to %s', (requestURL, baseURL, routePath) => {
+    expect(resolveRoutePath(requestURL, baseURL)).toBe(routePath)
   })
 })
 
-describe('assertAllowedRoute', () => {
+describe('isAllowedRoute', () => {
   it.each([
     ['GET', '/articles'],
     ['GET', '/articles/1/comments'],
@@ -86,7 +78,7 @@ describe('assertAllowedRoute', () => {
     ['GET', '/users/@me'],
     ['GET', '/accounts/%40me'],
   ])('admits %s %s', (method, routePath) => {
-    expect(statusFor(ROUTES, method, routePath)).toBe(200)
+    expect(isAllowedRoute(ROUTES, routePath, method)).toBe(true)
   })
 
   it.each([
@@ -98,20 +90,20 @@ describe('assertAllowedRoute', () => {
     ['GET', '/admin'],
     ['GET', '/users/%40me'],
   ])('refuses %s %s', (method, routePath) => {
-    expect(statusFor(ROUTES, method, routePath)).toBe(403)
+    expect(isAllowedRoute(ROUTES, routePath, method)).toBe(false)
   })
 
   it('admits every request without allowedRoutes', () => {
-    expect(statusFor(undefined, 'DELETE', '/admin')).toBe(200)
+    expect(isAllowedRoute(undefined, '/admin', 'DELETE')).toBe(true)
   })
 
   it('refuses every request with an empty allowedRoutes', () => {
-    expect(statusFor([], 'GET', '/articles')).toBe(403)
+    expect(isAllowedRoute([], '/articles', 'GET')).toBe(false)
   })
 
   it('refuses every method with an empty methods list', () => {
-    expect(statusFor([
+    expect(isAllowedRoute([
       { path: '/articles', methods: [] },
-    ], 'GET', '/articles')).toBe(403)
+    ], '/articles', 'GET')).toBe(false)
   })
 })

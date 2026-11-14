@@ -1,30 +1,23 @@
 // Kept identical in nuxt-api-party and nuxt-kirby: a change here goes to both repositories.
 
 import type { AllowedRoute } from '../types'
-import { createError } from 'h3'
 
 /* eslint-disable no-control-regex -- URL parsers strip leading and trailing C0 controls and percent-encode the rest, so the checks name them. */
 
 /**
- * Throws a 400 for a path that a URL parser or the API behind it could read as absolute or as
- * climbing above the base URL: a scheme, an authority, a tab or line break, or a dot segment, also
- * percent-encoded or with a `;` parameter.
+ * Checks that `path` stays below the base URL: no scheme, no authority, no tab or line break, and no
+ * dot segment, also percent-encoded or with a `;` parameter.
  */
-export function assertPathBelowBase(path: string) {
+export function isPathBelowBase(path: string) {
   const segments = path.split('?', 1)[0]!.replace(/%2e/gi, '.').replace(/%3b/gi, ';').split(/[/\\#]|%2f|%5c/i)
 
-  if (
+  return !(
     /[\t\n\r\u2028\u2029]/.test(path)
     // RFC 3986 forbids a colon in the first segment of a relative path.
     || /^[^/?#]*:/.test(path)
     || /^[\s\u0000-\u001F]*(?:[/\\]\s*){2}/.test(path)
     || segments.some(segment => /^\.{1,2}(?:;|[\u0000-\u0020]*$)/.test(segment))
-  ) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Path must stay below the base URL',
-    })
-  }
+  )
 }
 
 export function resolveRoutePath(requestURL: string, baseURL: string) {
@@ -37,36 +30,26 @@ export function resolveRoutePath(requestURL: string, baseURL: string) {
     target.origin !== base.origin
     || (target.pathname !== basePath && !target.pathname.startsWith(`${basePath}/`))
   ) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Path must stay below the base URL',
-    })
+    return
   }
 
   return target.pathname.slice(basePath.length) || '/'
 }
 
-export function assertAllowedRoute(
+export function isAllowedRoute(
   allowedRoutes: AllowedRoute[] | undefined,
   routePath: string,
   method: string,
 ) {
   if (!allowedRoutes)
-    return
+    return true
 
   const requestMethod = method.toUpperCase()
   const pathSegments = splitPath(routePath)
-  const isAllowed = allowedRoutes.some(route =>
+  return allowedRoutes.some(route =>
     (!route.methods || route.methods.some(routeMethod => routeMethod.toUpperCase() === requestMethod))
     && matchesPattern(splitPath(route.path).map(encodePathSegment), pathSegments),
   )
-
-  if (!isAllowed) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: 'Route is not allowed',
-    })
-  }
 }
 
 function splitPath(path: string) {
