@@ -1,6 +1,6 @@
-import type { RouterMethod } from 'h3'
+import type { HTTPMethod } from 'h3'
 
-export type RequestMethod = Uppercase<RouterMethod> | RouterMethod
+export type RequestMethod = HTTPMethod | Lowercase<HTTPMethod>
 
 export interface AllowedRoute {
   /** Pathname below the endpoint URL, where `*` matches one segment and a trailing `**` any number of them. */

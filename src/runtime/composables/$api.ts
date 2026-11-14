@@ -1,7 +1,7 @@
 import type { H3Event } from 'h3'
-import type { NitroFetchOptions } from 'nitropack'
-import type { $Fetch, ResponseType } from 'ofetch'
+import type { $Fetch, FetchOptions, ResponseType } from 'ofetch'
 import type { FetchResponseData, MethodOption, ParamsOption, PathItem, RequestBodyOption } from '../openapi'
+import type { RequestMethod } from '../types'
 import { resolvePathParams } from 'apiful/openapi'
 import { getRequestIP } from 'h3'
 import { camelCase, pascalCase } from 'scule'
@@ -26,8 +26,9 @@ const VISITOR_HEADERS = [
 
 // #region options
 export type ApiClientFetchOptions
-  = NitroFetchOptions<string>
+  = Omit<FetchOptions, 'method'>
     & {
+      method?: RequestMethod
       path?: Record<string, string>
     }
 
@@ -45,7 +46,7 @@ export type OpenAPIClientFetchOptions<
 > = MethodOption<Method, Params>
   & ParamsOption<Operation>
   & RequestBodyOption<Operation>
-  & Omit<NitroFetchOptions<string>, 'query' | 'body' | 'method'>
+  & Omit<FetchOptions, 'query' | 'body' | 'method'>
 
 export type OpenAPIClient<Paths> = <
   ReqT extends Extract<keyof Paths, string>,
