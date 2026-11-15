@@ -1,6 +1,6 @@
 # One HTTP-Native Server Proxy
 
-Until 4.x the server proxy had two modes: the default wrapped every call into a POST carrying the original request as JSON, and `passthrough` forwarded the request as it stood but added no endpoint credentials. 5.0 keeps one proxy that forwards method, path, query, headers and body as they are, streamed, and adds the endpoint credentials on the server. The envelope dropped headers set by interceptors and hooks, base64-encoded uploads, buffered responses and turned every read into an uncacheable POST; its one safety gain – an allowlist of inbound headers – survives as a rule: visitor credentials travel only with credential forwarding, and a cross-site request to such an endpoint is refused.
+One server proxy forwards method, path, query, headers and body as they are, streamed, and adds the endpoint credentials on the server – instead of a default that wraps every call into a `POST` carrying the original request as JSON, beside a passthrough mode that adds no endpoint credentials. Such an envelope drops headers set by interceptors and hooks, base64-encodes uploads, buffers responses and turns every read into an uncacheable `POST`. Its one safety gain, an allowlist of inbound headers, holds as a rule: visitor credentials travel only with credential forwarding, and a cross-site request to such an endpoint is refused.
 
 ## Consequences
 
