@@ -5,8 +5,8 @@ import type { AllowedRoute } from '../types'
 /* eslint-disable no-control-regex -- URL parsers strip leading and trailing C0 controls and percent-encode the rest, so the checks name them. */
 
 /**
- * Checks that `path` stays below the base URL: no scheme, no authority, no tab or line break, and no
- * dot segment, also percent-encoded or with a `;` parameter.
+ * Checks that `path` stays below the base URL it is joined to: no scheme, no authority, no tab or
+ * line break, and no dot segment, the last also percent-encoded once or with a `;` parameter.
  */
 export function isPathBelowBase(path: string) {
   const segments = path.split('?', 1)[0]!.replace(/%2e/gi, '.').replace(/%3b/gi, ';').split(/[/\\#]|%2f|%5c/i)
