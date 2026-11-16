@@ -94,13 +94,15 @@ describe('nuxt-api-party', async () => {
       expect(readTestResult<{ withCookies?: string }>(html).withCookies).toBe('session=secret')
     })
 
-    it('sends the visitor\'s headers but not the page request\'s own during SSR', async () => {
+    it('sends only the page request\'s headers that a browser call would carry as well during SSR', async () => {
       const html = await $fetch<string>('/page-request-headers', {
         headers: {
           'cookie': 'session=secret',
           'authorization': 'Bearer visitor-token',
           'user-agent': 'visitor-agent',
           'accept-language': 'de',
+          'x-forwarded-host': 'shop.example',
+          'x-forwarded-proto': 'https',
           'if-none-match': '"page"',
           'if-modified-since': 'Wed, 01 Jan 2025 00:00:00 GMT',
           'sec-fetch-dest': 'document',
@@ -113,6 +115,9 @@ describe('nuxt-api-party', async () => {
         userAgent: 'visitor-agent',
         acceptLanguage: 'de',
         forwardedFor: '127.0.0.1',
+        forwardedHost: 'shop.example',
+        forwardedProto: 'https',
+        proxyHost: new URL(url('/')).host,
         pageTag: '/page-request-headers',
         callAcceptLanguage: 'fr',
       })

@@ -13,15 +13,15 @@ import { getEndpointHeaders, mergeHeaders } from '../utils'
 
 let hasWarnedAboutHydration = false
 
-/**
- * Headers of the page request that describe the visitor rather than the page, which a request from the browser
- * would carry as well.
- */
-const VISITOR_HEADERS = [
+/** Headers of the page request that the browser's own request to the proxy would carry as well. */
+const SHARED_HEADERS = [
   'cookie',
   'authorization',
   'accept-language',
   'user-agent',
+  'host',
+  'x-forwarded-host',
+  'x-forwarded-proto',
 ]
 
 // #region options
@@ -96,8 +96,8 @@ export function createEndpointFetch(endpointId: string) {
   const requestEvent = import.meta.server && !clientEndpoint
     ? useRequestEvent()
     : undefined
-  const visitorHeaders = requestEvent
-    ? getVisitorHeaders(requestEvent)
+  const sharedHeaders = requestEvent
+    ? getSharedHeaders(requestEvent)
     : {}
 
   async function $fetch<T = unknown>(path: string, opts: ApiClientFetchOptions = {}) {
@@ -128,7 +128,7 @@ export function createEndpointFetch(endpointId: string) {
         }
       : {
           query,
-          headers: mergeHeaders(visitorHeaders, encodedBody?.headers, headers),
+          headers: mergeHeaders(sharedHeaders, encodedBody?.headers, headers),
           ...(encodedBody && {
             body: new Uint8Array(await encodedBody.arrayBuffer()),
           }),
@@ -150,12 +150,12 @@ export function createEndpointFetch(endpointId: string) {
 }
 
 /**
- * Collects the page request's `VISITOR_HEADERS` and the visitor's address. Unlike `useRequestFetch`, it leaves out
- * the page request's own headers, such as `If-None-Match`, to which the API could answer with a body-less `304`.
+ * Collects the page request's `SHARED_HEADERS` and the visitor's address. Unlike `useRequestFetch`, it leaves out
+ * headers such as `If-None-Match`, to which the API could answer with a body-less `304`.
  */
-function getVisitorHeaders(event: H3Event) {
+function getSharedHeaders(event: H3Event) {
   // Only the headers the page request carries come back, so none is `undefined`.
-  const headers = useRequestHeaders(VISITOR_HEADERS) as Record<string, string>
+  const headers = useRequestHeaders(SHARED_HEADERS) as Record<string, string>
 
   const clientAddress = getRequestIP(event, { xForwardedFor: true })
   if (clientAddress)
